@@ -1,0 +1,19 @@
+---
+import { sitio, whatsapp } from '../data/sitio.js';
+---
+<footer class="pie">
+  <div class="wrap pie__row">
+    <span>{sitio.nombre} · {sitio.comuna}, {sitio.ciudad}</span>
+    <span class="pie__links">
+      <a href={whatsapp('contacto')} target="_blank" rel="noopener">WhatsApp</a>
+      <a href={sitio.instagram} target="_blank" rel="noopener">Instagram</a>
+    </span>
+  </div>
+</footer>
+
+<style>
+.pie{ border-top:0.5px solid var(--hairline); padding:32px 0; font-size:14px; color:var(--txt-faint); }
+.pie__row{ display:flex; justify-content:space-between; gap:16px; flex-wrap:wrap; }
+.pie__links{ display:flex; gap:20px; }
+.pie__links a{ color:var(--txt-soft); text-decoration:none; }
+</style>

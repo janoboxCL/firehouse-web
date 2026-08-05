@@ -1,0 +1,80 @@
+---
+import { sitio, whatsapp } from '../data/sitio.js';
+---
+<section class="hero">
+  <div class="hero__fondo" aria-hidden="true">
+    <video class="hero__video" autoplay muted loop playsinline poster="/media/hero-poster.jpg">
+      <source src="/media/hero.webm" type="video/webm" />
+      <source src="/media/hero.mp4" type="video/mp4" />
+    </video>
+    <div class="hero__planos">
+      <span class="plano plano--carbon"></span>
+      <span class="plano plano--tapiz"></span>
+      <span class="plano plano--fuego"></span>
+    </div>
+    <div class="hero__velo"></div>
+  </div>
+
+  <div class="wrap hero__contenido">
+    <p class="count">5 · 6 · 7 · 8</p>
+
+    <h1 class="hero__titular">
+      En marzo no sabía dar una voltereta.
+      <span class="hero__remate">En octubre estaba compitiendo.</span>
+    </h1>
+
+    <p class="hero__bajada">
+      Academia de cheerleading en {sitio.comuna}, {sitio.ciudad}. Para niñas y niños
+      desde los {sitio.edadMinima} años, sin experiencia previa, y todos nuestros equipos compiten.
+    </p>
+
+    <p class="hero__acciones">
+      <a class="btn" href={whatsapp('hero')} target="_blank" rel="noopener">Ven a una clase de prueba gratis</a>
+      <a class="btn-quiet" href="/#precios">Ver cuánto cuesta la temporada</a>
+    </p>
+  </div>
+
+  <ul class="hero__datos">
+    {sitio.horarios.map(h => <li>{h.dia} {h.hora}</li>)}
+    <li>{sitio.comuna}</li>
+  </ul>
+</section>
+
+<style>
+.hero{ position:relative; overflow:hidden; isolation:isolate; }
+
+.hero__fondo{ position:absolute; inset:0; z-index:-1; }
+.hero__video{ width:100%; height:100%; object-fit:cover; }
+
+.hero__planos{ position:absolute; inset:0; overflow:hidden; }
+.plano{ position:absolute; display:block; transform:rotate(var(--tilt)); }
+.plano--carbon{ left:-10%; top:18%;  width:64%; height:140%; background:var(--ember-deep); opacity:.92; }
+.plano--tapiz { right:-14%; top:-30%; width:52%; height:120%; background:var(--mat-blue); opacity:.30; }
+.plano--fuego { left:24%;  top:-10%; width:26%; height:130%; background:var(--fire-red); opacity:.22; }
+
+/* Sin este velo el titular se pierde sobre las zonas claras del video */
+.hero__velo{ position:absolute; inset:0; background:linear-gradient(180deg, rgba(26,18,16,.55) 0%, rgba(26,18,16,.78) 100%); }
+
+.hero__contenido{ position:relative; padding-block:112px 88px; text-align:center; }
+.hero__titular{
+  font-size:clamp(2.3rem, 6.2vw, 4.4rem);
+  max-width:16ch;
+  margin:24px auto 0;
+}
+.hero__remate{ display:block; color:var(--fire-yellow); }
+.hero__bajada{ color:var(--txt-soft); max-width:52ch; margin:26px auto 34px; }
+.hero__acciones{ display:flex; flex-direction:column; align-items:center; gap:18px; }
+
+.hero__datos{
+  position:relative;
+  display:flex; justify-content:center; flex-wrap:wrap; gap:28px;
+  list-style:none; margin:0; padding:14px 24px;
+  border-top:0.5px solid var(--hairline);
+  font-size:14px; color:var(--txt-faint);
+}
+
+@media (max-width:640px){
+  .hero__contenido{ padding-block:72px 56px; }
+  .hero__datos{ gap:16px; font-size:13px; }
+}
+</style>

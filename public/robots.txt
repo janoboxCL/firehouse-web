@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://firehousecheer.cl/sitemap-index.xml

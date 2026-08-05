@@ -1,0 +1,78 @@
+---
+import Base from '../layouts/Base.astro';
+import Hero from '../components/Hero.astro';
+import { whatsapp } from '../data/sitio.js';
+
+const titulo = 'Cheerleading en San Miguel, Santiago | Firehouse Cheer — clase de prueba gratis';
+const descripcion = 'Academia de cheerleading en San Miguel para niñas y niños desde los 4 años. Sin experiencia previa y todos nuestros equipos compiten. Agenda una clase de prueba gratis por WhatsApp.';
+
+const anio = [
+  { meses: 'Marzo y abril',            titulo: 'Se parte de cero',        texto: 'Llegan los que empiezan. Se arman los equipos del año y se trabajan las bases: coordinación, volteretas, confianza. Nadie llega sabiendo.' },
+  { meses: 'Mayo y junio',             titulo: 'Se sube la exigencia',    texto: 'Entrenamiento avanzado. Aparecen los stunts, las progresiones más complejas y el trabajo real de equipo.' },
+  { meses: 'Julio a septiembre',       titulo: 'La coreografía',          texto: 'Se monta la rutina de la temporada y se prepara la competencia. Es la etapa más intensa y la que más une al grupo.' },
+  { meses: 'Octubre y noviembre',      titulo: 'Los campeonatos',         texto: 'Showcase y torneos. Todos los equipos compiten. Es lo que se estuvo preparando todo el año.' },
+  { meses: 'Diciembre y enero',        titulo: 'Cierre y refuerzo',       texto: 'Se cierra la temporada, se celebra lo conseguido y se refuerza lo que quedó pendiente.' },
+];
+---
+<Base titulo={titulo} descripcion={descripcion} ruta="">
+  <Hero />
+
+  <section class="section" id="el-anio">
+    <div class="wrap">
+      <p class="count">5 · 6 · 7 · 8</p>
+      <h2 class="section__title">Un año en Firehouse</h2>
+      <p class="section__intro">
+        El cheerleading tiene una temporada, como cualquier deporte de competencia.
+        Esto es lo que pasa entre marzo y enero.
+      </p>
+
+      <ol class="anio">
+        {anio.map(e => (
+          <li class="anio__paso">
+            <p class="anio__meses">{e.meses}</p>
+            <h3 class="anio__titulo">{e.titulo}</h3>
+            <p class="anio__texto">{e.texto}</p>
+          </li>
+        ))}
+      </ol>
+
+      <div class="anio__nota">
+        <h3>¿Se puede entrar a mitad de año?</h3>
+        <p>
+          Sí, y pasa todo el tiempo. No hay que esperar a marzo. Lo único que cambia es en qué
+          está el equipo cuando llega: si entra entre julio y septiembre va a encontrar un grupo
+          montando la coreografía, así que los coaches trabajan aparte con quien llega hasta que
+          se pone al día. Funciona. Esta temporada se sumaron niñas y niños que nunca habían
+          hecho cheerleading, y se integraron sin ningún problema.
+        </p>
+        <p><a class="btn" href={whatsapp('anio')} target="_blank" rel="noopener">Ven a una clase de prueba gratis</a></p>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+.anio{ list-style:none; margin:56px 0 0; padding:0; display:grid; gap:0; }
+.anio__paso{
+  border-left:2px solid var(--fire-red);
+  padding:0 0 40px 28px;
+  position:relative;
+}
+.anio__paso:last-child{ padding-bottom:0; }
+.anio__paso::before{
+  content:''; position:absolute; left:-7px; top:6px;
+  width:12px; height:12px; background:var(--fire-yellow);
+  transform:rotate(var(--tilt));
+}
+.anio__meses{ font-family:var(--font-count); font-size:12px; letter-spacing:.18em; color:var(--fire-yellow); }
+.anio__titulo{ font-size:1.5rem; margin-top:6px; }
+.anio__texto{ color:var(--txt-soft); max-width:58ch; margin-top:10px; }
+
+.anio__nota{
+  margin-top:64px; padding:40px;
+  background:var(--ember-deep);
+  border-left:4px solid var(--mat-blue);
+}
+.anio__nota h3{ font-size:1.4rem; }
+.anio__nota p{ color:var(--txt-soft); max-width:62ch; margin-top:14px; }
+</style>
