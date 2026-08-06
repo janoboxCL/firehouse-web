@@ -47,10 +47,17 @@ img,video{ max-width:100%; display:block; }
 .wrap{ width:100%; max-width:var(--wrap); margin-inline:auto; padding-inline:24px; }
 
 .count{
-  font-family:var(--font-count);
-  font-size:12px;
-  letter-spacing:.34em;
+  display:inline-flex; align-items:center; gap:14px;
+  font-family:var(--font-count); font-weight:700;
+  font-size:15px; letter-spacing:.30em;
   color:var(--fire-yellow);
+  text-shadow:0 1px 10px rgba(26,18,16,.8);
+}
+.count::before,
+.count::after{
+  content:''; width:34px; height:3px;
+  background:var(--fire-red);
+  transform:skewX(var(--tilt));
 }
 
 .btn{

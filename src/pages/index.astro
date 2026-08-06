@@ -30,14 +30,14 @@ const anio = [
         {anio.map(e => (
           <li class={e.cumbre ? 'etapa etapa--cumbre' : 'etapa'} data-desde={e.desde} data-hasta={e.hasta}>
             <div class="etapa__marca">
-              <span class="etapa__n">{e.n}</span>
+              <span class="etapa__n">{e.n}<i>/05</i></span>
               <p class="etapa__meses">{e.meses}</p>
             </div>
             <div class="etapa__cuerpo">
               <h3 class="etapa__titulo">{e.titulo}</h3>
               <p class="etapa__texto">{e.texto}</p>
-              <span class="etapa__aqui">Estamos acá</span>
             </div>
+            <span class="etapa__aqui">Estamos acá</span>
           </li>
         ))}
       </ol>
@@ -74,66 +74,70 @@ const anio = [
 .etapa{
   position:relative;
   display:grid;
-  grid-template-columns:minmax(210px, 260px) 1fr;
-  gap:40px;
-  align-items:start;
-  padding:38px 40px;
+  grid-template-columns:minmax(230px, 300px) 1fr;
+  gap:44px;
+  align-items:center;
+  padding:44px 44px;
   background:var(--ember-deep);
-  clip-path:polygon(0 0, 100% 22px, 100% 100%, 0 calc(100% - 22px));
-  margin-bottom:-10px;
+  clip-path:polygon(0 0, 100% 24px, 100% 100%, 0 calc(100% - 24px));
+  margin-bottom:-12px;
 }
 .etapa:nth-child(even){
-  background:#1E1411;
-  clip-path:polygon(0 22px, 100% 0, 100% calc(100% - 22px), 0 100%);
+  clip-path:polygon(0 24px, 100% 0, 100% calc(100% - 24px), 0 100%);
 }
 
-.etapa__marca{ position:relative; }
 .etapa__n{
   display:block;
-  font-family:var(--font-display); font-weight:800;
-  font-size:clamp(3rem, 7vw, 5.2rem); line-height:.85;
-  color:transparent; -webkit-text-stroke:1.5px var(--fire-red);
+  font-family:var(--font-count); font-weight:700;
+  font-size:13px; letter-spacing:.22em; color:var(--fire-red);
 }
+.etapa__n i{ font-style:normal; color:var(--ash); }
+
 .etapa__meses{
   font-family:var(--font-display); font-weight:800;
-  font-size:1.15rem; letter-spacing:.02em;
-  color:var(--fire-yellow); margin-top:12px;
+  font-size:clamp(1.9rem, 3.4vw, 2.9rem);
+  line-height:1.02; letter-spacing:-.02em;
+  color:var(--chalk); margin-top:10px;
 }
 
-.etapa__titulo{ font-size:clamp(1.5rem, 2.6vw, 2.1rem); }
+.etapa__titulo{
+  font-size:clamp(1.3rem, 2vw, 1.65rem);
+  color:var(--fire-yellow);
+}
 .etapa__texto{ color:var(--txt-soft); max-width:56ch; margin-top:12px; }
 
 .etapa__aqui{
-  display:none;
-  margin-top:18px;
+  position:absolute; top:0; right:44px;
   background:var(--fire-yellow); color:#241512;
-  font-family:var(--font-body); font-weight:500; font-size:13px;
-  letter-spacing:.06em; padding:7px 18px;
+  font-family:var(--font-body); font-weight:500; font-size:12.5px;
+  letter-spacing:.08em; padding:8px 20px;
   transform:skewX(var(--tilt));
+  display:none;
 }
-.etapa--ahora .etapa__aqui{ display:inline-block; }
-.etapa--ahora .etapa__n{ -webkit-text-stroke-color:var(--fire-yellow); }
+.etapa--ahora .etapa__aqui{ display:block; }
+.etapa--ahora .etapa__meses{ color:var(--fire-yellow); }
 
-/* El clímax de la temporada se ve como clímax */
-.etapa--cumbre{ background:var(--fire-red); padding-block:56px; }
-.etapa:nth-child(even).etapa--cumbre{ background:var(--fire-red); }
-.etapa--cumbre .etapa__n{ -webkit-text-stroke-color:rgba(255,255,255,.55); }
-.etapa--cumbre .etapa__meses{ color:#fff; }
-.etapa--cumbre .etapa__titulo{ font-size:clamp(1.8rem, 3.4vw, 2.7rem); }
-.etapa--cumbre .etapa__texto{ color:rgba(255,255,255,.9); }
-.etapa--cumbre.etapa--ahora .etapa__n{ -webkit-text-stroke-color:var(--fire-yellow); }
+/* El clímax: único bloque rojo de la sección */
+.etapa--cumbre{ background:var(--fire-red); padding-block:64px; }
+.etapa--cumbre .etapa__n{ color:rgba(255,255,255,.75); }
+.etapa--cumbre .etapa__n i{ color:rgba(255,255,255,.45); }
+.etapa--cumbre .etapa__meses{ color:#fff; font-size:clamp(2.1rem, 3.9vw, 3.3rem); }
+.etapa--cumbre .etapa__titulo{ color:#fff; font-size:clamp(1.5rem, 2.4vw, 2rem); }
+.etapa--cumbre .etapa__texto{ color:rgba(255,255,255,.92); }
+.etapa--cumbre.etapa--ahora .etapa__meses{ color:var(--fire-yellow); }
 
 .anio__nota{
-  margin-top:72px; padding:44px;
+  margin-top:80px; padding:44px;
   background:var(--ember-deep);
   border-left:5px solid var(--mat-blue);
 }
 .anio__nota h3{ font-size:1.5rem; }
 .anio__nota p{ color:var(--txt-soft); max-width:62ch; margin-top:16px; }
 
-@media (max-width:760px){
-  .etapa{ grid-template-columns:1fr; gap:16px; padding:32px 24px; clip-path:none; margin-bottom:6px; }
+@media (max-width:820px){
+  .etapa{ grid-template-columns:1fr; gap:18px; padding:34px 24px; clip-path:none; margin-bottom:8px; }
   .etapa:nth-child(even){ clip-path:none; }
-  .etapa__meses{ margin-top:4px; }
+  .etapa__aqui{ position:static; display:none; width:max-content; margin-top:16px; }
+  .etapa--ahora .etapa__aqui{ display:block; }
 }
 </style>
