@@ -12,7 +12,7 @@ const enlaces = [
     <a href="/" class="nav__marca" aria-label={`${sitio.nombre} — inicio`}>
       <picture>
         <source srcset="/logo.webp" type="image/webp" />
-        <img src="/logo.png" alt={sitio.nombre} width="160" height="140" />
+        <img src="/logo.png" alt={sitio.nombre} width="275" height="240" />
       </picture>
     </a>
     <nav aria-label="Principal" class="nav__links">
@@ -28,15 +28,15 @@ const enlaces = [
   position:sticky; top:0; z-index:50;
   background:rgba(26,18,16,.92); backdrop-filter:blur(8px);
 }
-.nav__row{ display:flex; align-items:center; justify-content:space-between; gap:24px; padding-block:10px; }
+.nav__row{ display:flex; align-items:center; justify-content:space-between; gap:24px; padding-block:8px; }
 .nav__marca{ display:block; line-height:0; }
-.nav__marca img{ height:54px; width:auto; }
+.nav__marca img{ height:78px; width:auto; }
 .nav__links{ display:flex; gap:26px; font-size:15px; }
 .nav__links a{ text-decoration:none; color:var(--txt-soft); }
 .nav__links a:hover{ color:var(--txt); }
 .nav__wa{ font-size:15px; color:var(--fire-yellow); text-decoration:none; font-weight:500; }
 @media (max-width:760px){
   .nav__links{ display:none; }
-  .nav__marca img{ height:44px; }
+  .nav__marca img{ height:58px; }
 }
 </style>
