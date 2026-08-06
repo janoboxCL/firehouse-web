@@ -66,7 +66,7 @@ import { sitio, whatsapp } from '../data/sitio.js';
 
 /* La diagonal ahora es el borde inferior del hero, no una losa sobre el video */
 .hero__diagonal{
-  position:absolute; left:0; right:0; bottom:56px; height:190px;
+  position:absolute; left:0; right:0; bottom:0; height:190px;
   background:var(--ember);
   clip-path:polygon(0 100%, 100% 6%, 100% 100%, 0 100%);
 }
@@ -76,7 +76,7 @@ import { sitio, whatsapp } from '../data/sitio.js';
   clip-path:polygon(0 100%, 100% 6%, 100% calc(6% + 8px), 0 calc(100% + 8px));
 }
 
-.hero__contenido{ position:relative; padding-block:120px 104px; text-align:center; }
+.hero__contenido{ position:relative; padding-block:150px 104px; text-align:center; }
 .hero__titular{
   font-size:clamp(2.1rem, 5.2vw, 3.8rem);
   max-width:19ch;
@@ -88,21 +88,16 @@ import { sitio, whatsapp } from '../data/sitio.js';
 .hero__acciones{ display:flex; flex-direction:column; align-items:center; gap:18px; }
 
 .hero__datos{
-  position:absolute; left:0; right:0; bottom:0; z-index:2;
-  display:flex; justify-content:center; flex-wrap:wrap; gap:0;
-  list-style:none; margin:0; padding:0;
-  font-size:14px; color:var(--txt-soft);
-  background:rgba(36,21,18,.86);
-  border-top:2px solid var(--fire-red);
+  position:relative;
+  display:flex; justify-content:center; flex-wrap:wrap; gap:28px;
+  list-style:none; margin:0; padding:14px 24px;
+  border-top:0.5px solid var(--hairline);
+  font-size:14px; color:var(--txt-faint);
 }
-.hero__datos li{ padding:16px 30px; }
-.hero__datos li + li{ border-left:0.5px solid var(--hairline); }
 
 @media (max-width:640px){
-  .hero__contenido{ padding-block:76px 72px; }
-  .hero__diagonal{ height:96px; bottom:100px; }
-  .hero__datos{ font-size:12.5px; }
-  .hero__datos li{ padding:12px 16px; }
+  .hero__contenido{ padding-block:96px 88px; }
+  .hero__diagonal{ height:96px; }
   .hero__datos{ gap:16px; font-size:13px; }
 }
 </style>

@@ -24,19 +24,38 @@ const enlaces = [
 
 <style>
 .nav{
-  border-bottom:0.5px solid var(--hairline);
   position:sticky; top:0; z-index:50;
-  background:rgba(26,18,16,.92); backdrop-filter:blur(8px);
+  background:rgba(26,18,16,.92);
+  backdrop-filter:blur(8px);
+  border-bottom:0.5px solid var(--hairline);
 }
-.nav__row{ display:flex; align-items:center; justify-content:space-between; gap:24px; padding-block:8px; }
-.nav__marca{ display:block; line-height:0; }
-.nav__marca img{ height:96px; width:auto; }
-.nav__links{ display:flex; gap:26px; font-size:15px; }
+
+/* La barra queda acotada: el escudo no aporta altura porque va absoluto */
+.nav__row{
+  position:relative;
+  display:flex; align-items:center; justify-content:flex-end;
+  gap:32px;
+  padding-block:15px;
+}
+
+.nav__marca{
+  position:absolute; left:24px; top:2px;
+  display:block; line-height:0; z-index:3;
+}
+.nav__marca img{
+  height:134px; width:auto;
+  filter:drop-shadow(0 6px 18px rgba(0,0,0,.55));
+}
+
+.nav__links{ display:flex; gap:28px; font-size:15px; margin-right:auto; margin-left:190px; }
 .nav__links a{ text-decoration:none; color:var(--txt-soft); }
 .nav__links a:hover{ color:var(--txt); }
 .nav__wa{ font-size:15px; color:var(--fire-yellow); text-decoration:none; font-weight:500; }
-@media (max-width:760px){
+
+@media (max-width:900px){
   .nav__links{ display:none; }
-  .nav__marca img{ height:64px; }
+  .nav__row{ padding-block:12px; }
+  .nav__marca{ left:20px; top:0; }
+  .nav__marca img{ height:88px; }
 }
 </style>
