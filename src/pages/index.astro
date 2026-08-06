@@ -7,11 +7,11 @@ const titulo = 'Cheerleading en San Miguel, Santiago | Firehouse Cheer — clase
 const descripcion = 'Academia de cheerleading en San Miguel para niñas y niños desde los 4 años. Sin experiencia previa y todos nuestros equipos compiten. Agenda una clase de prueba gratis por WhatsApp.';
 
 const anio = [
-  { meses: 'Marzo y abril',            titulo: 'Se parte de cero',        texto: 'Llegan los que empiezan. Se arman los equipos del año y se trabajan las bases: coordinación, volteretas, confianza. Nadie llega sabiendo.' },
-  { meses: 'Mayo y junio',             titulo: 'Se sube la exigencia',    texto: 'Entrenamiento avanzado. Aparecen los stunts, las progresiones más complejas y el trabajo real de equipo.' },
-  { meses: 'Julio a septiembre',       titulo: 'La coreografía',          texto: 'Se monta la rutina de la temporada y se prepara la competencia. Es la etapa más intensa y la que más une al grupo.' },
-  { meses: 'Octubre y noviembre',      titulo: 'Los campeonatos',         texto: 'Showcase y torneos. Todos los equipos compiten. Es lo que se estuvo preparando todo el año.' },
-  { meses: 'Diciembre y enero',        titulo: 'Cierre y refuerzo',       texto: 'Se cierra la temporada, se celebra lo conseguido y se refuerza lo que quedó pendiente.' },
+  { n:'01', meses: 'Marzo · Abril',       desde:3,  hasta:4,  titulo: 'Se parte de cero',     texto: 'Llegan los que empiezan. Se arman los equipos del año y se trabajan las bases: coordinación, volteretas, confianza. Nadie llega sabiendo.' },
+  { n:'02', meses: 'Mayo · Junio',        desde:5,  hasta:6,  titulo: 'Se sube la exigencia', texto: 'Entrenamiento avanzado. Aparecen los stunts, las progresiones más complejas y el trabajo real de equipo.' },
+  { n:'03', meses: 'Julio a Septiembre',  desde:7,  hasta:9,  titulo: 'La coreografía',       texto: 'Se monta la rutina de la temporada y se prepara la competencia. Es la etapa más intensa y la que más une al grupo.' },
+  { n:'04', meses: 'Octubre · Noviembre', desde:10, hasta:11, titulo: 'Los campeonatos',      texto: 'Showcase y torneos. Todos los equipos compiten. Es lo que se estuvo preparando todo el año.', cumbre:true },
+  { n:'05', meses: 'Diciembre · Enero',   desde:12, hasta:1,  titulo: 'Cierre y refuerzo',    texto: 'Se cierra la temporada, se celebra lo conseguido y se refuerza lo que quedó pendiente.' },
 ];
 ---
 <Base titulo={titulo} descripcion={descripcion} ruta="">
@@ -28,10 +28,16 @@ const anio = [
 
       <ol class="anio">
         {anio.map(e => (
-          <li class="anio__paso">
-            <p class="anio__meses">{e.meses}</p>
-            <h3 class="anio__titulo">{e.titulo}</h3>
-            <p class="anio__texto">{e.texto}</p>
+          <li class={e.cumbre ? 'etapa etapa--cumbre' : 'etapa'} data-desde={e.desde} data-hasta={e.hasta}>
+            <div class="etapa__marca">
+              <span class="etapa__n">{e.n}</span>
+              <p class="etapa__meses">{e.meses}</p>
+            </div>
+            <div class="etapa__cuerpo">
+              <h3 class="etapa__titulo">{e.titulo}</h3>
+              <p class="etapa__texto">{e.texto}</p>
+              <span class="etapa__aqui">Estamos acá</span>
+            </div>
           </li>
         ))}
       </ol>
@@ -49,30 +55,85 @@ const anio = [
       </div>
     </div>
   </section>
+
+  <script is:inline>
+    (() => {
+      const m = new Date().getMonth() + 1;
+      document.querySelectorAll('.etapa').forEach(el => {
+        const d = +el.dataset.desde, h = +el.dataset.hasta;
+        const dentro = d <= h ? (m >= d && m <= h) : (m >= d || m <= h);
+        if (dentro) el.classList.add('etapa--ahora');
+      });
+    })();
+  </script>
 </Base>
 
 <style>
-.anio{ list-style:none; margin:56px 0 0; padding:0; display:grid; gap:0; }
-.anio__paso{
-  border-left:2px solid var(--fire-red);
-  padding:0 0 40px 28px;
+.anio{ list-style:none; margin:64px 0 0; padding:0; }
+
+.etapa{
   position:relative;
+  display:grid;
+  grid-template-columns:minmax(210px, 260px) 1fr;
+  gap:40px;
+  align-items:start;
+  padding:38px 40px;
+  background:var(--ember-deep);
+  clip-path:polygon(0 0, 100% 22px, 100% 100%, 0 calc(100% - 22px));
+  margin-bottom:-10px;
 }
-.anio__paso:last-child{ padding-bottom:0; }
-.anio__paso::before{
-  content:''; position:absolute; left:-7px; top:6px;
-  width:12px; height:12px; background:var(--fire-yellow);
-  transform:rotate(var(--tilt));
+.etapa:nth-child(even){
+  background:#1E1411;
+  clip-path:polygon(0 22px, 100% 0, 100% calc(100% - 22px), 0 100%);
 }
-.anio__meses{ font-family:var(--font-count); font-size:12px; letter-spacing:.18em; color:var(--fire-yellow); }
-.anio__titulo{ font-size:1.5rem; margin-top:6px; }
-.anio__texto{ color:var(--txt-soft); max-width:58ch; margin-top:10px; }
+
+.etapa__marca{ position:relative; }
+.etapa__n{
+  display:block;
+  font-family:var(--font-display); font-weight:800;
+  font-size:clamp(3rem, 7vw, 5.2rem); line-height:.85;
+  color:transparent; -webkit-text-stroke:1.5px var(--fire-red);
+}
+.etapa__meses{
+  font-family:var(--font-display); font-weight:800;
+  font-size:1.15rem; letter-spacing:.02em;
+  color:var(--fire-yellow); margin-top:12px;
+}
+
+.etapa__titulo{ font-size:clamp(1.5rem, 2.6vw, 2.1rem); }
+.etapa__texto{ color:var(--txt-soft); max-width:56ch; margin-top:12px; }
+
+.etapa__aqui{
+  display:none;
+  margin-top:18px;
+  background:var(--fire-yellow); color:#241512;
+  font-family:var(--font-body); font-weight:500; font-size:13px;
+  letter-spacing:.06em; padding:7px 18px;
+  transform:skewX(var(--tilt));
+}
+.etapa--ahora .etapa__aqui{ display:inline-block; }
+.etapa--ahora .etapa__n{ -webkit-text-stroke-color:var(--fire-yellow); }
+
+/* El clímax de la temporada se ve como clímax */
+.etapa--cumbre{ background:var(--fire-red); padding-block:56px; }
+.etapa:nth-child(even).etapa--cumbre{ background:var(--fire-red); }
+.etapa--cumbre .etapa__n{ -webkit-text-stroke-color:rgba(255,255,255,.55); }
+.etapa--cumbre .etapa__meses{ color:#fff; }
+.etapa--cumbre .etapa__titulo{ font-size:clamp(1.8rem, 3.4vw, 2.7rem); }
+.etapa--cumbre .etapa__texto{ color:rgba(255,255,255,.9); }
+.etapa--cumbre.etapa--ahora .etapa__n{ -webkit-text-stroke-color:var(--fire-yellow); }
 
 .anio__nota{
-  margin-top:64px; padding:40px;
+  margin-top:72px; padding:44px;
   background:var(--ember-deep);
-  border-left:4px solid var(--mat-blue);
+  border-left:5px solid var(--mat-blue);
 }
-.anio__nota h3{ font-size:1.4rem; }
-.anio__nota p{ color:var(--txt-soft); max-width:62ch; margin-top:14px; }
+.anio__nota h3{ font-size:1.5rem; }
+.anio__nota p{ color:var(--txt-soft); max-width:62ch; margin-top:16px; }
+
+@media (max-width:760px){
+  .etapa{ grid-template-columns:1fr; gap:16px; padding:32px 24px; clip-path:none; margin-bottom:6px; }
+  .etapa:nth-child(even){ clip-path:none; }
+  .etapa__meses{ margin-top:4px; }
+}
 </style>

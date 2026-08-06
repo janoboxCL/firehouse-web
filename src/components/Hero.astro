@@ -66,14 +66,14 @@ import { sitio, whatsapp } from '../data/sitio.js';
 
 /* La diagonal ahora es el borde inferior del hero, no una losa sobre el video */
 .hero__diagonal{
-  position:absolute; left:0; right:0; bottom:0; height:110px;
+  position:absolute; left:0; right:0; bottom:0; height:190px;
   background:var(--ember);
-  clip-path:polygon(0 62%, 100% 0, 100% 100%, 0 100%);
+  clip-path:polygon(0 100%, 100% 6%, 100% 100%, 0 100%);
 }
 .hero__diagonal::before{
   content:''; position:absolute; inset:0;
   background:var(--fire-red);
-  clip-path:polygon(0 62%, 100% 0, 100% 5px, 0 calc(62% + 5px));
+  clip-path:polygon(0 100%, 100% 6%, 100% calc(6% + 8px), 0 calc(100% + 8px));
 }
 
 .hero__contenido{ position:relative; padding-block:120px 104px; text-align:center; }
@@ -97,7 +97,7 @@ import { sitio, whatsapp } from '../data/sitio.js';
 
 @media (max-width:640px){
   .hero__contenido{ padding-block:76px 72px; }
-  .hero__diagonal{ height:64px; }
+  .hero__diagonal{ height:96px; }
   .hero__datos{ gap:16px; font-size:13px; }
 }
 </style>

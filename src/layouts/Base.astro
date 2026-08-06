@@ -14,6 +14,8 @@ const schema = {
   name: sitio.nombre,
   alternateName: sitio.nombreCorto,
   url: sitio.url,
+  logo: `${sitio.url}/logo.png`,
+  image: `${sitio.url}/og.jpg`,
   telephone: sitio.telefono,
   sameAs: [sitio.instagram],
   address: {
@@ -37,11 +39,19 @@ const schema = {
   <meta name="description" content={descripcion} />
   <link rel="canonical" href={canonical} />
 
+  <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <meta name="theme-color" content="#1A1210" />
+
   <meta property="og:type" content="website" />
   <meta property="og:title" content={titulo} />
   <meta property="og:description" content={descripcion} />
   <meta property="og:url" content={canonical} />
   <meta property="og:locale" content="es_CL" />
+  <meta property="og:image" content={`${sitio.url}/og.jpg`} />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta name="twitter:card" content="summary_large_image" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />

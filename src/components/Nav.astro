@@ -1,5 +1,5 @@
 ---
-import { whatsapp } from '../data/sitio.js';
+import { whatsapp, sitio } from '../data/sitio.js';
 const enlaces = [
   { href: '/#equipos',  texto: 'Equipos' },
   { href: '/#el-anio',  texto: 'El año' },
@@ -9,7 +9,12 @@ const enlaces = [
 ---
 <header class="nav">
   <div class="wrap nav__row">
-    <a href="/" class="nav__marca">FIREHOUSE</a>
+    <a href="/" class="nav__marca" aria-label={`${sitio.nombre} — inicio`}>
+      <picture>
+        <source srcset="/logo.webp" type="image/webp" />
+        <img src="/logo.png" alt={sitio.nombre} width="160" height="140" />
+      </picture>
+    </a>
     <nav aria-label="Principal" class="nav__links">
       {enlaces.map(e => <a href={e.href}>{e.texto}</a>)}
     </nav>
@@ -18,12 +23,20 @@ const enlaces = [
 </header>
 
 <style>
-.nav{ border-bottom:0.5px solid var(--hairline); position:sticky; top:0; z-index:50; background:rgba(26,18,16,.92); backdrop-filter:blur(8px); }
-.nav__row{ display:flex; align-items:center; justify-content:space-between; gap:24px; padding-block:16px; }
-.nav__marca{ font-family:var(--font-display); font-weight:800; letter-spacing:.05em; text-decoration:none; font-size:19px; }
+.nav{
+  border-bottom:0.5px solid var(--hairline);
+  position:sticky; top:0; z-index:50;
+  background:rgba(26,18,16,.92); backdrop-filter:blur(8px);
+}
+.nav__row{ display:flex; align-items:center; justify-content:space-between; gap:24px; padding-block:10px; }
+.nav__marca{ display:block; line-height:0; }
+.nav__marca img{ height:54px; width:auto; }
 .nav__links{ display:flex; gap:26px; font-size:15px; }
 .nav__links a{ text-decoration:none; color:var(--txt-soft); }
 .nav__links a:hover{ color:var(--txt); }
 .nav__wa{ font-size:15px; color:var(--fire-yellow); text-decoration:none; font-weight:500; }
-@media (max-width:760px){ .nav__links{ display:none; } }
+@media (max-width:760px){
+  .nav__links{ display:none; }
+  .nav__marca img{ height:44px; }
+}
 </style>
