@@ -32,6 +32,7 @@ const schema = {
 ---
 <!doctype html>
 <html lang="es-CL">
+<script is:inline>document.documentElement.classList.add("js");</script>
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -74,5 +75,22 @@ const schema = {
     <slot />
   </main>
   <Pie />
+  <script is:inline>
+    (() => {
+      const objetivos = document.querySelectorAll('.reveal');
+      if (!objetivos.length) return;
+      if (!('IntersectionObserver' in window) ||
+          window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        objetivos.forEach(el => el.classList.add('visible'));
+        return;
+      }
+      const obs = new IntersectionObserver((entradas) => {
+        entradas.forEach(e => {
+          if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); }
+        });
+      }, { rootMargin: '0px 0px -12% 0px', threshold: 0.12 });
+      objetivos.forEach(el => obs.observe(el));
+    })();
+  </script>
 </body>
 </html>
