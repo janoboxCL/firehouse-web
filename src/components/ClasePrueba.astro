@@ -1,7 +1,7 @@
 ---
 import Etiqueta from './Etiqueta.astro';
 import { whatsapp } from '../data/sitio.js';
-const requisitos = ['Ropa deportiva cómoda', 'Botella de agua', 'Pelo largo tomado'];
+const requisitos = ['Ropa deportiva cómoda', 'Botella de agua', 'Pelo tomado'];
 ---
 <section class="section prueba" id="clase-prueba">
   <div class="wrap">
@@ -9,8 +9,8 @@ const requisitos = ['Ropa deportiva cómoda', 'Botella de agua', 'Pelo largo tom
       <Etiqueta texto="La primera clase" />
       <h2 class="section__title">Ven a entrenar un día con nosotros</h2>
       <p class="section__intro">
-        Una clase completa, con el equipo que le corresponde por edad y con los mismos coaches
-        que entrenan al equipo. Gratis y sin compromiso.
+        Una clase completa, con el equipo que le corresponde por edad y con los coaches
+        de verdad. Gratis y sin compromiso.
       </p>
     </div>
 
@@ -21,13 +21,11 @@ const requisitos = ['Ropa deportiva cómoda', 'Botella de agua', 'Pelo largo tom
           No evaluamos a nadie ni hace falta saber nada de antes. La idea es simple: que conozca
           al equipo, a los entrenadores y cómo entrenamos realmente. Después deciden con calma.
         </p>
-        <h3 class="prueba__sub">Qué pasa ese día</h3>
         <p>
-          Entra a una clase real, no a una clase especial para visitas. Calienta con el equipo,
-          trabaja la parte técnica que toque ese día y participa en todo lo que hace el resto.
-        </p>
-        <p>
-          Los coaches acompañan a cada quien según su nivel, sea cual sea.
+          <strong>Qué pasa ese día.</strong> Entra a una clase real, no a una clase especial para
+          visitas. Calienta con el equipo, trabaja la parte técnica que toque ese día y participa
+          en todo lo que hace el resto. Los coaches acompañan a cada quien según su nivel,
+          sea cual sea.
         </p>
       </div>
 
@@ -47,22 +45,16 @@ const requisitos = ['Ropa deportiva cómoda', 'Botella de agua', 'Pelo largo tom
 
 <style>
 .prueba{ background:var(--ember-deep); }
-.prueba__grid{ display:grid; grid-template-columns:1.05fr .95fr; gap:var(--e-8); margin-top:var(--e-6); align-items:start; }
+.prueba__grid{ display:grid; grid-template-columns:1.05fr .95fr; gap:var(--e-7); margin-top:var(--e-6); align-items:start; }
 
 .prueba__no{
   font-family:var(--font-display); font-weight:800;
   font-size:clamp(1.8rem, 3.4vw, 2.6rem); line-height:1;
   color:var(--fire-yellow); margin-bottom:var(--e-3);
 }
-.prueba__declaracion p{ color:var(--txt-soft); max-width:62ch; line-height:1.65; }
-.prueba__sub{
-  font-family:var(--font-body); font-weight:500;
-  font-size:14px; letter-spacing:.14em; text-transform:uppercase;
-  color:var(--fire-yellow); margin-top:var(--e-5);
-}
-.prueba__sub + p{ margin-top:var(--e-2); }
+.prueba__declaracion p{ color:var(--txt-soft); max-width:58ch; line-height:1.6; }
 .prueba__declaracion p + p{ margin-top:var(--e-2); }
-
+.prueba__declaracion strong{ color:var(--chalk); font-weight:500; }
 
 .prueba__llevar{ border-left:var(--regla) solid var(--mat-blue); padding-left:var(--e-4); }
 .prueba__rotulo{

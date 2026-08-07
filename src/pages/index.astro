@@ -29,7 +29,7 @@ const anio = [
   <Semana />
 
   <BandaFoto src="/media/banda-equipo.jpg" alt="Deportistas de Firehouse durante un entrenamiento"
-             frase="Se empieza sin saber nada. Se termina compitiendo." alto="medio" />
+             frase="Nadie llega sabiendo. Todas terminan compitiendo." alto="medio" />
 
   <section class="section anio-seccion" id="el-anio">
     <div class="wrap">
@@ -69,6 +69,12 @@ const anio = [
       </ol>
 
       <div class="anio__nota reveal">
+        <svg class="anio__calendario" viewBox="0 0 120 110" aria-hidden="true">
+          <rect x="6" y="18" width="108" height="86" rx="4" fill="none" stroke="currentColor" stroke-width="4"/>
+          <path d="M6 42h108M32 6v22M88 6v22" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
+          <path d="M28 58h14M53 58h14M78 58h14M28 80h14M78 80h14" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
+          <rect x="49" y="72" width="22" height="16" rx="2" fill="currentColor"/>
+        </svg>
         <h3>¿Cuándo es el mejor momento para entrar?</h3>
         <p class="nota__entrada">
           Se puede entrar en cualquier momento del año. Cuál es el mejor depende de cada deportista.
@@ -95,7 +101,7 @@ const anio = [
         <p class="nota__cierre">
           Escríbenos y te decimos con franqueza qué conviene según su edad y lo que ya sabe hacer.
         </p>
-        <p class="nota__accion"><a class="cta-texto" href={whatsapp('anio')} target="_blank" rel="noopener">Ven a una clase de prueba gratis</a></p>
+        <p class="nota__accion"><a class="btn" href={whatsapp('anio')} target="_blank" rel="noopener">Ven a una clase de prueba gratis</a></p>
       </div>
     </div>
   </section>
@@ -117,6 +123,10 @@ const anio = [
              alto="bajo" />
 
   <Precios />
+
+  <BandaFoto src="/media/banda-cierre.jpg"
+             alt="El equipo de Firehouse junto a su coach después de un entrenamiento"
+             alto="bajo" />
 
   <Contacto />
 </Base>
@@ -205,11 +215,20 @@ const anio = [
 .etapa--cumbre.etapa--ahora .etapa__hito{ color:var(--fire-yellow); }
 
 .anio__nota{
-  margin-top:var(--e-8); padding:var(--e-5);
+  position:relative; overflow:hidden;
+  margin-top:var(--e-8); padding:var(--e-6);
   background:var(--ember-deep);
   border-left:var(--regla) solid var(--mat-blue);
 }
-.anio__nota h3{ font-size:1.5rem; }
+.anio__calendario{
+  position:absolute; right:40px; top:50%;
+  transform:translateY(-50%) rotate(-6deg);
+  width:190px; height:auto;
+  color:rgba(245,239,232,.06);
+  pointer-events:none;
+}
+.anio__nota > *{ position:relative; }
+.anio__nota h3{ font-size:clamp(1.6rem, 2.9vw, 2.2rem); color:var(--fire-yellow); max-width:18ch; }
 .anio__nota p{ color:var(--txt-soft); max-width:var(--wrap-texto); margin-top:var(--e-1); line-height:1.6; }
 .anio__nota h4{
   font-family:var(--font-body); font-weight:500;
@@ -225,5 +244,6 @@ const anio = [
   .etapa{ grid-template-columns:1fr; gap:18px; padding:34px 24px; clip-path:none; margin-bottom:8px; }
   .etapa:nth-child(even){ clip-path:none; }
   .etapa__copa{ width:130px; right:-14px; opacity:.7; }
+  .anio__calendario{ width:120px; right:-18px; }
 }
 </style>
