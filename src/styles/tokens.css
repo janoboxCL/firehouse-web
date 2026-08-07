@@ -16,7 +16,11 @@
   --font-body:    'Instrument Sans', system-ui, sans-serif;
   --font-count:   'Space Mono', ui-monospace, monospace;
 
-  --tilt: -16deg;
+  /* Familia reducida de ángulos, todos ascendentes de izquierda a derecha */
+  --tilt-xl: -4deg;   /* grandes transiciones */
+  --tilt-md: -6deg;   /* recortes y reglas */
+  --tilt-sm: -8deg;   /* acentos pequeños */
+  --tilt: var(--tilt-md);
   --wrap: 1120px;
 }
 
@@ -49,7 +53,7 @@ img,video{ max-width:100%; display:block; }
 .count{
   display:inline-flex; align-items:center; gap:14px;
   font-family:var(--font-count); font-weight:700;
-  font-size:15px; letter-spacing:.30em;
+  font-size:14px; letter-spacing:.30em; text-transform:uppercase;
   color:var(--fire-yellow);
   text-shadow:0 1px 10px rgba(26,18,16,.8);
 }
@@ -57,7 +61,7 @@ img,video{ max-width:100%; display:block; }
 .count::after{
   content:''; width:34px; height:3px;
   background:var(--fire-red);
-  transform:skewX(var(--tilt));
+  transform:skewX(var(--tilt-sm));
 }
 
 .btn{
@@ -86,15 +90,15 @@ img,video{ max-width:100%; display:block; }
 /* Encabezado de sección: título con regla que se prolonga */
 .section__title{
   display:flex; align-items:center; gap:26px;
-  font-size:clamp(1.9rem, 4vw, 3rem);
+  font-size:clamp(2.1rem, 4.6vw, 3.6rem);
   margin-top:18px;
 }
 .section__title::after{
   content:''; flex:1; height:3px; min-width:40px;
   background:linear-gradient(90deg, var(--fire-red) 0%, var(--fire-red) 38%, var(--mat-blue) 38%, var(--mat-blue) 58%, transparent 100%);
-  transform:skewX(var(--tilt));
+  transform:skewX(var(--tilt-sm));
 }
-.section__intro{ color:var(--txt-soft); max-width:60ch; margin-top:22px; }
+.section__intro{ color:var(--txt-soft); max-width:56ch; margin-top:24px; font-size:clamp(1.05rem, 1.6vw, 1.3rem); line-height:1.55; }
 
 /* Aparición al hacer scroll. Sin JS el contenido se ve igual. */
 html.js .reveal{

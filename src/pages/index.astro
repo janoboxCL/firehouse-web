@@ -7,11 +7,11 @@ const titulo = 'Cheerleading en San Miguel, Santiago | Firehouse Cheer — clase
 const descripcion = 'Academia de cheerleading en San Miguel para niñas y niños desde los 4 años. Sin experiencia previa y todos nuestros equipos compiten. Agenda una clase de prueba gratis por WhatsApp.';
 
 const anio = [
-  { n:'01', meses: 'Marzo · Abril',       desde:3,  hasta:4,  titulo: 'Se parte de cero',     texto: 'Llegan los que empiezan. Se arman los equipos del año y se trabajan las bases: coordinación, volteretas, confianza. Nadie llega sabiendo.' },
-  { n:'02', meses: 'Mayo · Junio',        desde:5,  hasta:6,  titulo: 'Se sube la exigencia', texto: 'Entrenamiento avanzado. Aparecen los stunts, las progresiones más complejas y el trabajo real de equipo.' },
-  { n:'03', meses: 'Julio a Septiembre',  desde:7,  hasta:9,  titulo: 'La coreografía',       texto: 'Se monta la rutina de la temporada y se prepara la competencia. Es la etapa más intensa y la que más une al grupo.' },
-  { n:'04', meses: 'Octubre · Noviembre', desde:10, hasta:11, titulo: 'Los campeonatos',      texto: 'Showcase y torneos. Todos los equipos compiten. Es lo que se estuvo preparando todo el año.', cumbre:true },
-  { n:'05', meses: 'Diciembre · Enero',   desde:12, hasta:1,  titulo: 'Cierre y refuerzo',    texto: 'Se cierra la temporada, se celebra lo conseguido y se refuerza lo que quedó pendiente.' },
+  { n:'01', meses:'Marzo · Abril',       desde:3,  hasta:4,  hito:'Todo comienza.',        titulo:'Se parte de cero',     texto:'Llegan los que empiezan. Se arman los equipos del año y se trabajan las bases: coordinación, volteretas, confianza. Nadie llega sabiendo.' },
+  { n:'02', meses:'Mayo · Junio',        desde:5,  hasta:6,  hito:'Se construye la base.', titulo:'Se sube la exigencia', texto:'Entrenamiento avanzado. Aparecen los stunts, las progresiones más complejas y el trabajo real de equipo.' },
+  { n:'03', meses:'Julio a Septiembre',  desde:7,  hasta:9,  hito:'Toma forma la rutina.', titulo:'La coreografía',       texto:'Se monta la rutina de la temporada y se prepara la competencia. Es la etapa más intensa y la que más une al grupo.' },
+  { n:'04', meses:'Octubre · Noviembre', desde:10, hasta:11, hito:'Se compite.',           titulo:'Los campeonatos',      texto:'Showcase y torneos. Todos los equipos compiten. Es lo que se estuvo preparando todo el año.', cumbre:true },
+  { n:'05', meses:'Diciembre · Enero',   desde:12, hasta:1,  hito:'Se consolida.',         titulo:'Cierre y refuerzo',    texto:'Se cierra la temporada, se celebra lo conseguido y se refuerza lo que quedó pendiente.' },
 ];
 ---
 <Base titulo={titulo} descripcion={descripcion} ruta="">
@@ -45,6 +45,7 @@ const anio = [
               <p class="etapa__meses">{e.meses}</p>
             </div>
             <div class="etapa__cuerpo">
+              <p class="etapa__hito">{e.hito}</p>
               <h3 class="etapa__titulo">{e.titulo}</h3>
               <p class="etapa__texto">{e.texto}</p>
               <span class="etapa__aqui">● Estamos acá</span>
@@ -54,13 +55,25 @@ const anio = [
       </ol>
 
       <div class="anio__nota reveal">
-        <h3>¿Se puede entrar a mitad de año?</h3>
+        <h3>¿Cuándo es el mejor momento para entrar?</h3>
         <p>
-          Sí, y pasa todo el tiempo. No hay que esperar a marzo. Lo único que cambia es en qué
-          está el equipo cuando llega: si entra entre julio y septiembre va a encontrar un grupo
-          montando la coreografía, así que los coaches trabajan aparte con quien llega hasta que
-          se pone al día. Funciona. Esta temporada se sumaron niñas y niños que nunca habían
-          hecho cheerleading, y se integraron sin ningún problema.
+          Se puede entrar en cualquier momento del año. Cuál es el mejor depende de cada deportista.
+        </p>
+        <p>
+          <strong>Si parte de cero</strong>, lo ideal es sumarse en las etapas iniciales — marzo y abril,
+          o diciembre y enero. Ahí el equipo completo está construyendo bases y nadie va más adelante que nadie.
+        </p>
+        <p>
+          <strong>Si llega mientras se monta la coreografía</strong>, también funciona. Los coaches trabajan
+          aparte con quien se incorpora hasta nivelarlo, y esta temporada se sumaron niñas y niños sin
+          ninguna experiencia que se integraron sin problema.
+        </p>
+        <p>
+          <strong>En plena temporada de campeonatos</strong> la incorporación es posible, y rinde mejor
+          con algo de experiencia previa.
+        </p>
+        <p>
+          Escríbenos y te decimos con franqueza qué conviene según su edad y lo que ya sabe hacer.
         </p>
         <p><a class="btn" href={whatsapp('anio')} target="_blank" rel="noopener">Ven a una clase de prueba gratis</a></p>
       </div>
@@ -82,6 +95,15 @@ const anio = [
 <style>
 .anio{ list-style:none; margin:64px 0 0; padding:0; }
 
+/* Progresión ascendente: la temporada avanza hacia la derecha y culmina en los campeonatos */
+@media (min-width:821px){
+  .etapa:nth-child(1){ margin-left:0; }
+  .etapa:nth-child(2){ margin-left:18px; }
+  .etapa:nth-child(3){ margin-left:36px; }
+  .etapa:nth-child(4){ margin-left:54px; margin-right:-18px; }
+  .etapa:nth-child(5){ margin-left:36px; }
+}
+
 .etapa{
   position:relative;
   display:grid;
@@ -90,11 +112,11 @@ const anio = [
   align-items:center;
   padding:44px 44px;
   background:var(--ember-deep);
-  clip-path:polygon(0 0, 100% 24px, 100% 100%, 0 calc(100% - 24px));
+  clip-path:polygon(0 0, 100% 34px, 100% 100%, 0 calc(100% - 34px));
   margin-bottom:-12px;
 }
 .etapa:nth-child(even){
-  clip-path:polygon(0 24px, 100% 0, 100% calc(100% - 24px), 0 100%);
+  clip-path:polygon(0 34px, 100% 0, 100% calc(100% - 34px), 0 100%);
 }
 
 .etapa__n{
@@ -111,9 +133,17 @@ const anio = [
   color:var(--chalk); margin-top:10px;
 }
 
+/* Nivel 3: la frase que da sentido a la etapa */
+.etapa__hito{
+  font-family:var(--font-display); font-weight:800;
+  font-size:clamp(1.35rem, 2.2vw, 1.9rem);
+  color:var(--fire-yellow); line-height:1.1;
+}
 .etapa__titulo{
-  font-size:clamp(1.3rem, 2vw, 1.65rem);
-  color:var(--fire-yellow);
+  font-size:clamp(1rem, 1.4vw, 1.15rem);
+  font-family:var(--font-body); font-weight:500;
+  letter-spacing:.14em; text-transform:uppercase;
+  color:var(--txt-faint); margin-top:10px;
 }
 .etapa__texto{ color:var(--txt-soft); max-width:56ch; margin-top:12px; }
 
@@ -123,7 +153,7 @@ const anio = [
   background:var(--fire-yellow); color:#241512;
   font-family:var(--font-body); font-weight:500; font-size:12.5px;
   letter-spacing:.08em; padding:9px 22px;
-  transform:skewX(var(--tilt));
+  transform:skewX(var(--tilt-sm));
 }
 .etapa--ahora .etapa__aqui{ display:inline-block; }
 
@@ -136,15 +166,18 @@ const anio = [
   pointer-events:none;
 }
 .etapa--ahora .etapa__meses{ color:var(--fire-yellow); }
+.etapa--cumbre.etapa--ahora .etapa__hito{ color:var(--fire-yellow); }
 
 /* El clímax: único bloque rojo de la sección */
 .etapa--cumbre{ background:var(--fire-red); padding-block:70px; overflow:hidden; }
 .etapa--cumbre .etapa__n{ color:rgba(255,255,255,.75); }
 .etapa--cumbre .etapa__n i{ color:rgba(255,255,255,.45); }
 .etapa--cumbre .etapa__meses{ color:#fff; font-size:clamp(2.1rem, 3.9vw, 3.3rem); }
-.etapa--cumbre .etapa__titulo{ color:#fff; font-size:clamp(1.5rem, 2.4vw, 2rem); }
+.etapa--cumbre .etapa__hito{ color:#fff; font-size:clamp(1.6rem, 2.7vw, 2.3rem); }
+.etapa--cumbre .etapa__titulo{ color:rgba(255,255,255,.72); }
 .etapa--cumbre .etapa__texto{ color:rgba(255,255,255,.92); }
 .etapa--cumbre.etapa--ahora .etapa__meses{ color:var(--fire-yellow); }
+.etapa--cumbre.etapa--ahora .etapa__hito{ color:var(--fire-yellow); }
 
 .anio__nota{
   margin-top:80px; padding:44px;
@@ -152,7 +185,8 @@ const anio = [
   border-left:5px solid var(--mat-blue);
 }
 .anio__nota h3{ font-size:1.5rem; }
-.anio__nota p{ color:var(--txt-soft); max-width:62ch; margin-top:16px; }
+.anio__nota p{ color:var(--txt-soft); max-width:62ch; margin-top:14px; }
+.anio__nota strong{ color:var(--chalk); font-weight:500; }
 
 @media (max-width:820px){
   .etapa{ grid-template-columns:1fr; gap:18px; padding:34px 24px; clip-path:none; margin-bottom:8px; }
