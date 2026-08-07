@@ -18,14 +18,17 @@ const enlaces = [
     <nav aria-label="Principal" class="nav__links">
       {enlaces.map(e => <a href={e.href}>{e.texto}</a>)}
     </nav>
-    <a class="nav__wa" href={whatsapp('hero')} target="_blank" rel="noopener">WhatsApp</a>
+    <a class="nav__cta" href={whatsapp('hero')} target="_blank" rel="noopener">
+      <span class="nav__cta-largo">Clase de prueba gratis</span>
+      <span class="nav__cta-corto">Clase gratis</span>
+    </a>
   </div>
 </header>
 
 <style>
 .nav{
   position:sticky; top:0; z-index:50;
-  background:rgba(26,18,16,.92);
+  background:rgba(23,20,18,.92);
   backdrop-filter:blur(8px);
   border-bottom:0.5px solid var(--hairline);
 }
@@ -50,12 +53,29 @@ const enlaces = [
 .nav__links{ display:flex; gap:28px; font-size:15px; margin-right:auto; margin-left:190px; }
 .nav__links a{ text-decoration:none; color:var(--txt-soft); }
 .nav__links a:hover{ color:var(--txt); }
-.nav__wa{ font-size:15px; color:var(--fire-yellow); text-decoration:none; font-weight:500; }
+.nav__cta{
+  background:var(--fire-red); color:#fff;
+  font-size:15px; font-weight:500; text-decoration:none;
+  padding:12px 26px; border-radius:999px;
+  white-space:nowrap;
+  transition:background .18s ease, transform .18s ease;
+}
+.nav__cta:hover{ background:#a91111; transform:translateY(-1px); }
+.nav__cta:focus-visible{ outline:3px solid var(--fire-yellow); outline-offset:3px; }
+.nav__cta-corto{ display:none; }
+
+@media (prefers-reduced-motion: reduce){
+  .nav__cta{ transition:none; }
+  .nav__cta:hover{ transform:none; }
+}
 
 @media (max-width:900px){
   .nav__links{ display:none; }
   .nav__row{ padding-block:12px; }
   .nav__marca{ left:20px; top:0; }
   .nav__marca img{ height:88px; }
+  .nav__cta{ padding:11px 20px; font-size:14px; }
+  .nav__cta-largo{ display:none; }
+  .nav__cta-corto{ display:inline; }
 }
 </style>
