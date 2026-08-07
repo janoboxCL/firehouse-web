@@ -103,6 +103,20 @@ import { sitio, whatsapp } from '../data/sitio.js';
 .hero__datos li{ padding:var(--e-2) var(--e-4); }
 .hero__datos li + li{ border-left:0.5px solid var(--hairline); }
 
+@media (max-width:820px){
+  /* En vertical el video se recorta y el texto cae sobre la zona más movida:
+     acá el velo pesa más y el video se atenúa un poco. */
+  .hero__velo{
+    background:
+      radial-gradient(ellipse 92% 56% at 50% 44%, rgba(23,20,18,.82) 0%, rgba(23,20,18,.46) 100%),
+      linear-gradient(180deg, rgba(23,20,18,.74) 0%, rgba(23,20,18,.44) 46%, rgba(23,20,18,.86) 100%);
+  }
+  .hero__video{ filter:contrast(1.08) saturate(1.10) brightness(.90); }
+  .hero__titular{ text-shadow:0 2px 18px rgba(23,20,18,.98), 0 1px 4px rgba(23,20,18,1); }
+  .hero__bajada{ color:var(--chalk); text-shadow:0 1px 12px rgba(23,20,18,1); }
+  .hero__acciones .btn-quiet{ color:rgba(245,239,232,.9); }
+}
+
 @media (max-width:640px){
   .hero__contenido{ padding-block:96px 80px; }
   .hero__datos{ font-size:12.5px; }
