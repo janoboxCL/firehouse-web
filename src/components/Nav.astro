@@ -15,6 +15,7 @@ const enlaces = [
         <source srcset="/logo.webp" type="image/webp" />
         <img src="/logo.png" alt={sitio.nombre} width="275" height="240" />
       </picture>
+      <span class="nav__lema">The One and Only</span>
     </a>
 
     <nav aria-label="Principal" class="nav__links">
@@ -55,7 +56,20 @@ const enlaces = [
 .nav__marca{
   position:absolute; left:24px; top:2px;
   display:block; line-height:0; z-index:3;
+  text-align:center; text-decoration:none;
 }
+
+/* Cuarta línea del lockup: se recoge junto con el escudo */
+.nav__lema{
+  display:block; margin-top:8px;
+  font-family:var(--font-count);
+  font-size:10.5px; letter-spacing:.32em; line-height:1;
+  text-transform:uppercase; white-space:nowrap;
+  color:rgba(245,239,232,.66);
+  text-shadow:0 1px 10px rgba(23,20,18,.95);
+  transition:opacity var(--t-interfaz) ease;
+}
+.nav--compacta .nav__lema{ opacity:0; pointer-events:none; }
 .nav__marca img{
   height:134px; width:auto;
   filter:drop-shadow(0 6px 18px rgba(0,0,0,.55));
@@ -102,6 +116,7 @@ const enlaces = [
   .nav__row{ padding-block:10px; gap:var(--e-2); }
   .nav__marca{ left:20px; top:0; }
   .nav__marca img{ height:88px; }
+  .nav__lema{ font-size:8.5px; letter-spacing:.22em; margin-top:6px; }
   .nav--compacta .nav__marca img{ height:52px; }
   .nav--compacta .nav__marca{ top:6px; }
   .nav__cta{ padding:11px 18px; font-size:14px; }
@@ -120,8 +135,12 @@ const enlaces = [
   }
 }
 
+@media (max-width:520px){
+  .nav__lema{ display:none; }
+}
+
 @media (prefers-reduced-motion: reduce){
-  .nav__marca img, .nav__links, .nav__cta, .nav__boton span{ transition:none; }
+  .nav__marca img, .nav__lema, .nav__links, .nav__cta, .nav__boton span{ transition:none; }
   .nav__cta:hover{ transform:none; }
 }
 </style>
