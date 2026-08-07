@@ -7,6 +7,7 @@ import Equipos from '../components/Equipos.astro';
 import Precios from '../components/Precios.astro';
 import Contacto from '../components/Contacto.astro';
 import Etiqueta from '../components/Etiqueta.astro';
+import BandaFoto from '../components/BandaFoto.astro';
 import { whatsapp } from '../data/sitio.js';
 
 const titulo = 'Cheerleading en San Miguel, Santiago | Firehouse Cheer — clase de prueba gratis';
@@ -26,6 +27,9 @@ const anio = [
   <ClasePrueba />
 
   <Semana />
+
+  <BandaFoto src="/media/banda-equipo.jpg" alt="Deportistas de Firehouse durante un entrenamiento"
+             frase="Nadie llega sabiendo. Todas terminan compitiendo." alto="medio" />
 
   <section class="section anio-seccion" id="el-anio">
     <div class="wrap">
@@ -109,6 +113,9 @@ const anio = [
 
   <Equipos />
 
+  <BandaFoto src="/media/banda-competencia.jpg" alt="El equipo de Firehouse en competencia"
+             alto="bajo" />
+
   <Precios />
 
   <Contacto />
@@ -118,14 +125,7 @@ const anio = [
 .anio-seccion{ background:var(--ember); }
 .anio{ list-style:none; margin:var(--e-6) 0 0; padding:0; }
 
-/* Progresión ascendente: la temporada avanza hacia la derecha y culmina en los campeonatos */
-@media (min-width:821px){
-  .etapa:nth-child(1){ margin-left:0; }
-  .etapa:nth-child(2){ margin-left:18px; }
-  .etapa:nth-child(3){ margin-left:36px; }
-  .etapa:nth-child(4){ margin-left:54px; margin-right:-18px; }
-  .etapa:nth-child(5){ margin-left:36px; }
-}
+
 
 .etapa{
   position:relative;

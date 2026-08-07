@@ -13,7 +13,7 @@ import { sitio, whatsapp } from '../data/sitio.js';
       <dl class="datos reveal">
         <div><dt>WhatsApp</dt><dd><a href={whatsapp('contacto')} target="_blank" rel="noopener">+56 9 8611 4663</a></dd></div>
         <div><dt>Instagram</dt><dd><a href={sitio.instagram} target="_blank" rel="noopener">@firehouse.cheer</a></dd></div>
-        <div><dt>Dónde</dt><dd>{sitio.comuna}, {sitio.ciudad}</dd></div>
+        <div><dt>Dónde</dt><dd>{sitio.calle}, {sitio.comuna}</dd><p class="datos__extra">A pasos del Metro {sitio.metro}</p></div>
         <div><dt>Cuándo</dt><dd>{sitio.horarios.map(h => `${h.dia} ${h.hora}`).join(' · ')}</dd></div>
       </dl>
 
@@ -21,6 +21,17 @@ import { sitio, whatsapp } from '../data/sitio.js';
         <p class="contacto__frase">La primera clase es gratis.</p>
         <p class="contacto__sub">Escríbenos y coordinamos el día según su edad.</p>
         <a class="btn" href={whatsapp('hero')} target="_blank" rel="noopener">Ven a una clase de prueba gratis</a>
+      </div>
+    </div>
+
+    <div class="mapa reveal">
+      <div class="mapa__marco">
+        <iframe src={sitio.mapa} title={`Ubicación de Firehouse Cheer en ${sitio.calle}, ${sitio.comuna}`}
+                loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
+      </div>
+      <div class="mapa__pie">
+        <p><strong>{sitio.calle}, {sitio.comuna}</strong> — a pasos del Metro {sitio.metro}</p>
+        <a class="btn-mapa" href={sitio.comoLlegar} target="_blank" rel="noopener">Cómo llegar</a>
       </div>
     </div>
   </div>
@@ -54,7 +65,37 @@ dd a:hover{ color:var(--fire-yellow); }
 .contacto__sub{ color:var(--txt-soft); margin-top:var(--e-2); max-width:38ch; }
 .contacto__accion .btn{ margin-top:var(--e-4); }
 
+.datos__extra{
+  margin:var(--e-1) 0 0; font-size:14px; color:var(--fire-yellow);
+  font-family:var(--font-count); letter-spacing:.04em;
+}
+
+.mapa{ margin-top:var(--e-7); }
+.mapa__marco{
+  position:relative; aspect-ratio:21/9;
+  border-top:var(--regla) solid var(--fire-red);
+  border-bottom:var(--regla) solid var(--mat-blue);
+  background:var(--ember);
+  filter:grayscale(.35) contrast(1.05);
+}
+.mapa__marco iframe{ position:absolute; inset:0; width:100%; height:100%; border:0; }
+.mapa__pie{
+  display:flex; align-items:center; justify-content:space-between;
+  gap:var(--e-3); flex-wrap:wrap; margin-top:var(--e-3);
+}
+.mapa__pie p{ color:var(--txt-soft); }
+.mapa__pie strong{ color:var(--chalk); font-weight:500; }
+.btn-mapa{
+  display:inline-flex; align-items:center; min-height:48px;
+  padding:12px 28px; border-radius:var(--radio);
+  border:1.5px solid var(--chalk); color:var(--chalk);
+  text-decoration:none; font-weight:500;
+  transition:background var(--t-interfaz) ease, color var(--t-interfaz) ease;
+}
+.btn-mapa:hover{ background:var(--chalk); color:var(--ember); }
+
 @media (max-width:900px){
+  .mapa__marco{ aspect-ratio:4/3; }
   .contacto__grid{ grid-template-columns:1fr; gap:var(--e-5); }
   .contacto__accion{ padding-left:var(--e-3); }
 }

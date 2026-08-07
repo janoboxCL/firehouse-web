@@ -20,6 +20,7 @@ const schema = {
   sameAs: [sitio.instagram],
   address: {
     '@type': 'PostalAddress',
+    streetAddress: sitio.calle,
     addressLocality: sitio.comuna,
     addressRegion: sitio.ciudad,
     addressCountry: 'CL',
@@ -32,9 +33,9 @@ const schema = {
 ---
 <!doctype html>
 <html lang="es-CL">
-<script is:inline>document.documentElement.classList.add("js");</script>
 <head>
   <meta charset="utf-8" />
+  <script is:inline>document.documentElement.classList.add("js");</script>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>{titulo}</title>
   <meta name="description" content={descripcion} />
