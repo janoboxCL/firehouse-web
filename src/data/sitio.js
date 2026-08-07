@@ -8,6 +8,7 @@ export const sitio = {
   comuna: 'La Cisterna',
   ciudad: 'Santiago',
   metro: 'Lo Ovalle',
+  cercanas: 'San Miguel, El Bosque y Pedro Aguirre Cerda',
   mapa: 'https://maps.google.com/maps?q=Santa%20Corina%20197%2C%20La%20Cisterna%2C%20Santiago&z=16&output=embed',
   comoLlegar: 'https://www.google.com/maps/dir/?api=1&destination=Santa+Corina+197%2C+La+Cisterna%2C+Santiago',
   edadMinima: 4,
