@@ -10,8 +10,25 @@ import Etiqueta from '../components/Etiqueta.astro';
 import BandaFoto from '../components/BandaFoto.astro';
 import { whatsapp } from '../data/sitio.js';
 
-const titulo = 'Cheerleading en Santiago para niñas y niños | Firehouse Cheer — clase de prueba gratis';
-const descripcion = 'Academia de cheerleading en Santiago para niñas y niños desde los 4 años. Sin experiencia previa y todos nuestros equipos compiten. Estamos en La Cisterna, a pasos del Metro Lo Ovalle. Agenda una clase de prueba gratis.';
+const titulo = 'Clases de cheerleading en Santiago | Clase de prueba gratis';
+const descripcion = 'Clases de cheerleading en Santiago para niñas y niños desde los 4 años. Se empieza sin experiencia y todos nuestros equipos compiten. En La Cisterna, a pasos del Metro Lo Ovalle. La primera clase es gratis.';
+
+// Cada pregunta tiene su respuesta visible en la página. Google penaliza
+// el schema de FAQ que no corresponde a contenido real.
+const preguntas = [
+  { p: '¿Desde qué edad se puede entrar a Firehouse?',
+    r: 'Desde los 4 años. Los equipos se arman por edad cada temporada y todos entrenan el cheerleading completo.' },
+  { p: '¿Hay que tener experiencia previa para empezar?',
+    r: 'No. Se empieza sin saber nada: los equipos se arman con quienes llegan y las bases se trabajan desde cero.' },
+  { p: '¿Cuándo es el mejor momento para entrar?',
+    r: 'Se puede entrar en cualquier momento del año. Si se parte de cero, lo ideal es sumarse en las etapas iniciales (marzo y abril, o diciembre y enero). Durante la coreografía también funciona: los coaches trabajan aparte con quien se incorpora hasta nivelarlo.' },
+  { p: '¿La clase de prueba tiene costo?',
+    r: 'No. La primera clase es gratis y sin compromiso: es una clase real con el equipo que corresponde por edad y con los mismos coaches que lo entrenan. No es una audición y no se evalúa a nadie.' },
+  { p: '¿Cuánto cuesta una temporada de cheerleading?',
+    r: 'La matrícula es de $10.000 por una vez y la mensualidad de $30.000 entre marzo y diciembre. Durante la temporada se suman la tenida de entrenamiento, el traje de competencia y el pack de competencias, cada uno en el momento del año en que se necesita.' },
+  { p: '¿Los niños también pueden hacer cheerleading?',
+    r: 'Sí. El cheerleading competitivo contempla categorías mixtas y en Firehouse entrenan niñas y niños.' },
+];
 
 const anio = [
   { n:'01', meses:'marzo — abril',       desde:3,  hasta:4,  hito:'Todo comienza.',        titulo:'Se parte de cero',     texto:'Llegan quienes parten desde cero. Se arman los equipos del año y se trabajan las bases: coordinación, volteretas, confianza. Nadie llega sabiendo.' },
@@ -21,7 +38,7 @@ const anio = [
   { n:'05', meses:'diciembre — enero',   desde:12, hasta:1,  hito:'Se consolida.',         titulo:'Cierre y refuerzo',    texto:'Se cierra la temporada, se celebra lo conseguido y se refuerzan las habilidades que van a seguir creciendo.' },
 ];
 ---
-<Base titulo={titulo} descripcion={descripcion} ruta="">
+<Base titulo={titulo} descripcion={descripcion} ruta="" preguntas={preguntas}>
   <Hero />
 
   <ClasePrueba />

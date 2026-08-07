@@ -5,7 +5,7 @@ import Nav from '../components/Nav.astro';
 import Pie from '../components/Pie.astro';
 import { sitio } from '../data/sitio.js';
 
-const { titulo, descripcion, ruta = '' } = Astro.props;
+const { titulo, descripcion, ruta = '', preguntas = null } = Astro.props;
 const canonical = `${sitio.url}${ruta}`;
 
 const schema = {
@@ -25,6 +25,11 @@ const schema = {
     addressRegion: sitio.ciudad,
     addressCountry: 'CL',
   },
+  priceRange: '$$',
+  currenciesAccepted: 'CLP',
+  geo: { '@type': 'GeoCoordinates', latitude: sitio.lat, longitude: sitio.lng },
+  areaServed: sitio.areaServida.map(c => ({ '@type': 'City', name: c })),
+  publicAccess: true,
   openingHoursSpecification: [
     { '@type': 'OpeningHoursSpecification', dayOfWeek: 'Friday',   opens: '18:00', closes: '20:00' },
     { '@type': 'OpeningHoursSpecification', dayOfWeek: 'Saturday', opens: '16:00', closes: '18:00' },
@@ -68,6 +73,15 @@ const schema = {
   </script>
 
   <script type="application/ld+json" set:html={JSON.stringify(schema)} />
+  {preguntas && <script type="application/ld+json" set:html={JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: preguntas.map(p => ({
+      '@type': 'Question',
+      name: p.p,
+      acceptedAnswer: { '@type': 'Answer', text: p.r },
+    })),
+  })} />}
 </head>
 <body>
   <TopBar />
