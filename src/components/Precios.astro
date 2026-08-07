@@ -14,7 +14,8 @@ const items = [
       <Etiqueta texto="Los costos" />
       <h2 class="section__title">Todo lo que se paga en una temporada</h2>
       <p class="section__intro">
-        Preferimos decirlo completo desde el principio. Estos son todos los ítems del año — no hay otros.
+        Este es el esquema completo de costos de una temporada. Lo mostramos entero desde el
+        principio para que no aparezcan sorpresas después.
       </p>
     </div>
 
@@ -52,7 +53,7 @@ const items = [
     <div class="precios__cierre reveal">
       <p class="precios__frase">Antes de pagar nada, ven a conocernos.</p>
       <p class="precios__sub">La primera clase es gratis y no compromete a nada.</p>
-      <a class="btn" href={whatsapp('precios')} target="_blank" rel="noopener">Ven a una clase de prueba gratis</a>
+      <a class="btn-sec" href={whatsapp('precios')} target="_blank" rel="noopener">Ven a una clase de prueba gratis</a>
     </div>
   </div>
 </section>
@@ -95,7 +96,7 @@ const items = [
   font-size:clamp(1.6rem, 3.2vw, 2.4rem); line-height:1.05;
 }
 .precios__sub{ color:var(--txt-soft); margin-top:var(--e-1); }
-.precios__cierre .btn{ margin-top:var(--e-3); }
+.precios__cierre .btn-sec{ margin-top:var(--e-3); }
 
 @media (max-width:820px){
   .fila{ grid-template-columns:1fr auto; gap:var(--e-2); }

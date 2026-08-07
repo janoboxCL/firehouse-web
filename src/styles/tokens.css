@@ -62,6 +62,9 @@ img,video{ max-width:100%; display:block; }
 
 .wrap{ width:100%; max-width:var(--wrap); margin-inline:auto; padding-inline:24px; }
 
+.tabular, .count{
+  font-variant-numeric:tabular-nums;
+}
 .count{
   display:inline-flex; align-items:center; gap:14px;
   font-family:var(--font-count); font-weight:700;
@@ -92,13 +95,34 @@ img,video{ max-width:100%; display:block; }
 .btn{ min-height:48px; }
 .btn:focus-visible{ outline:3px solid var(--fire-yellow); outline-offset:3px; }
 
+/* Segundo nivel: mismo peso de acción, menos peso visual */
+.btn-sec{
+  display:inline-flex; align-items:center; min-height:48px;
+  padding:14px 30px; border-radius:var(--radio);
+  border:1.5px solid var(--chalk); color:var(--chalk);
+  text-decoration:none; font-weight:500; font-size:16px;
+  transition:background var(--t-interfaz) ease, color var(--t-interfaz) ease;
+}
+.btn-sec:hover{ background:var(--chalk); color:var(--ember); }
+.btn-sec:focus-visible{ outline:3px solid var(--fire-yellow); outline-offset:3px; }
+
+/* Tercer nivel: repeticiones intermedias, sin botón */
+.cta-texto{
+  display:inline-flex; align-items:center; gap:10px; min-height:48px;
+  color:var(--fire-yellow); font-weight:500; font-size:16px;
+  text-decoration:none; border-bottom:2px solid var(--fire-yellow);
+}
+.cta-texto:hover{ color:var(--chalk); border-bottom-color:var(--chalk); }
+
 .btn-quiet{
   color:var(--txt-faint);
   text-decoration:underline;
   font-size:15px;
 }
 
-.section{ padding:96px 0; }
+.section{ padding:var(--e-7) 0; }
+/* Las secciones con fondo propio respiran más: separan los bloques de información */
+.section[class*="prueba"], .section[class*="equipos"], .section[class*="contacto"]{ padding:var(--e-8) 0; }
 
 /* Encabezado de sección: título con regla que se prolonga */
 .section__title{
