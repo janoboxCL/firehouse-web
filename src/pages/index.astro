@@ -7,11 +7,11 @@ const titulo = 'Cheerleading en San Miguel, Santiago | Firehouse Cheer — clase
 const descripcion = 'Academia de cheerleading en San Miguel para niñas y niños desde los 4 años. Sin experiencia previa y todos nuestros equipos compiten. Agenda una clase de prueba gratis por WhatsApp.';
 
 const anio = [
-  { n:'01', meses:'Marzo · Abril',       desde:3,  hasta:4,  hito:'Todo comienza.',        titulo:'Se parte de cero',     texto:'Llegan los que empiezan. Se arman los equipos del año y se trabajan las bases: coordinación, volteretas, confianza. Nadie llega sabiendo.' },
-  { n:'02', meses:'Mayo · Junio',        desde:5,  hasta:6,  hito:'Se construye la base.', titulo:'Se sube la exigencia', texto:'Entrenamiento avanzado. Aparecen los stunts, las progresiones más complejas y el trabajo real de equipo.' },
-  { n:'03', meses:'Julio a Septiembre',  desde:7,  hasta:9,  hito:'Toma forma la rutina.', titulo:'La coreografía',       texto:'Se monta la rutina de la temporada y se prepara la competencia. Es la etapa más intensa y la que más une al grupo.' },
-  { n:'04', meses:'Octubre · Noviembre', desde:10, hasta:11, hito:'Se compite.',           titulo:'Los campeonatos',      texto:'Showcase y torneos. Todos los equipos compiten. Es lo que se estuvo preparando todo el año.', cumbre:true },
-  { n:'05', meses:'Diciembre · Enero',   desde:12, hasta:1,  hito:'Se consolida.',         titulo:'Cierre y refuerzo',    texto:'Se cierra la temporada, se celebra lo conseguido y se refuerza lo que quedó pendiente.' },
+  { n:'01', meses:'marzo — abril',       desde:3,  hasta:4,  hito:'Todo comienza.',        titulo:'Se parte de cero',     texto:'Llegan quienes parten desde cero. Se arman los equipos del año y se trabajan las bases: coordinación, volteretas, confianza. Nadie llega sabiendo.' },
+  { n:'02', meses:'mayo — junio',        desde:5,  hasta:6,  hito:'Se construye la base.', titulo:'Se sube la exigencia', texto:'El entrenamiento avanza. Aparecen los stunts, las progresiones más complejas y el trabajo real de equipo.' },
+  { n:'03', meses:'julio — septiembre',  desde:7,  hasta:9,  hito:'Toma forma la rutina.', titulo:'La coreografía',       texto:'Se monta la rutina de la temporada y se prepara la competencia. Es la etapa más intensa y la que más une al grupo.' },
+  { n:'04', meses:'octubre — noviembre', desde:10, hasta:11, hito:'Se compite.',           titulo:'Los campeonatos',      texto:'Showcase y torneos. Llega el momento de mostrar todo lo que el equipo preparó durante el año.', cumbre:true },
+  { n:'05', meses:'diciembre — enero',   desde:12, hasta:1,  hito:'Se consolida.',         titulo:'Cierre y refuerzo',    texto:'Se cierra la temporada, se celebra lo conseguido y se refuerzan las habilidades que van a seguir creciendo.' },
 ];
 ---
 <Base titulo={titulo} descripcion={descripcion} ruta="">
@@ -56,23 +56,29 @@ const anio = [
 
       <div class="anio__nota reveal">
         <h3>¿Cuándo es el mejor momento para entrar?</h3>
-        <p>
+        <p class="nota__entrada">
           Se puede entrar en cualquier momento del año. Cuál es el mejor depende de cada deportista.
         </p>
+
+        <h4>Si parte de cero</h4>
         <p>
-          <strong>Si parte de cero</strong>, lo ideal es sumarse en las etapas iniciales — marzo y abril,
-          o diciembre y enero. Ahí el equipo completo está construyendo bases y nadie va más adelante que nadie.
+          Lo ideal es sumarse en las etapas iniciales — marzo y abril, o diciembre y enero.
+          Ahí resulta más fácil construir las bases junto al resto del equipo.
         </p>
+
+        <h4>Si se suma durante la coreografía</h4>
         <p>
-          <strong>Si llega mientras se monta la coreografía</strong>, también funciona. Los coaches trabajan
-          aparte con quien se incorpora hasta nivelarlo, y esta temporada se sumaron niñas y niños sin
-          ninguna experiencia que se integraron sin problema.
+          También funciona. Los coaches trabajan aparte con quien se incorpora hasta nivelarlo:
+          esta temporada se sumaron niñas y niños sin ninguna experiencia y se integraron bien
+          al proceso.
         </p>
+
+        <h4>Si llega durante los campeonatos</h4>
         <p>
-          <strong>En plena temporada de campeonatos</strong> la incorporación es posible, y rinde mejor
-          con algo de experiencia previa.
+          La incorporación es posible, y rinde mejor con algo de experiencia previa.
         </p>
-        <p>
+
+        <p class="nota__cierre">
           Escríbenos y te decimos con franqueza qué conviene según su edad y lo que ya sabe hacer.
         </p>
         <p><a class="btn" href={whatsapp('anio')} target="_blank" rel="noopener">Ven a una clase de prueba gratis</a></p>
@@ -122,7 +128,9 @@ const anio = [
 .etapa__n{
   display:block;
   font-family:var(--font-count); font-weight:700;
-  font-size:13px; letter-spacing:.22em; color:var(--fire-red);
+  font-size:13px; letter-spacing:.22em; color:var(--txt-faint);
+  font-variant-numeric:tabular-nums;
+  min-width:6ch;
 }
 .etapa__n i{ font-style:normal; color:var(--ash); }
 
@@ -145,7 +153,7 @@ const anio = [
   letter-spacing:.14em; text-transform:uppercase;
   color:var(--txt-faint); margin-top:10px;
 }
-.etapa__texto{ color:var(--txt-soft); max-width:56ch; margin-top:12px; }
+.etapa__texto{ color:var(--txt-soft); max-width:62ch; margin-top:var(--e-2); line-height:1.6; }
 
 .etapa__aqui{
   display:none;
@@ -170,7 +178,7 @@ const anio = [
 
 /* El clímax: único bloque rojo de la sección */
 .etapa--cumbre{ background:var(--fire-red); padding-block:70px; overflow:hidden; }
-.etapa--cumbre .etapa__n{ color:rgba(255,255,255,.75); }
+.etapa--cumbre .etapa__n{ color:rgba(255,255,255,.7); }
 .etapa--cumbre .etapa__n i{ color:rgba(255,255,255,.45); }
 .etapa--cumbre .etapa__meses{ color:#fff; font-size:clamp(2.1rem, 3.9vw, 3.3rem); }
 .etapa--cumbre .etapa__hito{ color:#fff; font-size:clamp(1.6rem, 2.7vw, 2.3rem); }
@@ -180,13 +188,20 @@ const anio = [
 .etapa--cumbre.etapa--ahora .etapa__hito{ color:var(--fire-yellow); }
 
 .anio__nota{
-  margin-top:80px; padding:44px;
+  margin-top:var(--e-8); padding:var(--e-5);
   background:var(--ember-deep);
-  border-left:5px solid var(--mat-blue);
+  border-left:var(--regla) solid var(--mat-blue);
 }
 .anio__nota h3{ font-size:1.5rem; }
-.anio__nota p{ color:var(--txt-soft); max-width:62ch; margin-top:14px; }
-.anio__nota strong{ color:var(--chalk); font-weight:500; }
+.anio__nota p{ color:var(--txt-soft); max-width:var(--wrap-texto); margin-top:var(--e-1); line-height:1.6; }
+.anio__nota h4{
+  font-family:var(--font-body); font-weight:500;
+  font-size:14px; letter-spacing:.12em; text-transform:uppercase;
+  color:var(--fire-yellow); margin:var(--e-4) 0 0;
+}
+.nota__entrada{ font-size:1.12rem; }
+.nota__cierre{ margin-top:var(--e-4) !important; color:var(--chalk) !important; }
+
 
 @media (max-width:820px){
   .etapa{ grid-template-columns:1fr; gap:18px; padding:34px 24px; clip-path:none; margin-bottom:8px; }

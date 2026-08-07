@@ -21,13 +21,13 @@ import { sitio, whatsapp } from '../data/sitio.js';
     <p class="count">5 · 6 · 7 · 8</p>
 
     <h1 class="hero__titular">
-      En marzo no sabía dar una voltereta.
-      <span class="hero__remate">En octubre estaba compitiendo.</span>
+      <span class="hero__linea">En marzo no sabía dar una voltereta.</span>{' '}
+      <span class="hero__linea hero__remate">En octubre estaba compitiendo.</span>
     </h1>
 
     <p class="hero__bajada">
-      Academia de cheerleading en {sitio.comuna}, {sitio.ciudad}. Para niñas y niños
-      desde los {sitio.edadMinima} años, sin experiencia previa, y todos nuestros equipos compiten.
+      Cheerleading en {sitio.comuna}, {sitio.ciudad}, para niñas y niños desde los
+      {sitio.edadMinima} años. Se empieza sin experiencia previa y se entrena para competir.
     </p>
 
     <p class="hero__acciones">
@@ -71,18 +71,24 @@ import { sitio, whatsapp } from '../data/sitio.js';
 .hero__contenido{ position:relative; padding-block:150px 104px; text-align:center; }
 
 .hero__titular{
-  font-size:clamp(2.3rem, 5.9vw, 4.5rem);
-  max-width:17ch;
-  margin:24px auto 0;
+  font-size:clamp(2.1rem, 4.6vw, 3.5rem);
+  max-width:100%;
+  margin:var(--e-3) auto 0;
   text-shadow:0 2px 26px rgba(23,20,18,.85), 0 1px 3px rgba(23,20,18,.9);
 }
-.hero__remate{ display:block; color:var(--fire-yellow); }
+/* En escritorio cada frase ocupa su línea; en móvil el navegador reparte solo */
+.hero__linea{ display:inline; }
+.hero__remate{ color:var(--fire-yellow); }
+@media (min-width:900px){
+  .hero__linea{ display:block; }
+}
 
 .hero__bajada{
-  color:var(--chalk); max-width:52ch; margin:26px auto 34px;
+  color:var(--txt-soft); max-width:56ch; margin:var(--e-3) auto var(--e-4);
+  font-size:clamp(1.05rem, 1.5vw, 1.25rem);
   text-shadow:0 1px 14px rgba(23,20,18,.95);
 }
-.hero__acciones{ display:flex; flex-direction:column; align-items:center; gap:18px; }
+.hero__acciones{ display:flex; flex-direction:column; align-items:center; gap:var(--e-2); }
 .hero__acciones .btn-quiet{ color:rgba(245,239,232,.8); text-shadow:0 1px 10px rgba(23,20,18,.9); }
 
 /* El corte diagonal se reemplaza por dos reglas: rojo sobre azul de tapiz */
@@ -92,10 +98,10 @@ import { sitio, whatsapp } from '../data/sitio.js';
   list-style:none; margin:0; padding:0;
   font-size:14px; color:var(--txt-soft);
   background:var(--ember-deep);
-  border-top:4px solid var(--fire-red);
-  border-bottom:4px solid var(--mat-blue);
+  border-top:var(--regla) solid var(--fire-red);
+  border-bottom:var(--regla) solid var(--mat-blue);
 }
-.hero__datos li{ padding:17px 32px; }
+.hero__datos li{ padding:var(--e-2) var(--e-4); }
 .hero__datos li + li{ border-left:0.5px solid var(--hairline); }
 
 @media (max-width:640px){
