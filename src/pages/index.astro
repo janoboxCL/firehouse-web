@@ -1,6 +1,12 @@
 ---
 import Base from '../layouts/Base.astro';
 import Hero from '../components/Hero.astro';
+import ClasePrueba from '../components/ClasePrueba.astro';
+import Semana from '../components/Semana.astro';
+import Equipos from '../components/Equipos.astro';
+import Precios from '../components/Precios.astro';
+import Contacto from '../components/Contacto.astro';
+import Etiqueta from '../components/Etiqueta.astro';
 import { whatsapp } from '../data/sitio.js';
 
 const titulo = 'Cheerleading en San Miguel, Santiago | Firehouse Cheer — clase de prueba gratis';
@@ -17,10 +23,14 @@ const anio = [
 <Base titulo={titulo} descripcion={descripcion} ruta="">
   <Hero />
 
-  <section class="section" id="el-anio">
+  <ClasePrueba />
+
+  <Semana />
+
+  <section class="section anio-seccion" id="el-anio">
     <div class="wrap">
       <div class="reveal">
-        <p class="count">5 · 6 · 7 · 8</p>
+        <Etiqueta texto="5 · 6 · 7 · 8" />
         <h2 class="section__title">Un año en Firehouse</h2>
       </div>
       <p class="section__intro reveal">
@@ -96,10 +106,17 @@ const anio = [
       });
     })();
   </script>
+
+  <Equipos />
+
+  <Precios />
+
+  <Contacto />
 </Base>
 
 <style>
-.anio{ list-style:none; margin:64px 0 0; padding:0; }
+.anio-seccion{ background:var(--ember); }
+.anio{ list-style:none; margin:var(--e-6) 0 0; padding:0; }
 
 /* Progresión ascendente: la temporada avanza hacia la derecha y culmina en los campeonatos */
 @media (min-width:821px){

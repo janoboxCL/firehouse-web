@@ -1,0 +1,63 @@
+---
+import Etiqueta from './Etiqueta.astro';
+const dias = [
+  { dia:'Viernes', hora:'18:00 — 20:00', clase:'Cheer Class', texto:'Stunts, transiciones y preparación competitiva. Es donde se arma la rutina del equipo.' },
+  { dia:'Sábado',  hora:'16:00 — 18:00', clase:'Gimnasia',    texto:'Técnica de suelo, fuerza y progresiones. Acá se construye lo que después permite todo lo demás.' },
+];
+---
+<section class="section semana" id="semana">
+  <div class="wrap">
+    <div class="reveal">
+      <Etiqueta texto="La semana" />
+      <h2 class="section__title">Dos días a la semana</h2>
+    </div>
+
+    <div class="semana__grid">
+      {dias.map(d => (
+        <article class="dia reveal">
+          <p class="dia__nombre">{d.dia}</p>
+          <p class="dia__hora">{d.hora}</p>
+          <h3 class="dia__clase">{d.clase}</h3>
+          <p class="dia__texto">{d.texto}</p>
+        </article>
+      ))}
+    </div>
+
+    <p class="semana__pie reveal">Cuatro horas semanales, en San Miguel.</p>
+  </div>
+</section>
+
+<style>
+.semana__grid{ display:grid; grid-template-columns:1fr 1fr; gap:var(--e-4); margin-top:var(--e-6); }
+
+.dia{
+  background:var(--ember-deep);
+  padding:var(--e-5);
+  border-top:var(--regla) solid var(--fire-red);
+  position:relative;
+}
+.dia:nth-child(2){ border-top-color:var(--mat-blue); }
+
+.dia__nombre{
+  font-family:var(--font-display); font-weight:800;
+  font-size:clamp(2rem, 4vw, 3.1rem); line-height:1;
+  color:var(--chalk);
+}
+.dia__hora{
+  font-family:var(--font-count); font-size:14px; letter-spacing:.12em;
+  color:var(--fire-yellow); margin-top:var(--e-1);
+}
+.dia__clase{
+  font-family:var(--font-body); font-weight:500;
+  font-size:14px; letter-spacing:.14em; text-transform:uppercase;
+  color:var(--txt-faint); margin-top:var(--e-3);
+}
+.dia__texto{ color:var(--txt-soft); margin-top:var(--e-2); line-height:1.6; max-width:40ch; }
+
+.semana__pie{
+  margin-top:var(--e-4); color:var(--txt-faint);
+  font-family:var(--font-count); font-size:14px; letter-spacing:.06em;
+}
+
+@media (max-width:760px){ .semana__grid{ grid-template-columns:1fr; } }
+</style>

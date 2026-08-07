@@ -1,0 +1,90 @@
+---
+import Etiqueta from './Etiqueta.astro';
+import { whatsapp } from '../data/sitio.js';
+const tramos = [
+  { edad:'4 a 8',  texto:'Coordinación, volteretas y trabajo en equipo. Se entra sin saber nada y se compite igual que el resto.' },
+  { edad:'9 a 13', texto:'Técnica de suelo, stunts y progresiones, con rutina propia para la temporada.' },
+  { edad:'14 +',   texto:'Pirámides, transiciones y rutina completa, con la mayor exigencia técnica de la academia.' },
+];
+---
+<section class="section equipos" id="equipos">
+  <div class="wrap">
+    <div class="reveal">
+      <Etiqueta texto="Los equipos" />
+      <h2 class="section__title">Todos los equipos hacen de todo</h2>
+      <p class="section__intro">
+        Acá no hay grupos de espera ni categorías de relleno. Todos los equipos entrenan lo mismo:
+        gimnasia de suelo, stunts, elevaciones, pirámides y su propia coreografía. Y todos compiten.
+      </p>
+    </div>
+
+    <div class="equipos__grid">
+      {tramos.map(t => (
+        <article class="tramo reveal">
+          <p class="tramo__edad">{t.edad}</p>
+          <p class="tramo__anios">años</p>
+          <p class="tramo__texto">{t.texto}</p>
+        </article>
+      ))}
+    </div>
+
+    <p class="equipos__nota reveal">
+      La única razón por la que existen equipos separados es práctica: las edades y la cantidad
+      de deportistas que se inscriben. Por eso cambian cada temporada — algunos años son tres
+      equipos, otros más. <strong>Lo que se ajusta es la exigencia, no el contenido.</strong>
+      Una niña de seis y una de dieciséis hacen los mismos elementos, en el nivel que a cada
+      una le corresponde.
+    </p>
+
+    <div class="mixto reveal">
+      <h3>El cheerleading es un deporte mixto</h3>
+      <p>
+        Acá entrenan niñas y niños. No es una excepción ni una adaptación: el cheerleading de
+        competencia es mixto en todo el mundo, y los equipos con hombres compiten en su propia categoría.
+      </p>
+      <p>
+        Sabemos que a veces la duda no es del niño sino de la casa. Si es tu caso, ven a ver un
+        entrenamiento. Es más fácil entender de qué se trata viéndolo que explicándolo.
+      </p>
+      <a class="btn" href={whatsapp('equipos')} target="_blank" rel="noopener">Ven a una clase de prueba gratis</a>
+    </div>
+  </div>
+</section>
+
+<style>
+.equipos{ background:var(--ember-deep); }
+.equipos__grid{ display:grid; grid-template-columns:repeat(3, 1fr); gap:var(--e-3); margin-top:var(--e-6); }
+
+.tramo{
+  background:var(--ember);
+  padding:var(--e-4);
+  clip-path:polygon(0 0, 100% 18px, 100% 100%, 0 calc(100% - 18px));
+}
+.tramo__edad{
+  font-family:var(--font-display); font-weight:800;
+  font-size:clamp(2.6rem, 5.4vw, 4rem); line-height:.9;
+  color:var(--fire-yellow);
+}
+.tramo__anios{
+  font-family:var(--font-count); font-size:13px; letter-spacing:.2em;
+  color:var(--txt-faint); margin-top:var(--e-1);
+}
+.tramo__texto{ color:var(--txt-soft); margin-top:var(--e-3); line-height:1.55; font-size:16px; }
+
+.equipos__nota{
+  margin-top:var(--e-5); color:var(--txt-soft);
+  max-width:var(--wrap-texto); line-height:1.6;
+}
+.equipos__nota strong{ color:var(--chalk); font-weight:500; }
+
+.mixto{
+  margin-top:var(--e-7); padding:var(--e-5);
+  background:var(--ember);
+  border-left:var(--regla) solid var(--fire-red);
+}
+.mixto h3{ font-size:clamp(1.4rem, 2.4vw, 1.9rem); color:var(--fire-yellow); }
+.mixto p{ color:var(--txt-soft); max-width:var(--wrap-texto); margin-top:var(--e-2); line-height:1.6; }
+.mixto .btn{ margin-top:var(--e-4); }
+
+@media (max-width:900px){ .equipos__grid{ grid-template-columns:1fr; } .tramo{ clip-path:none; } }
+</style>

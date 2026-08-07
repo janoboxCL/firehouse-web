@@ -1,0 +1,105 @@
+---
+import Etiqueta from './Etiqueta.astro';
+import { whatsapp } from '../data/sitio.js';
+const items = [
+  { nombre:'Mensualidad',             valor:'$30.000', incluye:'De marzo a diciembre',                        cuando:'Cada mes' },
+  { nombre:'Tenida de entrenamiento', valor:'$30.000', incluye:'Polera, colet y cinta de competencia',        cuando:'Al inicio' },
+  { nombre:'Traje de competencia',    valor:'$100.000',incluye:'Se usa dos temporadas',                       cuando:'Mitad de año' },
+  { nombre:'Pack de competencias',    valor:'$150.000',incluye:'2 showcase y 3 torneos, uno regional',        cuando:'Antes de octubre' },
+];
+---
+<section class="section precios" id="precios">
+  <div class="wrap">
+    <div class="reveal">
+      <Etiqueta texto="Los costos" />
+      <h2 class="section__title">Todo lo que se paga en una temporada</h2>
+      <p class="section__intro">
+        Preferimos decirlo completo desde el principio. Estos son todos los ítems del año — no hay otros.
+      </p>
+    </div>
+
+    <ul class="tabla reveal">
+      {items.map(i => (
+        <li class="fila">
+          <div class="fila__nombre">
+            <p class="fila__titulo">{i.nombre}</p>
+            <p class="fila__incluye">{i.incluye}</p>
+          </div>
+          <p class="fila__valor">{i.valor}</p>
+          <p class="fila__cuando">{i.cuando}</p>
+        </li>
+      ))}
+    </ul>
+
+    <p class="precios__aviso reveal">
+      Estos valores son referenciales de la temporada anterior. Los definitivos se confirman a
+      medida que avanza el año y suelen variar poco. Preferimos mostrarte el orden de magnitud
+      real antes que dejarte con la duda.
+    </p>
+
+    <div class="precios__ventajas">
+      <div class="ventaja reveal">
+        <h3>El segundo año cuesta menos</h3>
+        <p>El traje de competencia se usa dos temporadas, así que quien continúa se ahorra $100.000.</p>
+      </div>
+      <div class="ventaja reveal">
+        <h3>De a dos cuesta menos</h3>
+        <p>Si inscribes a dos —hermanos, primos o amigos— tenemos un valor especial.</p>
+        <a class="enlace" href={whatsapp('dosAlumnos')} target="_blank" rel="noopener">Consultar el valor para dos</a>
+      </div>
+    </div>
+
+    <div class="precios__cierre reveal">
+      <p class="precios__frase">Antes de pagar nada, ven a conocernos.</p>
+      <p class="precios__sub">La primera clase es gratis y no compromete a nada.</p>
+      <a class="btn" href={whatsapp('precios')} target="_blank" rel="noopener">Ven a una clase de prueba gratis</a>
+    </div>
+  </div>
+</section>
+
+<style>
+.tabla{ list-style:none; margin:var(--e-6) 0 0; padding:0; }
+.fila{
+  display:grid; grid-template-columns:1fr auto 180px;
+  gap:var(--e-4); align-items:center;
+  padding:var(--e-3) 0;
+  border-bottom:0.5px solid var(--hairline);
+}
+.fila:first-child{ border-top:0.5px solid var(--hairline); }
+.fila__titulo{ font-family:var(--font-display); font-weight:800; font-size:clamp(1.1rem, 1.8vw, 1.35rem); }
+.fila__incluye{ color:var(--txt-faint); font-size:14.5px; margin-top:2px; }
+.fila__valor{
+  font-family:var(--font-count); font-weight:700;
+  font-size:clamp(1.2rem, 2.2vw, 1.6rem); color:var(--fire-yellow);
+  font-variant-numeric:tabular-nums; white-space:nowrap;
+}
+.fila__cuando{
+  font-family:var(--font-body); font-size:13px; letter-spacing:.12em;
+  text-transform:uppercase; color:var(--txt-faint); text-align:right;
+}
+
+.precios__aviso{
+  margin-top:var(--e-4); color:var(--txt-soft);
+  max-width:var(--wrap-texto); line-height:1.6; font-size:16px;
+}
+
+.precios__ventajas{ display:grid; grid-template-columns:1fr 1fr; gap:var(--e-3); margin-top:var(--e-6); }
+.ventaja{ background:var(--ember-deep); padding:var(--e-4); border-left:var(--regla) solid var(--mat-blue); }
+.ventaja h3{ font-size:clamp(1.15rem, 1.9vw, 1.4rem); color:var(--fire-yellow); }
+.ventaja p{ color:var(--txt-soft); margin-top:var(--e-1); line-height:1.55; }
+.enlace{ display:inline-block; margin-top:var(--e-2); color:var(--chalk); font-size:15px; }
+
+.precios__cierre{ margin-top:var(--e-7); text-align:center; }
+.precios__frase{
+  font-family:var(--font-display); font-weight:800;
+  font-size:clamp(1.6rem, 3.2vw, 2.4rem); line-height:1.05;
+}
+.precios__sub{ color:var(--txt-soft); margin-top:var(--e-1); }
+.precios__cierre .btn{ margin-top:var(--e-3); }
+
+@media (max-width:820px){
+  .fila{ grid-template-columns:1fr auto; gap:var(--e-2); }
+  .fila__cuando{ grid-column:1 / -1; text-align:left; }
+  .precios__ventajas{ grid-template-columns:1fr; }
+}
+</style>

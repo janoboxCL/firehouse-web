@@ -120,6 +120,12 @@ html.js .reveal{
 }
 html.js .reveal.visible{ opacity:1; transform:none; }
 
+/* Escalonado: los elementos de una misma fila entran uno tras otro */
+html.js .semana__grid .reveal:nth-child(2),
+html.js .equipos__grid .reveal:nth-child(2),
+html.js .precios__ventajas .reveal:nth-child(2){ transition-delay:90ms; }
+html.js .equipos__grid .reveal:nth-child(3){ transition-delay:180ms; }
+
 @media (prefers-reduced-motion: reduce){
   html.js .reveal{ opacity:1; transform:none; transition:none; }
 }

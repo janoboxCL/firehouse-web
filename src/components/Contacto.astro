@@ -1,0 +1,61 @@
+---
+import Etiqueta from './Etiqueta.astro';
+import { sitio, whatsapp } from '../data/sitio.js';
+---
+<section class="section contacto" id="contacto">
+  <div class="wrap">
+    <div class="reveal">
+      <Etiqueta texto="Contacto" />
+      <h2 class="section__title">Escríbenos</h2>
+    </div>
+
+    <div class="contacto__grid">
+      <dl class="datos reveal">
+        <div><dt>WhatsApp</dt><dd><a href={whatsapp('contacto')} target="_blank" rel="noopener">+56 9 8611 4663</a></dd></div>
+        <div><dt>Instagram</dt><dd><a href={sitio.instagram} target="_blank" rel="noopener">@firehouse.cheer</a></dd></div>
+        <div><dt>Dónde</dt><dd>{sitio.comuna}, {sitio.ciudad}</dd></div>
+        <div><dt>Cuándo</dt><dd>{sitio.horarios.map(h => `${h.dia} ${h.hora}`).join(' · ')}</dd></div>
+      </dl>
+
+      <div class="contacto__accion reveal">
+        <p class="contacto__frase">La primera clase es gratis.</p>
+        <p class="contacto__sub">Escríbenos y coordinamos el día según su edad.</p>
+        <a class="btn" href={whatsapp('hero')} target="_blank" rel="noopener">Ven a una clase de prueba gratis</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+.contacto{ background:var(--ember-deep); }
+.contacto__grid{ display:grid; grid-template-columns:1fr 1fr; gap:var(--e-7); margin-top:var(--e-6); align-items:start; }
+
+.datos{ margin:0; }
+.datos > div{ padding:var(--e-3) 0; border-bottom:0.5px solid var(--hairline); }
+.datos > div:first-child{ border-top:0.5px solid var(--hairline); }
+dt{
+  font-family:var(--font-body); font-size:13px; font-weight:500;
+  letter-spacing:.14em; text-transform:uppercase; color:var(--txt-faint);
+}
+dd{
+  margin:var(--e-1) 0 0;
+  font-family:var(--font-display); font-weight:800;
+  font-size:clamp(1.05rem, 1.8vw, 1.3rem);
+}
+dd a{ text-decoration:none; }
+dd a:hover{ color:var(--fire-yellow); }
+
+.contacto__accion{ border-left:var(--regla) solid var(--fire-red); padding-left:var(--e-4); }
+.contacto__frase{
+  font-family:var(--font-display); font-weight:800;
+  font-size:clamp(1.5rem, 2.8vw, 2.1rem); line-height:1.05;
+  color:var(--fire-yellow);
+}
+.contacto__sub{ color:var(--txt-soft); margin-top:var(--e-2); max-width:38ch; }
+.contacto__accion .btn{ margin-top:var(--e-4); }
+
+@media (max-width:900px){
+  .contacto__grid{ grid-template-columns:1fr; gap:var(--e-5); }
+  .contacto__accion{ padding-left:var(--e-3); }
+}
+</style>
