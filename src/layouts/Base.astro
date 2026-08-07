@@ -12,7 +12,7 @@ const schema = {
   '@context': 'https://schema.org',
   '@type': 'SportsActivityLocation',
   name: sitio.nombre,
-  alternateName: sitio.nombreCorto,
+  alternateName: [sitio.nombreCorto, 'Firehouse — The One and Only'],
   url: sitio.url,
   logo: `${sitio.url}/logo.png`,
   image: `${sitio.url}/og.jpg`,

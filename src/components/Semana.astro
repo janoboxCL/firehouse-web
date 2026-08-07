@@ -2,7 +2,7 @@
 import Etiqueta from './Etiqueta.astro';
 const dias = [
   { dia:'Viernes', hora:'18:00 — 20:00', clase:'Cheer Class', texto:'Stunts, transiciones y preparación competitiva. Es donde se arma la rutina del equipo.' },
-  { dia:'Sábado',  hora:'16:00 — 18:00', clase:'Gimnasia',    texto:'Técnica de suelo, fuerza y progresiones. Acá se construye lo que después permite todo lo demás.' },
+  { dia:'Sábado',  hora:'16:00 — 18:00', clase:'Gimnasia',    texto:'Técnica de suelo, fuerza, acondicionamiento y progresiones seguras. Acá se construye lo que después permite todo lo demás.' },
 ];
 ---
 <section class="section semana" id="semana">
@@ -44,6 +44,7 @@ const dias = [
   color:var(--chalk);
 }
 .dia__hora{
+  font-variant-numeric:tabular-nums;
   font-family:var(--font-count); font-size:14px; letter-spacing:.12em;
   color:var(--fire-yellow); margin-top:var(--e-1);
 }

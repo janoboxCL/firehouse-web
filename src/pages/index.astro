@@ -29,7 +29,7 @@ const anio = [
   <Semana />
 
   <BandaFoto src="/media/banda-equipo.jpg" alt="Deportistas de Firehouse durante un entrenamiento"
-             frase="Nadie llega sabiendo. Todas terminan compitiendo." alto="medio" />
+             frase="Nadie llega sabiendo. Todos entrenan para competir." alto="medio" />
 
   <section class="section anio-seccion" id="el-anio">
     <div class="wrap">
@@ -62,7 +62,6 @@ const anio = [
               <p class="etapa__hito">{e.hito}</p>
               <h3 class="etapa__titulo">{e.titulo}</h3>
               <p class="etapa__texto">{e.texto}</p>
-              <span class="etapa__aqui">● Estamos acá</span>
             </div>
           </li>
         ))}
@@ -101,7 +100,7 @@ const anio = [
         <p class="nota__cierre">
           Escríbenos y te decimos con franqueza qué conviene según su edad y lo que ya sabe hacer.
         </p>
-        <p class="nota__accion"><a class="btn" href={whatsapp('anio')} target="_blank" rel="noopener">Ven a una clase de prueba gratis</a></p>
+        <p class="nota__accion"><a class="cta-texto" href={whatsapp('anio')} target="_blank" rel="noopener">Ven a una clase de prueba gratis</a></p>
       </div>
     </div>
   </section>
@@ -112,7 +111,14 @@ const anio = [
       document.querySelectorAll('.etapa').forEach(el => {
         const d = +el.dataset.desde, h = +el.dataset.hasta;
         const dentro = d <= h ? (m >= d && m <= h) : (m >= d || m <= h);
-        if (dentro) el.classList.add('etapa--ahora');
+        if (dentro) {
+          el.classList.add('etapa--ahora');
+          el.setAttribute('aria-current', 'step');
+          const marca = document.createElement('span');
+          marca.className = 'etapa__aqui';
+          marca.textContent = '● Estamos acá';
+          el.querySelector('.etapa__cuerpo')?.appendChild(marca);
+        }
       });
     })();
   </script>
@@ -126,7 +132,7 @@ const anio = [
 
   <BandaFoto src="/media/banda-cierre.jpg"
              alt="El equipo de Firehouse junto a su coach después de un entrenamiento"
-             alto="bajo" />
+             alto="medio" foco="center 38%" />
 
   <Contacto />
 </Base>
@@ -183,14 +189,13 @@ const anio = [
 .etapa__texto{ color:var(--txt-soft); max-width:62ch; margin-top:var(--e-2); line-height:1.6; }
 
 .etapa__aqui{
-  display:none;
   margin-top:20px;
   background:var(--fire-yellow); color:#1C1A18;
   font-family:var(--font-body); font-weight:500; font-size:12.5px;
   letter-spacing:.08em; padding:9px 22px;
   transform:skewX(var(--tilt-sm));
 }
-.etapa--ahora .etapa__aqui{ display:inline-block; }
+.etapa__aqui{ display:inline-block; }
 
 /* Copa: adorno de la banda de campeonatos */
 .etapa__copa{

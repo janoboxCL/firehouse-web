@@ -7,7 +7,10 @@ import { sitio, whatsapp } from '../data/sitio.js';
       <source srcset="/logo.webp" type="image/webp" />
       <img class="pie__logo" src="/logo.png" alt="" width="275" height="240" />
     </picture>
-    <span class="pie__dato">{sitio.nombre} · {sitio.comuna}, {sitio.ciudad}</span>
+    <span class="pie__dato">
+      <span class="pie__firma">Firehouse<sup>®</sup> · The One and Only</span>
+      <span class="pie__lugar">{sitio.nombre} · {sitio.calle}, {sitio.comuna}</span>
+    </span>
     <span class="pie__links">
       <a href={whatsapp('contacto')} target="_blank" rel="noopener">WhatsApp</a>
       <a href={sitio.instagram} target="_blank" rel="noopener">Instagram</a>
@@ -19,6 +22,15 @@ import { sitio, whatsapp } from '../data/sitio.js';
 .pie{ border-top:0.5px solid var(--hairline); padding:var(--e-7) 0 var(--e-6); font-size:13.5px; color:var(--txt-faint); }
 .pie__row{ display:flex; align-items:center; justify-content:space-between; gap:20px; flex-wrap:wrap; }
 .pie__logo{ height:64px; width:auto; opacity:.55; }
+.pie__dato{ display:flex; flex-direction:column; gap:6px; }
+.pie__firma{
+  font-family:var(--font-display); font-weight:800;
+  font-size:14px; letter-spacing:.16em; text-transform:uppercase;
+  color:var(--txt-soft);
+}
+.pie__firma sup{ font-size:.6em; letter-spacing:0; }
+.pie__lugar{ color:var(--txt-faint); }
+
 .pie__links{ display:flex; gap:20px; }
 .pie__links a{ color:var(--txt-faint); text-decoration:none; }
 .pie__links a:hover{ color:var(--txt-soft); }

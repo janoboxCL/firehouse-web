@@ -11,10 +11,11 @@ const tramos = [
   <div class="wrap">
     <div class="reveal">
       <Etiqueta texto="Los equipos" />
-      <h2 class="section__title">Todos los equipos hacen de todo</h2>
+      <h2 class="section__title">Cada equipo entrena completo. Cada equipo compite.</h2>
       <p class="section__intro">
-        Acá no hay grupos de espera ni categorías de relleno. Todos los equipos entrenan lo mismo:
-        gimnasia de suelo, stunts, elevaciones, pirámides y su propia coreografía. Y todos compiten.
+        Desde el primer año se entrena el cheerleading completo: gimnasia de suelo, stunts,
+        elevaciones, pirámides y una coreografía propia. Cada equipo prepara su rutina con un
+        objetivo competitivo.
       </p>
     </div>
 
@@ -32,21 +33,22 @@ const tramos = [
       La única razón por la que existen equipos separados es práctica: las edades y la cantidad
       de deportistas que se inscriben. Por eso cambian cada temporada — algunos años son tres
       equipos, otros más. <strong>Lo que se ajusta es la exigencia, no el contenido.</strong>
-      Una niña de seis y una de dieciséis hacen los mismos elementos, en el nivel que a cada
-      una le corresponde.
+      Una deportista de seis años y otra de dieciséis trabajan las mismas áreas del cheerleading,
+      con progresiones y dificultad adaptadas a su edad y a su nivel.
     </p>
 
     <div class="mixto reveal">
       <h3>El cheerleading es un deporte mixto</h3>
       <p>
-        Acá entrenan niñas y niños. No es una excepción ni una adaptación: el cheerleading de
-        competencia es mixto en todo el mundo, y los equipos con hombres compiten en su propia categoría.
+        Acá entrenan niñas y niños. No es una excepción ni una adaptación: el cheerleading
+        competitivo contempla categorías mixtas, y los niños y hombres participan del deporte
+        igual que las niñas y las mujeres.
       </p>
       <p>
         Sabemos que a veces la duda no es del niño sino de la casa. Si es tu caso, ven a ver un
         entrenamiento. Es más fácil entender de qué se trata viéndolo que explicándolo.
       </p>
-      <a class="btn" href={whatsapp('equipos')} target="_blank" rel="noopener">Ven a una clase de prueba gratis</a>
+      <a class="cta-texto" href={whatsapp('equipos')} target="_blank" rel="noopener">Ven a una clase de prueba gratis</a>
     </div>
   </div>
 </section>
@@ -61,6 +63,7 @@ const tramos = [
   clip-path:polygon(0 0, 100% 18px, 100% 100%, 0 calc(100% - 18px));
 }
 .tramo__edad{
+  font-variant-numeric:tabular-nums;
   font-family:var(--font-display); font-weight:800;
   font-size:clamp(2.6rem, 5.4vw, 4rem); line-height:.9;
   color:var(--fire-yellow);
@@ -88,7 +91,7 @@ const tramos = [
   color:var(--fire-yellow); max-width:16ch;
 }
 .mixto p{ color:var(--txt-soft); max-width:var(--wrap-texto); margin-top:var(--e-2); line-height:1.6; }
-.mixto .btn{ margin-top:var(--e-4); }
+.mixto .cta-texto{ margin-top:var(--e-4); }
 
 @media (max-width:900px){ .equipos__grid{ grid-template-columns:1fr; } .tramo{ clip-path:none; } }
 </style>
