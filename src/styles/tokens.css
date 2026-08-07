@@ -36,6 +36,9 @@
 *,*::before,*::after{ box-sizing:border-box; }
 html{ scroll-behavior:smooth; }
 
+/* Las anclas no quedan escondidas bajo la barra fija */
+[id]{ scroll-margin-top:96px; }
+
 body{
   margin:0;
   background:var(--ember);
