@@ -1,12 +1,14 @@
 ---
 import { whatsapp, sitio } from '../data/sitio.js';
+const { interior = false } = Astro.props;
+
 const enlaces = [
-  { href: '/clases-cheerleading-santiago', texto: 'Las clases' },
+  { href: '/clases-cheerleading-santiago', texto: 'Entrenamientos' },
   { href: '/clase-de-prueba',              texto: 'Clase de prueba' },
   { href: '/precios',                      texto: 'Precios' },
 ];
 ---
-<header class="nav" id="nav">
+<header class:list={['nav', interior && 'nav--interior']} id="nav">
   <div class="wrap nav__row">
     <a href="/" class="nav__marca" aria-label={`${sitio.nombre} — inicio`}>
       <picture>
@@ -67,14 +69,18 @@ const enlaces = [
   text-shadow:0 1px 10px rgba(23,20,18,.95);
   transition:opacity var(--t-interfaz) ease;
 }
-.nav--compacta .nav__lema{ opacity:0; pointer-events:none; }
+.nav--compacta .nav__lema,
+.nav--interior .nav__lema{ opacity:0; pointer-events:none; }
 .nav__marca img{
   height:134px; width:auto;
   filter:drop-shadow(0 6px 18px rgba(0,0,0,.55));
   transition:height var(--t-interfaz) ease;
 }
 /* Al hacer scroll el escudo se recoge dentro de la barra y deja de pisar el contenido */
-.nav--compacta .nav__marca img{ height:62px; }
+.nav--compacta .nav__marca img,
+.nav--interior .nav__marca img{ height:62px; }
+.nav--interior .nav__marca{ top:6px; }
+.nav--interior .nav__links{ margin-left:110px; }
 .nav--compacta .nav__marca{ top:6px; }
 
 .nav__links{ display:flex; gap:22px; font-size:15px; margin-right:auto; margin-left:190px; transition:margin-left var(--t-interfaz) ease; }
@@ -115,7 +121,9 @@ const enlaces = [
   .nav__marca{ left:20px; top:0; }
   .nav__marca img{ height:88px; }
   .nav__lema{ font-size:8px; letter-spacing:.16em; margin-top:6px; }
-  .nav--compacta .nav__marca img{ height:52px; }
+  .nav--compacta .nav__marca img,
+  .nav--interior .nav__marca img{ height:52px; }
+  .nav--interior .nav__marca{ top:6px; }
   .nav--compacta .nav__marca{ top:6px; }
   .nav__cta{ padding:11px 18px; font-size:14px; }
   .nav__cta-largo{ display:none; }
