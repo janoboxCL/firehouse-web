@@ -32,11 +32,11 @@ const preguntas = [
 ];
 
 const anio = [
-  { n:'01', meses:'marzo — abril',       desde:3,  hasta:4,  hito:'Todo comienza.',        titulo:'Se parte de cero',     texto:'Llegan quienes parten desde cero. Se arman los equipos del año y se trabajan las bases: coordinación, volteretas, confianza. Nadie llega sabiendo.' },
-  { n:'02', meses:'mayo — junio',        desde:5,  hasta:6,  hito:'Se construye la base.', titulo:'Se sube la exigencia', texto:'El entrenamiento avanza. Aparecen los stunts, las progresiones más complejas y el trabajo real de equipo.' },
-  { n:'03', meses:'julio — septiembre',  desde:7,  hasta:9,  hito:'Toma forma la rutina.', titulo:'La coreografía',       texto:'Se monta la rutina de la temporada y se prepara la competencia. Es la etapa más intensa y la que más une al grupo.' },
-  { n:'04', meses:'octubre — noviembre', desde:10, hasta:11, hito:'Se compite.',           titulo:'Los campeonatos',      texto:'Showcase y torneos. Llega el momento de mostrar todo lo que el equipo preparó durante el año.', cumbre:true },
-  { n:'05', meses:'diciembre — enero',   desde:12, hasta:1,  hito:'Se consolida.',         titulo:'Cierre y refuerzo',    texto:'Se cierra la temporada, se celebra lo conseguido y se refuerzan las habilidades que van a seguir creciendo.' },
+  { n:'1', meses:'marzo — abril',       desde:3,  hasta:4,  hito:'Todo comienza.',        titulo:'Se parte de cero',     texto:'Llegan quienes parten desde cero. Se arman los equipos del año y se trabajan las bases: coordinación, volteretas, confianza. Nadie llega sabiendo.' },
+  { n:'2', meses:'mayo — junio',        desde:5,  hasta:6,  hito:'Se construye la base.', titulo:'Se sube la exigencia', texto:'El entrenamiento avanza. Aparecen los stunts, las progresiones más complejas y el trabajo real de equipo.' },
+  { n:'3', meses:'julio — septiembre',  desde:7,  hasta:9,  hito:'Toma forma la rutina.', titulo:'La coreografía',       texto:'Se monta la rutina de la temporada y se prepara la competencia. Es la etapa más intensa y la que más une al grupo.' },
+  { n:'4', meses:'octubre — noviembre', desde:10, hasta:11, hito:'Se compite.',           titulo:'Los campeonatos',      texto:'Showcase y torneos. Llega el momento de mostrar todo lo que el equipo preparó durante el año.', cumbre:true },
+  { n:'5', meses:'diciembre — enero',   desde:12, hasta:1,  hito:'Se consolida.',         titulo:'Cierre y refuerzo',    texto:'Se cierra la temporada, se celebra lo conseguido y se refuerzan las habilidades que van a seguir creciendo.' },
 ];
 ---
 <Base titulo={titulo} descripcion={descripcion} ruta="" preguntas={preguntas}>
@@ -73,7 +73,7 @@ const anio = [
               </svg>
             )}
             <div class="etapa__marca">
-              <span class="etapa__n">{e.n}<i>/05</i></span>
+              <span class="etapa__n"><i>Etapa</i> {e.n} <i>/ 5</i></span>
               <p class="etapa__meses">{e.meses}</p>
             </div>
             <div class="etapa__cuerpo">
@@ -185,7 +185,7 @@ const anio = [
   font-variant-numeric:tabular-nums;
   min-width:6ch;
 }
-.etapa__n i{ font-style:normal; color:var(--ash); }
+.etapa__n i{ font-style:normal; color:var(--ash); letter-spacing:.14em; }
 
 .etapa__meses{
   font-family:var(--font-display); font-weight:800;

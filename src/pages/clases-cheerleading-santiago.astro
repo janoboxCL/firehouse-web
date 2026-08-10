@@ -9,11 +9,13 @@ import { sitio, whatsapp } from '../data/sitio.js';
 const titulo = 'Clases de cheerleading en Santiago | Firehouse Cheer All Stars';
 const descripcion = 'Clases de cheerleading en Santiago para niñas y niños desde los 4 años: técnica de cheer, gimnasia de suelo y acondicionamiento. En La Cisterna, a pasos del Metro Lo Ovalle. Primera clase gratis.';
 
+const bajada = `Firehouse Cheer All Stars entrena cheerleading de competencia en ${sitio.comuna}, a pasos del Metro ${sitio.metro}. Para niñas y niños desde los ${sitio.edadMinima} años, con o sin experiencia previa.`;
+
 const disciplinas = [
   {
     n: '01',
     nombre: 'Técnica de cheerleading',
-    texto: 'Stunts, elevaciones, pirámides y transiciones. Es la parte del deporte que se hace en equipo: unos sostienen, otro sube, y todos aprenden las dos posiciones antes de especializarse.',
+    texto: 'Stunts, elevaciones, pirámides y transiciones. Es la parte del deporte que se hace en equipo. Al comienzo se conocen y practican distintos roles, y con el tiempo cada deportista se especializa según sus habilidades, su edad y lo que necesita el equipo.',
   },
   {
     n: '02',
@@ -23,7 +25,7 @@ const disciplinas = [
   {
     n: '03',
     nombre: 'Acondicionamiento físico',
-    texto: 'Fuerza, elongación, control corporal y resistencia. No es relleno entre ejercicios: es lo que permite que un stunt se sostenga y que una caída no termine en lesión.',
+    texto: 'Fuerza, elongación, control corporal y resistencia. No es relleno entre ejercicios: es lo que permite ejecutar los stunts con mayor control y ayuda a reducir el riesgo de lesiones.',
   },
 ];
 
@@ -48,7 +50,7 @@ const preguntas = [
 
   <CabeceraPagina etiqueta="Entrenamientos" titulo="Clases de cheerleading en Santiago"
                   acento="azul" objeto="megafono" ruta="Entrenamientos"
-                  bajada={`Firehouse Cheer All Stars entrena cheerleading de competencia en {sitio.comuna}, a pasos del Metro {sitio.metro}. Para niñas y niños desde los {sitio.edadMinima} años, con o sin experiencia previa.`}>
+                  bajada={bajada}>
     <a class="btn" href={whatsapp('hero')} target="_blank" rel="noopener">Ven a una clase de prueba gratis</a>
   </CabeceraPagina>
 
@@ -91,8 +93,8 @@ const preguntas = [
       </p>
       <p class="progresion__texto">
         Por eso el acondicionamiento no es opcional y por eso los equipos se separan por edad:
-        el cuerpo de una niña de seis no soporta lo mismo que el de una de dieciséis, aunque las
-        dos trabajen las mismas áreas del cheerleading.
+        la exigencia se adapta a la edad y al desarrollo físico de cada deportista, aunque todos
+        trabajen las mismas áreas del cheerleading.
       </p>
       <p><a class="cta-texto" href="/#el-anio">Ver cómo avanza una temporada completa</a></p>
     </div>
@@ -125,12 +127,12 @@ const preguntas = [
     <div class="wrap">
       <div class="reveal">
         <Etiqueta texto="Dónde" />
-        <h2 class="section__title">Academia de cheerleader en La Cisterna</h2>
+        <h2 class="section__title">Entrena cheerleading en La Cisterna</h2>
         <p class="donde__texto">
-          Si buscas cheerleading en Santiago y quieres entrenar cerca, nuestro gimnasio está en
-          {' '}{sitio.calle}, {sitio.comuna}, a pasos del <strong>Metro {sitio.metro} (Línea 2)</strong>.
-          Llegan deportistas desde {sitio.cercanas}, y el acceso en metro hace que la distancia
-          pese menos que en auto.
+          Si buscas clases de cheerleading en Santiago, nuestro gimnasio está en {sitio.calle},
+          {sitio.comuna}, a pasos del <strong>Metro {sitio.metro} (Línea 2)</strong>, con acceso
+          directo desde distintos puntos del sector sur de Santiago. Entrenan con nosotros
+          deportistas de {sitio.cercanas}.
         </p>
       </div>
 
