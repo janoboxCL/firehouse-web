@@ -3,6 +3,7 @@ import '../styles/tokens.css';
 import TopBar from '../components/TopBar.astro';
 import Nav from '../components/Nav.astro';
 import Pie from '../components/Pie.astro';
+import Arriba from '../components/Arriba.astro';
 import { sitio } from '../data/sitio.js';
 
 const { titulo, descripcion, ruta = '', preguntas = null, miga = null } = Astro.props;
@@ -99,6 +100,7 @@ const schema = {
     <slot />
   </main>
   <Pie />
+  <Arriba />
   <script is:inline>
     (() => {
       const objetivos = document.querySelectorAll('.reveal');

@@ -1,0 +1,48 @@
+---
+import Base from '../layouts/Base.astro';
+import Etiqueta from '../components/Etiqueta.astro';
+import { whatsapp } from '../data/sitio.js';
+
+const titulo = 'Página no encontrada | Firehouse Cheer';
+const descripcion = 'La página que buscas no existe o cambió de dirección.';
+---
+<Base titulo={titulo} descripcion={descripcion} ruta="/404">
+  <section class="section error">
+    <div class="wrap">
+      <Etiqueta texto="Error 404" />
+      <h1 class="error__titulo">Esta página no existe</h1>
+      <p class="error__texto">
+        O cambió de dirección. Puede que el enlace esté antiguo: el sitio se renovó
+        y algunas páginas quedaron en otro lugar.
+      </p>
+
+      <ul class="error__lista">
+        <li><a href="/">Volver al inicio</a></li>
+        <li><a href="/clases-cheerleading-santiago">Ver los entrenamientos</a></li>
+        <li><a href="/clase-de-prueba">La clase de prueba gratis</a></li>
+        <li><a href="/precios">Cuánto cuesta la temporada</a></li>
+      </ul>
+
+      <p class="error__accion">
+        <a class="btn" id="wa-404" href={whatsapp('contacto')} target="_blank" rel="noopener">Escríbenos por WhatsApp</a>
+      </p>
+    </div>
+  </section>
+</Base>
+
+<style>
+.error{ padding-block:var(--e-8); }
+.error__titulo{ font-size:clamp(2.1rem, 5vw, 3.5rem); margin-top:var(--e-3); max-width:16ch; }
+.error__texto{ color:var(--txt-soft); max-width:56ch; margin-top:var(--e-3); line-height:1.6; }
+
+.error__lista{ list-style:none; margin:var(--e-5) 0 0; padding:0; max-width:var(--wrap-texto); }
+.error__lista li{ border-bottom:0.5px solid var(--hairline); }
+.error__lista li:first-child{ border-top:0.5px solid var(--hairline); }
+.error__lista a{
+  display:block; padding:var(--e-3) 0;
+  font-family:var(--font-display); font-weight:800;
+  font-size:clamp(1.1rem, 1.9vw, 1.4rem); text-decoration:none;
+}
+.error__lista a:hover{ color:var(--fire-yellow); }
+.error__accion{ margin-top:var(--e-5); }
+</style>

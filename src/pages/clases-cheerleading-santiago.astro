@@ -51,7 +51,7 @@ const preguntas = [
   <CabeceraPagina etiqueta="Entrenamientos" titulo="Clases de cheerleading en Santiago"
                   acento="azul" objeto="megafono" ruta="Entrenamientos"
                   bajada={bajada}>
-    <a class="btn" href={whatsapp('hero')} target="_blank" rel="noopener">Ven a una clase de prueba gratis</a>
+    <a class="btn" id="wa-clases-cabecera" href={whatsapp('hero')} target="_blank" rel="noopener">Ven a una clase de prueba gratis</a>
   </CabeceraPagina>
 
   <BandaFoto src="/media/banda-entrenamiento.jpg" alt="Deportistas de Firehouse trabajando gimnasia de suelo durante un entrenamiento" alto="medio" foco="center 42%" />
@@ -139,8 +139,8 @@ const preguntas = [
       <dl class="donde__datos reveal">
         <div><dt>Dirección</dt><dd>{sitio.calle}, {sitio.comuna}</dd></div>
         <div><dt>Metro</dt><dd>{sitio.metro}, Línea 2</dd></div>
-        <div><dt>WhatsApp</dt><dd><a href={whatsapp('contacto')} target="_blank" rel="noopener">+56 9 8611 4663</a></dd></div>
-        <div><dt>Correo</dt><dd><a href={`mailto:${sitio.correo}`}>{sitio.correo}</a></dd></div>
+        <div><dt>WhatsApp</dt><dd><a id="wa-clases-datos" href={whatsapp('contacto')} target="_blank" rel="noopener">+56 9 8611 4663</a></dd></div>
+        <div><dt>Correo</dt><dd><a id="correo-clases" href={`mailto:${sitio.correo}`}>{sitio.correo}</a></dd></div>
       </dl>
 
       <p class="reveal"><a class="cta-texto" href="/#contacto">Ver el mapa y cómo llegar</a></p>
@@ -167,7 +167,7 @@ const preguntas = [
     <div class="wrap reveal">
       <p class="cierre__frase">La primera clase es gratis.</p>
       <p class="cierre__sub">Una clase real con el equipo, sin evaluación y sin compromiso.</p>
-      <a class="btn" href={whatsapp('hero')} target="_blank" rel="noopener">Ven a una clase de prueba gratis</a>
+      <a class="btn" id="wa-clases-cierre" href={whatsapp('hero')} target="_blank" rel="noopener">Ven a una clase de prueba gratis</a>
       <p class="cierre__ver"><a class="cta-texto" href="/clase-de-prueba">Cómo es la clase de prueba, paso a paso</a></p>
     </div>
   </section>

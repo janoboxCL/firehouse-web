@@ -30,9 +30,9 @@ import { sitio, whatsapp } from '../data/sitio.js';
 
     <nav class="pie__col" aria-label="Contacto">
       <p class="pie__rotulo">Escríbenos</p>
-      <a href={whatsapp('contacto')} target="_blank" rel="noopener">WhatsApp</a>
-      <a href={sitio.instagram} target="_blank" rel="noopener">Instagram</a>
-      <a href={`mailto:${sitio.correo}`}>Correo</a>
+      <a id="wa-pie" href={whatsapp('contacto')} target="_blank" rel="noopener">WhatsApp</a>
+      <a id="ig-pie" href={sitio.instagram} target="_blank" rel="noopener">Instagram</a>
+      <a id="correo-pie" href={`mailto:${sitio.correo}`}>Correo</a>
     </nav>
   </div>
 </footer>

@@ -11,8 +11,8 @@ import { sitio, whatsapp } from '../data/sitio.js';
 
     <div class="contacto__grid">
       <dl class="datos reveal">
-        <div><dt>WhatsApp</dt><dd><a href={whatsapp('contacto')} target="_blank" rel="noopener">+56 9 8611 4663</a></dd></div>
-        <div><dt>Instagram</dt><dd><a href={sitio.instagram} target="_blank" rel="noopener">@firehouse.cheer</a></dd></div>
+        <div><dt>WhatsApp</dt><dd><a id="wa-home-contacto-dato" href={whatsapp('contacto')} target="_blank" rel="noopener">+56 9 8611 4663</a></dd></div>
+        <div><dt>Instagram</dt><dd><a id="ig-home-contacto" href={sitio.instagram} target="_blank" rel="noopener">@firehouse.cheer</a></dd></div>
         <div><dt>Dónde</dt><dd>{sitio.calle}, {sitio.comuna}</dd><p class="datos__extra">A pasos del Metro {sitio.metro}</p></div>
         <div><dt>Cuándo</dt><dd>{sitio.horarios.map(h => `${h.dia} ${h.hora}`).join(' · ')}</dd></div>
       </dl>
@@ -20,7 +20,7 @@ import { sitio, whatsapp } from '../data/sitio.js';
       <div class="contacto__accion reveal">
         <p class="contacto__frase">La primera clase es gratis.</p>
         <p class="contacto__sub">Escríbenos y coordinamos el día según su edad.</p>
-        <a class="btn" href={whatsapp('hero')} target="_blank" rel="noopener">Ven a una clase de prueba gratis</a>
+        <a class="btn" id="wa-home-contacto-boton" href={whatsapp('hero')} target="_blank" rel="noopener">Ven a una clase de prueba gratis</a>
       </div>
     </div>
 
@@ -31,7 +31,7 @@ import { sitio, whatsapp } from '../data/sitio.js';
       </div>
       <div class="mapa__pie">
         <p><strong>{sitio.calle}, {sitio.comuna}</strong> — a pasos del Metro {sitio.metro}, a minutos de {sitio.cercanas}.</p>
-        <a class="btn-mapa" href={sitio.comoLlegar} target="_blank" rel="noopener">Cómo llegar</a>
+        <a class="btn-mapa" id="mapa-como-llegar" href={sitio.comoLlegar} target="_blank" rel="noopener">Cómo llegar</a>
       </div>
     </div>
   </div>
