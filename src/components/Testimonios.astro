@@ -24,6 +24,12 @@ const hay = testimonios.length > 0;
     <div class="testi__lista">
       {testimonios.map(t => (
         <blockquote class:list={['cita', 'reveal', t.destacado && 'cita--destacada']}>
+          {t.destacado && (
+            <svg class="cita__estrella" viewBox="0 0 120 120" aria-hidden="true">
+              <path d="M60 8 74.6 45.2 114 47.9 83.6 73.1 93.4 111.4 60 89.2 26.6 111.4 36.4 73.1 6 47.9 45.4 45.2 60 8Z"
+                    fill="none" stroke="currentColor" stroke-width="5" stroke-linejoin="round"/>
+            </svg>
+          )}
           <p class="cita__texto">{t.texto}</p>
           <cite class="cita__autor">{t.autor}</cite>
         </blockquote>
@@ -83,7 +89,17 @@ const hay = testimonios.length > 0;
 }
 
 /* La reseña más fuerte ocupa el ancho completo y sube de escala */
-.cita--destacada{ grid-column:1 / -1; padding:var(--e-6) var(--e-5) var(--e-5); }
+.cita--destacada{
+  grid-column:1 / -1; padding:var(--e-6) var(--e-5) var(--e-5);
+  overflow:hidden;
+}
+.cita__estrella{
+  position:absolute; right:var(--e-4); top:50%;
+  transform:translateY(-50%) rotate(-8deg);
+  width:210px; height:auto;
+  color:var(--fire-yellow); opacity:.14;
+  pointer-events:none;
+}
 .cita--destacada .cita__texto{ font-size:clamp(1.4rem, 3vw, 2.2rem); line-height:1.18; max-width:26ch; }
 .cita--destacada::before{ font-size:7rem; }
 
@@ -91,6 +107,7 @@ const hay = testimonios.length > 0;
 
 @media (max-width:820px){
   .testi__lista{ grid-template-columns:1fr; }
+  .cita__estrella{ width:130px; right:-24px; opacity:.10; }
   .cita{ clip-path:none; }
   .testi__cabecera{ align-items:flex-start; }
 }
