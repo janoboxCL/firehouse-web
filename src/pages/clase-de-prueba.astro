@@ -1,5 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
+import CabeceraPagina from '../components/CabeceraPagina.astro';
 import Etiqueta from '../components/Etiqueta.astro';
 import Faq from '../components/Faq.astro';
 import BandaFoto from '../components/BandaFoto.astro';
@@ -25,21 +26,15 @@ const preguntas = [
     r: 'Depende de la edad y del equipo que corresponda. Escríbenos por WhatsApp y coordinamos el día: entrenamos viernes de 18:00 a 20:00 y sábados de 16:00 a 18:00.' },
 ];
 ---
-<Base titulo={titulo} descripcion={descripcion} ruta="/clase-de-prueba" preguntas={preguntas}>
+<Base titulo={titulo} descripcion={descripcion} ruta="/clase-de-prueba" preguntas={preguntas} miga="Clase de prueba">
 
-  <section class="section cabecera">
-    <div class="wrap reveal">
-      <Etiqueta texto="La primera clase" />
-      <h1 class="cabecera__titulo">Ven a entrenar un día con nosotros</h1>
-      <p class="cabecera__bajada">
-        Una clase completa, con el equipo que le corresponde por edad y con los mismos coaches
-        que lo entrenan. Gratis y sin compromiso.
-      </p>
-      <p class="cabecera__accion">
-        <a class="btn" href={whatsapp('hero')} target="_blank" rel="noopener">Ven a una clase de prueba gratis</a>
-      </p>
-    </div>
-  </section>
+  <CabeceraPagina etiqueta="La primera clase" titulo="Ven a entrenar un día con nosotros"
+                  acento="amarillo" objeto="mono" ruta="Clase de prueba"
+                  bajada={`Una clase completa, con el equipo que le corresponde por edad y con los mismos coaches que lo entrenan. Gratis y sin compromiso.`}>
+    <a class="btn" href={whatsapp('hero')} target="_blank" rel="noopener">Ven a una clase de prueba gratis</a>
+  </CabeceraPagina>
+
+  <BandaFoto src="/media/banda-llegada.jpg" alt="Niñas y niños llegando al gimnasio antes de empezar el entrenamiento" alto="medio" foco="center 46%" />
 
   <section class="section audicion">
     <div class="wrap">
@@ -114,16 +109,6 @@ const preguntas = [
 </Base>
 
 <style>
-.cabecera{ padding-top:var(--e-8); }
-.cabecera__titulo{
-  font-size:clamp(2.1rem, 5vw, 3.7rem);
-  max-width:18ch; margin-top:var(--e-3);
-}
-.cabecera__bajada{
-  color:var(--txt-soft); max-width:var(--wrap-texto);
-  margin-top:var(--e-3); font-size:clamp(1.05rem, 1.6vw, 1.3rem); line-height:1.55;
-}
-.cabecera__accion{ margin-top:var(--e-5); }
 
 .audicion{ background:var(--ember-deep); }
 .audicion__no{

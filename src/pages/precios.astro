@@ -1,7 +1,8 @@
 ---
 import Base from '../layouts/Base.astro';
-import Etiqueta from '../components/Etiqueta.astro';
+import CabeceraPagina from '../components/CabeceraPagina.astro';
 import Faq from '../components/Faq.astro';
+import BandaFoto from '../components/BandaFoto.astro';
 import { whatsapp } from '../data/sitio.js';
 
 const titulo = 'Cuánto cuesta el cheerleading en Santiago | Precios Firehouse Cheer';
@@ -32,18 +33,14 @@ const preguntas = [
     r: 'No. La primera clase es gratis y no obliga a matricularse después.' },
 ];
 ---
-<Base titulo={titulo} descripcion={descripcion} ruta="/precios" preguntas={preguntas}>
+<Base titulo={titulo} descripcion={descripcion} ruta="/precios" preguntas={preguntas} miga="Precios">
 
-  <section class="section cabecera">
-    <div class="wrap reveal">
-      <Etiqueta texto="Los costos" />
-      <h1 class="cabecera__titulo">Todo lo que se paga en una temporada</h1>
-      <p class="cabecera__bajada">
-        Este es el esquema completo de costos de una temporada. Lo mostramos entero desde el
-        principio para que no aparezcan sorpresas después.
-      </p>
-    </div>
-  </section>
+  <CabeceraPagina etiqueta="Los costos" titulo="Todo lo que se paga en una temporada"
+                  acento="rojo" objeto="etiqueta" ruta="Precios"
+                  bajada={`Este es el esquema completo de costos de una temporada. Lo mostramos entero desde el principio para que no aparezcan sorpresas después.`}>
+  </CabeceraPagina>
+
+  <BandaFoto src="/media/banda-tecnica.jpg" alt="Equipo de Firehouse practicando motions en el tapiz" alto="bajo" foco="center 44%" />
 
   <section class="section tablas">
     <div class="wrap">
@@ -119,12 +116,6 @@ const preguntas = [
 </Base>
 
 <style>
-.cabecera{ padding-top:var(--e-8); }
-.cabecera__titulo{ font-size:clamp(2.1rem, 5vw, 3.7rem); max-width:18ch; margin-top:var(--e-3); }
-.cabecera__bajada{
-  color:var(--txt-soft); max-width:var(--wrap-texto);
-  margin-top:var(--e-3); font-size:clamp(1.05rem, 1.6vw, 1.3rem); line-height:1.55;
-}
 
 .grupo{ margin-top:var(--e-6); }
 .grupo:first-child{ margin-top:0; }

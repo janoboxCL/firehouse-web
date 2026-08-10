@@ -5,7 +5,7 @@ import Nav from '../components/Nav.astro';
 import Pie from '../components/Pie.astro';
 import { sitio } from '../data/sitio.js';
 
-const { titulo, descripcion, ruta = '', preguntas = null } = Astro.props;
+const { titulo, descripcion, ruta = '', preguntas = null, miga = null } = Astro.props;
 const canonical = `${sitio.url}${ruta}`;
 
 const schema = {
@@ -74,6 +74,14 @@ const schema = {
   </script>
 
   <script type="application/ld+json" set:html={JSON.stringify(schema)} />
+  {miga && <script type="application/ld+json" set:html={JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Inicio', item: sitio.url },
+      { '@type': 'ListItem', position: 2, name: miga, item: canonical },
+    ],
+  })} />}
   {preguntas && <script type="application/ld+json" set:html={JSON.stringify({
     '@context': 'https://schema.org',
     '@type': 'FAQPage',

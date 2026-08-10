@@ -1,5 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
+import CabeceraPagina from '../components/CabeceraPagina.astro';
 import Etiqueta from '../components/Etiqueta.astro';
 import Faq from '../components/Faq.astro';
 import BandaFoto from '../components/BandaFoto.astro';
@@ -43,22 +44,15 @@ const preguntas = [
     r: 'Dos: viernes de 18:00 a 20:00 y sábados de 16:00 a 18:00. Cuatro horas semanales en total.' },
 ];
 ---
-<Base titulo={titulo} descripcion={descripcion} ruta="/clases-cheerleading-santiago" preguntas={preguntas}>
+<Base titulo={titulo} descripcion={descripcion} ruta="/clases-cheerleading-santiago" preguntas={preguntas} miga="Las clases">
 
-  <section class="section cabecera">
-    <div class="wrap reveal">
-      <Etiqueta texto="Las clases" />
-      <h1 class="cabecera__titulo">Clases de cheerleading en Santiago</h1>
-      <p class="cabecera__bajada">
-        Firehouse Cheer All Stars entrena cheerleading de competencia en {sitio.comuna}, a pasos
-        del Metro {sitio.metro}. Para niñas y niños desde los {sitio.edadMinima} años, con o sin
-        experiencia previa.
-      </p>
-      <p class="cabecera__accion">
-        <a class="btn" href={whatsapp('hero')} target="_blank" rel="noopener">Ven a una clase de prueba gratis</a>
-      </p>
-    </div>
-  </section>
+  <CabeceraPagina etiqueta="Las clases" titulo="Clases de cheerleading en Santiago"
+                  acento="azul" objeto="megafono" ruta="Las clases"
+                  bajada={`Firehouse Cheer All Stars entrena cheerleading de competencia en {sitio.comuna}, a pasos del Metro {sitio.metro}. Para niñas y niños desde los {sitio.edadMinima} años, con o sin experiencia previa.`}>
+    <a class="btn" href={whatsapp('hero')} target="_blank" rel="noopener">Ven a una clase de prueba gratis</a>
+  </CabeceraPagina>
+
+  <BandaFoto src="/media/banda-entrenamiento.jpg" alt="Deportistas de Firehouse trabajando gimnasia de suelo durante un entrenamiento" alto="medio" foco="center 42%" />
 
   <section class="section disciplinas">
     <div class="wrap">
@@ -178,13 +172,6 @@ const preguntas = [
 </Base>
 
 <style>
-.cabecera{ padding-top:var(--e-8); }
-.cabecera__titulo{ font-size:clamp(2.1rem, 5vw, 3.7rem); max-width:18ch; margin-top:var(--e-3); }
-.cabecera__bajada{
-  color:var(--txt-soft); max-width:var(--wrap-texto);
-  margin-top:var(--e-3); font-size:clamp(1.05rem, 1.6vw, 1.3rem); line-height:1.55;
-}
-.cabecera__accion{ margin-top:var(--e-5); }
 
 .disciplinas{ background:var(--ember-deep); }
 .disc__lista{ list-style:none; margin:var(--e-6) 0 0; padding:0; }
