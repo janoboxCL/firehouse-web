@@ -1,0 +1,196 @@
+---
+import Base from '../layouts/Base.astro';
+import Etiqueta from '../components/Etiqueta.astro';
+import Faq from '../components/Faq.astro';
+import { whatsapp } from '../data/sitio.js';
+
+const titulo = 'Cuánto cuesta el cheerleading en Santiago | Precios Firehouse Cheer';
+const descripcion = 'Matrícula $10.000 y mensualidad $30.000 de marzo a diciembre. Tenida, traje de competencia y pack de campeonatos, cada uno en su momento del año. Todos los costos publicados.';
+
+const alEntrar = [
+  { nombre:'Matrícula',   valor:'$10.000', incluye:'Se paga una sola vez, al inscribirse', cuando:'Al entrar' },
+  { nombre:'Mensualidad', valor:'$30.000', incluye:'De marzo a diciembre',                 cuando:'Cada mes' },
+];
+const enLaTemporada = [
+  { nombre:'Tenida de entrenamiento', valor:'$30.000', incluye:'Polera, colet y cinta de competencia',     cuando:'Al inicio' },
+  { nombre:'Traje de competencia',    valor:'$100.000',incluye:'Sirve dos temporadas si la talla acompaña',cuando:'Mitad de año' },
+  { nombre:'Pack de competencias',    valor:'$150.000',incluye:'2 showcase y 3 torneos, uno regional',     cuando:'Antes de octubre' },
+];
+
+const preguntas = [
+  { p: '¿Hay que pagar todo al momento de inscribirse?',
+    r: 'No. Para entrar solo se paga la matrícula de $10.000 y la primera mensualidad de $30.000. El resto de los ítems aparece en el momento del año en que se necesita.' },
+  { p: '¿Qué pasa si entro a mitad de temporada?',
+    r: 'Se asumen solo los ítems que quedan por delante. Quien entra en septiembre, por ejemplo, ya no compra la tenida de inicio de temporada.' },
+  { p: '¿El traje de competencia se compra todos los años?',
+    r: 'No necesariamente. Está pensado para dos temporadas, siempre que la talla siga siendo adecuada. Por eso la segunda temporada suele costar $100.000 menos.' },
+  { p: '¿Hay descuento por dos alumnos?',
+    r: 'Sí. Si inscribes a dos —hermanos, primos o amigos— tenemos un valor especial. Escríbenos y te lo contamos.' },
+  { p: '¿Los valores son definitivos?',
+    r: 'Son referenciales de la temporada anterior. Los definitivos se confirman a medida que avanza el año y suelen variar poco. Preferimos mostrar el orden de magnitud real antes que dejarte con la duda.' },
+  { p: '¿La clase de prueba tiene costo?',
+    r: 'No. La primera clase es gratis y no obliga a matricularse después.' },
+];
+---
+<Base titulo={titulo} descripcion={descripcion} ruta="/precios" preguntas={preguntas}>
+
+  <section class="section cabecera">
+    <div class="wrap reveal">
+      <Etiqueta texto="Los costos" />
+      <h1 class="cabecera__titulo">Todo lo que se paga en una temporada</h1>
+      <p class="cabecera__bajada">
+        Este es el esquema completo de costos de una temporada. Lo mostramos entero desde el
+        principio para que no aparezcan sorpresas después.
+      </p>
+    </div>
+  </section>
+
+  <section class="section tablas">
+    <div class="wrap">
+      <div class="grupo reveal">
+        <h2 class="grupo__titulo">Para empezar</h2>
+        <ul class="tabla">
+          {alEntrar.map(i => (
+            <li class="fila">
+              <div><p class="fila__titulo">{i.nombre}</p><p class="fila__incluye">{i.incluye}</p></div>
+              <p class="fila__valor">{i.valor}</p>
+              <p class="fila__cuando">{i.cuando}</p>
+            </li>
+          ))}
+        </ul>
+        <p class="grupo__nota">Con esto entra y empieza a entrenar. Nada más se paga ese día.</p>
+      </div>
+
+      <div class="grupo reveal">
+        <h2 class="grupo__titulo">Durante la temporada</h2>
+        <ul class="tabla">
+          {enLaTemporada.map(i => (
+            <li class="fila">
+              <div><p class="fila__titulo">{i.nombre}</p><p class="fila__incluye">{i.incluye}</p></div>
+              <p class="fila__valor">{i.valor}</p>
+              <p class="fila__cuando">{i.cuando}</p>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div class="escalonado reveal">
+        <h2>No se paga todo junto</h2>
+        <p>
+          Cada ítem aparece en el momento del año en que se necesita, y quien entra a mitad de
+          temporada asume solo los que quedan por delante. El calendario de pagos lo conversamos
+          caso a caso.
+        </p>
+      </div>
+
+      <div class="ventajas">
+        <div class="ventaja reveal">
+          <h2>El segundo año cuesta menos</h2>
+          <p>Si la talla sigue funcionando, el traje puede usarse también la temporada siguiente: quien continúa se ahorra $100.000.</p>
+        </div>
+        <div class="ventaja reveal">
+          <h2>De a dos cuesta menos</h2>
+          <p>Si inscribes a dos —hermanos, primos o amigos— tenemos un valor especial.</p>
+          <a class="cta-texto" href={whatsapp('dosAlumnos')} target="_blank" rel="noopener">Consultar el valor para dos</a>
+        </div>
+      </div>
+
+      <div class="incluye reveal">
+        <h2 class="section__title">Qué incluye la mensualidad</h2>
+        <ul class="incluye__lista">
+          <li>Dos entrenamientos por semana: Cheer Class los viernes y Gimnasia los sábados</li>
+          <li>Cuatro horas semanales de entrenamiento dirigido</li>
+          <li>Preparación de la rutina de competencia del equipo</li>
+          <li>Acompañamiento técnico según el nivel de cada deportista</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <Faq preguntas={preguntas} titulo="Preguntas sobre los costos" />
+
+  <section class="section cierre">
+    <div class="wrap reveal">
+      <p class="cierre__frase">Antes de pagar nada, ven a conocernos.</p>
+      <p class="cierre__sub">La primera clase es gratis y no compromete a nada.</p>
+      <a class="btn" href={whatsapp('precios')} target="_blank" rel="noopener">Ven a una clase de prueba gratis</a>
+    </div>
+  </section>
+</Base>
+
+<style>
+.cabecera{ padding-top:var(--e-8); }
+.cabecera__titulo{ font-size:clamp(2.1rem, 5vw, 3.7rem); max-width:18ch; margin-top:var(--e-3); }
+.cabecera__bajada{
+  color:var(--txt-soft); max-width:var(--wrap-texto);
+  margin-top:var(--e-3); font-size:clamp(1.05rem, 1.6vw, 1.3rem); line-height:1.55;
+}
+
+.grupo{ margin-top:var(--e-6); }
+.grupo:first-child{ margin-top:0; }
+.grupo__titulo{
+  font-family:var(--font-body); font-weight:500;
+  font-size:14px; letter-spacing:.14em; text-transform:uppercase;
+  color:var(--fire-yellow);
+}
+.grupo__nota{ margin-top:var(--e-2); color:var(--txt-faint); font-size:15px; }
+
+.tabla{ list-style:none; margin:var(--e-3) 0 0; padding:0; }
+.fila{
+  display:grid; grid-template-columns:1fr auto 180px;
+  gap:var(--e-4); align-items:center;
+  padding:var(--e-3) 0; border-bottom:0.5px solid var(--hairline);
+}
+.fila:first-child{ border-top:0.5px solid var(--hairline); }
+.fila__titulo{ font-family:var(--font-display); font-weight:800; font-size:clamp(1.1rem, 1.8vw, 1.35rem); }
+.fila__incluye{ color:var(--txt-faint); font-size:14.5px; margin-top:2px; }
+.fila__valor{
+  font-family:var(--font-count); font-weight:700;
+  font-size:clamp(1.2rem, 2.2vw, 1.6rem); color:var(--fire-yellow);
+  font-variant-numeric:tabular-nums; white-space:nowrap;
+}
+.fila__cuando{
+  font-size:13px; letter-spacing:.12em; text-transform:uppercase;
+  color:var(--txt-faint); text-align:right;
+}
+
+.escalonado{
+  margin-top:var(--e-6); padding:var(--e-5);
+  background:var(--ember-deep); border-left:var(--regla) solid var(--fire-red);
+}
+.escalonado h2{ font-size:clamp(1.3rem, 2.2vw, 1.7rem); color:var(--fire-yellow); }
+.escalonado p{ color:var(--txt-soft); max-width:var(--wrap-texto); margin-top:var(--e-2); line-height:1.6; }
+
+.ventajas{ display:grid; grid-template-columns:1fr 1fr; gap:var(--e-3); margin-top:var(--e-3); }
+.ventaja{ background:var(--ember-deep); padding:var(--e-4); border-left:var(--regla) solid var(--mat-blue); }
+.ventaja h2{ font-size:clamp(1.15rem, 1.9vw, 1.4rem); color:var(--fire-yellow); }
+.ventaja p{ color:var(--txt-soft); margin-top:var(--e-1); line-height:1.55; }
+.ventaja .cta-texto{ margin-top:var(--e-2); }
+
+.incluye{ margin-top:var(--e-7); }
+.incluye__lista{ list-style:none; margin:var(--e-4) 0 0; padding:0; max-width:var(--wrap-texto); }
+.incluye__lista li{
+  padding:var(--e-2) 0 var(--e-2) var(--e-4);
+  border-bottom:0.5px solid var(--hairline);
+  color:var(--txt-soft); position:relative;
+}
+.incluye__lista li::before{
+  content:''; position:absolute; left:0; top:calc(var(--e-2) + 10px);
+  width:12px; height:3px; background:var(--fire-red);
+  transform:skewX(var(--tilt-sm));
+}
+
+.cierre{ background:var(--ember-deep); text-align:center; }
+.cierre__frase{
+  font-family:var(--font-display); font-weight:800;
+  font-size:clamp(1.6rem, 3.2vw, 2.4rem); line-height:1.05;
+}
+.cierre__sub{ color:var(--txt-soft); margin-top:var(--e-1); }
+.cierre .btn{ margin-top:var(--e-3); }
+
+@media (max-width:820px){
+  .fila{ grid-template-columns:1fr auto; gap:var(--e-2); }
+  .fila__cuando{ grid-column:1 / -1; text-align:left; }
+  .ventajas{ grid-template-columns:1fr; }
+}
+</style>

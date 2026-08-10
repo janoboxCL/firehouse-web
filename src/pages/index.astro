@@ -8,6 +8,7 @@ import Precios from '../components/Precios.astro';
 import Contacto from '../components/Contacto.astro';
 import Etiqueta from '../components/Etiqueta.astro';
 import BandaFoto from '../components/BandaFoto.astro';
+import Faq from '../components/Faq.astro';
 import { whatsapp } from '../data/sitio.js';
 
 const titulo = 'Clases de cheerleading en Santiago | Clase de prueba gratis';
@@ -150,6 +151,8 @@ const anio = [
   <BandaFoto src="/media/banda-cierre.jpg"
              alt="El equipo de Firehouse junto a su coach después de un entrenamiento"
              alto="medio" foco="center 38%" />
+
+  <Faq preguntas={preguntas} titulo="Lo que nos preguntan siempre" />
 
   <Contacto />
 </Base>

@@ -1,0 +1,8 @@
+# Sitio antiguo → sitio nuevo. Cloudflare Pages lee este archivo.
+/index.html                          /                               301
+/clases-cheerleading-santiago.html   /clases-cheerleading-santiago   301
+/temporada-2026                      /                               301
+/temporada-2026.html                 /                               301
+/hoja-ruta2026.html                  /                               301
+/hoja_ruta2026.html                  /                               301
+/hoja-de-ruta-2026_v2.html           /                               301

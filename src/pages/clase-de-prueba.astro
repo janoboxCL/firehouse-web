@@ -1,0 +1,183 @@
+---
+import Base from '../layouts/Base.astro';
+import Etiqueta from '../components/Etiqueta.astro';
+import Faq from '../components/Faq.astro';
+import BandaFoto from '../components/BandaFoto.astro';
+import { sitio, whatsapp } from '../data/sitio.js';
+
+const titulo = 'Clase de prueba gratis de cheerleading en Santiago | Firehouse Cheer';
+const descripcion = 'Ven a entrenar un día con nosotros. Una clase real con el equipo y los mismos coaches, gratis y sin compromiso. No es una audición. Desde los 4 años, en La Cisterna.';
+
+const requisitos = ['Ropa deportiva cómoda', 'Botella de agua', 'Pelo largo tomado'];
+
+const preguntas = [
+  { p: '¿Tiene que saber hacer algo antes de ir?',
+    r: 'No. Recibimos a niñas y niños que nunca han hecho cheerleading ni gimnasia. Las bases se trabajan desde cero y los coaches acompañan a cada quien según su nivel.' },
+  { p: '¿Y si le da vergüenza o no quiere participar?',
+    r: 'Puede mirar primero y sumarse cuando quiera. Nadie la va a obligar y nadie se lo va a hacer notar.' },
+  { p: '¿Puedo quedarme a mirar la clase?',
+    r: 'Sí. Puedes acompañarla y ver el entrenamiento completo.' },
+  { p: '¿Es realmente gratis?',
+    r: 'Sí. No tiene costo ni obliga a matricularse después.' },
+  { p: '¿Desde qué edad?',
+    r: 'Desde los 4 años. Coordinamos el día según la edad, porque cada equipo entrena en su horario.' },
+  { p: '¿Qué día es la clase de prueba?',
+    r: 'Depende de la edad y del equipo que corresponda. Escríbenos por WhatsApp y coordinamos el día: entrenamos viernes de 18:00 a 20:00 y sábados de 16:00 a 18:00.' },
+];
+---
+<Base titulo={titulo} descripcion={descripcion} ruta="/clase-de-prueba" preguntas={preguntas}>
+
+  <section class="section cabecera">
+    <div class="wrap reveal">
+      <Etiqueta texto="La primera clase" />
+      <h1 class="cabecera__titulo">Ven a entrenar un día con nosotros</h1>
+      <p class="cabecera__bajada">
+        Una clase completa, con el equipo que le corresponde por edad y con los mismos coaches
+        que lo entrenan. Gratis y sin compromiso.
+      </p>
+      <p class="cabecera__accion">
+        <a class="btn" href={whatsapp('hero')} target="_blank" rel="noopener">Ven a una clase de prueba gratis</a>
+      </p>
+    </div>
+  </section>
+
+  <section class="section audicion">
+    <div class="wrap">
+      <div class="reveal">
+        <p class="audicion__no">No es una audición</p>
+        <p class="audicion__texto">
+          No evaluamos a nadie ni hace falta saber nada de antes. La idea es simple: que conozca
+          al equipo, a los entrenadores y cómo entrenamos realmente. Después deciden con calma.
+        </p>
+      </div>
+
+      <div class="doble">
+        <div class="reveal">
+          <h2 class="bloque__titulo">Qué pasa ese día</h2>
+          <p>
+            Entra a una clase real, no a una clase especial para visitas. Calienta con el equipo,
+            trabaja la parte técnica que toque ese día y participa en todo lo que hace el resto.
+          </p>
+          <p>Los coaches acompañan a cada quien según su nivel, sea cual sea.</p>
+          <p>
+            Si es su primera vez en un gimnasio de cheerleading, lo normal es que los primeros
+            veinte minutos mire más de lo que hace. Nadie la apura.
+          </p>
+        </div>
+
+        <div class="llevar reveal">
+          <p class="llevar__rotulo">Qué tiene que llevar</p>
+          <ul class="llevar__lista">
+            {requisitos.map((r, i) => (
+              <li><span class="llevar__num">{String(i + 1).padStart(2, '0')}</span>{r}</li>
+            ))}
+          </ul>
+          <p class="llevar__nada">Nada más. No hace falta uniforme, ni zapatillas especiales, ni experiencia.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <BandaFoto src="/media/banda-equipo.jpg"
+             alt="Deportistas de Firehouse escuchando al coach durante un entrenamiento"
+             frase="Nadie llega sabiendo. Todos entrenan para competir." alto="medio" />
+
+  <section class="section cuando">
+    <div class="wrap reveal">
+      <Etiqueta texto="Cuándo" />
+      <h2 class="section__title">Cuándo entrenamos</h2>
+      <ul class="cuando__lista">
+        {sitio.horarios.map(h => (
+          <li>
+            <span class="cuando__dia">{h.dia}</span>
+            <span class="cuando__hora">{h.hora}</span>
+            <span class="cuando__clase">{h.clase}</span>
+          </li>
+        ))}
+      </ul>
+      <p class="cuando__lugar">
+        {sitio.calle}, {sitio.comuna} — a pasos del Metro {sitio.metro}, a minutos de {sitio.cercanas}.
+      </p>
+      <p><a class="cta-texto" href="/#contacto">Ver el mapa y cómo llegar</a></p>
+    </div>
+  </section>
+
+  <Faq preguntas={preguntas} titulo="Lo que nos preguntan siempre" />
+
+  <section class="section cierre">
+    <div class="wrap reveal">
+      <p class="cierre__frase">Antes de decidir nada, ven a conocernos.</p>
+      <p class="cierre__sub">Escríbenos y coordinamos el día según su edad.</p>
+      <a class="btn" href={whatsapp('hero')} target="_blank" rel="noopener">Ven a una clase de prueba gratis</a>
+    </div>
+  </section>
+</Base>
+
+<style>
+.cabecera{ padding-top:var(--e-8); }
+.cabecera__titulo{
+  font-size:clamp(2.1rem, 5vw, 3.7rem);
+  max-width:18ch; margin-top:var(--e-3);
+}
+.cabecera__bajada{
+  color:var(--txt-soft); max-width:var(--wrap-texto);
+  margin-top:var(--e-3); font-size:clamp(1.05rem, 1.6vw, 1.3rem); line-height:1.55;
+}
+.cabecera__accion{ margin-top:var(--e-5); }
+
+.audicion{ background:var(--ember-deep); }
+.audicion__no{
+  font-family:var(--font-display); font-weight:800;
+  font-size:clamp(1.9rem, 4vw, 3rem); line-height:1;
+  color:var(--fire-yellow);
+}
+.audicion__texto{ color:var(--txt-soft); max-width:var(--wrap-texto); margin-top:var(--e-3); line-height:1.65; }
+
+.doble{ display:grid; grid-template-columns:1.05fr .95fr; gap:var(--e-8); margin-top:var(--e-7); align-items:start; }
+.bloque__titulo{ font-size:clamp(1.3rem, 2.2vw, 1.7rem); }
+.doble p{ color:var(--txt-soft); max-width:56ch; margin-top:var(--e-2); line-height:1.65; }
+
+.llevar{ border-left:var(--regla) solid var(--mat-blue); padding-left:var(--e-4); }
+.llevar__rotulo{
+  font-family:var(--font-body); font-size:13px; font-weight:500;
+  letter-spacing:.14em; text-transform:uppercase; color:var(--txt-faint);
+}
+.llevar__lista{ list-style:none; margin:var(--e-3) 0 0; padding:0; }
+.llevar__lista li{
+  display:flex; align-items:baseline; gap:var(--e-2);
+  font-family:var(--font-display); font-weight:800;
+  font-size:clamp(1.15rem, 1.9vw, 1.5rem);
+  padding:var(--e-2) 0; border-bottom:0.5px solid var(--hairline);
+}
+.llevar__num{ font-family:var(--font-count); font-size:12px; font-weight:700; color:var(--fire-yellow); min-width:3ch; }
+.llevar__nada{ color:var(--txt-faint); font-size:15px; margin-top:var(--e-3); max-width:44ch; }
+
+.cuando__lista{ list-style:none; margin:var(--e-5) 0 0; padding:0; }
+.cuando__lista li{
+  display:flex; align-items:baseline; gap:var(--e-3); flex-wrap:wrap;
+  padding:var(--e-3) 0; border-bottom:0.5px solid var(--hairline);
+}
+.cuando__lista li:first-child{ border-top:0.5px solid var(--hairline); }
+.cuando__dia{ font-family:var(--font-display); font-weight:800; font-size:clamp(1.2rem, 2.2vw, 1.7rem); min-width:7ch; }
+.cuando__hora{ font-family:var(--font-count); color:var(--fire-yellow); font-variant-numeric:tabular-nums; }
+.cuando__clase{
+  font-size:13px; letter-spacing:.14em; text-transform:uppercase;
+  color:var(--txt-faint); margin-left:auto;
+}
+.cuando__lugar{ color:var(--txt-soft); margin-top:var(--e-3); max-width:var(--wrap-texto); }
+.cuando p:last-child{ margin-top:var(--e-3); }
+
+.cierre{ background:var(--ember-deep); text-align:center; }
+.cierre__frase{
+  font-family:var(--font-display); font-weight:800;
+  font-size:clamp(1.6rem, 3.2vw, 2.4rem); line-height:1.05;
+}
+.cierre__sub{ color:var(--txt-soft); margin-top:var(--e-1); }
+.cierre .btn{ margin-top:var(--e-3); }
+
+@media (max-width:900px){
+  .doble{ grid-template-columns:1fr; gap:var(--e-5); }
+  .llevar{ padding-left:var(--e-3); }
+  .cuando__clase{ margin-left:0; width:100%; }
+}
+</style>

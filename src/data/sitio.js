@@ -3,6 +3,7 @@ export const sitio = {
   nombreCorto: 'Firehouse Cheer',
   url: 'https://firehousecheer.cl',
   telefono: '+56986114663',
+  correo: 'allstarfirehouse@gmail.com',
   instagram: 'https://www.instagram.com/firehouse.cheer/',
   calle: 'Santa Corina 197',
   comuna: 'La Cisterna',

@@ -12,6 +12,9 @@ import { sitio, whatsapp } from '../data/sitio.js';
       <span class="pie__lugar">{sitio.nombre} · {sitio.calle}, {sitio.comuna}</span>
     </span>
     <span class="pie__links">
+      <a href="/clases-cheerleading-santiago">Las clases</a>
+      <a href="/clase-de-prueba">Clase de prueba</a>
+      <a href="/precios">Precios</a>
       <a href={whatsapp('contacto')} target="_blank" rel="noopener">WhatsApp</a>
       <a href={sitio.instagram} target="_blank" rel="noopener">Instagram</a>
     </span>
@@ -31,7 +34,7 @@ import { sitio, whatsapp } from '../data/sitio.js';
 .pie__firma sup{ font-size:.6em; letter-spacing:0; }
 .pie__lugar{ color:var(--txt-faint); }
 
-.pie__links{ display:flex; gap:20px; }
+.pie__links{ display:flex; gap:20px; flex-wrap:wrap; }
 .pie__links a{ color:var(--txt-faint); text-decoration:none; }
 .pie__links a:hover{ color:var(--txt-soft); }
 </style>
