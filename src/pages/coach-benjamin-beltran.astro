@@ -90,7 +90,7 @@ const preguntas = [
       </p>
       <ul class="cifras">
         {cifras.map(c => (
-          <li><span class="cifras__n">{c.n}</span><span class="cifras__t">{c.t}</span></li>
+          <li class="cifra"><span class="cifra__n">{c.n}</span><span class="cifra__t">{c.t}</span></li>
         ))}
       </ul>
     </div>
@@ -242,10 +242,15 @@ const preguntas = [
 .significa{ background:var(--ember-deep); }
 .significa__texto{ color:var(--txt-soft); max-width:var(--wrap-texto); margin-top:var(--e-3); font-size:clamp(1.05rem,1.6vw,1.25rem); line-height:1.6; }
 
-.cifras{ list-style:none; display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:var(--e-4); margin:var(--e-6) 0 0; padding:0; }
-.cifras li{ border-top:var(--regla) solid var(--fire-red); padding-top:var(--e-2); }
-.cifras__n{ display:block; font-family:var(--font-display); font-weight:800; font-size:clamp(2.6rem,5vw,3.6rem); line-height:.95; color:var(--fire-yellow); font-variant-numeric:tabular-nums; }
-.cifras__t{ display:block; color:var(--txt-faint); font-size:14px; margin-top:var(--e-1); line-height:1.4; }
+.cifras{
+  list-style:none; margin:var(--e-6) 0 0; padding:0;
+  display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:2px;
+  background:var(--hairline);
+}
+.cifra{ background:var(--ember); padding:var(--e-4) var(--e-3); position:relative; overflow:hidden; }
+.cifra::before{ content:''; position:absolute; left:0; top:0; width:100%; height:4px; background:var(--fire-red); }
+.cifra__n{ display:block; font-family:var(--font-display); font-weight:800; font-size:clamp(3.2rem,6vw,4.6rem); line-height:.88; color:var(--fire-yellow); font-variant-numeric:tabular-nums; letter-spacing:-.02em; }
+.cifra__t{ display:block; color:var(--txt-soft); font-size:14.5px; margin-top:var(--e-2); line-height:1.4; max-width:20ch; }
 
 .hitos{ list-style:none; margin:var(--e-5) 0 0; padding:0; }
 .hito{ display:flex; gap:var(--e-4); padding:var(--e-3) 0; border-bottom:0.5px solid var(--hairline); align-items:flex-start; }
@@ -282,6 +287,7 @@ const preguntas = [
 .cierre .btn{ margin-top:var(--e-3); }
 
 @media (max-width:900px){
+  .cifras{ grid-template-columns:1fr 1fr; }
   .cab__fila{ flex-direction:column-reverse; align-items:flex-start; gap:var(--e-4); }
   .cab__foto{ width:210px; }
   .cumbre{ flex-direction:column; align-items:flex-start; padding:var(--e-5) var(--e-4); }
