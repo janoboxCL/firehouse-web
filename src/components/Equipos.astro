@@ -15,6 +15,11 @@ const tramos = ['4 a 8', '9 a 13', '14 y más'];
       </p>
     </div>
 
+    <picture class="equipos__foto reveal">
+      <source srcset="/media/equipos-todos.webp" type="image/webp" />
+      <img src="/media/equipos-todos.jpg" alt="Deportistas de todas las edades entrenando juntos en el mismo tapete" width="1600" height="760" loading="lazy" decoding="async" />
+    </picture>
+
     <div class="principio reveal">
       <p class="principio__lema">Perfection before progression</p>
       <p class="principio__texto">
@@ -65,8 +70,11 @@ const tramos = ['4 a 8', '9 a 13', '14 y más'];
 .equipos{ background:var(--ember-deep); }
 
 /* El principio de entrenamiento, como declaración */
+.equipos__foto{ display:block; margin-top:var(--e-6); }
+.equipos__foto img{ width:100%; height:auto; display:block; border-bottom:var(--regla) solid var(--mat-blue); }
+
 .principio{
-  margin-top:var(--e-6); padding:var(--e-6) var(--e-5);
+  margin-top:var(--e-5); padding:var(--e-6) var(--e-5);
   background:var(--ember);
   border-left:var(--regla) solid var(--fire-red);
 }
