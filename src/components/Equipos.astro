@@ -1,11 +1,7 @@
 ---
 import Etiqueta from './Etiqueta.astro';
 import { whatsapp } from '../data/sitio.js';
-const tramos = [
-  { edad:'4 a 8',  texto:'Coordinación, primeras volteretas y trabajo en equipo, con progresiones adaptadas a su edad y una rutina propia para la temporada.' },
-  { edad:'9 a 13', texto:'Técnica de suelo, stunts y progresiones, con rutina propia para la temporada.' },
-  { edad:'14 +',   texto:'Pirámides, transiciones y rutina completa, con la mayor exigencia técnica de la academia.' },
-];
+const tramos = ['4 a 8', '9 a 13', '14 y más'];
 ---
 <section class="section equipos" id="equipos">
   <div class="wrap">
@@ -13,28 +9,41 @@ const tramos = [
       <Etiqueta texto="Los equipos" />
       <h2 class="section__title">Cada equipo entrena completo. Cada equipo compite.</h2>
       <p class="section__intro">
-        Desde el primer año se entrena el cheerleading completo: gimnasia de suelo, stunts,
-        elevaciones, pirámides y una coreografía propia. Cada equipo prepara su rutina con un
-        objetivo competitivo.
+        Todos los equipos trabajan el mismo programa: gimnasia de suelo, stunts, elevaciones,
+        pirámides y una coreografía propia. No hay contenidos reservados para las más grandes.
+        Lo que cambia es la dificultad de cada elemento, no lo que se enseña.
       </p>
     </div>
 
-    <div class="equipos__grid">
-      {tramos.map(t => (
-        <article class="tramo reveal">
-          <p class="tramo__edad">{t.edad}</p>
-          <p class="tramo__anios">años</p>
-          <p class="tramo__texto">{t.texto}</p>
-        </article>
-      ))}
+    <div class="principio reveal">
+      <p class="principio__lema">Perfection before progression</p>
+      <p class="principio__texto">
+        Primero sale bien, después sale más difícil. Nadie avanza al elemento siguiente hasta
+        dominar el anterior, y eso vale igual para quien tiene cuatro años que para quien tiene
+        dieciséis. Es la razón por la que se puede empezar de cero sin quedarse atrás: cada
+        deportista avanza cuando ya domina lo anterior, no cuando le toca por edad.
+      </p>
     </div>
 
-    <p class="equipos__nota reveal">
-      Los equipos se organizan principalmente por edad y por la cantidad de deportistas de cada
-      temporada. Por eso cambian cada año — algunos son tres equipos, otros más. <strong>Lo que cambia es la dificultad, no las áreas que se entrenan.</strong>
-      &nbsp;Una deportista de seis años y otra de dieciséis trabajan las mismas áreas del cheerleading,
-      con progresiones y dificultad adaptadas a su edad y a su nivel.
-    </p>
+    <div class="sinreq reveal">
+      <h3>Para entrar no hay requisitos</h3>
+      <p>
+        No hay audición, ni prueba de nivel, ni experiencia previa. Quien llega entra al equipo
+        que le corresponde por edad y empieza a entrenar el mismo programa que el resto.
+      </p>
+    </div>
+
+    <div class="grupos reveal">
+      <p class="grupos__rotulo">Los equipos se arman cada temporada</p>
+      <ul class="grupos__lista">
+        {tramos.map(t => <li><span class="grupos__edad">{t}</span><span class="grupos__anios">años</span></li>)}
+      </ul>
+      <p class="grupos__nota">
+        Los tramos son referenciales: dependen de las edades y de la cantidad de deportistas que
+        se inscriban cada año, así que algunas temporadas son tres equipos y otras más.
+        Escríbenos y te decimos en qué equipo entrenaría.
+      </p>
+    </div>
 
     <div class="mixto reveal">
       <h3>El cheerleading es un deporte mixto</h3>
@@ -47,42 +56,60 @@ const tramos = [
         Sabemos que a veces la duda no es del niño sino de la casa. Si es tu caso, ven a ver un
         entrenamiento. Es más fácil entender de qué se trata viéndolo que explicándolo.
       </p>
-      <a class="cta-texto" id="wa-home-equipos" href={whatsapp('equipos')} target="_blank" rel="noopener">Ven a una clase de prueba gratis</a>
+      <a class="cta-texto" href={whatsapp('equipos')} target="_blank" rel="noopener" id="wa-home-equipos">Ven a una clase de prueba gratis</a>
     </div>
   </div>
 </section>
 
 <style>
 .equipos{ background:var(--ember-deep); }
-.equipos__grid{ display:grid; grid-template-columns:repeat(3, 1fr); gap:var(--e-3); margin-top:var(--e-6); }
 
-.tramo{
+/* El principio de entrenamiento, como declaración */
+.principio{
+  margin-top:var(--e-6); padding:var(--e-6) var(--e-5);
   background:var(--ember);
-  padding:var(--e-4);
-  clip-path:polygon(0 0, 100% 18px, 100% 100%, 0 calc(100% - 18px));
+  border-left:var(--regla) solid var(--fire-red);
 }
-.tramo__edad{
-  font-variant-numeric:tabular-nums;
+.principio__lema{
   font-family:var(--font-display); font-weight:800;
-  font-size:clamp(2.6rem, 5.4vw, 4rem); line-height:.9;
-  color:var(--fire-yellow);
+  font-size:clamp(1.8rem, 4vw, 3rem); line-height:1.02;
+  color:var(--fire-yellow); letter-spacing:-.015em;
 }
-.tramo__anios{
-  font-family:var(--font-count); font-size:13px; letter-spacing:.2em;
-  color:var(--txt-faint); margin-top:var(--e-1);
+.principio__texto{
+  color:var(--txt-soft); max-width:var(--wrap-texto);
+  margin-top:var(--e-3); line-height:1.65; font-size:clamp(1rem,1.5vw,1.15rem);
 }
-.tramo__texto{ color:var(--txt-soft); margin-top:var(--e-3); line-height:1.55; font-size:16px; }
 
-.equipos__nota{
-  margin-top:var(--e-5); color:var(--txt-soft);
-  max-width:var(--wrap-texto); line-height:1.6;
+.sinreq{ margin-top:var(--e-5); }
+.sinreq h3{ font-size:clamp(1.3rem,2.2vw,1.7rem); color:var(--chalk); }
+.sinreq p{ color:var(--txt-soft); max-width:var(--wrap-texto); margin-top:var(--e-2); line-height:1.6; }
+
+.grupos{ margin-top:var(--e-6); }
+.grupos__rotulo{
+  font-family:var(--font-body); font-weight:500; font-size:14px;
+  letter-spacing:.14em; text-transform:uppercase; color:var(--txt-faint);
 }
-.equipos__nota strong{ color:var(--chalk); font-weight:500; }
+.grupos__lista{
+  list-style:none; margin:var(--e-3) 0 0; padding:0;
+  display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:2px;
+  background:var(--hairline);
+}
+.grupos__lista li{ background:var(--ember); padding:var(--e-4) var(--e-3); }
+.grupos__edad{
+  display:block; font-family:var(--font-display); font-weight:800;
+  font-size:clamp(2.2rem,4.4vw,3.2rem); line-height:.92;
+  color:var(--fire-yellow); font-variant-numeric:tabular-nums;
+}
+.grupos__anios{
+  display:block; font-family:var(--font-count); font-size:12.5px;
+  letter-spacing:.2em; color:var(--txt-faint); margin-top:6px;
+}
+.grupos__nota{ color:var(--txt-soft); max-width:var(--wrap-texto); margin-top:var(--e-3); line-height:1.6; }
 
 .mixto{
   margin-top:var(--e-8); padding:var(--e-6);
   background:var(--ember);
-  border-left:var(--regla) solid var(--fire-red);
+  border-left:var(--regla) solid var(--mat-blue);
 }
 .mixto h3{
   font-family:var(--font-display); font-weight:800;
@@ -91,6 +118,4 @@ const tramos = [
 }
 .mixto p{ color:var(--txt-soft); max-width:var(--wrap-texto); margin-top:var(--e-2); line-height:1.6; }
 .mixto .cta-texto{ margin-top:var(--e-4); }
-
-@media (max-width:900px){ .equipos__grid{ grid-template-columns:1fr; } .tramo{ clip-path:none; } }
 </style>
