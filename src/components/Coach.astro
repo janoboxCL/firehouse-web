@@ -1,0 +1,52 @@
+---
+import Etiqueta from './Etiqueta.astro';
+const cifras = [
+  { n: '27',  t: 'años en el cheerleading' },
+  { n: '19',  t: 'temporadas en un mismo colegio' },
+  { n: '4.º', t: 'del mundo · USASF 2008' },
+  { n: '10',  t: 'años formando entrenadores' },
+];
+---
+<section class="section coach" id="coach">
+  <div class="wrap coach__fila">
+    <picture class="coach__foto reveal">
+      <source srcset="/media/coach-retrato.webp" type="image/webp" />
+      <img src="/media/coach-retrato.jpg" alt="Benjamín Beltrán, head coach de Firehouse Cheer, con una deportista de la academia" width="900" height="1200" loading="lazy" />
+    </picture>
+
+    <div class="coach__texto reveal">
+      <Etiqueta texto="Quién entrena" />
+      <h2 class="section__title">Coach Benjamín Beltrán</h2>
+      <p class="coach__bajada">
+        Tu hija no entrena en una academia: entrena con una persona. Esta es la suya.
+      </p>
+
+      <ul class="coach__cifras">
+        {cifras.map(c => (
+          <li><span class="coach__n">{c.n}</span><span class="coach__t">{c.t}</span></li>
+        ))}
+      </ul>
+
+      <p><a class="cta-texto" href="/coach-benjamin-beltran" id="ver-coach">Conocer su trayectoria</a></p>
+    </div>
+  </div>
+</section>
+
+<style>
+.coach{ background:var(--ember-deep); }
+.coach__fila{ display:flex; gap:var(--e-6); align-items:center; }
+.coach__foto{ flex:none; width:280px; }
+.coach__foto img{ width:100%; height:auto; display:block; border-left:var(--regla) solid var(--fire-red); }
+.coach__texto{ flex:1; }
+.coach__bajada{ color:var(--txt-soft); max-width:52ch; margin-top:var(--e-3); font-size:clamp(1.05rem,1.6vw,1.25rem); line-height:1.55; }
+
+.coach__cifras{ list-style:none; display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:var(--e-3); margin:var(--e-5) 0 var(--e-4); padding:0; }
+.coach__cifras li{ border-top:0.5px solid var(--hairline); padding-top:var(--e-2); }
+.coach__n{ display:block; font-family:var(--font-display); font-weight:800; font-size:clamp(2rem,3.6vw,2.7rem); line-height:.95; color:var(--fire-yellow); font-variant-numeric:tabular-nums; }
+.coach__t{ display:block; color:var(--txt-faint); font-size:13px; margin-top:6px; line-height:1.4; }
+
+@media (max-width:900px){
+  .coach__fila{ flex-direction:column; align-items:flex-start; gap:var(--e-4); }
+  .coach__foto{ width:200px; }
+}
+</style>
