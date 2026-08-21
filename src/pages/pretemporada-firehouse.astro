@@ -1,7 +1,8 @@
 ---
 import Base from '../layouts/Base.astro';
 import Faq from '../components/Faq.astro';
-import { whatsapp } from '../data/sitio.js';
+import BandaFoto from '../components/BandaFoto.astro';
+import { sitio, whatsapp } from '../data/sitio.js';
 
 const titulo = 'Taller de verano de cheerleading en Santiago | Pretemporada Firehouse 2027';
 const descripcion = 'Cheerleading en diciembre y enero para niñas y niños desde los 4 años, sin experiencia previa. 16 clases por $50.000, en La Cisterna. Sin obligación de continuar en marzo.';
@@ -30,11 +31,12 @@ const preguntas = [
         <source src="/media/pt-hero.mp4" type="video/mp4" />
       </video>
       <div class="pt-hero__velo"></div>
+      <div class="pt-hero__franja" aria-hidden="true"></div>
     </div>
 
     <div class="wrap pt-hero__contenido">
       <p class="pt-count">DIC · ENE</p>
-      <p class="pt-eyebrow">Pretemporada 2027</p>
+      <p class="pt-kicker">Pretemporada<br class="pt-kicker__salto" /> 2027</p>
       <h1 class="pt-hero__titulo">Prueba el cheerleading este verano, sin compromiso</h1>
       <p class="pt-hero__bajada">
         Dos meses para jugar, aprender y moverse en equipo. Desde los 4 años, sin experiencia
@@ -81,8 +83,15 @@ const preguntas = [
     </div>
   </section>
 
-  <section class="pt-section">
+  <section class="pt-section pt-section--objeto">
     <div class="wrap">
+      <svg class="pt-objeto pt-objeto--sol" viewBox="0 0 120 120" aria-hidden="true">
+        <circle cx="60" cy="60" r="22" fill="none" stroke="currentColor" stroke-width="5"/>
+        <g stroke="currentColor" stroke-width="5" stroke-linecap="round">
+          <path d="M60 10v18M60 92v18M110 60H92M28 60H10"/>
+          <path d="M93 27 80 40M40 80 27 93M93 93 80 80M40 40 27 27"/>
+        </g>
+      </svg>
       <p class="pt-eyebrow">Qué se hace</p>
       <h2 class="pt-title">Se aprende jugando, con técnica real</h2>
 
@@ -104,6 +113,10 @@ const preguntas = [
     </div>
   </section>
 
+  <BandaFoto src="/media/dia-cheer.jpg"
+             alt="Deportistas de Firehouse entrenando motions en fila durante la Cheer Class"
+             alto="bajo" foco="center 46%" />
+
   <section class="pt-section pt-section--panel">
     <div class="wrap pt-split">
       <picture class="pt-split__foto">
@@ -123,15 +136,21 @@ const preguntas = [
     <p class="pt-nota pt-nota--foto">Foto provisional del archivo actual. Se reemplaza cuando exista registro propio de la pretemporada.</p>
   </section>
 
-  <section class="pt-section">
+  <section class="pt-section pt-section--panel pt-section--objeto">
     <div class="wrap">
+      <svg class="pt-objeto pt-objeto--mono" viewBox="0 0 120 120" aria-hidden="true">
+        <path d="M52 60 14 34c-6-4-12 1-10 8l8 34c1 7 8 10 13 6l27-22Z" fill="none" stroke="currentColor" stroke-width="5" stroke-linejoin="round"/>
+        <path d="M68 60l38-26c6-4 12 1 10 8l-8 34c-1 7-8 10-13 6L68 60Z" fill="none" stroke="currentColor" stroke-width="5" stroke-linejoin="round"/>
+        <rect x="50" y="46" width="20" height="28" rx="6" fill="none" stroke="currentColor" stroke-width="5"/>
+        <path d="M60 78v28" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round"/>
+      </svg>
       <p class="pt-eyebrow">Sin complicaciones</p>
       <h2 class="pt-title">Trae tus ganas. Lo demás es fácil.</h2>
-      <div class="pt-lista3">
-        <div><span>01</span>Ropa deportiva cómoda</div>
-        <div><span>02</span>Botella de agua</div>
-        <div><span>03</span>Pelo largo tomado</div>
-      </div>
+      <ul class="pt-lista3">
+        <li><span>01</span>Ropa deportiva cómoda</li>
+        <li><span>02</span>Botella de agua</li>
+        <li><span>03</span>Pelo largo tomado</li>
+      </ul>
     </div>
   </section>
 
@@ -150,8 +169,27 @@ const preguntas = [
 
   <Faq preguntas={preguntas} titulo="Antes de decidir" />
 
+  <section class="pt-contacto">
+    <div class="wrap">
+      <p class="eyebrow" style="color:var(--fire-yellow); display:flex; align-items:center; gap:12px">
+        <span style="width:30px;height:3px;background:rgba(245,239,232,.38);display:inline-block;transform:skewX(var(--tilt-sm))"></span>
+        Dónde entrenamos
+      </p>
+      <h2 class="pt-title pt-title--serio">Santa Corina 197, La Cisterna</h2>
+      <p class="pt-parrafo pt-parrafo--serio">A pasos del Metro Lo Ovalle. WhatsApp +56 9 8611 4663.</p>
+      <div class="pt-mapa">
+        <iframe src={sitio.mapa} title="Ubicación de Firehouse Cheer en Santa Corina 197, La Cisterna"
+                loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+      </div>
+    </div>
+  </section>
+
   <section class="pt-cierre">
     <div class="wrap">
+      <svg class="pt-objeto pt-objeto--estrella" viewBox="0 0 120 120" aria-hidden="true">
+        <path d="M60 8 74.6 45.2 114 47.9 83.6 73.1 93.4 111.4 60 89.2 26.6 111.4 36.4 73.1 6 47.9 45.4 45.2 60 8Z"
+              fill="none" stroke="currentColor" stroke-width="5" stroke-linejoin="round"/>
+      </svg>
       <h2 class="pt-title">¿Le damos un cupo para este verano?</h2>
       <p class="pt-parrafo">16 clases, $50.000, sin matrícula.</p>
       <a class="pt-btn" href={whatsapp('pretemporada')} target="_blank" rel="noopener" id="wa-pt-cierre">Reservar mi cupo</a>
@@ -193,7 +231,7 @@ const preguntas = [
 
 .pt-btn{
   display:inline-flex; align-items:center; min-height:48px;
-  background:var(--coral); color:#171412; font-weight:500; font-size:16px;
+  background:linear-gradient(90deg, var(--coral), var(--aqua)); color:#171412; font-weight:600; font-size:16px;
   padding:14px 30px; border-radius:var(--radio); text-decoration:none;
   transition:transform var(--t-interfaz) ease, background var(--t-interfaz) ease;
 }
@@ -210,8 +248,24 @@ const preguntas = [
 .pt-hero__video{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
 .pt-hero__velo{
   position:absolute; inset:0;
-  background:linear-gradient(180deg, rgba(23,20,18,.58) 0%, rgba(23,20,18,.30) 45%, rgba(23,20,18,.88) 100%);
+  background:
+    radial-gradient(ellipse 75% 60% at 20% 15%, rgba(255,107,74,.30) 0%, rgba(255,107,74,0) 60%),
+    radial-gradient(ellipse 75% 60% at 85% 90%, rgba(34,184,176,.32) 0%, rgba(34,184,176,0) 60%),
+    linear-gradient(180deg, rgba(23,20,18,.62) 0%, rgba(23,20,18,.36) 45%, rgba(23,20,18,.90) 100%);
 }
+.pt-hero__franja{
+  position:absolute; left:0; right:0; bottom:0; height:8px;
+  background:linear-gradient(90deg, var(--coral) 0%, var(--coral) 50%, var(--aqua) 50%, var(--aqua) 100%);
+}
+
+.pt-kicker{
+  font-family:var(--font-display); font-weight:800;
+  font-size:clamp(1.8rem, 5vw, 3.1rem); line-height:.95; letter-spacing:-.01em;
+  color:var(--sun); text-transform:uppercase;
+  text-shadow:0 2px 20px rgba(23,20,18,.9);
+}
+.pt-kicker__salto{ display:none; }
+@media (max-width:520px){ .pt-kicker__salto{ display:block; } }
 .pt-hero__contenido{ position:relative; padding:var(--e-8) 0 var(--e-7); text-align:center; max-width:640px; margin-inline:auto; }
 .pt-hero__titulo{ font-family:var(--font-display); font-weight:800; font-size:clamp(2.1rem, 5vw, 3.4rem); line-height:1.05; margin-top:var(--e-3); }
 .pt-hero__bajada{ color:rgba(245,239,232,.92); font-size:clamp(1.05rem,1.6vw,1.2rem); margin-top:var(--e-3); max-width:44ch; margin-inline:auto; text-shadow:0 1px 12px rgba(23,20,18,.9); }
@@ -219,6 +273,16 @@ const preguntas = [
 
 .pt-section{ padding:var(--e-7) 0; }
 .pt-section--panel{ background:var(--ember-deep); position:relative; overflow:hidden; }
+.pt-section--objeto{ position:relative; overflow:hidden; }
+
+.pt-objeto{ position:absolute; pointer-events:none; }
+.pt-objeto--sol{ right:-24px; top:20%; width:190px; color:var(--sun); opacity:.12; transform:rotate(8deg); }
+.pt-objeto--mono{ left:-20px; bottom:-10px; width:170px; color:var(--coral); opacity:.13; transform:rotate(-10deg); }
+.pt-objeto--estrella{ position:static; display:block; margin:0 auto var(--e-3); width:48px; color:var(--sun); }
+@media (max-width:700px){
+  .pt-objeto--sol{ width:120px; right:-16px; }
+  .pt-objeto--mono{ width:110px; }
+}
 
 /* Precio destacado */
 .pt-precio{ display:flex; align-items:baseline; gap:var(--e-3); margin-top:var(--e-5); flex-wrap:wrap; }
@@ -245,12 +309,25 @@ const preguntas = [
 .pt-split__texto{ flex:1; }
 
 /* Qué llevar */
-.pt-lista3{ display:flex; gap:var(--e-3); margin-top:var(--e-4); flex-wrap:wrap; }
-.pt-lista3 div{ flex:1; min-width:140px; background:var(--ember-deep); padding:var(--e-3); text-align:center; }
-.pt-lista3 span{ display:block; font-family:var(--font-count); color:var(--sun); font-size:11px; margin-bottom:6px; }
+.pt-lista3{ list-style:none; display:flex; gap:var(--e-3); margin:var(--e-5) 0 0; padding:0; flex-wrap:wrap; }
+.pt-lista3 li{
+  flex:1; min-width:150px; background:var(--ember); padding:var(--e-4) var(--e-3); text-align:center;
+  font-family:var(--font-display); font-weight:800; font-size:clamp(1.05rem, 1.9vw, 1.3rem);
+  border-top:3px solid var(--aqua);
+}
+.pt-lista3 span{ display:block; font-family:var(--font-count); color:var(--sun); font-size:12px; margin-bottom:8px; font-weight:400; }
 
 /* Bloque serio: paleta normal del sitio */
 .pt-serio{ background:var(--ember-deep); padding:var(--e-7) 0; border-left:4px solid var(--fire-red); }
+
+.pt-contacto{ background:var(--ember); padding:var(--e-7) 0; }
+.pt-mapa{
+  margin-top:var(--e-4); aspect-ratio:21/9;
+  border-top:3px solid var(--fire-red); border-bottom:3px solid var(--mat-blue);
+  filter:grayscale(.35) contrast(1.05);
+}
+.pt-mapa iframe{ width:100%; height:100%; border:0; display:block; }
+@media (max-width:700px){ .pt-mapa{ aspect-ratio:4/3; } }
 
 /* Cierre */
 .pt-cierre{ text-align:center; padding:var(--e-8) 0; background:var(--ember-deep); }
