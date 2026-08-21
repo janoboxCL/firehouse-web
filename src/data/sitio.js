@@ -31,6 +31,7 @@ const mensajes = {
   precios:   'Hola, quiero información para sumarme a Firehouse.',
   dosAlumnos:'Hola, quiero consultar por el valor para dos alumnos.',
   contacto:  'Hola, quiero hacer una consulta sobre Firehouse.',
+  pretemporada: 'Hola, quiero reservar un cupo para la Pretemporada Firehouse 2027.',
 };
 
 export function whatsapp(clave = 'hero') {

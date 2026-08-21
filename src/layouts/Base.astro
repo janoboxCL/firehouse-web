@@ -6,7 +6,7 @@ import Pie from '../components/Pie.astro';
 import Arriba from '../components/Arriba.astro';
 import { sitio } from '../data/sitio.js';
 
-const { titulo, descripcion, ruta = '', preguntas = null, miga = null } = Astro.props;
+const { titulo, descripcion, ruta = '', preguntas = null, miga = null, noindex = false } = Astro.props;
 const canonical = `${sitio.url}${ruta}`;
 
 const schema = {
@@ -47,6 +47,7 @@ const schema = {
   <title>{titulo}</title>
   <meta name="description" content={descripcion} />
   <link rel="canonical" href={canonical} />
+  {noindex && <meta name="robots" content="noindex, nofollow" />}
 
   <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />

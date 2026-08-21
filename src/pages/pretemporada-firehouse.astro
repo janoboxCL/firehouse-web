@@ -1,0 +1,270 @@
+---
+import Base from '../layouts/Base.astro';
+import Faq from '../components/Faq.astro';
+import { whatsapp } from '../data/sitio.js';
+
+const titulo = 'Taller de verano de cheerleading en Santiago | Pretemporada Firehouse 2027';
+const descripcion = 'Cheerleading en diciembre y enero para niñas y niños desde los 4 años, sin experiencia previa. 16 clases por $50.000, en La Cisterna. Sin obligación de continuar en marzo.';
+
+const preguntas = [
+  { p: '¿Hay que tener experiencia?',
+    r: 'No. La mayoría llega sin haber hecho nunca cheerleading ni gimnasia.' },
+  { p: '¿Es una audición?',
+    r: 'No. No se evalúa a nadie ni hay que pasar ninguna prueba para entrar.' },
+  { p: '¿Hay que seguir en marzo?',
+    r: 'No. La pretemporada se paga y se cierra sola. Seguir es una decisión que se toma a fines de enero, sin compromiso.' },
+  { p: '¿Se puede entrar empezada la pretemporada?',
+    r: 'Sí, mientras queden cupos. El valor se ajusta a las clases que queden.' },
+  { p: '¿Los niños también pueden?',
+    r: 'Sí. El cheerleading competitivo contempla categorías mixtas y en Firehouse entrenan niñas y niños.' },
+  { p: '¿Qué pasa si falta a una clase?',
+    r: 'No pasa nada. En la pretemporada no hay rutina que dependa de que todos estén, así que se puede faltar sin afectar al resto.' },
+];
+---
+<Base titulo={titulo} descripcion={descripcion} ruta="/pretemporada-firehouse" preguntas={preguntas} miga="Pretemporada 2027" noindex>
+
+  <section class="pt-hero">
+    <div class="pt-hero__fondo" aria-hidden="true">
+      <video class="pt-hero__video" autoplay muted loop playsinline poster="/media/pt-hero-poster.jpg">
+        <source src="/media/pt-hero.webm" type="video/webm" />
+        <source src="/media/pt-hero.mp4" type="video/mp4" />
+      </video>
+      <div class="pt-hero__velo"></div>
+    </div>
+
+    <div class="wrap pt-hero__contenido">
+      <p class="pt-count">DIC · ENE</p>
+      <p class="pt-eyebrow">Pretemporada 2027</p>
+      <h1 class="pt-hero__titulo">Prueba el cheerleading este verano, sin compromiso</h1>
+      <p class="pt-hero__bajada">
+        Dos meses para jugar, aprender y moverse en equipo. Desde los 4 años, sin experiencia
+        previa y sin obligación de continuar en marzo.
+      </p>
+      <p class="pt-hero__cta">
+        <a class="pt-btn" href={whatsapp('pretemporada')} target="_blank" rel="noopener" id="wa-pt-hero">Quiero un cupo</a>
+        <a class="pt-btn-quiet" href="#marzo">Ver qué pasa en marzo</a>
+      </p>
+    </div>
+  </section>
+
+  <section class="pt-section">
+    <div class="wrap">
+      <p class="pt-eyebrow">Qué es</p>
+      <h2 class="pt-title">Diciembre y enero, dos veces por semana</h2>
+      <p class="pt-parrafo">
+        La pretemporada es la puerta de entrada a Firehouse. Cheerleading de verdad —gimnasia
+        de suelo, volteretas, stunts, coreografía— pero sin campeonatos ni presión de competencia.
+      </p>
+    </div>
+  </section>
+
+  <section class="pt-section pt-section--panel">
+    <div class="wrap">
+      <p class="pt-eyebrow">Cuándo y cuánto</p>
+      <h2 class="pt-title">16 clases por $50.000</h2>
+
+      <div class="pt-precio">
+        <span class="pt-precio__num">$3.125</span>
+        <span class="pt-precio__txt">por clase de dos horas — se paga una vez, por los dos meses completos</span>
+      </div>
+
+      <ul class="pt-datos">
+        <li><span>Cuándo</span><b>4 dic — 30 ene</b></li>
+        <li><span>Días</span><b>Vie 18–20 · Sáb 16–18</b></li>
+        <li><span>Matrícula</span><b>Sin costo</b></li>
+        <li><span>Dónde</span><b>La Cisterna</b></li>
+      </ul>
+      <p class="pt-nota">
+        16 clases entre el 4 de diciembre de 2026 y el 30 de enero de 2027. No hay clases el
+        25 de diciembre ni el 1 de enero.
+      </p>
+    </div>
+  </section>
+
+  <section class="pt-section">
+    <div class="wrap">
+      <p class="pt-eyebrow">Qué se hace</p>
+      <h2 class="pt-title">Se aprende jugando, con técnica real</h2>
+
+      <div class="pt-grid3">
+        <div class="pt-card">
+          <h3>Gimnasia de suelo</h3>
+          <p>Volteretas, ruedas y progresiones, paso a paso según la edad.</p>
+        </div>
+        <div class="pt-card">
+          <h3>Stunts y elevaciones</h3>
+          <p>Equilibrio y trabajo en equipo, con la asistencia del coach.</p>
+        </div>
+        <div class="pt-card">
+          <h3>Coreografía</h3>
+          <p>Motions, ritmo y energía Firehouse, en equipo.</p>
+        </div>
+      </div>
+      <p class="pt-nota">Perfection before progression: nadie avanza a un elemento nuevo antes de dominar el anterior.</p>
+    </div>
+  </section>
+
+  <section class="pt-section pt-section--panel">
+    <div class="wrap pt-split">
+      <picture class="pt-split__foto">
+        <source srcset="/media/gal-circulo.webp" type="image/webp" />
+        <img src="/media/gal-circulo.jpg" alt="El equipo de Firehouse sentado en círculo escuchando indicaciones" width="1000" height="760" loading="lazy" decoding="async" />
+      </picture>
+      <div class="pt-split__texto">
+        <p class="pt-eyebrow">El diferenciador</p>
+        <h2 class="pt-title">Entrenan junto al equipo que compite</h2>
+        <p class="pt-parrafo">
+          La pretemporada corre en el mismo horario del equipo de competencia. No es un grupo
+          aparte: se entrena a metros de las deportistas que acaban de volver de los campeonatos.
+        </p>
+        <p class="pt-parrafo"><strong>Cupos limitados</strong> — el espacio se comparte con el equipo.</p>
+      </div>
+    </div>
+    <p class="pt-nota pt-nota--foto">Foto provisional del archivo actual. Se reemplaza cuando exista registro propio de la pretemporada.</p>
+  </section>
+
+  <section class="pt-section">
+    <div class="wrap">
+      <p class="pt-eyebrow">Sin complicaciones</p>
+      <h2 class="pt-title">Trae tus ganas. Lo demás es fácil.</h2>
+      <div class="pt-lista3">
+        <div><span>01</span>Ropa deportiva cómoda</div>
+        <div><span>02</span>Botella de agua</div>
+        <div><span>03</span>Pelo largo tomado</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="pt-serio" id="marzo">
+    <div class="wrap">
+      <p class="pt-eyebrow pt-eyebrow--serio">Y si quiere seguir en marzo</p>
+      <h2 class="pt-title pt-title--serio">Sin sorpresas después</h2>
+      <p class="pt-parrafo pt-parrafo--serio">
+        Quien viene de la pretemporada no paga matrícula. La temporada 2027 tiene mensualidad,
+        tenida, uniforme de competencia y pack de competencias — cada ítem en el momento del año
+        en que se necesita, nunca todo junto.
+      </p>
+      <p class="pt-ver"><a class="pt-cta-texto" href="/precios">Ver el esquema completo de costos →</a></p>
+    </div>
+  </section>
+
+  <Faq preguntas={preguntas} titulo="Antes de decidir" />
+
+  <section class="pt-cierre">
+    <div class="wrap">
+      <h2 class="pt-title">¿Le damos un cupo para este verano?</h2>
+      <p class="pt-parrafo">16 clases, $50.000, sin matrícula.</p>
+      <a class="pt-btn" href={whatsapp('pretemporada')} target="_blank" rel="noopener" id="wa-pt-cierre">Reservar mi cupo</a>
+      <p class="pt-ver"><a class="pt-cta-texto" href="/clase-de-prueba">¿Prefieres probar antes? Ven a una clase de prueba gratis</a></p>
+    </div>
+  </section>
+
+</Base>
+
+<style>
+/* Paleta de verano: reemplaza rojo/azul de competencia en toda la página,
+   salvo el bloque "Y si quiere seguir en marzo", que vuelve a la paleta
+   normal del sitio a propósito — señal visual de que ahí se pone serio. */
+.pt-hero, .pt-section, .pt-serio, .pt-cierre{
+  --coral:#FF6B4A; --aqua:#22B8B0; --sun:#FFD23F;
+}
+
+.pt-eyebrow{
+  font-family:var(--font-count); font-size:11px; letter-spacing:.3em;
+  color:var(--sun); text-transform:uppercase;
+  display:flex; align-items:center; gap:12px;
+}
+.pt-eyebrow::before{ content:''; width:30px; height:3px; background:rgba(245,239,232,.38); transform:skewX(var(--tilt-sm)); }
+.pt-eyebrow--serio{ color:var(--fire-yellow); }
+
+.pt-count{
+  display:inline-flex; align-items:center; gap:14px;
+  font-family:var(--font-count); font-weight:700; font-size:15px; letter-spacing:.28em;
+  color:var(--sun); margin-bottom:var(--e-2);
+}
+.pt-count::before, .pt-count::after{ content:''; width:30px; height:3px; background:var(--coral); transform:skewX(var(--tilt-sm)); }
+
+.pt-title{ font-family:var(--font-display); font-weight:800; font-size:clamp(1.6rem, 3.4vw, 2.4rem); line-height:1.05; margin-top:var(--e-3); }
+.pt-title--serio{ color:var(--chalk); }
+.pt-parrafo{ color:var(--txt-soft); max-width:var(--wrap-texto); margin-top:var(--e-3); font-size:clamp(1rem,1.5vw,1.15rem); line-height:1.6; }
+.pt-parrafo--serio strong{ color:var(--chalk); font-weight:500; }
+.pt-nota{ color:var(--txt-faint); font-size:14px; margin-top:var(--e-3); max-width:var(--wrap-texto); }
+.pt-nota--foto{ margin-top:var(--e-2); font-style:italic; }
+
+.pt-btn{
+  display:inline-flex; align-items:center; min-height:48px;
+  background:var(--coral); color:#171412; font-weight:500; font-size:16px;
+  padding:14px 30px; border-radius:var(--radio); text-decoration:none;
+  transition:transform var(--t-interfaz) ease, background var(--t-interfaz) ease;
+}
+.pt-btn:hover{ transform:translateY(-2px); }
+.pt-btn:focus-visible{ outline:3px solid var(--sun); outline-offset:3px; }
+.pt-btn-quiet{ color:rgba(245,239,232,.78); font-size:15px; text-decoration:underline; }
+.pt-cta-texto{ color:var(--fire-yellow); text-decoration:none; border-bottom:2px solid var(--fire-yellow); font-size:16px; }
+.pt-cta-texto:hover{ color:var(--chalk); border-bottom-color:var(--chalk); }
+.pt-ver{ margin-top:var(--e-3); }
+
+/* Hero */
+.pt-hero{ position:relative; overflow:hidden; isolation:isolate; border-bottom:3px solid var(--coral); }
+.pt-hero__fondo{ position:absolute; inset:0; z-index:-1; }
+.pt-hero__video{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+.pt-hero__velo{
+  position:absolute; inset:0;
+  background:linear-gradient(180deg, rgba(23,20,18,.58) 0%, rgba(23,20,18,.30) 45%, rgba(23,20,18,.88) 100%);
+}
+.pt-hero__contenido{ position:relative; padding:var(--e-8) 0 var(--e-7); text-align:center; max-width:640px; margin-inline:auto; }
+.pt-hero__titulo{ font-family:var(--font-display); font-weight:800; font-size:clamp(2.1rem, 5vw, 3.4rem); line-height:1.05; margin-top:var(--e-3); }
+.pt-hero__bajada{ color:rgba(245,239,232,.92); font-size:clamp(1.05rem,1.6vw,1.2rem); margin-top:var(--e-3); max-width:44ch; margin-inline:auto; text-shadow:0 1px 12px rgba(23,20,18,.9); }
+.pt-hero__cta{ display:flex; flex-direction:column; align-items:center; gap:var(--e-2); margin-top:var(--e-5); }
+
+.pt-section{ padding:var(--e-7) 0; }
+.pt-section--panel{ background:var(--ember-deep); position:relative; overflow:hidden; }
+
+/* Precio destacado */
+.pt-precio{ display:flex; align-items:baseline; gap:var(--e-3); margin-top:var(--e-5); flex-wrap:wrap; }
+.pt-precio__num{ font-family:var(--font-display); font-weight:800; font-size:clamp(2.6rem,6vw,4rem); color:var(--sun); line-height:1; font-variant-numeric:tabular-nums; }
+.pt-precio__txt{ color:var(--txt-soft); font-size:15px; max-width:26ch; }
+
+.pt-datos{ display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:2px; background:var(--hairline); margin:var(--e-4) 0 0; padding:0; list-style:none; }
+.pt-datos li{ background:var(--ember-deep); padding:var(--e-3); }
+.pt-datos span{ display:block; font-family:var(--font-count); font-size:10.5px; letter-spacing:.12em; color:var(--aqua); text-transform:uppercase; }
+.pt-datos b{ display:block; margin-top:6px; font-family:var(--font-display); font-weight:800; font-size:17px; }
+
+/* Actividades */
+.pt-grid3{ display:grid; grid-template-columns:repeat(3,1fr); gap:var(--e-3); margin-top:var(--e-5); }
+.pt-card{ background:var(--ember-deep); padding:var(--e-4); border-top:3px solid var(--coral); }
+.pt-card:nth-child(2){ border-top-color:var(--aqua); }
+.pt-card:nth-child(3){ border-top-color:var(--sun); }
+.pt-card h3{ font-family:var(--font-display); font-weight:800; font-size:15px; }
+.pt-card p{ color:var(--txt-soft); font-size:13.5px; margin-top:6px; }
+
+/* Diferenciador */
+.pt-split{ display:flex; gap:var(--e-6); align-items:center; }
+.pt-split__foto{ flex:1; display:block; }
+.pt-split__foto img{ width:100%; height:auto; display:block; }
+.pt-split__texto{ flex:1; }
+
+/* Qué llevar */
+.pt-lista3{ display:flex; gap:var(--e-3); margin-top:var(--e-4); flex-wrap:wrap; }
+.pt-lista3 div{ flex:1; min-width:140px; background:var(--ember-deep); padding:var(--e-3); text-align:center; }
+.pt-lista3 span{ display:block; font-family:var(--font-count); color:var(--sun); font-size:11px; margin-bottom:6px; }
+
+/* Bloque serio: paleta normal del sitio */
+.pt-serio{ background:var(--ember-deep); padding:var(--e-7) 0; border-left:4px solid var(--fire-red); }
+
+/* Cierre */
+.pt-cierre{ text-align:center; padding:var(--e-8) 0; background:var(--ember-deep); }
+.pt-cierre .pt-title{ max-width:20ch; margin-inline:auto; }
+.pt-cierre .pt-parrafo{ margin-inline:auto; }
+.pt-cierre .pt-btn{ margin-top:var(--e-3); }
+
+@media (prefers-reduced-motion: reduce){
+  .pt-btn{ transition:none; }
+  .pt-btn:hover{ transform:none; }
+}
+
+@media (max-width:900px){
+  .pt-grid3{ grid-template-columns:1fr; }
+  .pt-split{ flex-direction:column; }
+}
+</style>
