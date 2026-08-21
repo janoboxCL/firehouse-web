@@ -1,0 +1,49 @@
+---
+import Etiqueta from './Etiqueta.astro';
+const { preguntas, titulo = 'Preguntas frecuentes' } = Astro.props;
+---
+<section class="section faq" id="preguntas">
+  <div class="wrap">
+    <div class="reveal">
+      <Etiqueta texto="Preguntas frecuentes" />
+      <h2 class="section__title">{titulo}</h2>
+    </div>
+
+    <div class="faq__lista">
+      {preguntas.map(item => (
+        <details class="faq__item reveal">
+          <summary>{item.p}</summary>
+          <p>{item.r}</p>
+        </details>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+.faq__lista{ margin-top:var(--e-6); border-top:0.5px solid var(--hairline); }
+
+.faq__item{ border-bottom:0.5px solid var(--hairline); }
+.faq__item summary{
+  display:flex; align-items:center; justify-content:space-between; gap:var(--e-3);
+  padding:var(--e-3) 0; cursor:pointer; list-style:none;
+  font-family:var(--font-display); font-weight:800;
+  font-size:clamp(1.05rem, 1.8vw, 1.3rem);
+}
+.faq__item summary::-webkit-details-marker{ display:none; }
+.faq__item summary::after{
+  content:'+'; font-family:var(--font-count); font-size:1.4rem;
+  color:var(--fire-yellow); line-height:1; flex:none;
+  transition:transform var(--t-interfaz) ease;
+}
+.faq__item[open] summary::after{ transform:rotate(45deg); }
+.faq__item summary:hover{ color:var(--fire-yellow); }
+.faq__item p{
+  color:var(--txt-soft); max-width:var(--wrap-texto);
+  padding-bottom:var(--e-3); line-height:1.65;
+}
+
+@media (prefers-reduced-motion: reduce){
+  .faq__item summary::after{ transition:none; }
+}
+</style>

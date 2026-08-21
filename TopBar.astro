@@ -1,0 +1,16 @@
+---
+// Acá viven los avisos. Reemplaza al carrusel: un solo mensaje, cambiable en una línea.
+const aviso = 'Temporada 2026 en curso · incorporaciones abiertas';
+---
+<div class="topbar"><div class="wrap">{aviso}</div></div>
+
+<style>
+.topbar{
+  background:var(--ember-deep);
+  color:var(--txt-soft);
+  border-bottom:var(--regla) solid var(--fire-red);
+  font-size:13.5px; letter-spacing:.02em;
+  padding:var(--e-1) 0;
+  text-align:center;
+}
+</style>

@@ -1,0 +1,78 @@
+---
+/*
+  Banda fotográfica a sangre completa. Funciona como tejido conectivo entre
+  secciones: entra con un corte diagonal y sale con el opuesto, de modo que
+  las secciones vecinas se traban en vez de apilarse.
+  Si la imagen no existe todavía, muestra los planos de color y no se rompe.
+*/
+const { src, alt = '', frase = '', autor = '', alto = 'medio', foco = 'center' } = Astro.props;
+const webp = src ? src.replace(/\.jpg$/, '.webp') : null;
+---
+<div class:list={['banda', `banda--${alto}`]}>
+  <div class="banda__fondo">
+    {src && (
+      <picture>
+        <source srcset={webp} type="image/webp" />
+        <img src={src} alt={alt} loading="lazy" decoding="async" width="1920" height="820" style={`object-position:${foco}`} />
+      </picture>
+    )}
+    <span class="banda__plano banda__plano--tapiz"></span>
+    <span class="banda__plano banda__plano--fuego"></span>
+    <span class="banda__velo"></span>
+  </div>
+  {frase && (
+    <blockquote class="banda__frase reveal">
+      <p>{frase}</p>
+      {autor && <cite>{autor}</cite>}
+    </blockquote>
+  )}
+</div>
+
+<style>
+.banda{
+  position:relative; overflow:hidden;
+  display:grid; place-items:center;
+  clip-path:polygon(0 0, 100% 40px, 100% 100%, 0 calc(100% - 40px));
+  margin-block:-20px;
+}
+.banda--bajo{ min-height:240px; }
+.banda--medio{ min-height:380px; }
+.banda--alto{ min-height:520px; }
+
+.banda__fondo{ position:absolute; inset:0; background:var(--ember-deep); }
+.banda__fondo picture, .banda__fondo img{
+  display:block; width:100%; height:100%; object-fit:cover;
+  /* tratamiento cromático común, deliberadamente leve */
+  filter:saturate(1.06) contrast(1.03);
+}
+
+.banda__plano{ position:absolute; display:block; transform:rotate(var(--tilt-md)); }
+.banda__plano--tapiz{ right:-14%; top:-40%; width:46%; height:180%; background:var(--mat-blue); opacity:.22; }
+.banda__plano--fuego{ left:-8%;  top:-40%; width:26%; height:180%; background:var(--fire-red); opacity:.20; }
+
+.banda__velo{
+  position:absolute; inset:0;
+  background:linear-gradient(180deg, rgba(23,20,18,.72) 0%, rgba(23,20,18,.38) 45%, rgba(23,20,18,.82) 100%);
+}
+
+.banda__frase{
+  position:relative; margin:0; padding:var(--e-6) var(--e-4);
+  max-width:34ch; text-align:center;
+}
+.banda__frase p{
+  font-family:var(--font-display); font-weight:800;
+  font-size:clamp(1.5rem, 3.2vw, 2.6rem); line-height:1.12;
+  text-shadow:0 2px 24px rgba(23,20,18,.9);
+}
+.banda__frase cite{
+  display:block; margin-top:var(--e-2); font-style:normal;
+  font-family:var(--font-count); font-size:13px; letter-spacing:.14em;
+  color:var(--fire-yellow);
+}
+
+@media (max-width:760px){
+  .banda{ clip-path:polygon(0 0, 100% 20px, 100% 100%, 0 calc(100% - 20px)); }
+  .banda--medio{ min-height:280px; }
+  .banda--alto{ min-height:340px; }
+}
+</style>

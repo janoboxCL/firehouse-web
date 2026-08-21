@@ -1,0 +1,123 @@
+---
+import '../styles/tokens.css';
+import TopBar from '../components/TopBar.astro';
+import Nav from '../components/Nav.astro';
+import Pie from '../components/Pie.astro';
+import Arriba from '../components/Arriba.astro';
+import { sitio } from '../data/sitio.js';
+
+const { titulo, descripcion, ruta = '', preguntas = null, miga = null, noindex = false } = Astro.props;
+const canonical = `${sitio.url}${ruta}`;
+
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'SportsActivityLocation',
+  name: sitio.nombre,
+  alternateName: [sitio.nombreCorto, 'Firehouse — The One and Only'],
+  url: sitio.url,
+  logo: `${sitio.url}/logo.png`,
+  image: `${sitio.url}/og.jpg`,
+  telephone: sitio.telefono,
+  email: sitio.correo,
+  sameAs: [sitio.instagram],
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: sitio.calle,
+    addressLocality: sitio.comuna,
+    addressRegion: sitio.ciudad,
+    addressCountry: 'CL',
+  },
+  priceRange: '$$',
+  currenciesAccepted: 'CLP',
+  geo: { '@type': 'GeoCoordinates', latitude: sitio.lat, longitude: sitio.lng },
+  areaServed: sitio.areaServida.map(c => ({ '@type': 'City', name: c })),
+  publicAccess: true,
+  openingHoursSpecification: [
+    { '@type': 'OpeningHoursSpecification', dayOfWeek: 'Friday',   opens: '18:00', closes: '20:00' },
+    { '@type': 'OpeningHoursSpecification', dayOfWeek: 'Saturday', opens: '16:00', closes: '18:00' },
+  ],
+};
+---
+<!doctype html>
+<html lang="es-CL">
+<head>
+  <meta charset="utf-8" />
+  <script is:inline>document.documentElement.classList.add("js");</script>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{titulo}</title>
+  <meta name="description" content={descripcion} />
+  <link rel="canonical" href={canonical} />
+  {noindex && <meta name="robots" content="noindex, nofollow" />}
+
+  <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <meta name="theme-color" content="#171412" />
+
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content={titulo} />
+  <meta property="og:description" content={descripcion} />
+  <meta property="og:url" content={canonical} />
+  <meta property="og:locale" content="es_CL" />
+  <meta property="og:image" content={`${sitio.url}/og.jpg`} />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta name="twitter:card" content="summary_large_image" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;800&family=Instrument+Sans:wght@400;500&family=Space+Mono&display=swap" />
+
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-L88KFZ3MYR"></script>
+  <script is:inline>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){ dataLayer.push(arguments); }
+    gtag('js', new Date());
+    gtag('config', 'G-L88KFZ3MYR');
+  </script>
+
+  <script type="application/ld+json" set:html={JSON.stringify(schema)} />
+  {miga && <script type="application/ld+json" set:html={JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Inicio', item: sitio.url },
+      { '@type': 'ListItem', position: 2, name: miga, item: canonical },
+    ],
+  })} />}
+  {preguntas && <script type="application/ld+json" set:html={JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: preguntas.map(p => ({
+      '@type': 'Question',
+      name: p.p,
+      acceptedAnswer: { '@type': 'Answer', text: p.r },
+    })),
+  })} />}
+</head>
+<body>
+  <TopBar />
+  <Nav interior={ruta !== ''} />
+  <main>
+    <slot />
+  </main>
+  <Pie />
+  <Arriba />
+  <script is:inline>
+    (() => {
+      const objetivos = document.querySelectorAll('.reveal');
+      if (!objetivos.length) return;
+      if (!('IntersectionObserver' in window) ||
+          window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        objetivos.forEach(el => el.classList.add('visible'));
+        return;
+      }
+      const obs = new IntersectionObserver((entradas) => {
+        entradas.forEach(e => {
+          if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); }
+        });
+      }, { rootMargin: '0px 0px -12% 0px', threshold: 0.12 });
+      objetivos.forEach(el => obs.observe(el));
+    })();
+  </script>
+</body>
+</html>

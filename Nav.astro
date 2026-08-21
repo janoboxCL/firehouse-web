@@ -1,0 +1,174 @@
+---
+import { whatsapp, sitio } from '../data/sitio.js';
+const { interior = false } = Astro.props;
+
+const enlaces = [
+  { href: '/clases-cheerleading-santiago', texto: 'Entrenamientos' },
+  { href: '/clase-de-prueba',              texto: 'Clase de prueba' },
+  { href: '/precios',                      texto: 'Precios' },
+  { href: '/coach-benjamin-beltran',       texto: 'El coach' },
+];
+---
+<header class:list={['nav', interior && 'nav--interior']} id="nav">
+  <div class="wrap nav__row">
+    <a href="/" class="nav__marca" aria-label={`${sitio.nombre} — inicio`}>
+      <picture>
+        <source srcset="/logo.webp" type="image/webp" />
+        <img src="/logo.png" alt={sitio.nombre} width="275" height="240" />
+      </picture>
+      <span class="nav__lema">The One and Only</span>
+    </a>
+
+    <nav aria-label="Principal" class="nav__links">
+      {enlaces.map(e => <a href={e.href}>{e.texto}</a>)}
+    </nav>
+
+    <a class="nav__cta" id="wa-menu" href={whatsapp('hero')} target="_blank" rel="noopener">
+      <span class="nav__cta-largo">Clase de prueba gratis</span>
+      <span class="nav__cta-corto">Clase gratis</span>
+    </a>
+
+    <button class="nav__boton" id="nav-boton" type="button"
+            aria-label="Abrir menú" aria-expanded="false" aria-controls="nav-panel">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+
+  <nav class="nav__panel" id="nav-panel" aria-label="Menú" hidden>
+    {enlaces.map(e => <a href={e.href}>{e.texto}</a>)}
+  </nav>
+</header>
+
+<style>
+.nav{
+  position:sticky; top:0; z-index:50;
+  background:rgba(23,20,18,.94);
+  backdrop-filter:blur(8px);
+  border-bottom:0.5px solid var(--hairline);
+}
+
+.nav__row{
+  position:relative;
+  display:flex; align-items:center; justify-content:flex-end;
+  gap:var(--e-4);
+  padding-block:15px;
+}
+
+.nav__marca{
+  position:absolute; left:24px; top:2px;
+  display:block; line-height:0; z-index:3;
+  text-align:center; text-decoration:none;
+}
+
+/* Cuarta línea del lockup: se recoge junto con el escudo */
+.nav__lema{
+  display:block; margin-top:8px;
+  font-family:var(--font-count);
+  font-size:10.5px; letter-spacing:.32em; line-height:1;
+  text-transform:uppercase; white-space:nowrap;
+  color:rgba(245,239,232,.66);
+  text-shadow:0 1px 10px rgba(23,20,18,.95);
+  transition:opacity var(--t-interfaz) ease;
+}
+.nav--compacta .nav__lema,
+.nav--interior .nav__lema{ opacity:0; pointer-events:none; }
+.nav__marca img{
+  height:134px; width:auto;
+  filter:drop-shadow(0 6px 18px rgba(0,0,0,.55));
+  transition:height var(--t-interfaz) ease;
+}
+/* Al hacer scroll el escudo se recoge dentro de la barra y deja de pisar el contenido */
+.nav--compacta .nav__marca img,
+.nav--interior .nav__marca img{ height:62px; }
+.nav--interior .nav__marca{ top:6px; }
+.nav--interior .nav__links{ margin-left:110px; }
+.nav--compacta .nav__marca{ top:6px; }
+
+.nav__links{ display:flex; gap:22px; font-size:15px; margin-right:auto; margin-left:190px; transition:margin-left var(--t-interfaz) ease; }
+.nav--compacta .nav__links{ margin-left:110px; }
+.nav__links a{ text-decoration:none; color:var(--txt-soft); }
+.nav__links a:hover{ color:var(--txt); }
+
+.nav__cta{
+  background:var(--fire-red); color:#fff;
+  font-size:15px; font-weight:500; text-decoration:none;
+  padding:12px 26px; border-radius:var(--radio);
+  white-space:nowrap; min-height:48px;
+  display:inline-flex; align-items:center;
+  transition:background var(--t-interfaz) ease, transform var(--t-interfaz) ease;
+}
+.nav__cta:hover{ background:#a91111; transform:translateY(-1px); }
+.nav__cta:focus-visible{ outline:3px solid var(--fire-yellow); outline-offset:3px; }
+.nav__cta-corto{ display:none; }
+
+/* Botón de menú */
+.nav__boton{
+  display:none;
+  width:48px; height:48px; padding:12px;
+  background:none; border:0; cursor:pointer;
+  flex-direction:column; justify-content:space-between;
+}
+.nav__boton span{ display:block; height:2px; background:var(--chalk); border-radius:2px; transition:transform var(--t-interfaz) ease, opacity var(--t-interfaz) ease; }
+.nav__boton[aria-expanded="true"] span:nth-child(1){ transform:translateY(10px) rotate(45deg); }
+.nav__boton[aria-expanded="true"] span:nth-child(2){ opacity:0; }
+.nav__boton[aria-expanded="true"] span:nth-child(3){ transform:translateY(-10px) rotate(-45deg); }
+
+.nav__panel{ display:none; }
+
+@media (max-width:900px){
+  .nav__links{ display:none; }
+  .nav__boton{ display:flex; }
+  .nav__row{ padding-block:10px; gap:var(--e-2); }
+  .nav__marca{ left:20px; top:0; }
+  .nav__marca img{ height:88px; }
+  .nav__lema{ font-size:8px; letter-spacing:.16em; margin-top:6px; }
+  .nav--compacta .nav__marca img,
+  .nav--interior .nav__marca img{ height:52px; }
+  .nav--interior .nav__marca{ top:6px; }
+  .nav--compacta .nav__marca{ top:6px; }
+  .nav__cta{ padding:11px 18px; font-size:14px; }
+  .nav__cta-largo{ display:none; }
+  .nav__cta-corto{ display:inline; }
+
+  .nav__panel{
+    display:flex; flex-direction:column;
+    border-top:0.5px solid var(--hairline);
+    background:var(--ember-deep);
+  }
+  .nav__panel[hidden]{ display:none; }
+  .nav__panel a{
+    padding:18px 24px; text-decoration:none; color:var(--txt-soft); font-size:16px;
+    border-bottom:0.5px solid var(--hairline);
+  }
+}
+
+@media (prefers-reduced-motion: reduce){
+  .nav__marca img, .nav__lema, .nav__links, .nav__cta, .nav__boton span{ transition:none; }
+  .nav__cta:hover{ transform:none; }
+}
+</style>
+
+<script is:inline>
+  (() => {
+    const nav = document.getElementById('nav');
+    const boton = document.getElementById('nav-boton');
+    const panel = document.getElementById('nav-panel');
+
+    boton?.addEventListener('click', () => {
+      const abierto = boton.getAttribute('aria-expanded') === 'true';
+      boton.setAttribute('aria-expanded', String(!abierto));
+      boton.setAttribute('aria-label', abierto ? 'Abrir menú' : 'Cerrar menú');
+      panel.hidden = abierto;
+    });
+
+    panel?.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+      boton.setAttribute('aria-expanded', 'false');
+      boton.setAttribute('aria-label', 'Abrir menú');
+      panel.hidden = true;
+    }));
+
+    const alScroll = () => nav.classList.toggle('nav--compacta', window.scrollY > 70);
+    alScroll();
+    window.addEventListener('scroll', alScroll, { passive: true });
+  })();
+</script>
