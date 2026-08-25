@@ -31,25 +31,27 @@ const descripcion = 'Registra tus datos para conocer las opciones de Firehouse C
         <h1 class="registro__titulo">Registro Firehouse</h1>
         <p class="registro__bajada">Cuéntanos un poco sobre tu familia para poder orientarte mejor.</p>
         <p class="registro__tiempo">⏱ No te tomará más de 3 minutos</p>
-
-        <ol class="progreso" aria-label="Progreso del formulario">
-          <li data-progreso-item="1" class="activo">
-            <span class="progreso__circulo">1</span>
-            <span class="progreso__texto-item">Apoderado</span>
-          </li>
-          <li data-progreso-item="2">
-            <span class="progreso__circulo">2</span>
-            <span class="progreso__texto-item">Atleta</span>
-          </li>
-          <li data-progreso-item="3">
-            <span class="progreso__circulo">3</span>
-            <span class="progreso__texto-item">Contacto</span>
-          </li>
-        </ol>
-        <p class="progreso__texto" id="texto-paso">Paso 1 de 3</p>
       </div>
 
       <form id="form-registro" class="registro__form reveal" novalidate>
+        <div class="registro__stepper-sticky">
+          <ol class="progreso" aria-label="Progreso del formulario">
+            <li data-progreso-item="1" class="activo">
+              <span class="progreso__circulo">1</span>
+              <span class="progreso__texto-item">Apoderado</span>
+            </li>
+            <li data-progreso-item="2">
+              <span class="progreso__circulo">2</span>
+              <span class="progreso__texto-item">Atleta</span>
+            </li>
+            <li data-progreso-item="3">
+              <span class="progreso__circulo">3</span>
+              <span class="progreso__texto-item">Contacto</span>
+            </li>
+          </ol>
+          <p class="progreso__texto" id="texto-paso">Paso 1 de 3</p>
+        </div>
+
         <input type="hidden" id="f-submission-id" />
         <input type="hidden" id="f-started-at" />
 
@@ -218,7 +220,7 @@ const descripcion = 'Registra tus datos para conocer las opciones de Firehouse C
 .registro{ padding-top: var(--e-6); }
 .registro__wrap{ max-width: 760px; }
 
-.registro__cabecera{ margin-bottom: var(--e-6); }
+.registro__cabecera{ margin-bottom: var(--e-4); }
 .registro__titulo{
   font-family: var(--font-display); font-weight: 800;
   font-size: clamp(2rem, 5vw, 2.9rem); margin-top: var(--e-2);
@@ -231,8 +233,27 @@ const descripcion = 'Registra tus datos para conocer las opciones de Firehouse C
   border-radius: 999px; padding: 8px 16px; font-size: 13px; font-weight: 600;
 }
 
+/* Va pegado (sticky) arriba de la tarjeta mientras se hace scroll dentro del
+   formulario, para que nunca se pierda de vista qué paso es — ni siquiera con
+   el teclado del celular abierto tapando la parte de arriba de la página. */
+.registro__stepper-sticky{
+  position: sticky; top: 78px; z-index: 5;
+  background: var(--ember-deep);
+  margin: calc(-1 * var(--e-5)) calc(-1 * var(--e-5)) var(--e-4);
+  padding: var(--e-4) var(--e-5) var(--e-3);
+  border-bottom: 1px solid var(--hairline);
+  border-radius: 20px 20px 0 0;
+}
+@media (min-width: 640px){
+  .registro__stepper-sticky{
+    top: 100px;
+    margin: calc(-1 * var(--e-6)) calc(-1 * var(--e-6)) var(--e-4);
+    padding: var(--e-4) var(--e-6) var(--e-3);
+  }
+}
+
 .progreso{
-  list-style: none; display: flex; margin: var(--e-6) 0 0; padding: 0; position: relative;
+  list-style: none; display: flex; margin: 0; padding: 0; position: relative;
 }
 .progreso li{
   flex: 1; position: relative; display: flex; flex-direction: column; align-items: center;
@@ -400,6 +421,15 @@ input.tocado:invalid:focus-visible, select.tocado:invalid:focus-visible, textare
 @media (max-width: 640px){
   .registro{ padding-top: var(--e-5); }
   .registro__form{ border-radius: 16px; padding: var(--e-4); }
+  .registro__stepper-sticky{
+    top: 62px;
+    margin: calc(-1 * var(--e-4)) calc(-1 * var(--e-4)) var(--e-3);
+    padding: var(--e-3) var(--e-4) var(--e-2);
+    border-radius: 16px 16px 0 0;
+  }
+  .progreso__circulo{ width: 36px; height: 36px; font-size: 13px; }
+  .progreso li:not(:last-child)::after{ top: 18px; }
+  .progreso li{ font-size: 11px; }
   .paso__nav{ flex-direction: column-reverse; align-items: stretch; }
   .paso__nav .btn, .paso__nav .btn-quiet{ text-align: center; }
 }
