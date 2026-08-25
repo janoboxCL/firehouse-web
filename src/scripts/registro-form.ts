@@ -381,7 +381,7 @@ async function enviarRegistro(evt: SubmitEvent): Promise<void> {
       telefonoSecundario: $<HTMLInputElement>('#f-telefono-secundario')?.value || '',
       email: $<HTMLInputElement>('#f-email')!.value,
       relacion: valorRadioSeleccionado('relacion'),
-      comuna: $<HTMLInputElement>('#f-comuna')!.value,
+      comuna: leerComunaSeleccionada(),
       comoConocio: $<HTMLSelectElement>('#f-como-conocio')!.value,
       canalPreferido: valorRadioSeleccionado('canalPreferido'),
       comentarioInicial: $<HTMLTextAreaElement>('#f-comentario')?.value || '',
@@ -446,6 +446,93 @@ function mostrarExito(nombres: string[]): void {
 }
 
 // ---------------------------------------------------------------------------
+// Mejoras de llenado: máscara de teléfono, feedback de correo, comuna RM/otra,
+// y estilos de error que sólo aparecen después de que la persona tocó el campo.
+// ---------------------------------------------------------------------------
+
+const EMAIL_RE_UI = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+function formatearTelefonoInput(input: HTMLInputElement | null): void {
+  if (!input) return;
+  input.addEventListener('input', () => {
+    const digitos = input.value.replace(/\D/g, '').slice(0, 9);
+    if (digitos.length > 5) {
+      input.value = `${digitos.slice(0, 1)} ${digitos.slice(1, 5)} ${digitos.slice(5)}`;
+    } else if (digitos.length > 1) {
+      input.value = `${digitos.slice(0, 1)} ${digitos.slice(1)}`;
+    } else {
+      input.value = digitos;
+    }
+  });
+}
+
+function inicializarFeedbackEmail(): void {
+  const input = $<HTMLInputElement>('#f-email');
+  const feedback = $<HTMLElement>('#email-feedback');
+  if (!input || !feedback) return;
+
+  const actualizar = () => {
+    const valor = input.value.trim();
+    feedback.classList.remove('valido', 'invalido');
+    if (!valor) {
+      feedback.textContent = '';
+      return;
+    }
+    if (EMAIL_RE_UI.test(valor)) {
+      feedback.textContent = '✓ Correo válido';
+      feedback.classList.add('valido');
+    } else {
+      feedback.textContent = 'Revisa el formato (ejemplo@correo.com)';
+      feedback.classList.add('invalido');
+    }
+  };
+  input.addEventListener('input', actualizar);
+  input.addEventListener('blur', actualizar);
+}
+
+function leerComunaSeleccionada(): string {
+  const select = $<HTMLSelectElement>('#f-comuna-rm');
+  if (!select) return '';
+  if (select.value === 'OTRA') {
+    return $<HTMLInputElement>('#f-comuna-otra')?.value ?? '';
+  }
+  return select.value;
+}
+
+function inicializarComunaOtra(): void {
+  const select = $<HTMLSelectElement>('#f-comuna-rm');
+  const wrap = $<HTMLElement>('#comuna-otra-wrap');
+  const input = $<HTMLInputElement>('#f-comuna-otra');
+  if (!select || !wrap || !input) return;
+
+  select.addEventListener('change', () => {
+    const esOtra = select.value === 'OTRA';
+    wrap.hidden = !esOtra;
+    if (esOtra) {
+      input.setAttribute('required', 'required');
+      input.focus();
+    } else {
+      input.removeAttribute('required');
+      input.value = '';
+    }
+  });
+}
+
+/** Agrega la clase .tocado a un campo recién editado, para que el estilo de
+ * "campo inválido" sólo aparezca después de que la persona ya interactuó con él
+ * (nunca antes de que alcance a escribir nada). */
+function inicializarEstadoTocado(form: HTMLFormElement): void {
+  form.addEventListener(
+    'blur',
+    (evt) => {
+      const el = evt.target as HTMLElement;
+      if (el.matches?.('input, select, textarea')) el.classList.add('tocado');
+    },
+    true, // fase de captura: blur no burbujea
+  );
+}
+
+// ---------------------------------------------------------------------------
 // Inicialización
 // ---------------------------------------------------------------------------
 
@@ -485,6 +572,11 @@ export function iniciarFormularioRegistro(): void {
     { once: true },
   );
 
+  formatearTelefonoInput($<HTMLInputElement>('#f-telefono'));
+  formatearTelefonoInput($<HTMLInputElement>('#f-telefono-secundario'));
+  inicializarFeedbackEmail();
+  inicializarComunaOtra();
+  inicializarEstadoTocado(form);
   inicializarContadorComentario();
   mostrarPaso(1);
 }
