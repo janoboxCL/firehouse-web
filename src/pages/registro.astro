@@ -1,7 +1,8 @@
 ---
 import Base from '../layouts/Base.astro';
+import BandaFoto from '../components/BandaFoto.astro';
 import { whatsapp } from '../data/sitio.js';
-import { COMUNAS_CHILE } from '../lib/crm/comunas.ts';
+import { COMUNAS_CHILE, REGIONES_COMUNAS } from '../lib/crm/comunas.ts';
 import {
   RELACION_APODERADO,
   RELACION_APODERADO_LABEL,
@@ -12,10 +13,16 @@ import {
   LIMITES,
 } from '../lib/crm/constants.ts';
 
+const comunasRM = REGIONES_COMUNAS.find((r) => r.region === 'Metropolitana de Santiago')!.comunas;
+
 const titulo = 'Registro Firehouse | Cuéntanos sobre tu familia';
 const descripcion = 'Registra tus datos para conocer las opciones de Firehouse Cheer: Pretemporada, temporada 2027 o renovación.';
 ---
 <Base titulo={titulo} descripcion={descripcion} ruta="/registro">
+  <BandaFoto src="/media/banda-llegada.jpg"
+             alt="Niñas y niños llegando al gimnasio antes de empezar el entrenamiento en Firehouse"
+             alto="bajo" foco="center 46%" />
+
   <section class="section registro">
     <div class="wrap registro__wrap">
 
@@ -23,11 +30,21 @@ const descripcion = 'Registra tus datos para conocer las opciones de Firehouse C
         <p class="count">Registro</p>
         <h1 class="registro__titulo">Registro Firehouse</h1>
         <p class="registro__bajada">Cuéntanos un poco sobre tu familia para poder orientarte mejor.</p>
+        <p class="registro__tiempo">⏱ No te tomará más de 3 minutos</p>
 
         <ol class="progreso" aria-label="Progreso del formulario">
-          <li data-progreso-item="1" class="activo"><span class="progreso__num">1</span> Apoderado</li>
-          <li data-progreso-item="2"><span class="progreso__num">2</span> Atleta</li>
-          <li data-progreso-item="3"><span class="progreso__num">3</span> Contacto</li>
+          <li data-progreso-item="1" class="activo">
+            <span class="progreso__circulo">1</span>
+            <span class="progreso__texto-item">Apoderado</span>
+          </li>
+          <li data-progreso-item="2">
+            <span class="progreso__circulo">2</span>
+            <span class="progreso__texto-item">Atleta</span>
+          </li>
+          <li data-progreso-item="3">
+            <span class="progreso__circulo">3</span>
+            <span class="progreso__texto-item">Contacto</span>
+          </li>
         </ol>
         <p class="progreso__texto" id="texto-paso">Paso 1 de 3</p>
       </div>
@@ -67,6 +84,7 @@ const descripcion = 'Registra tus datos para conocer las opciones de Firehouse C
           <div class="campo">
             <label for="f-email">Correo electrónico</label>
             <input id="f-email" type="email" maxlength={LIMITES.EMAIL_MAX} required autocomplete="email" />
+            <p class="campo__validacion" id="email-feedback" aria-live="polite"></p>
           </div>
 
           <div class="campo">
@@ -82,11 +100,19 @@ const descripcion = 'Registra tus datos para conocer las opciones de Firehouse C
           </div>
 
           <div class="campo">
-            <label for="f-comuna">Comuna</label>
-            <input id="f-comuna" type="text" list="lista-comunas" maxlength={LIMITES.COMUNA_MAX} required autocomplete="address-level2" />
-            <datalist id="lista-comunas">
-              {COMUNAS_CHILE.map((c) => <option value={c} />)}
-            </datalist>
+            <label for="f-comuna-rm">Comuna</label>
+            <select id="f-comuna-rm" required>
+              <option value="">Selecciona tu comuna</option>
+              {comunasRM.map((c) => <option value={c}>{c}</option>)}
+              <option value="OTRA">Otra (fuera de la Región Metropolitana)</option>
+            </select>
+            <div class="campo campo--anidado" id="comuna-otra-wrap" hidden>
+              <label for="f-comuna-otra">¿Cuál es tu comuna?</label>
+              <input id="f-comuna-otra" type="text" list="lista-comunas" maxlength={LIMITES.COMUNA_MAX} autocomplete="address-level2" />
+              <datalist id="lista-comunas">
+                {COMUNAS_CHILE.map((c) => <option value={c} />)}
+              </datalist>
+            </div>
           </div>
 
           <div class="campo">
@@ -111,7 +137,7 @@ const descripcion = 'Registra tus datos para conocer las opciones de Firehouse C
 
           <div id="atletas-lista"></div>
 
-          <button type="button" id="btn-agregar-atleta" class="btn-sec btn-agregar">+ Agregar otro/a atleta</button>
+          <button type="button" id="btn-agregar-atleta" class="btn-agregar">+ Agregar otro/a atleta</button>
 
           <div class="paso__nav">
             <button type="button" class="btn-quiet" data-accion="atras">Atrás</button>
@@ -189,7 +215,7 @@ const descripcion = 'Registra tus datos para conocer las opciones de Firehouse C
 </script>
 
 <style is:global>
-.registro{ padding-top: var(--e-7); }
+.registro{ padding-top: var(--e-6); }
 .registro__wrap{ max-width: 760px; }
 
 .registro__cabecera{ margin-bottom: var(--e-6); }
@@ -199,26 +225,63 @@ const descripcion = 'Registra tus datos para conocer las opciones de Firehouse C
 }
 .registro__bajada{ color: var(--txt-soft); margin-top: var(--e-2); max-width: 56ch; }
 
+.registro__tiempo{
+  display: inline-flex; align-items: center; gap: 8px;
+  margin-top: var(--e-3); background: rgba(255,196,0,.12); color: var(--fire-yellow);
+  border-radius: 999px; padding: 8px 16px; font-size: 13px; font-weight: 600;
+}
+
 .progreso{
-  list-style: none; display: flex; gap: var(--e-4); margin: var(--e-5) 0 0; padding: 0;
-  font-family: var(--font-body); font-size: 14px; color: var(--txt-faint);
+  list-style: none; display: flex; margin: var(--e-6) 0 0; padding: 0; position: relative;
 }
-.progreso li{ display: flex; align-items: center; gap: 8px; }
-.progreso__num{
-  display: inline-flex; align-items: center; justify-content: center;
-  width: 22px; height: 22px; border-radius: 999px; border: 1px solid var(--hairline);
-  font-family: var(--font-count); font-size: 12px;
+.progreso li{
+  flex: 1; position: relative; display: flex; flex-direction: column; align-items: center;
+  gap: 10px; font-family: var(--font-body); font-size: 13px; color: var(--txt-faint); text-align: center;
 }
-.progreso li.activo{ color: var(--fire-yellow); }
-.progreso li.activo .progreso__num{ border-color: var(--fire-yellow); color: var(--fire-yellow); }
-.progreso li.completado{ color: var(--txt-soft); }
-.progreso__texto{ margin-top: var(--e-2); font-size: 13px; color: var(--txt-faint); }
+.progreso li:not(:last-child)::after{
+  content: ''; position: absolute; top: 21px; left: 50%; width: 100%; height: 2px;
+  background: var(--hairline); z-index: 0;
+}
+.progreso li.completado:not(:last-child)::after{ background: var(--fire-red); }
+
+.progreso__circulo{
+  position: relative; z-index: 1;
+  width: 42px; height: 42px; border-radius: 999px;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--ember-deep); border: 2px solid var(--hairline);
+  font-family: var(--font-count); font-weight: 700; font-size: 15px; color: var(--txt-faint);
+  transition: all var(--t-interfaz) ease;
+}
+.progreso li.activo .progreso__circulo{
+  border-color: var(--fire-yellow); color: var(--fire-yellow); background: rgba(255,196,0,.14);
+  box-shadow: 0 0 0 6px rgba(255,196,0,.12);
+}
+.progreso li.completado .progreso__circulo{
+  border-color: var(--fire-red); background: var(--fire-red); color: transparent;
+}
+.progreso li.completado .progreso__circulo::after{
+  content: '✓'; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+  color: #fff; font-size: 17px; font-family: var(--font-body);
+}
+.progreso__texto-item{ font-weight: 500; }
+.progreso li.activo .progreso__texto-item{ color: var(--fire-yellow); font-weight: 700; }
+.progreso li.completado .progreso__texto-item{ color: var(--txt-soft); }
+
+.progreso__texto{
+  margin-top: var(--e-3); font-family: var(--font-count); font-weight: 700;
+  font-size: 13px; letter-spacing: .12em; text-transform: uppercase; color: var(--txt-soft);
+}
 
 .registro__form{
   background: var(--ember-deep); border-radius: 20px; padding: var(--e-5);
   border: 1px solid var(--hairline);
 }
 @media (min-width: 640px){ .registro__form{ padding: var(--e-6); } }
+
+/* Transición suave al cambiar de paso */
+fieldset[data-paso]:not([hidden]){ animation: registroPasoEntra 320ms ease both; }
+@keyframes registroPasoEntra{ from{ opacity: 0; transform: translateY(10px); } to{ opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce){ fieldset[data-paso]{ animation: none !important; } }
 
 .paso__titulo{ font-family: var(--font-display); font-weight: 800; font-size: 1.6rem; padding: 0; }
 .paso__intro{ color: var(--txt-soft); margin-top: var(--e-2); margin-bottom: var(--e-4); }
@@ -229,19 +292,34 @@ const descripcion = 'Registra tus datos para conocer las opciones de Firehouse C
   color: var(--txt-soft); margin-bottom: 8px;
 }
 .campo__opcional{ color: var(--txt-faint); font-weight: 400; }
+.campo--anidada, .campo--anidado{
+  margin-top: var(--e-3); padding: var(--e-3); border-radius: 12px;
+  background: rgba(245,239,232,.04); border: 1px solid var(--hairline);
+}
+.campo__validacion{ margin-top: 6px; font-size: 13px; min-height: 1.2em; }
+.campo__validacion.valido{ color: var(--fire-yellow); }
+.campo__validacion.invalido{ color: rgba(197,21,21,.85); }
 
 input[type="text"], input[type="tel"], input[type="email"], input[type="date"], select, textarea{
   width: 100%; box-sizing: border-box;
   background: var(--ember); color: var(--chalk);
   border: 1px solid var(--hairline); border-radius: 12px;
   padding: 14px 16px; font-family: var(--font-body); font-size: 16px;
-  min-height: 48px;
+  min-height: 48px; transition: border-color 150ms ease, box-shadow 150ms ease, background 150ms ease;
 }
 textarea{ min-height: 96px; resize: vertical; }
 input:focus-visible, select:focus-visible, textarea:focus-visible{
-  outline: 3px solid var(--fire-yellow); outline-offset: 2px;
+  outline: none; border-color: var(--fire-yellow);
+  box-shadow: 0 0 0 4px rgba(255,196,0,.20);
 }
-input:invalid:not(:placeholder-shown){ border-color: var(--fire-red); }
+/* Sólo mostramos el aviso de campo inválido después de que la persona ya interactuó
+   con el campo (clase .tocado agregada al perder el foco) — nunca antes de escribir. */
+input.tocado:invalid, select.tocado:invalid, textarea.tocado:invalid{
+  border-color: rgba(197,21,21,.5); background: rgba(197,21,21,.05);
+}
+input.tocado:invalid:focus-visible, select.tocado:invalid:focus-visible, textarea.tocado:invalid:focus-visible{
+  box-shadow: 0 0 0 4px rgba(197,21,21,.16);
+}
 
 .campo__ayuda{ margin-top: 6px; font-size: 13px; color: var(--fire-yellow); min-height: 1em; }
 .campo__contador{ margin-top: 6px; font-size: 12px; color: var(--txt-faint); text-align: right; }
@@ -280,7 +358,16 @@ input:invalid:not(:placeholder-shown){ border-color: var(--fire-red); }
 }
 .atleta-card__bloque{ margin-top: var(--e-3); }
 
-.btn-agregar{ margin-top: var(--e-4); width: 100%; text-align: center; }
+.btn-agregar{
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  width: 100%; margin-top: var(--e-4); min-height: 52px;
+  background: transparent; color: var(--fire-yellow);
+  border: 2px dashed rgba(255,196,0,.4); border-radius: 14px;
+  padding: 16px; font-family: var(--font-body); font-weight: 600; font-size: 15px;
+  cursor: pointer; transition: border-color 150ms ease, background 150ms ease, transform 150ms ease;
+}
+.btn-agregar:hover{ border-color: var(--fire-yellow); background: rgba(255,196,0,.08); transform: translateY(-1px); }
+.btn-agregar:focus-visible{ outline: none; border-color: var(--fire-yellow); box-shadow: 0 0 0 4px rgba(255,196,0,.2); }
 
 .campo-consentimiento{
   display: flex; gap: 12px; align-items: flex-start; margin-top: var(--e-5);
