@@ -1,0 +1,83 @@
+---
+// ⚠️ REVISIÓN PENDIENTE: este texto es una versión base, clara y honesta sobre qué datos
+// recopila Firehouse y para qué. No reemplaza asesoría legal. Debe ser revisado por Firehouse
+// (idealmente con un abogado) antes de considerarse definitivo, especialmente por tratarse de
+// datos de menores de edad.
+import Base from '../layouts/Base.astro';
+import CabeceraPagina from '../components/CabeceraPagina.astro';
+import { sitio } from '../data/sitio.js';
+import { PRIVACY_POLICY_VERSION } from '../lib/crm/constants.ts';
+
+const titulo = 'Política de Privacidad | Firehouse Cheer';
+const descripcion = 'Cómo Firehouse Cheerleading All Stars recopila, usa y protege los datos que nos entregas al registrarte.';
+---
+<Base titulo={titulo} descripcion={descripcion} ruta="/privacidad" miga="Política de Privacidad">
+  <CabeceraPagina etiqueta="Privacidad" titulo="Política de Privacidad" acento="azul" ruta="Política de Privacidad"
+    bajada="Cómo usamos la información que nos entregas al registrarte en Firehouse." />
+
+  <section class="section privacidad">
+    <div class="wrap privacidad__contenido reveal">
+      <p class="privacidad__version">Versión {PRIVACY_POLICY_VERSION} · Última actualización: 24 de agosto de 2026</p>
+
+      <h2>Qué datos recopilamos</h2>
+      <p>
+        Cuando completas el formulario de registro en <strong>{sitio.nombre}</strong> te pedimos los datos de
+        contacto del apoderado o apoderada (nombre, teléfono, correo electrónico y comuna) y datos básicos
+        del o la atleta (nombre, fecha de nacimiento y su situación o experiencia previa en cheerleading).
+        No te pedimos RUT, dirección exacta, antecedentes médicos ni información financiera en este formulario.
+      </p>
+
+      <h2>Para qué usamos estos datos</h2>
+      <p>
+        Usamos esta información exclusivamente para gestionar tu contacto con Firehouse: responder tu
+        solicitud, orientarte sobre la alternativa que corresponde a tu familia (Pretemporada, temporada 2027
+        u otra) y coordinar los siguientes pasos si decides sumarte a la academia.
+      </p>
+
+      <h2>Datos de niñas, niños y adolescentes</h2>
+      <p>
+        Este formulario lo completa siempre una persona adulta responsable del atleta. Los datos del atleta se
+        usan únicamente en el contexto de la relación comercial y de entrenamiento con Firehouse, nunca se
+        publican ni se comparten con fines distintos a los descritos en esta política.
+      </p>
+
+      <h2>Con quién compartimos tus datos</h2>
+      <p>
+        Tus datos no se venden ni se comparten con terceros para fines de publicidad. Se almacenan en una base
+        de datos con acceso restringido sólo al personal autorizado de Firehouse, y se usan internamente para
+        el seguimiento de tu caso.
+      </p>
+
+      <h2>Cuánto tiempo los conservamos</h2>
+      <p>
+        Conservamos tus datos mientras exista una relación de seguimiento comercial o de entrenamiento con
+        Firehouse. Si quieres que eliminemos tus datos antes, puedes solicitarlo por los canales de contacto
+        más abajo.
+      </p>
+
+      <h2>Tus derechos</h2>
+      <p>
+        Puedes solicitarnos en cualquier momento acceder, corregir o eliminar los datos que nos entregaste,
+        o revocar tu autorización de contacto, escribiéndonos a{' '}
+        <a href={`mailto:${sitio.correo}`}>{sitio.correo}</a> o por WhatsApp al {sitio.telefono}.
+      </p>
+
+      <h2>Contacto</h2>
+      <p>
+        {sitio.nombre} · {sitio.calle}, {sitio.comuna}, {sitio.ciudad} · <a href={`mailto:${sitio.correo}`}>{sitio.correo}</a>
+      </p>
+    </div>
+  </section>
+</Base>
+
+<style is:global>
+.privacidad__contenido{ max-width: var(--wrap-texto); }
+.privacidad__version{ color: var(--txt-faint); font-size: 14px; margin-bottom: var(--e-5); }
+.privacidad h2{
+  font-family: var(--font-display); font-weight: 800; font-size: 1.35rem;
+  margin-top: var(--e-6); margin-bottom: var(--e-2); color: var(--chalk);
+}
+.privacidad h2:first-of-type{ margin-top: 0; }
+.privacidad p{ color: var(--txt-soft); line-height: 1.7; }
+.privacidad a{ color: var(--fire-yellow); text-decoration: underline; }
+</style>

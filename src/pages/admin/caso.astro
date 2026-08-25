@@ -1,0 +1,144 @@
+---
+import AdminBase from '../../layouts/AdminBase.astro';
+import {
+  CRM_ESTADOS,
+  CRM_ESTADOS_LABEL,
+  PRIORIDAD_OPCIONES,
+  INTERACCION_TIPOS,
+  INTERACCION_TIPOS_LABEL,
+  LIMITES,
+} from '../../lib/crm/constants.ts';
+---
+<AdminBase titulo="Ficha del caso">
+  <a href="/admin" class="ficha-volver">← Volver al listado</a>
+
+  <div id="ficha-error" class="admin-error" hidden></div>
+  <p id="ficha-cargando" class="admin-spinner">Cargando caso…</p>
+
+  <div id="ficha-contenido" hidden>
+    <div id="ficha-duplicado" class="admin-error ficha-duplicado" hidden>
+      Posible registro duplicado: ya existe un apoderado con el mismo teléfono o correo.
+    </div>
+
+    <div class="ficha-grid">
+      <div class="ficha-col">
+        <section class="admin-card ficha-bloque">
+          <h2 class="ficha-bloque__titulo">Atleta</h2>
+          <dl class="ficha-datos" id="bloque-atleta"></dl>
+        </section>
+
+        <section class="admin-card ficha-bloque">
+          <h2 class="ficha-bloque__titulo">Apoderado</h2>
+          <dl class="ficha-datos" id="bloque-apoderado"></dl>
+          <div class="ficha-acciones">
+            <a id="btn-whatsapp" class="admin-btn" href="#" target="_blank" rel="noopener">WhatsApp</a>
+            <a id="btn-email" class="admin-btn admin-btn--secundario" href="#">Email</a>
+            <button type="button" id="btn-copiar-telefono" class="admin-btn admin-btn--secundario">Copiar teléfono</button>
+          </div>
+        </section>
+      </div>
+
+      <div class="ficha-col">
+        <section class="admin-card ficha-bloque">
+          <h2 class="ficha-bloque__titulo">Gestión CRM</h2>
+          <p id="ficha-sin-accion" class="ficha-aviso" hidden>Este caso no tiene próxima acción.</p>
+
+          <form id="form-gestion">
+            <div class="admin-campo">
+              <label class="admin-label" for="g-estado">Estado</label>
+              <select id="g-estado" class="admin-select">
+                {Object.values(CRM_ESTADOS).map((v) => <option value={v}>{CRM_ESTADOS_LABEL[v]}</option>)}
+              </select>
+            </div>
+            <div class="admin-campo">
+              <label class="admin-label" for="g-responsable">Responsable</label>
+              <select id="g-responsable" class="admin-select">
+                <option value="">Sin asignar</option>
+              </select>
+            </div>
+            <div class="admin-campo">
+              <label class="admin-label" for="g-proxima-accion">Próxima acción</label>
+              <input id="g-proxima-accion" class="admin-input" type="text" maxlength={LIMITES.PROXIMA_ACCION_MAX} placeholder="Ej: Invitar a clase" />
+            </div>
+            <div class="admin-campo">
+              <label class="admin-label" for="g-fecha">Fecha próxima acción</label>
+              <input id="g-fecha" class="admin-input" type="datetime-local" />
+            </div>
+            <div class="admin-campo">
+              <label class="admin-label" for="g-prioridad">Prioridad</label>
+              <select id="g-prioridad" class="admin-select">
+                {Object.values(PRIORIDAD_OPCIONES).map((v) => <option value={v}>{v === 'ALTA' ? 'Alta' : 'Normal'}</option>)}
+              </select>
+            </div>
+            <button type="submit" id="btn-guardar-gestion" class="admin-btn">Guardar cambios</button>
+            <p id="gestion-guardado" class="ficha-guardado" hidden>Cambios guardados.</p>
+          </form>
+        </section>
+      </div>
+    </div>
+
+    <section class="admin-card ficha-bloque ficha-historial">
+      <h2 class="ficha-bloque__titulo">Historial</h2>
+      <ol id="ficha-timeline" class="ficha-timeline"></ol>
+
+      <form id="form-interaccion" class="ficha-nueva-interaccion">
+        <p class="ficha-bloque__subtitulo">+ Agregar nota / interacción</p>
+        <div class="ficha-nueva-interaccion__fila">
+          <select id="i-tipo" class="admin-select">
+            {Object.values(INTERACCION_TIPOS).filter((v) => v !== 'CAMBIO_ESTADO').map((v) => (
+              <option value={v}>{INTERACCION_TIPOS_LABEL[v]}</option>
+            ))}
+          </select>
+        </div>
+        <textarea id="i-nota" class="admin-textarea" maxlength={LIMITES.NOTA_INTERACCION_MAX} placeholder="Nota…" required></textarea>
+        <p class="ficha-contador" id="i-contador">0 / {LIMITES.NOTA_INTERACCION_MAX}</p>
+        <button type="submit" id="btn-agregar-interaccion" class="admin-btn admin-btn--secundario">Agregar</button>
+      </form>
+    </section>
+  </div>
+</AdminBase>
+
+<script>
+  import { iniciarFicha } from '../../scripts/admin-caso.ts';
+  iniciarFicha();
+</script>
+
+<style is:global>
+.ficha-volver{ display: inline-block; margin-bottom: 16px; font-size: 14px; color: #6B6259; text-decoration: none; }
+.ficha-volver:hover{ color: var(--fire-red); }
+
+.ficha-duplicado{ margin-bottom: 20px; }
+
+.ficha-grid{ display: grid; grid-template-columns: 1.2fr 1fr; gap: 20px; align-items: start; }
+.ficha-col{ display: flex; flex-direction: column; gap: 20px; }
+
+.ficha-bloque__titulo{ font-size: 1.1rem; margin: 0 0 16px; }
+.ficha-bloque__subtitulo{ font-size: 14px; font-weight: 500; margin: 0 0 10px; }
+
+.ficha-datos{ display: grid; grid-template-columns: auto 1fr; gap: 8px 16px; margin: 0; font-size: 14px; }
+.ficha-datos dt{ color: #6B6259; }
+.ficha-datos dd{ margin: 0; font-weight: 500; }
+
+.ficha-acciones{ display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+
+.ficha-aviso{
+  background: #FFF3D6; color: #8A5A00; border-radius: 8px; padding: 10px 12px;
+  font-size: 13px; margin-bottom: 16px;
+}
+.ficha-guardado{ color: #1E7A34; font-size: 13px; margin-top: 10px; }
+
+.ficha-historial{ margin-top: 20px; }
+.ficha-timeline{ list-style: none; margin: 0 0 24px; padding: 0; }
+.ficha-timeline li{ padding: 12px 0; border-bottom: 1px solid #EFEBE4; font-size: 14px; }
+.ficha-timeline li:last-child{ border-bottom: none; }
+.ficha-timeline__meta{ color: #6B6259; font-size: 12px; }
+.ficha-timeline__tipo{ font-weight: 500; }
+
+.ficha-nueva-interaccion{ border-top: 1px solid #EFEBE4; padding-top: 20px; }
+.ficha-nueva-interaccion__fila{ max-width: 220px; margin-bottom: 10px; }
+.ficha-contador{ font-size: 12px; color: #6B6259; text-align: right; margin: 6px 0 12px; }
+
+@media (max-width: 900px){
+  .ficha-grid{ grid-template-columns: 1fr; }
+}
+</style>

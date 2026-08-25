@@ -1,0 +1,320 @@
+---
+import Base from '../layouts/Base.astro';
+import { whatsapp } from '../data/sitio.js';
+import { COMUNAS_CHILE } from '../lib/crm/comunas.ts';
+import {
+  RELACION_APODERADO,
+  RELACION_APODERADO_LABEL,
+  COMO_CONOCIO_OPCIONES,
+  COMO_CONOCIO_LABEL,
+  CANAL_PREFERIDO,
+  CANAL_PREFERIDO_LABEL,
+  LIMITES,
+} from '../lib/crm/constants.ts';
+
+const titulo = 'Registro Firehouse | Cuéntanos sobre tu familia';
+const descripcion = 'Registra tus datos para conocer las opciones de Firehouse Cheer: Pretemporada, temporada 2027 o renovación.';
+---
+<Base titulo={titulo} descripcion={descripcion} ruta="/registro">
+  <section class="section registro">
+    <div class="wrap registro__wrap">
+
+      <div id="form-cabecera" class="registro__cabecera reveal">
+        <p class="count">Registro</p>
+        <h1 class="registro__titulo">Registro Firehouse</h1>
+        <p class="registro__bajada">Cuéntanos un poco sobre tu familia para poder orientarte mejor.</p>
+
+        <ol class="progreso" aria-label="Progreso del formulario">
+          <li data-progreso-item="1" class="activo"><span class="progreso__num">1</span> Apoderado</li>
+          <li data-progreso-item="2"><span class="progreso__num">2</span> Atleta</li>
+          <li data-progreso-item="3"><span class="progreso__num">3</span> Contacto</li>
+        </ol>
+        <p class="progreso__texto" id="texto-paso">Paso 1 de 3</p>
+      </div>
+
+      <form id="form-registro" class="registro__form reveal" novalidate>
+        <input type="hidden" id="f-submission-id" />
+        <input type="hidden" id="f-started-at" />
+
+        <!-- Trampa anti-bot: invisible para personas, visible para robots que llenan todo. -->
+        <div class="campo-trampa" aria-hidden="true">
+          <label for="f-honeypot">Deja este campo vacío</label>
+          <input id="f-honeypot" type="text" tabindex="-1" autocomplete="off" />
+        </div>
+
+        <div id="error-envio" class="banner-error" role="alert" hidden></div>
+
+        <!-- ================= PASO 1 — APODERADO ================= -->
+        <fieldset data-paso="1">
+          <legend class="paso__titulo">Tus datos</legend>
+          <p class="paso__intro">Necesitamos estos datos para poder contactarte y orientarte sobre Firehouse.</p>
+
+          <div class="campo">
+            <label for="f-nombre">Nombre</label>
+            <input id="f-nombre" type="text" maxlength={LIMITES.NOMBRE_MAX} required autocomplete="given-name" />
+          </div>
+
+          <div class="campo">
+            <label for="f-apellidos">Apellidos</label>
+            <input id="f-apellidos" type="text" maxlength={LIMITES.APELLIDOS_MAX} required autocomplete="family-name" />
+          </div>
+
+          <div class="campo">
+            <label for="f-telefono">Celular / WhatsApp</label>
+            <input id="f-telefono" type="tel" inputmode="tel" placeholder="9 1234 5678" required autocomplete="tel" />
+          </div>
+
+          <div class="campo">
+            <label for="f-email">Correo electrónico</label>
+            <input id="f-email" type="email" maxlength={LIMITES.EMAIL_MAX} required autocomplete="email" />
+          </div>
+
+          <div class="campo">
+            <p class="campo__label">Relación con el/la atleta</p>
+            <div class="pills">
+              {Object.entries(RELACION_APODERADO).map(([, valor]) => (
+                <label class="pill">
+                  <input type="radio" name="relacion" value={valor} required={valor === RELACION_APODERADO.MAMA} />
+                  {RELACION_APODERADO_LABEL[valor]}
+                </label>
+              ))}
+            </div>
+          </div>
+
+          <div class="campo">
+            <label for="f-comuna">Comuna</label>
+            <input id="f-comuna" type="text" list="lista-comunas" maxlength={LIMITES.COMUNA_MAX} required autocomplete="address-level2" />
+            <datalist id="lista-comunas">
+              {COMUNAS_CHILE.map((c) => <option value={c} />)}
+            </datalist>
+          </div>
+
+          <div class="campo">
+            <label for="f-telefono-secundario">Segundo teléfono <span class="campo__opcional">(opcional)</span></label>
+            <input id="f-telefono-secundario" type="tel" inputmode="tel" placeholder="9 1234 5678" autocomplete="tel" />
+          </div>
+
+          <p class="campo__privacidad">
+            Usaremos estos datos exclusivamente para gestionar tu contacto con Firehouse y los procesos
+            relacionados con la academia.
+          </p>
+
+          <div class="paso__nav">
+            <span></span>
+            <button type="button" class="btn" data-accion="siguiente">Siguiente</button>
+          </div>
+        </fieldset>
+
+        <!-- ================= PASO 2 — ATLETA(S) ================= -->
+        <fieldset data-paso="2" hidden>
+          <legend class="paso__titulo">Datos del/la atleta</legend>
+
+          <div id="atletas-lista"></div>
+
+          <button type="button" id="btn-agregar-atleta" class="btn-sec btn-agregar">+ Agregar otro/a atleta</button>
+
+          <div class="paso__nav">
+            <button type="button" class="btn-quiet" data-accion="atras">Atrás</button>
+            <button type="button" class="btn" data-accion="siguiente">Siguiente</button>
+          </div>
+        </fieldset>
+
+        <!-- ================= PASO 3 — CONTACTO Y ORIGEN ================= -->
+        <fieldset data-paso="3" hidden>
+          <legend class="paso__titulo">Para finalizar</legend>
+
+          <div class="campo">
+            <label for="f-como-conocio">¿Cómo conociste Firehouse?</label>
+            <select id="f-como-conocio" required>
+              <option value="">Selecciona una opción</option>
+              {Object.entries(COMO_CONOCIO_OPCIONES).map(([, valor]) => (
+                <option value={valor}>{COMO_CONOCIO_LABEL[valor]}</option>
+              ))}
+            </select>
+          </div>
+
+          <div class="campo">
+            <p class="campo__label">¿Cómo prefieres que te contactemos?</p>
+            <div class="pills">
+              {Object.entries(CANAL_PREFERIDO).map(([, valor]) => (
+                <label class="pill">
+                  <input type="radio" name="canalPreferido" value={valor} required={valor === CANAL_PREFERIDO.WHATSAPP} />
+                  {CANAL_PREFERIDO_LABEL[valor]}
+                </label>
+              ))}
+            </div>
+          </div>
+
+          <div class="campo">
+            <label for="f-comentario">¿Quieres contarnos algo más? <span class="campo__opcional">(opcional)</span></label>
+            <textarea id="f-comentario" maxlength={LIMITES.COMENTARIO_INICIAL_MAX} rows="4"></textarea>
+            <p class="campo__contador" id="contador-comentario">0 / {LIMITES.COMENTARIO_INICIAL_MAX}</p>
+          </div>
+
+          <label class="campo-consentimiento">
+            <input id="f-consent" type="checkbox" required />
+            <span>
+              Autorizo a Firehouse a contactarme mediante los datos proporcionados para responder mi
+              solicitud y entregarme información relacionada con la academia. He leído la
+              <a href="/privacidad" target="_blank" rel="noopener">Política de Privacidad</a>.
+            </span>
+          </label>
+
+          <div class="paso__nav">
+            <button type="button" class="btn-quiet" data-accion="atras">Atrás</button>
+            <button type="submit" id="btn-enviar" class="btn btn-enviar">ENVIAR REGISTRO</button>
+          </div>
+        </fieldset>
+      </form>
+
+      <div id="pantalla-exito" class="registro__exito" hidden>
+        <p class="registro__exito-emoji">🔥</p>
+        <h2>¡Listo!</h2>
+        <p id="exito-texto"></p>
+        <p>
+          Gracias por interesarte en Firehouse. Revisaremos la información y nos comunicaremos contigo
+          para orientarte sobre la alternativa más adecuada.
+        </p>
+        <a class="btn" href={whatsapp('registro')} target="_blank" rel="noopener">Hablar con Firehouse por WhatsApp</a>
+        <p><a class="btn-quiet" href="/">Volver al inicio</a></p>
+      </div>
+
+    </div>
+  </section>
+</Base>
+
+<script>
+  import { iniciarFormularioRegistro } from '../scripts/registro-form.ts';
+  iniciarFormularioRegistro();
+</script>
+
+<style is:global>
+.registro{ padding-top: var(--e-7); }
+.registro__wrap{ max-width: 760px; }
+
+.registro__cabecera{ margin-bottom: var(--e-6); }
+.registro__titulo{
+  font-family: var(--font-display); font-weight: 800;
+  font-size: clamp(2rem, 5vw, 2.9rem); margin-top: var(--e-2);
+}
+.registro__bajada{ color: var(--txt-soft); margin-top: var(--e-2); max-width: 56ch; }
+
+.progreso{
+  list-style: none; display: flex; gap: var(--e-4); margin: var(--e-5) 0 0; padding: 0;
+  font-family: var(--font-body); font-size: 14px; color: var(--txt-faint);
+}
+.progreso li{ display: flex; align-items: center; gap: 8px; }
+.progreso__num{
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 22px; height: 22px; border-radius: 999px; border: 1px solid var(--hairline);
+  font-family: var(--font-count); font-size: 12px;
+}
+.progreso li.activo{ color: var(--fire-yellow); }
+.progreso li.activo .progreso__num{ border-color: var(--fire-yellow); color: var(--fire-yellow); }
+.progreso li.completado{ color: var(--txt-soft); }
+.progreso__texto{ margin-top: var(--e-2); font-size: 13px; color: var(--txt-faint); }
+
+.registro__form{
+  background: var(--ember-deep); border-radius: 20px; padding: var(--e-5);
+  border: 1px solid var(--hairline);
+}
+@media (min-width: 640px){ .registro__form{ padding: var(--e-6); } }
+
+.paso__titulo{ font-family: var(--font-display); font-weight: 800; font-size: 1.6rem; padding: 0; }
+.paso__intro{ color: var(--txt-soft); margin-top: var(--e-2); margin-bottom: var(--e-4); }
+
+.campo{ margin-top: var(--e-4); }
+.campo label, .campo__label{
+  display: block; font-family: var(--font-body); font-weight: 500; font-size: 14px;
+  color: var(--txt-soft); margin-bottom: 8px;
+}
+.campo__opcional{ color: var(--txt-faint); font-weight: 400; }
+
+input[type="text"], input[type="tel"], input[type="email"], input[type="date"], select, textarea{
+  width: 100%; box-sizing: border-box;
+  background: var(--ember); color: var(--chalk);
+  border: 1px solid var(--hairline); border-radius: 12px;
+  padding: 14px 16px; font-family: var(--font-body); font-size: 16px;
+  min-height: 48px;
+}
+textarea{ min-height: 96px; resize: vertical; }
+input:focus-visible, select:focus-visible, textarea:focus-visible{
+  outline: 3px solid var(--fire-yellow); outline-offset: 2px;
+}
+input:invalid:not(:placeholder-shown){ border-color: var(--fire-red); }
+
+.campo__ayuda{ margin-top: 6px; font-size: 13px; color: var(--fire-yellow); min-height: 1em; }
+.campo__contador{ margin-top: 6px; font-size: 12px; color: var(--txt-faint); text-align: right; }
+.campo__privacidad{ margin-top: var(--e-4); font-size: 13px; color: var(--txt-faint); }
+
+.pills{ display: flex; flex-wrap: wrap; gap: 10px; }
+.pill{
+  display: inline-flex; align-items: center; gap: 8px;
+  border: 1px solid var(--hairline); border-radius: 999px;
+  padding: 12px 18px; font-size: 15px; cursor: pointer; min-height: 44px;
+  transition: border-color 150ms ease, background 150ms ease;
+}
+.pill:has(input:checked){ border-color: var(--fire-yellow); background: rgba(255,196,0,.1); }
+.pill input{ accent-color: var(--fire-yellow); }
+
+.tarjetas-interes{ display: grid; gap: 12px; }
+.tarjeta-interes{
+  display: block; border: 1px solid var(--hairline); border-radius: 14px;
+  padding: 16px; cursor: pointer; transition: border-color 150ms ease, background 150ms ease;
+}
+.tarjeta-interes:has(input:checked){ border-color: var(--fire-yellow); background: rgba(255,196,0,.08); }
+.tarjeta-interes input{ position: absolute; opacity: 0; pointer-events: none; }
+.tarjeta-interes__titulo{ display: block; font-family: var(--font-display); font-weight: 800; font-size: 1.05rem; }
+.tarjeta-interes__texto{ display: block; margin-top: 6px; color: var(--txt-soft); font-size: 14px; }
+
+.atleta-card{
+  border: 1px solid var(--hairline); border-radius: 16px; padding: var(--e-4);
+  margin-top: var(--e-4); background: var(--ember);
+}
+.atleta-card:first-of-type{ margin-top: var(--e-3); }
+.atleta-card__cabecera{ display: flex; align-items: center; justify-content: space-between; }
+.atleta-card__titulo{ font-family: var(--font-display); font-weight: 800; font-size: 1.1rem; }
+.atleta-card__eliminar{
+  background: none; border: none; color: var(--txt-faint); text-decoration: underline;
+  font-size: 13px; cursor: pointer; padding: 8px;
+}
+.atleta-card__bloque{ margin-top: var(--e-3); }
+
+.btn-agregar{ margin-top: var(--e-4); width: 100%; text-align: center; }
+
+.campo-consentimiento{
+  display: flex; gap: 12px; align-items: flex-start; margin-top: var(--e-5);
+  font-size: 14px; color: var(--txt-soft); cursor: pointer;
+}
+.campo-consentimiento input{ margin-top: 4px; width: 20px; height: 20px; accent-color: var(--fire-yellow); flex: none; }
+.campo-consentimiento a{ color: var(--fire-yellow); text-decoration: underline; }
+
+.paso__nav{
+  display: flex; align-items: center; justify-content: space-between;
+  margin-top: var(--e-6); gap: var(--e-3);
+}
+.btn-enviar{ min-width: 220px; text-align: center; }
+.btn.cargando{ opacity: .75; pointer-events: none; }
+
+.banner-error{
+  background: rgba(197,21,21,.15); border: 1px solid var(--fire-red); color: var(--chalk);
+  border-radius: 12px; padding: 14px 16px; margin-bottom: var(--e-4); font-size: 14px;
+}
+
+.campo-trampa{ position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+
+.registro__exito{ text-align: center; padding: var(--e-7) var(--e-4); }
+.registro__exito-emoji{ font-size: 3rem; margin: 0; }
+.registro__exito h2{ font-family: var(--font-display); font-size: 2.2rem; margin-top: var(--e-3); }
+.registro__exito p{ color: var(--txt-soft); margin-top: var(--e-3); max-width: 46ch; margin-inline: auto; }
+.registro__exito .btn{ margin-top: var(--e-5); }
+.registro__exito .btn-quiet{ display: inline-block; margin-top: var(--e-4); }
+
+@media (max-width: 640px){
+  .registro{ padding-top: var(--e-5); }
+  .registro__form{ border-radius: 16px; padding: var(--e-4); }
+  .paso__nav{ flex-direction: column-reverse; align-items: stretch; }
+  .paso__nav .btn, .paso__nav .btn-quiet{ text-align: center; }
+}
+</style>
+</Base>

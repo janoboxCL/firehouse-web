@@ -32,6 +32,7 @@ const mensajes = {
   dosAlumnos:'Hola, quiero consultar por el valor para dos alumnos.',
   contacto:  'Hola, quiero hacer una consulta sobre Firehouse.',
   pretemporada: 'Hola, quiero reservar un cupo para la Pretemporada Firehouse 2027.',
+  registro:  'Hola, acabo de completar el formulario de registro y quería contarles un poco más.',
 };
 
 export function whatsapp(clave = 'hero') {

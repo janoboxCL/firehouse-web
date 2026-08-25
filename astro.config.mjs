@@ -5,5 +5,5 @@ export default defineConfig({
   site: 'https://firehousecheer.cl',
   trailingSlash: 'never',
   build: { format: 'file' },
-  integrations: [sitemap({ filter: (pagina) => !pagina.includes('/404') && !pagina.includes('/pretemporada-firehouse') })],
+  integrations: [sitemap({ filter: (pagina) => !pagina.includes('/404') && !pagina.includes('/pretemporada-firehouse') && !pagina.includes('/admin') })],
 });

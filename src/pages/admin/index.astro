@@ -1,0 +1,131 @@
+---
+import AdminBase from '../../layouts/AdminBase.astro';
+import {
+  CRM_JOURNEYS,
+  CRM_JOURNEYS_LABEL,
+  CRM_ESTADOS,
+  CRM_ESTADOS_LABEL,
+} from '../../lib/crm/constants.ts';
+---
+<AdminBase titulo="Dashboard">
+  <div id="dashboard-error" class="admin-error" hidden></div>
+
+  <h1 class="db-titulo">Firehouse CRM</h1>
+
+  <section class="db-kpis" id="db-kpis" aria-label="Resumen">
+    <div class="admin-card db-kpi">
+      <p class="db-kpi__valor" id="kpi-nuevos">—</p>
+      <p class="db-kpi__label">Nuevos</p>
+    </div>
+    <div class="admin-card db-kpi">
+      <p class="db-kpi__valor" id="kpi-pendientes-hoy">—</p>
+      <p class="db-kpi__label">Pendientes hoy</p>
+    </div>
+    <div class="admin-card db-kpi">
+      <p class="db-kpi__valor" id="kpi-agendados">—</p>
+      <p class="db-kpi__label">Agendados</p>
+    </div>
+    <div class="admin-card db-kpi">
+      <p class="db-kpi__valor" id="kpi-inscritos">—</p>
+      <p class="db-kpi__label">Inscritos</p>
+    </div>
+    <div class="admin-card db-kpi">
+      <p class="db-kpi__valor" id="kpi-sin-contactar">—</p>
+      <p class="db-kpi__label">Sin contactar &gt; 24h</p>
+    </div>
+  </section>
+
+  <section class="admin-card db-filtros">
+    <div class="db-filtros__fila">
+      <div class="db-filtro">
+        <label class="admin-label" for="f-journey">Journey</label>
+        <select id="f-journey" class="admin-select">
+          <option value="">Todos</option>
+          {Object.values(CRM_JOURNEYS).map((v) => <option value={v}>{CRM_JOURNEYS_LABEL[v]}</option>)}
+        </select>
+      </div>
+      <div class="db-filtro">
+        <label class="admin-label" for="f-estado">Estado</label>
+        <select id="f-estado" class="admin-select">
+          <option value="">Todos</option>
+          {Object.values(CRM_ESTADOS).map((v) => <option value={v}>{CRM_ESTADOS_LABEL[v]}</option>)}
+        </select>
+      </div>
+      <div class="db-filtro">
+        <label class="admin-label" for="f-responsable">Responsable</label>
+        <select id="f-responsable" class="admin-select">
+          <option value="">Todos</option>
+        </select>
+      </div>
+      <div class="db-filtro">
+        <label class="admin-label" for="f-fecha">Fecha</label>
+        <select id="f-fecha" class="admin-select">
+          <option value="TODOS">Todos</option>
+          <option value="HOY">Hoy</option>
+          <option value="ATRASADOS">Atrasados</option>
+          <option value="SEMANA">Esta semana</option>
+        </select>
+      </div>
+      <div class="db-filtro db-filtro--busqueda">
+        <label class="admin-label" for="f-busqueda">Buscar</label>
+        <input id="f-busqueda" class="admin-input" type="search" placeholder="Atleta, apoderado, teléfono o email" />
+      </div>
+    </div>
+  </section>
+
+  <section class="admin-card db-tabla-wrap">
+    <p id="db-cargando" class="admin-spinner">Cargando casos…</p>
+    <p id="db-vacio" class="admin-vacio" hidden>No hay casos que coincidan con estos filtros.</p>
+
+    <table class="db-tabla" id="db-tabla" hidden>
+      <thead>
+        <tr>
+          <th>Atleta</th>
+          <th>Edad</th>
+          <th>Apoderado</th>
+          <th>Journey</th>
+          <th>Estado</th>
+          <th>Próxima acción</th>
+          <th>Fecha</th>
+          <th>Responsable</th>
+        </tr>
+      </thead>
+      <tbody id="db-tabla-body"></tbody>
+    </table>
+  </section>
+</AdminBase>
+
+<script>
+  import { iniciarDashboard } from '../../scripts/admin-dashboard.ts';
+  iniciarDashboard();
+</script>
+
+<style is:global>
+.db-titulo{ font-size: 1.7rem; margin: 0 0 20px; }
+
+.db-kpis{ display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; margin-bottom: 20px; }
+.db-kpi{ text-align: center; padding: 18px 12px; }
+.db-kpi__valor{ font-family: var(--font-display); font-weight: 800; font-size: 2rem; color: var(--fire-red); margin: 0; }
+.db-kpi__label{ font-size: 12px; color: #6B6259; margin: 4px 0 0; }
+
+.db-filtros{ margin-bottom: 20px; }
+.db-filtros__fila{ display: grid; grid-template-columns: repeat(4, 1fr) 1.6fr; gap: 14px; align-items: end; }
+.db-filtro--busqueda input{ min-width: 0; }
+
+.db-tabla-wrap{ padding: 0; overflow-x: auto; }
+.db-tabla{ width: 100%; border-collapse: collapse; font-size: 14px; }
+.db-tabla th{
+  text-align: left; padding: 12px 16px; font-size: 12px; text-transform: uppercase;
+  letter-spacing: .04em; color: #6B6259; border-bottom: 1px solid #E4DFD6; white-space: nowrap;
+}
+.db-tabla td{ padding: 14px 16px; border-bottom: 1px solid #EFEBE4; vertical-align: middle; }
+.db-tabla tbody tr{ cursor: pointer; }
+.db-tabla tbody tr:hover{ background: #FAF8F4; }
+.db-fila__vencido{ color: var(--fire-red); font-weight: 500; }
+#db-cargando, #db-vacio{ padding: 32px; }
+
+@media (max-width: 1000px){
+  .db-kpis{ grid-template-columns: repeat(2, 1fr); }
+  .db-filtros__fila{ grid-template-columns: 1fr 1fr; }
+}
+</style>

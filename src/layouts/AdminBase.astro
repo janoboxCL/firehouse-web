@@ -1,0 +1,119 @@
+---
+import '../styles/tokens.css';
+
+const { titulo, ocultarCabecera = false } = Astro.props;
+---
+<!doctype html>
+<html lang="es-CL">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{titulo} · Firehouse CRM</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;800&family=Instrument+Sans:wght@400;500&family=Space+Mono&display=swap" />
+</head>
+<body class="admin-tema">
+  {!ocultarCabecera && (
+    <header class="admin-header">
+      <div class="admin-header__wrap">
+        <a href="/admin" class="admin-header__marca">Firehouse <span>CRM</span></a>
+        <nav class="admin-header__nav">
+          <span id="admin-usuario" class="admin-header__usuario"></span>
+          <button type="button" id="admin-logout" class="admin-header__logout">Cerrar sesión</button>
+        </nav>
+      </div>
+    </header>
+  )}
+  <main class="admin-main">
+    <slot />
+  </main>
+</body>
+</html>
+
+<style is:global>
+body.admin-tema{
+  background: #F4F1EC;
+  color: var(--ember);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.5;
+  margin: 0;
+}
+body.admin-tema h1, body.admin-tema h2, body.admin-tema h3{
+  font-family: var(--font-display);
+  color: var(--ember);
+}
+body.admin-tema a{ color: var(--fire-red); }
+
+.admin-header{
+  background: #fff; border-bottom: 1px solid #E4DFD6;
+  position: sticky; top: 0; z-index: 10;
+}
+.admin-header__wrap{
+  max-width: 1280px; margin-inline: auto; padding: 14px 24px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.admin-header__marca{
+  font-family: var(--font-display); font-weight: 800; font-size: 1.1rem;
+  color: var(--ember); text-decoration: none;
+}
+.admin-header__marca span{ color: var(--fire-red); }
+.admin-header__nav{ display: flex; align-items: center; gap: 16px; }
+.admin-header__usuario{ font-size: 13px; color: #6B6259; }
+.admin-header__logout{
+  background: none; border: 1px solid #D8D2C8; border-radius: 999px;
+  padding: 8px 16px; font-size: 13px; cursor: pointer; color: var(--ember);
+}
+.admin-header__logout:hover{ border-color: var(--fire-red); color: var(--fire-red); }
+
+.admin-main{ max-width: 1280px; margin-inline: auto; padding: 28px 24px 64px; }
+
+.admin-card{
+  background: #fff; border: 1px solid #E4DFD6; border-radius: 14px; padding: 20px;
+}
+
+.admin-btn{
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  background: var(--fire-red); color: #fff; border: none; border-radius: 10px;
+  padding: 11px 20px; font-size: 14px; font-weight: 500; cursor: pointer;
+  text-decoration: none; font-family: var(--font-body); min-height: 42px;
+}
+.admin-btn:hover{ background: #a91111; }
+.admin-btn:disabled{ opacity: .6; cursor: not-allowed; }
+.admin-btn--secundario{
+  background: #fff; color: var(--ember); border: 1px solid #D8D2C8;
+}
+.admin-btn--secundario:hover{ border-color: var(--ember); background: #fff; }
+
+.admin-input, .admin-select, .admin-textarea{
+  width: 100%; box-sizing: border-box; background: #fff; color: var(--ember);
+  border: 1px solid #D8D2C8; border-radius: 8px; padding: 10px 12px; font-size: 14px;
+  font-family: var(--font-body); min-height: 40px;
+}
+.admin-textarea{ min-height: 80px; resize: vertical; }
+.admin-input:focus-visible, .admin-select:focus-visible, .admin-textarea:focus-visible{
+  outline: 2px solid var(--fire-red); outline-offset: 1px;
+}
+.admin-label{ display: block; font-size: 13px; font-weight: 500; color: #6B6259; margin-bottom: 6px; }
+
+.admin-badge{
+  display: inline-flex; align-items: center; border-radius: 999px; padding: 3px 10px;
+  font-size: 12px; font-weight: 500; white-space: nowrap;
+}
+.admin-badge--journey{ background: #E9EEF9; color: #1B4FA8; }
+.admin-badge--estado-abierto{ background: #FFF3D6; color: #8A5A00; }
+.admin-badge--estado-cerrado-ok{ background: #E3F3E5; color: #1E7A34; }
+.admin-badge--estado-cerrado-no{ background: #F1EAE6; color: #6B6259; }
+.admin-badge--vencido{ background: #FBE3E3; color: #A91111; }
+.admin-badge--prioridad-alta{ background: #FBE3E3; color: #A91111; }
+
+.admin-spinner{ color: #6B6259; font-size: 14px; padding: 24px 0; }
+.admin-vacio{ color: #6B6259; font-size: 14px; padding: 32px 0; text-align: center; }
+.admin-error{
+  background: #FBE3E3; border: 1px solid #E8A6A6; color: #7A1414;
+  border-radius: 10px; padding: 12px 14px; font-size: 14px; margin-bottom: 16px;
+}
+</style>
