@@ -21,7 +21,7 @@ import {
   INTERACCION_TIPOS,
   LIMITES,
 } from '../lib/crm/constants.ts';
-import { formatearFecha, formatearFechaHora, aFechaLocalInput } from '../lib/crm/format.ts';
+import { formatearFecha, formatearFechaHora, aFechaLocalInput, mensajeWhatsappSugerido } from '../lib/crm/format.ts';
 import type { SupabaseClient } from '@supabase/supabase-js';
 
 function $<T extends Element>(selector: string): T | null {
@@ -77,7 +77,8 @@ function renderBloqueApoderado(caso: CasoResumen): void {
   ].join('');
 
   const btnWa = $<HTMLAnchorElement>('#btn-whatsapp')!;
-  btnWa.href = `https://wa.me/${ap.telefono.replace('+', '')}`;
+  const mensaje = mensajeWhatsappSugerido(caso.journey, caso.estado, ap.nombre, caso.atleta.nombre);
+  btnWa.href = `https://wa.me/${ap.telefono.replace('+', '')}?text=${encodeURIComponent(mensaje)}`;
   const btnEmail = $<HTMLAnchorElement>('#btn-email')!;
   btnEmail.href = `mailto:${ap.email}`;
 

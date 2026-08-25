@@ -7,13 +7,16 @@
 
 import { createClient } from '@supabase/supabase-js';
 import { validarRegistroPublico } from '../../src/lib/crm/registro.ts';
+import { enviarCorreoConfirmacion } from '../lib/resend.ts';
 
 interface Env {
   SUPABASE_URL: string;
   SUPABASE_SERVICE_ROLE_KEY: string;
-  // Opcionales — si no están configurados, esas protecciones simplemente se omiten.
+  // Opcionales — si no están configurados, esas protecciones/funciones simplemente se omiten.
   TURNSTILE_SECRET_KEY?: string;
   RATE_LIMIT_KV?: KVNamespace;
+  RESEND_API_KEY?: string;
+  EMAIL_FROM?: string;
 }
 
 const MAX_BODY_BYTES = 20_000;
@@ -120,6 +123,20 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     : [];
 
   console.log('registration_created', { apoderadoId: data?.apoderadoId, atletas: data?.atletas?.length ?? 0 });
+
+  // Correo de confirmación: es un "best effort". Si Resend no está configurado
+  // todavía, o si falla, el registro YA quedó guardado — nunca lo hacemos fallar por esto.
+  if (env.RESEND_API_KEY && env.EMAIL_FROM) {
+    try {
+      await enviarCorreoConfirmacion(env.RESEND_API_KEY, env.EMAIL_FROM, {
+        apoderadoNombre: validacion.value.apoderado.nombre,
+        apoderadoEmail: validacion.value.apoderado.email,
+        nombresAtletas,
+      });
+    } catch (err) {
+      console.error('email_confirmacion_error', (err as Error).message?.slice(0, 200));
+    }
+  }
 
   return jsonResponse(200, { success: true, atletas: nombresAtletas });
 };

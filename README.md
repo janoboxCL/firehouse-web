@@ -116,13 +116,44 @@ command `npm run build`, output `dist`). Lo único nuevo es configurar en el das
 Cloudflare Pages las variables de entorno de la sección 2, para **Production** y para
 **Preview** si quieres probar en ramas.
 
-Opcionales (el sistema funciona sin ellos, simplemente con menos protecciones):
+Opcionales (el sistema funciona sin ellos, simplemente con menos protecciones/funciones):
 - **Turnstile**: crea un site en Cloudflare Turnstile, agrega `TURNSTILE_SECRET_KEY` a
   las Functions y `turnstileToken` se empezará a verificar automáticamente.
 - **Rate limiting por IP**: crea un KV Namespace en Cloudflare y enlázalo como binding
   `RATE_LIMIT_KV` en Settings → Functions. Sin este binding, `/api/registro` sigue
   protegido por honeypot + verificación de tiempo de llenado, sólo que sin límite duro
   por IP.
+- **Correo de confirmación automático** (vía [Resend](https://resend.com)): ver sección 5.1.
+
+## 5.1. Correo de confirmación automático (opcional)
+
+Cuando una familia completa `/registro`, el sistema puede enviarle automáticamente un
+correo de confirmación. Usa [Resend](https://resend.com), que tiene un plan gratis de
+3.000 correos/mes — de sobra para Firehouse.
+
+1. Crea una cuenta gratis en [resend.com](https://resend.com).
+2. En Resend, ve a **Domains → Add Domain** y agrega `firehousecheer.cl` (o un subdominio
+   como `mail.firehousecheer.cl`). Resend te va a dar 2-3 registros DNS (TXT/MX) para
+   verificar que el dominio es tuyo.
+3. Agrega esos registros en Cloudflare: tu dominio → **DNS** → **Add record**, copiando
+   exactamente lo que indica Resend. La verificación suele tardar unos minutos.
+4. En Resend, ve a **API Keys → Create API Key** y cópiala.
+5. En Cloudflare Pages → Settings → Environment variables (Production), agrega:
+   - `RESEND_API_KEY` → la API key que copiaste (márcala como *secret*)
+   - `EMAIL_FROM` → por ejemplo `Firehouse Cheer <registro@firehousecheer.cl>` (debe
+     usar el dominio que verificaste en el paso 2-3)
+6. Guarda y espera el redeploy automático.
+
+Si no configuras esto, el formulario sigue funcionando exactamente igual — el correo de
+confirmación simplemente no se envía (es un "best effort": si Resend falla o no está
+configurado, el registro igual se guarda normalmente, nunca se pierde nada por esto).
+
+**Nota sobre WhatsApp:** el envío automático de WhatsApp queda fuera de este MVP a
+propósito (requiere verificación de negocio en Meta y aprobación de plantillas — ver
+sección "Qué quedó fuera" más abajo). Lo que sí existe: en la ficha de cada caso, el
+botón de WhatsApp abre la conversación con **un mensaje ya escrito** (distinto según el
+journey del caso), que el staff puede editar antes de enviar — no requiere ninguna
+configuración adicional, ya funciona.
 
 ## 6. Probar el formulario público
 

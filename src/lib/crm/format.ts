@@ -35,3 +35,36 @@ export function claseBadgeEstado(estado: string): string {
   if (ESTADOS_CERRADOS.includes(estado)) return 'admin-badge--estado-cerrado-no';
   return 'admin-badge--estado-abierto';
 }
+
+/**
+ * Mensaje de WhatsApp sugerido para abrir la conversación con una familia recién
+ * registrada. Queda precargado en el campo de texto de WhatsApp — el staff puede
+ * editarlo antes de enviar, no se manda automáticamente.
+ */
+export function mensajeWhatsappSugerido(
+  journey: string,
+  estado: string,
+  apoderadoNombre: string,
+  atletaNombre: string,
+): string {
+  const nombrePila = apoderadoNombre.split(' ')[0];
+
+  // Sólo usamos el mensaje "de bienvenida" mientras el caso sigue NUEVO — para
+  // casos ya contactados un saludo genérico es más natural que repetir la
+  // confirmación de registro.
+  if (estado !== CRM_ESTADOS.NUEVO) {
+    return `¡Hola ${nombrePila}! 👋 Te escribo de Firehouse Cheer.`;
+  }
+
+  switch (journey) {
+    case 'RENOVACION_2027':
+      return `¡Hola ${nombrePila}! 👋 Somos de Firehouse. Vimos que ${atletaNombre} está pensando en continuar con nosotros en 2027 y queríamos conversar contigo sobre los próximos pasos. ¿Tienes unos minutos?`;
+    case 'PRETEMPORADA':
+      return `¡Hola ${nombrePila}! 🔥 Recibimos el registro de ${atletaNombre} para la Pretemporada Firehouse. Queremos contarte cómo funciona y coordinar su primera clase. ¿Cuándo te acomoda conversar?`;
+    case 'EXPERIMENTADA_2027':
+    case 'PRINCIPIANTE_2027':
+      return `¡Hola ${nombrePila}! 🔥 Recibimos el registro de ${atletaNombre} para la temporada 2027 de Firehouse. Nos encantaría conocerlos y contarte cómo es el proceso de incorporación. ¿Conversamos?`;
+    default:
+      return `¡Hola ${nombrePila}! 👋 Somos de Firehouse. Vimos tu registro y queremos ayudarte a encontrar la mejor opción para ${atletaNombre}. ¿Tienes unos minutos para conversar?`;
+  }
+}
