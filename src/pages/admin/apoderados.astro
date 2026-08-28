@@ -84,6 +84,7 @@ import AdminBase from '../../layouts/AdminBase.astro';
   position: fixed; inset: 0; background: rgba(23,20,18,.5);
   display: flex; align-items: center; justify-content: center; padding: 20px; z-index: 50;
 }
+.fusion-panel[hidden]{ display: none; }
 .fusion-panel__card{ max-width: 640px; width: 100%; }
 .fusion-panel__opciones{ display: grid; gap: 14px; margin: 18px 0; }
 @media (min-width: 640px){ .fusion-panel__opciones{ grid-template-columns: 1fr 1fr; } }
