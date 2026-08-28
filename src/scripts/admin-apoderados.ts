@@ -38,12 +38,16 @@ function coincide(ap: ApoderadoConAtletas, textoCrudo: string): boolean {
 }
 
 function actualizarBarraSeleccion(): void {
-  const barra = $<HTMLElement>('#apoderados-barra')!;
   const contador = $<HTMLElement>('#apoderados-contador')!;
   const btn = $<HTMLButtonElement>('#btn-fusionar')!;
 
-  barra.hidden = seleccionados.size === 0;
-  contador.textContent = `${seleccionados.size} seleccionado${seleccionados.size === 1 ? '' : 's'} (máximo 2)`;
+  if (seleccionados.size === 0) {
+    contador.textContent = 'Selecciona 2 contactos en la tabla para fusionarlos';
+  } else if (seleccionados.size === 1) {
+    contador.textContent = '1 seleccionado — elige un segundo contacto para fusionar';
+  } else {
+    contador.textContent = '2 seleccionados — listo para fusionar';
+  }
   btn.disabled = seleccionados.size !== 2;
 
   // Una vez hay 2 seleccionados, el resto de los checkboxes se deshabilita hasta

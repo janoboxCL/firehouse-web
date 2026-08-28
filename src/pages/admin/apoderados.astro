@@ -16,8 +16,8 @@ import AdminBase from '../../layouts/AdminBase.astro';
     <input id="ap-busqueda" class="admin-input" type="search" placeholder="Buscar por nombre, teléfono o email" />
   </section>
 
-  <div class="apoderados-barra" id="apoderados-barra" hidden>
-    <span id="apoderados-contador">0 seleccionados</span>
+  <div class="apoderados-barra" id="apoderados-barra">
+    <span id="apoderados-contador">Selecciona 2 contactos en la tabla para fusionarlos</span>
     <button type="button" id="btn-fusionar" class="admin-btn" disabled>Fusionar seleccionados</button>
   </div>
 
@@ -28,7 +28,7 @@ import AdminBase from '../../layouts/AdminBase.astro';
     <table class="db-tabla apoderados-tabla" id="apoderados-tabla" hidden>
       <thead>
         <tr>
-          <th></th>
+          <th>Fusionar</th>
           <th>Nombre</th>
           <th>Teléfono</th>
           <th>Email</th>
