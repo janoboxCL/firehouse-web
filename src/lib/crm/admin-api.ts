@@ -113,6 +113,7 @@ export async function obtenerInteracciones(supabase: SupabaseClient, casoId: str
 }
 
 export interface CambiosCaso {
+  journey?: string;
   estado?: string;
   responsable_id?: string | null;
   proxima_accion?: string | null;
@@ -259,4 +260,62 @@ export function nombreAdminDe(admins: AdminMini[], id: string | null): string {
   if (!id) return '—';
   const admin = admins.find((a) => a.user_id === id);
   return admin?.display_name || '—';
+}
+
+// ---------------------------------------------------------------------------
+// Gestión de contactos: listar por apoderado, eliminar y fusión manual.
+// ---------------------------------------------------------------------------
+
+export interface ApoderadoConAtletas extends ApoderadoResumen {
+  created_at: string;
+  atletas: Array<{ id: string; nombre: string; apellidos: string }>;
+}
+
+export async function obtenerApoderados(supabase: SupabaseClient): Promise<ApoderadoConAtletas[]> {
+  const { data, error } = await supabase
+    .from('apoderados')
+    .select(
+      `id, nombre, apellidos, telefono, telefono_secundario, email, comuna, relacion,
+       canal_preferido, possible_duplicate, duplicate_reason, created_at,
+       atletas ( id, nombre, apellidos )`,
+    )
+    .order('created_at', { ascending: false })
+    .limit(1000);
+  if (error) throw error;
+  return (data ?? []) as unknown as ApoderadoConAtletas[];
+}
+
+/** Elimina un solo atleta y, en cascada, su caso e historial. No toca al apoderado
+ * ni a sus otros atletas, si tiene. */
+export async function eliminarAtleta(supabase: SupabaseClient, atletaId: string): Promise<void> {
+  const { error } = await supabase.from('atletas').delete().eq('id', atletaId);
+  if (error) throw error;
+}
+
+/** Elimina un apoderado completo: en cascada se van todos sus atletas, casos e
+ * historial. Es irreversible — el caller debe confirmar con la persona antes. */
+export async function eliminarApoderado(supabase: SupabaseClient, apoderadoId: string): Promise<void> {
+  const { error } = await supabase.from('apoderados').delete().eq('id', apoderadoId);
+  if (error) throw error;
+}
+
+export interface ResultadoFusion {
+  atletasMovidos: number;
+  apoderadoEliminado: string;
+}
+
+/** Fusión MANUAL: el staff ya decidió cuál de los dos contactos se mantiene.
+ * Mueve a todos los atletas del descartado hacia el que se mantiene y elimina
+ * el duplicado — todo en una sola transacción del lado de la base de datos. */
+export async function fusionarApoderados(
+  supabase: SupabaseClient,
+  mantenerId: string,
+  descartarId: string,
+): Promise<ResultadoFusion> {
+  const { data, error } = await supabase.rpc('fn_fusionar_apoderados', {
+    p_mantener_id: mantenerId,
+    p_descartar_id: descartarId,
+  });
+  if (error) throw error;
+  return data as ResultadoFusion;
 }

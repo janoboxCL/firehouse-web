@@ -21,6 +21,7 @@ const { titulo, ocultarCabecera = false } = Astro.props;
       <div class="admin-header__wrap">
         <a href="/admin" class="admin-header__marca">Firehouse <span>CRM</span></a>
         <nav class="admin-header__nav">
+          <a href="/admin/apoderados" class="admin-header__link">Contactos</a>
           <span id="admin-usuario" class="admin-header__usuario"></span>
           <button type="button" id="admin-logout" class="admin-header__logout">Cerrar sesión</button>
         </nav>
@@ -62,6 +63,8 @@ body.admin-tema a{ color: var(--fire-red); }
 }
 .admin-header__marca span{ color: var(--fire-red); }
 .admin-header__nav{ display: flex; align-items: center; gap: 16px; }
+.admin-header__link{ font-size: 13px; color: var(--ember); text-decoration: none; }
+.admin-header__link:hover{ color: var(--fire-red); }
 .admin-header__usuario{ font-size: 13px; color: #6B6259; }
 .admin-header__logout{
   background: none; border: 1px solid #D8D2C8; border-radius: 999px;

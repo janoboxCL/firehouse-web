@@ -1,0 +1,97 @@
+---
+import AdminBase from '../../layouts/AdminBase.astro';
+---
+<AdminBase titulo="Contactos">
+  <a href="/admin" class="ficha-volver">← Volver al listado de casos</a>
+
+  <h1 class="db-titulo">Contactos</h1>
+  <p class="apoderados-intro">
+    Selecciona exactamente dos contactos para fusionarlos manualmente, o elimina uno
+    directamente. Ambas acciones son irreversibles.
+  </p>
+
+  <div id="apoderados-error" class="admin-error" hidden></div>
+
+  <section class="admin-card apoderados-filtros">
+    <input id="ap-busqueda" class="admin-input" type="search" placeholder="Buscar por nombre, teléfono o email" />
+  </section>
+
+  <div class="apoderados-barra" id="apoderados-barra" hidden>
+    <span id="apoderados-contador">0 seleccionados</span>
+    <button type="button" id="btn-fusionar" class="admin-btn" disabled>Fusionar seleccionados</button>
+  </div>
+
+  <section class="admin-card apoderados-tabla-wrap">
+    <p id="apoderados-cargando" class="admin-spinner">Cargando contactos…</p>
+    <p id="apoderados-vacio" class="admin-vacio" hidden>No hay contactos que coincidan con la búsqueda.</p>
+
+    <table class="db-tabla apoderados-tabla" id="apoderados-tabla" hidden>
+      <thead>
+        <tr>
+          <th></th>
+          <th>Nombre</th>
+          <th>Teléfono</th>
+          <th>Email</th>
+          <th>Comuna</th>
+          <th>Atletas</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="apoderados-tabla-body"></tbody>
+    </table>
+  </section>
+
+  <div id="fusion-panel" class="fusion-panel" hidden>
+    <div class="admin-card fusion-panel__card">
+      <h2 class="ficha-bloque__titulo">¿Cuál contacto quieres mantener?</h2>
+      <p class="apoderados-intro">
+        Todos los atletas del que descartes se van a mover al que mantengas. El
+        descartado se elimina.
+      </p>
+      <div class="fusion-panel__opciones" id="fusion-panel__opciones"></div>
+      <button type="button" id="btn-cancelar-fusion" class="admin-btn admin-btn--secundario">Cancelar</button>
+    </div>
+  </div>
+</AdminBase>
+
+<script>
+  import { iniciarApoderados } from '../../scripts/admin-apoderados.ts';
+  iniciarApoderados();
+</script>
+
+<style is:global>
+.apoderados-intro{ font-size: 14px; color: #6B6259; margin: 0 0 20px; max-width: 60ch; }
+
+.apoderados-filtros{ margin-bottom: 16px; }
+
+.apoderados-barra{
+  display: flex; align-items: center; justify-content: space-between;
+  background: #fff; border: 1px solid #E4DFD6; border-radius: 12px;
+  padding: 12px 18px; margin-bottom: 16px; font-size: 14px; color: #6B6259;
+}
+
+.apoderados-tabla-wrap{ padding: 0; overflow-x: auto; }
+.apoderados-tabla td{ vertical-align: middle; }
+.apoderados-tabla tbody tr:hover{ background: #FAF8F4; }
+.apoderados-tabla input[type="checkbox"]{ width: 18px; height: 18px; accent-color: var(--fire-red); }
+.apoderados-fila-dup{ background: #FFF8EC; }
+.apoderados-eliminar-fila{
+  background: none; border: none; color: #A91111; font-size: 13px;
+  cursor: pointer; text-decoration: underline; padding: 6px;
+}
+
+.fusion-panel{
+  position: fixed; inset: 0; background: rgba(23,20,18,.5);
+  display: flex; align-items: center; justify-content: center; padding: 20px; z-index: 50;
+}
+.fusion-panel__card{ max-width: 640px; width: 100%; }
+.fusion-panel__opciones{ display: grid; gap: 14px; margin: 18px 0; }
+@media (min-width: 640px){ .fusion-panel__opciones{ grid-template-columns: 1fr 1fr; } }
+.fusion-opcion{
+  border: 1px solid #E4DFD6; border-radius: 12px; padding: 16px; text-align: left;
+  background: #fff; cursor: pointer; font-family: var(--font-body);
+}
+.fusion-opcion:hover{ border-color: var(--fire-red); }
+.fusion-opcion__nombre{ font-weight: 600; margin: 0 0 6px; }
+.fusion-opcion__dato{ font-size: 13px; color: #6B6259; margin: 2px 0; }
+</style>

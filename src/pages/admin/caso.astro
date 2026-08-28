@@ -3,6 +3,8 @@ import AdminBase from '../../layouts/AdminBase.astro';
 import {
   CRM_ESTADOS,
   CRM_ESTADOS_LABEL,
+  CRM_JOURNEYS,
+  CRM_JOURNEYS_LABEL,
   PRIORIDAD_OPCIONES,
   INTERACCION_TIPOS,
   INTERACCION_TIPOS_LABEL,
@@ -45,6 +47,13 @@ import {
           <p id="ficha-sin-accion" class="ficha-aviso" hidden>Este caso no tiene próxima acción.</p>
 
           <form id="form-gestion">
+            <div class="admin-campo">
+              <label class="admin-label" for="g-journey">Categoría (journey)</label>
+              <select id="g-journey" class="admin-select">
+                {Object.values(CRM_JOURNEYS).map((v) => <option value={v}>{CRM_JOURNEYS_LABEL[v]}</option>)}
+              </select>
+              <p class="ficha-ayuda-journey">Si un caso quedó "Por clasificar", cámbialo aquí una vez que hables con la familia.</p>
+            </div>
             <div class="admin-campo">
               <label class="admin-label" for="g-estado">Estado</label>
               <select id="g-estado" class="admin-select">
@@ -96,6 +105,22 @@ import {
         <button type="submit" id="btn-agregar-interaccion" class="admin-btn admin-btn--secundario">Agregar</button>
       </form>
     </section>
+
+    <section class="admin-card ficha-bloque ficha-peligro">
+      <h2 class="ficha-bloque__titulo">Eliminar</h2>
+      <p class="ficha-peligro__texto">
+        Esto borra el registro definitivamente, incluyendo todo su historial de
+        interacciones. No se puede deshacer.
+      </p>
+      <div class="ficha-acciones">
+        <button type="button" id="btn-eliminar-atleta" class="admin-btn admin-btn--peligro">
+          Eliminar este atleta y su caso
+        </button>
+        <button type="button" id="btn-eliminar-apoderado" class="admin-btn admin-btn--peligro">
+          Eliminar todo el registro del apoderado
+        </button>
+      </div>
+    </section>
   </div>
 </AdminBase>
 
@@ -128,6 +153,14 @@ import {
   font-size: 13px; margin-bottom: 16px;
 }
 .ficha-guardado{ color: #1E7A34; font-size: 13px; margin-top: 10px; }
+.ficha-ayuda-journey{ font-size: 12px; color: #6B6259; margin-top: 6px; }
+
+.ficha-peligro{ margin-top: 20px; border-color: rgba(197,21,21,.25); }
+.ficha-peligro__texto{ font-size: 13px; color: #6B6259; margin: 0 0 14px; }
+.admin-btn--peligro{
+  background: #fff; color: var(--fire-red); border: 1px solid rgba(197,21,21,.4);
+}
+.admin-btn--peligro:hover{ background: rgba(197,21,21,.06); border-color: var(--fire-red); }
 
 .ficha-historial{ margin-top: 20px; }
 .ficha-timeline{ list-style: none; margin: 0 0 24px; padding: 0; }

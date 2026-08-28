@@ -5,6 +5,8 @@ import {
   obtenerInteracciones,
   actualizarCaso,
   agregarInteraccion,
+  eliminarAtleta,
+  eliminarApoderado,
   edadDeAtleta,
   casoSinProximaAccion,
   nombreAdminDe,
@@ -113,6 +115,7 @@ function actualizarAvisoSinAccion(): void {
 }
 
 function rellenarFormularioGestion(caso: CasoResumen): void {
+  $<HTMLSelectElement>('#g-journey')!.value = caso.journey;
   $<HTMLSelectElement>('#g-estado')!.value = caso.estado;
   $<HTMLInputElement>('#g-proxima-accion')!.value = caso.proxima_accion ?? '';
   $<HTMLInputElement>('#g-fecha')!.value = aFechaLocalInput(caso.fecha_proxima_accion);
@@ -140,6 +143,39 @@ function renderTimeline(interacciones: Interaccion[], admins: AdminMini[]): void
     nota.textContent = i.nota ?? ''; // nunca innerHTML: el texto del usuario nunca se renderiza como HTML
     li.append(meta, tipo, nota);
     lista.appendChild(li);
+  });
+}
+
+function conectarBotonesEliminar(supabase: SupabaseClient, caso: CasoResumen): void {
+  const btnAtleta = $<HTMLButtonElement>('#btn-eliminar-atleta');
+  const btnApoderado = $<HTMLButtonElement>('#btn-eliminar-apoderado');
+  const nombreAtleta = `${caso.atleta.nombre} ${caso.atleta.apellidos}`;
+  const nombreApoderado = `${caso.atleta.apoderado.nombre} ${caso.atleta.apoderado.apellidos}`;
+
+  btnAtleta?.addEventListener('click', async () => {
+    const confirmado = window.confirm(
+      `¿Eliminar a ${nombreAtleta} y su caso? Se borra también todo su historial de interacciones. Esta acción no se puede deshacer.`,
+    );
+    if (!confirmado) return;
+    try {
+      await eliminarAtleta(supabase, caso.atleta.id);
+      window.location.href = '/admin';
+    } catch {
+      mostrarError('No pudimos eliminar el registro. Inténtalo nuevamente.');
+    }
+  });
+
+  btnApoderado?.addEventListener('click', async () => {
+    const confirmado = window.confirm(
+      `¿Eliminar todo el registro de ${nombreApoderado}? Si tiene más de un/a atleta registrado/a, se eliminan todos junto con su historial. Esta acción no se puede deshacer.`,
+    );
+    if (!confirmado) return;
+    try {
+      await eliminarApoderado(supabase, caso.atleta.apoderado.id);
+      window.location.href = '/admin';
+    } catch {
+      mostrarError('No pudimos eliminar el registro. Inténtalo nuevamente.');
+    }
   });
 }
 
@@ -187,6 +223,7 @@ export async function iniciarFicha(): Promise<void> {
 
   await conectarFormularioGestion(supabase, id, admins);
   conectarFormularioInteraccion(supabase, id, admins);
+  conectarBotonesEliminar(supabase, caso);
 }
 
 async function recargarCasoYTimeline(
@@ -196,6 +233,7 @@ async function recargarCasoYTimeline(
 ): Promise<void> {
   const [caso, interacciones] = await Promise.all([obtenerCasoPorId(supabase, id), obtenerInteracciones(supabase, id)]);
   if (!caso) return;
+  renderBloqueAtleta(caso);
   rellenarFormularioGestion(caso);
   renderTimeline(interacciones, admins);
 }
@@ -214,6 +252,7 @@ async function conectarFormularioGestion(supabase: SupabaseClient, id: string, a
 
     try {
       await actualizarCaso(supabase, id, {
+        journey: $<HTMLSelectElement>('#g-journey')!.value,
         estado: $<HTMLSelectElement>('#g-estado')!.value,
         responsable_id: $<HTMLSelectElement>('#g-responsable')!.value || null,
         proxima_accion: $<HTMLInputElement>('#g-proxima-accion')!.value || null,
@@ -221,8 +260,8 @@ async function conectarFormularioGestion(supabase: SupabaseClient, id: string, a
         prioridad: $<HTMLSelectElement>('#g-prioridad')!.value,
       });
       // Volvemos a leer el caso: si el nuevo estado es de cierre, un trigger en la base de
-      // datos ya limpió próxima acción/fecha, y si el estado cambió, ya quedó la interacción
-      // de CAMBIO_ESTADO registrada — reflejamos ambas cosas recargando.
+      // datos ya limpió próxima acción/fecha, y tanto el cambio de estado como el de
+      // categoría ya quedaron registrados como interacción — reflejamos todo recargando.
       await recargarCasoYTimeline(supabase, id, admins);
       guardado.hidden = false;
       setTimeout(() => (guardado.hidden = true), 2500);
