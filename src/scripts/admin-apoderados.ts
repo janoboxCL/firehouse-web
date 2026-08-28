@@ -147,11 +147,23 @@ function tarjetaFusionOpcion(ap: ApoderadoConAtletas): string {
     </button>`;
 }
 
+function cerrarPanelFusion(): void {
+  const panel = $<HTMLElement>('#fusion-panel');
+  const opciones = $<HTMLElement>('#fusion-panel__opciones');
+  if (panel) panel.hidden = true;
+  if (opciones) opciones.innerHTML = ''; // nunca dejar contenido viejo dando vueltas
+}
+
 function abrirPanelFusion(supabase: SupabaseClient, onListo: () => void): void {
   const [idA, idB] = Array.from(seleccionados);
   const apA = TODOS.find((a) => a.id === idA);
   const apB = TODOS.find((a) => a.id === idB);
-  if (!apA || !apB) return;
+
+  if (!apA || !apB) {
+    mostrarError('Selecciona primero 2 contactos en la tabla (marca sus casillas) antes de fusionar.');
+    cerrarPanelFusion();
+    return;
+  }
 
   const panel = $<HTMLElement>('#fusion-panel')!;
   const opciones = $<HTMLElement>('#fusion-panel__opciones')!;
@@ -165,22 +177,29 @@ function abrirPanelFusion(supabase: SupabaseClient, onListo: () => void): void {
       btn.disabled = true;
       try {
         await fusionarApoderados(supabase, mantenerId, descartarId);
-        panel.hidden = true;
+        cerrarPanelFusion();
         seleccionados.clear();
         onListo();
       } catch {
         mostrarError('No pudimos fusionar estos contactos. Inténtalo nuevamente.');
-        panel.hidden = true;
+        cerrarPanelFusion();
       }
     });
   });
 
   $<HTMLButtonElement>('#btn-cancelar-fusion')!.onclick = () => {
-    panel.hidden = true;
+    cerrarPanelFusion();
   };
 }
 
 export async function iniciarApoderados(): Promise<void> {
+  // Si el navegador restauró esta página desde su caché (ej. al volver con el botón
+  // "atrás"), nunca debe quedar el modal de fusión abierto con contenido viejo.
+  cerrarPanelFusion();
+  window.addEventListener('pageshow', (evento) => {
+    if ((evento as PageTransitionEvent).persisted) cerrarPanelFusion();
+  });
+
   const { supabase, perfil } = await requireAdminSession();
   montarCabeceraAdmin(perfil);
 
