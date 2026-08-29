@@ -1,0 +1,80 @@
+---
+import AdminBase from '../../layouts/AdminBase.astro';
+import { LIMITES } from '../../lib/crm/constants.ts';
+---
+<AdminBase titulo="Plantillas de mensajes">
+  <a href="/admin" class="ficha-volver">← Volver al listado de casos</a>
+  <h1 class="db-titulo">Plantillas de mensajes</h1>
+  <p class="apoderados-intro">
+    Mensajes reutilizables para WhatsApp y correo. Usa <code>{'{nombre_apoderado}'}</code> y
+    <code>{'{nombre_atleta}'}</code> donde quieras que se reemplacen automáticamente.
+  </p>
+
+  <div id="pl-error" class="admin-error" hidden></div>
+
+  <section class="admin-card pl-form-card">
+    <h2 class="ficha-bloque__titulo" id="pl-form-titulo">Nueva plantilla</h2>
+    <form id="pl-form">
+      <input type="hidden" id="pl-id" />
+      <div class="admin-campo">
+        <label class="admin-label" for="pl-nombre">Nombre interno</label>
+        <input id="pl-nombre" class="admin-input" type="text" maxlength="100" placeholder="Ej: Recordatorio de clase" required />
+      </div>
+      <div class="admin-campo">
+        <label class="admin-label" for="pl-canal">Canal</label>
+        <select id="pl-canal" class="admin-select">
+          <option value="WHATSAPP">Sólo WhatsApp</option>
+          <option value="EMAIL">Sólo correo</option>
+          <option value="AMBOS">WhatsApp y correo</option>
+        </select>
+      </div>
+      <div class="admin-campo" id="pl-asunto-wrap" hidden>
+        <label class="admin-label" for="pl-asunto">Asunto del correo</label>
+        <input id="pl-asunto" class="admin-input" type="text" maxlength="200" />
+      </div>
+      <div class="admin-campo">
+        <label class="admin-label" for="pl-cuerpo">Mensaje</label>
+        <textarea id="pl-cuerpo" class="admin-textarea" maxlength={LIMITES.NOTA_INTERACCION_MAX} required></textarea>
+      </div>
+      <label class="pl-activo-label">
+        <input type="checkbox" id="pl-activo" checked /> Activa (aparece para elegir en las fichas)
+      </label>
+      <div class="ficha-acciones">
+        <button type="submit" class="admin-btn">Guardar plantilla</button>
+        <button type="button" id="pl-btn-cancelar" class="admin-btn admin-btn--secundario" hidden>Cancelar edición</button>
+      </div>
+    </form>
+  </section>
+
+  <section class="admin-card">
+    <p id="pl-cargando" class="admin-spinner">Cargando plantillas…</p>
+    <p id="pl-vacio" class="admin-vacio" hidden>Todavía no hay plantillas.</p>
+    <div id="pl-lista"></div>
+  </section>
+</AdminBase>
+
+<script>
+  import { iniciarPlantillas } from '../../scripts/admin-plantillas.ts';
+  iniciarPlantillas();
+</script>
+
+<style is:global>
+.pl-form-card{ margin-bottom: 20px; }
+.pl-activo-label{ display: flex; align-items: center; gap: 8px; font-size: 14px; color: #6B6259; margin: 4px 0 16px; }
+.pl-activo-label input{ width: 18px; height: 18px; accent-color: var(--fire-red); }
+
+.pl-item{
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 16px;
+  padding: 14px 0; border-bottom: 1px solid #EFEBE4;
+}
+.pl-item:last-child{ border-bottom: none; }
+.pl-item__nombre{ font-weight: 600; margin: 0 0 4px; }
+.pl-item__cuerpo{ font-size: 13px; color: #6B6259; margin: 0; white-space: pre-wrap; }
+.pl-item__acciones{ display: flex; gap: 10px; flex-shrink: 0; }
+.pl-item__accion{
+  background: none; border: none; font-size: 13px; cursor: pointer; text-decoration: underline; padding: 4px;
+}
+.pl-item__accion--editar{ color: var(--ember); }
+.pl-item__accion--eliminar{ color: #A91111; }
+.pl-item--inactiva{ opacity: .55; }
+</style>

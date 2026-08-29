@@ -226,22 +226,27 @@ export function filtrarCasos(casos: CasoResumen[], filtros: FiltrosCasos, ahora:
 }
 
 /**
+ * 0 = acción vencida · 1 = acción para hoy · 2 = caso nuevo · 3 = resto.
+ * Mientras más bajo, más urgente. Se usa tanto para ordenar casos sueltos como
+ * para ordenar grupos de familia por su caso más urgente.
+ */
+export function bucketDeCaso(c: Pick<CasoResumen, 'estado' | 'fecha_proxima_accion'>, ahora: Date = new Date()): number {
+  if (casoEstaVencido(c, ahora)) return 0;
+  if (casoEsParaHoy(c, ahora)) return 1;
+  if (c.estado === CRM_ESTADOS.NUEVO) return 2;
+  return 3;
+}
+
+/**
  * Orden comercial por defecto:
  * 1) acciones vencidas · 2) acciones para hoy · 3) casos nuevos · 4) resto por fecha de creación.
  */
 export function ordenarCasos(casos: CasoResumen[], ahora: Date = new Date()): CasoResumen[] {
-  function bucket(c: CasoResumen): number {
-    if (casoEstaVencido(c, ahora)) return 0;
-    if (casoEsParaHoy(c, ahora)) return 1;
-    if (c.estado === CRM_ESTADOS.NUEVO) return 2;
-    return 3;
-  }
-
   return [...casos].sort((a, b) => {
-    const diff = bucket(a) - bucket(b);
+    const diff = bucketDeCaso(a, ahora) - bucketDeCaso(b, ahora);
     if (diff !== 0) return diff;
 
-    if (bucket(a) <= 1) {
+    if (bucketDeCaso(a, ahora) <= 1) {
       // dentro de vencidas/hoy: la fecha más antigua primero (más urgente)
       const fa = a.fecha_proxima_accion ? new Date(a.fecha_proxima_accion).getTime() : Infinity;
       const fb = b.fecha_proxima_accion ? new Date(b.fecha_proxima_accion).getTime() : Infinity;
@@ -249,6 +254,49 @@ export function ordenarCasos(casos: CasoResumen[], ahora: Date = new Date()): Ca
     }
 
     return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Vista principal agrupada por apoderado: la gestión ocurre a nivel de familia,
+// no de atleta suelto, así que el dashboard agrupa — pero cada atleta conserva
+// su propio estado/journey/próxima acción dentro del grupo.
+// ---------------------------------------------------------------------------
+
+export interface GrupoApoderado {
+  apoderado: ApoderadoResumen;
+  casos: CasoResumen[];
+}
+
+export function agruparPorApoderado(casos: CasoResumen[]): GrupoApoderado[] {
+  const mapa = new Map<string, GrupoApoderado>();
+  for (const caso of casos) {
+    const id = caso.atleta.apoderado.id;
+    if (!mapa.has(id)) mapa.set(id, { apoderado: caso.atleta.apoderado, casos: [] });
+    mapa.get(id)!.casos.push(caso);
+  }
+  return Array.from(mapa.values());
+}
+
+/** Un grupo de familia es tan urgente como su caso más urgente. */
+export function ordenarGruposPorUrgencia(grupos: GrupoApoderado[], ahora: Date = new Date()): GrupoApoderado[] {
+  function bucketGrupo(g: GrupoApoderado): number {
+    return Math.min(...g.casos.map((c) => bucketDeCaso(c, ahora)));
+  }
+  function fechaMasUrgente(g: GrupoApoderado): number {
+    const relevantes = g.casos.filter((c) => bucketDeCaso(c, ahora) <= 1 && c.fecha_proxima_accion);
+    if (relevantes.length === 0) return Infinity;
+    return Math.min(...relevantes.map((c) => new Date(c.fecha_proxima_accion!).getTime()));
+  }
+  function creadoMasReciente(g: GrupoApoderado): number {
+    return Math.max(...g.casos.map((c) => new Date(c.created_at).getTime()));
+  }
+
+  return [...grupos].sort((a, b) => {
+    const diff = bucketGrupo(a) - bucketGrupo(b);
+    if (diff !== 0) return diff;
+    if (bucketGrupo(a) <= 1) return fechaMasUrgente(a) - fechaMasUrgente(b);
+    return creadoMasReciente(b) - creadoMasReciente(a);
   });
 }
 
@@ -260,6 +308,120 @@ export function nombreAdminDe(admins: AdminMini[], id: string | null): string {
   if (!id) return '—';
   const admin = admins.find((a) => a.user_id === id);
   return admin?.display_name || '—';
+}
+
+// ---------------------------------------------------------------------------
+// Notas de apoderado: bitácora separada a nivel de familia.
+// ---------------------------------------------------------------------------
+
+export interface NotaApoderado {
+  id: string;
+  apoderado_id: string;
+  nota: string;
+  responsable_id: string | null;
+  created_at: string;
+}
+
+export async function obtenerNotasApoderado(supabase: SupabaseClient, apoderadoId: string): Promise<NotaApoderado[]> {
+  const { data, error } = await supabase
+    .from('notas_apoderado')
+    .select('id, apoderado_id, nota, responsable_id, created_at')
+    .eq('apoderado_id', apoderadoId)
+    .order('created_at', { ascending: true });
+  if (error) throw error;
+  return data ?? [];
+}
+
+export async function agregarNotaApoderado(supabase: SupabaseClient, apoderadoId: string, nota: string): Promise<void> {
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+  const { error } = await supabase
+    .from('notas_apoderado')
+    .insert({ apoderado_id: apoderadoId, nota, responsable_id: session?.user.id ?? null });
+  if (error) throw error;
+}
+
+// ---------------------------------------------------------------------------
+// Plantillas de mensaje: reutilizables por WhatsApp y/o correo.
+// ---------------------------------------------------------------------------
+
+export type CanalPlantilla = 'WHATSAPP' | 'EMAIL' | 'AMBOS';
+
+export interface PlantillaMensaje {
+  id: string;
+  nombre: string;
+  canal: CanalPlantilla;
+  asunto: string | null;
+  cuerpo: string;
+  activo: boolean;
+  created_at: string;
+}
+
+export async function obtenerPlantillas(supabase: SupabaseClient, soloActivas = false): Promise<PlantillaMensaje[]> {
+  let query = supabase
+    .from('plantillas_mensaje')
+    .select('id, nombre, canal, asunto, cuerpo, activo, created_at')
+    .order('created_at', { ascending: false });
+  if (soloActivas) query = query.eq('activo', true);
+  const { data, error } = await query;
+  if (error) throw error;
+  return data ?? [];
+}
+
+export interface DatosPlantilla {
+  nombre: string;
+  canal: CanalPlantilla;
+  asunto: string | null;
+  cuerpo: string;
+  activo: boolean;
+}
+
+export async function crearPlantilla(supabase: SupabaseClient, datos: DatosPlantilla): Promise<void> {
+  const { error } = await supabase.from('plantillas_mensaje').insert(datos);
+  if (error) throw error;
+}
+
+export async function actualizarPlantilla(supabase: SupabaseClient, id: string, datos: DatosPlantilla): Promise<void> {
+  const { error } = await supabase.from('plantillas_mensaje').update(datos).eq('id', id);
+  if (error) throw error;
+}
+
+export async function eliminarPlantilla(supabase: SupabaseClient, id: string): Promise<void> {
+  const { error } = await supabase.from('plantillas_mensaje').delete().eq('id', id);
+  if (error) throw error;
+}
+
+/** Reemplaza los placeholders de una plantilla con datos reales de la familia. */
+export function rellenarPlantilla(texto: string, nombreApoderado: string, nombreAtleta: string): string {
+  return texto
+    .replaceAll('{nombre_apoderado}', nombreApoderado.split(' ')[0])
+    .replaceAll('{nombre_atleta}', nombreAtleta);
+}
+
+/** Envía un correo desde el panel admin, vía la Cloudflare Function protegida
+ * (nunca se llama a Resend directo desde el navegador). */
+export async function enviarCorreoAdmin(
+  supabase: SupabaseClient,
+  to: string,
+  subject: string,
+  html: string,
+): Promise<void> {
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+  if (!session) throw new Error('Sin sesión activa.');
+
+  const res = await fetch('/api/admin/enviar-correo', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', authorization: `Bearer ${session.access_token}` },
+    body: JSON.stringify({ to, subject, html }),
+  });
+
+  if (!res.ok) {
+    const data = await res.json().catch(() => null);
+    throw new Error(data?.message || 'No pudimos enviar el correo.');
+  }
 }
 
 // ---------------------------------------------------------------------------

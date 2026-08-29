@@ -84,6 +84,12 @@ function filaApoderado(ap: ApoderadoConAtletas, supabase: SupabaseClient, onCamb
   });
 
   const celdaAccion = tr.children[6];
+  const linkVer = document.createElement('a');
+  linkVer.href = `/admin/apoderado?id=${ap.id}`;
+  linkVer.className = 'apoderados-ver-fila';
+  linkVer.textContent = 'Ver ficha';
+  celdaAccion.appendChild(linkVer);
+
   const btnEliminar = document.createElement('button');
   btnEliminar.type = 'button';
   btnEliminar.className = 'apoderados-eliminar-fila';

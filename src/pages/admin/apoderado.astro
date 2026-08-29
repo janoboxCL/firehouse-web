@@ -1,0 +1,90 @@
+---
+import AdminBase from '../../layouts/AdminBase.astro';
+import { LIMITES } from '../../lib/crm/constants.ts';
+---
+<AdminBase titulo="Ficha de apoderado">
+  <a href="/admin" class="ficha-volver">← Volver al listado</a>
+
+  <div id="ap-error" class="admin-error" hidden></div>
+  <p id="ap-cargando" class="admin-spinner">Cargando…</p>
+
+  <div id="ap-contenido" hidden>
+    <div id="ap-duplicado" class="admin-error ficha-duplicado" hidden>
+      Posible registro duplicado: ya existe otro contacto con el mismo teléfono o correo.
+      Puedes fusionarlos desde <a href="/admin/apoderados">Contactos</a>.
+    </div>
+
+    <div class="ficha-grid">
+      <div class="ficha-col">
+        <section class="admin-card ficha-bloque">
+          <h2 class="ficha-bloque__titulo">Apoderado</h2>
+          <dl class="ficha-datos" id="ap-datos"></dl>
+          <div class="ficha-acciones">
+            <a id="ap-btn-whatsapp" class="admin-btn admin-btn--whatsapp" href="#" target="_blank" rel="noopener">💬 WhatsApp</a>
+            <a id="ap-btn-email" class="admin-btn admin-btn--secundario" href="#">Email</a>
+            <button type="button" id="ap-btn-copiar" class="admin-btn admin-btn--secundario">Copiar teléfono</button>
+          </div>
+
+          <div class="ap-plantilla">
+            <label class="admin-label" for="ap-select-plantilla">Usar una plantilla</label>
+            <select id="ap-select-plantilla" class="admin-select">
+              <option value="">Elegir plantilla…</option>
+            </select>
+            <div class="ap-plantilla__acciones">
+              <button type="button" id="ap-btn-plantilla-whatsapp" class="admin-btn admin-btn--whatsapp" disabled>Abrir WhatsApp con esta plantilla</button>
+              <button type="button" id="ap-btn-plantilla-email" class="admin-btn admin-btn--secundario" disabled>Enviar por correo</button>
+            </div>
+            <p id="ap-plantilla-estado" class="ficha-guardado" hidden></p>
+          </div>
+        </section>
+
+        <section class="admin-card ficha-bloque">
+          <h2 class="ficha-bloque__titulo">Notas de la familia</h2>
+          <p class="apoderados-intro">
+            Bitácora aparte del historial de cada atleta — para anotar algo que aplica
+            a toda la familia (ej. "ambas niñas vinieron hoy").
+          </p>
+          <ol id="ap-notas" class="ficha-timeline"></ol>
+          <form id="ap-form-nota">
+            <textarea id="ap-nota-texto" class="admin-textarea" maxlength={LIMITES.NOTA_INTERACCION_MAX} placeholder="Nota sobre la familia…" required></textarea>
+            <button type="submit" class="admin-btn admin-btn--secundario">Agregar nota</button>
+          </form>
+        </section>
+      </div>
+
+      <div class="ficha-col">
+        <section class="admin-card ficha-bloque">
+          <h2 class="ficha-bloque__titulo">Atletas</h2>
+          <table class="familia-card__atletas" id="ap-atletas-tabla">
+            <tbody id="ap-atletas-body"></tbody>
+          </table>
+        </section>
+
+        <section class="admin-card ficha-bloque ficha-peligro">
+          <h2 class="ficha-bloque__titulo">Eliminar</h2>
+          <p class="ficha-peligro__texto">
+            Elimina todo el registro de este apoderado, incluyendo sus atletas, casos
+            e historial. No se puede deshacer.
+          </p>
+          <button type="button" id="ap-btn-eliminar" class="admin-btn admin-btn--peligro">
+            Eliminar todo el registro
+          </button>
+        </section>
+      </div>
+    </div>
+  </div>
+</AdminBase>
+
+<script>
+  import { iniciarFichaApoderado } from '../../scripts/admin-apoderado-ficha.ts';
+  iniciarFichaApoderado();
+</script>
+
+<style is:global>
+.ap-plantilla{ margin-top: 20px; border-top: 1px solid #EFEBE4; padding-top: 16px; }
+.ap-plantilla__acciones{ display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
+#ap-form-nota{ border-top: 1px solid #EFEBE4; padding-top: 16px; margin-top: 4px; }
+#ap-form-nota textarea{ margin-bottom: 10px; }
+.familia-card__atletas tr{ cursor: pointer; }
+.familia-card__atletas tr:hover td{ background: #FAF8F4; }
+</style>

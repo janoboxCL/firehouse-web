@@ -56,6 +56,30 @@ function construirHtml(datos: DatosCorreoConfirmacion): string {
 </html>`;
 }
 
+/** Llamada cruda a la API de Resend. La usan tanto el correo de confirmación
+ * automático como el envío manual desde el panel admin. */
+export async function enviarCorreoGenerico(
+  apiKey: string,
+  remitente: string,
+  destinatario: string,
+  asunto: string,
+  html: string,
+): Promise<void> {
+  const res = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      'content-type': 'application/json',
+    },
+    body: JSON.stringify({ from: remitente, to: destinatario, subject: asunto, html }),
+  });
+
+  if (!res.ok) {
+    const cuerpo = await res.text().catch(() => '');
+    throw new Error(`resend_http_${res.status}: ${cuerpo.slice(0, 200)}`);
+  }
+}
+
 /**
  * Envía el correo de confirmación. Lanza si Resend responde con error — el
  * caller decide qué hacer (normalmente: loguear y seguir, nunca romper el flujo).
@@ -65,22 +89,11 @@ export async function enviarCorreoConfirmacion(
   remitente: string,
   datos: DatosCorreoConfirmacion,
 ): Promise<void> {
-  const res = await fetch('https://api.resend.com/emails', {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-      'content-type': 'application/json',
-    },
-    body: JSON.stringify({
-      from: remitente,
-      to: datos.apoderadoEmail,
-      subject: '¡Recibimos tu registro en Firehouse! 🔥',
-      html: construirHtml(datos),
-    }),
-  });
-
-  if (!res.ok) {
-    const cuerpo = await res.text().catch(() => '');
-    throw new Error(`resend_http_${res.status}: ${cuerpo.slice(0, 200)}`);
-  }
+  await enviarCorreoGenerico(
+    apiKey,
+    remitente,
+    datos.apoderadoEmail,
+    '¡Recibimos tu registro en Firehouse! 🔥',
+    construirHtml(datos),
+  );
 }

@@ -3,12 +3,14 @@ import {
   obtenerCasos,
   obtenerAdmins,
   filtrarCasos,
-  ordenarCasos,
   casoEstaVencido,
   casoEsParaHoy,
   edadDeAtleta,
   nombreAdminDe,
+  agruparPorApoderado,
+  ordenarGruposPorUrgencia,
   type CasoResumen,
+  type GrupoApoderado,
   type FiltrosCasos,
   type AdminMini,
 } from '../lib/crm/admin-api.ts';
@@ -56,9 +58,10 @@ function renderKPIs(casos: CasoResumen[]): void {
   $('#kpi-sin-contactar')!.textContent = String(sinContactar24h.length);
 }
 
-function filaTabla(caso: CasoResumen): HTMLTableRowElement {
+function filaAtleta(caso: CasoResumen): HTMLTableRowElement {
   const tr = document.createElement('tr');
-  tr.addEventListener('click', () => {
+  tr.addEventListener('click', (evt) => {
+    evt.stopPropagation(); // no abrir también la ficha del apoderado
     window.location.href = `/admin/caso?id=${caso.id}`;
   });
 
@@ -73,40 +76,63 @@ function filaTabla(caso: CasoResumen): HTMLTableRowElement {
   celdaFecha.textContent = caso.fecha_proxima_accion ? textoFecha : '—';
 
   tr.innerHTML = `
-    <td>${caso.atleta.nombre} ${caso.atleta.apellidos}</td>
-    <td>${edad ?? '—'}</td>
-    <td>${caso.atleta.apoderado.nombre} ${caso.atleta.apoderado.apellidos}</td>
+    <td>${caso.atleta.nombre} ${caso.atleta.apellidos} ${edad !== null ? `(${edad})` : ''}</td>
     <td><span class="admin-badge admin-badge--journey">${CRM_JOURNEYS_LABEL[caso.journey] ?? caso.journey}</span></td>
     <td><span class="admin-badge ${claseBadgeEstado(caso.estado)}">${CRM_ESTADOS_LABEL[caso.estado] ?? caso.estado}</span></td>
     <td>${caso.proxima_accion ?? '—'}</td>
     <td></td>
     <td>${nombreAdminDe(ADMINS, caso.responsable_id)}</td>
   `;
-  tr.children[6].replaceWith(celdaFecha);
+  tr.children[4].replaceWith(celdaFecha);
   return tr;
+}
+
+function tarjetaFamilia(grupo: GrupoApoderado): HTMLElement {
+  const card = document.createElement('div');
+  card.className = 'familia-card';
+
+  const header = document.createElement('div');
+  header.className = 'familia-card__header';
+  header.innerHTML = `
+    <div>
+      <p class="familia-card__nombre">${grupo.apoderado.nombre} ${grupo.apoderado.apellidos}</p>
+      <p class="familia-card__contacto">${grupo.apoderado.telefono} · ${grupo.apoderado.email}</p>
+    </div>
+  `;
+  header.addEventListener('click', () => {
+    window.location.href = `/admin/apoderado?id=${grupo.apoderado.id}`;
+  });
+
+  const tabla = document.createElement('table');
+  tabla.className = 'familia-card__atletas';
+  const cuerpo = document.createElement('tbody');
+  grupo.casos.forEach((c) => cuerpo.appendChild(filaAtleta(c)));
+  tabla.appendChild(cuerpo);
+
+  card.append(header, tabla);
+  return card;
 }
 
 function renderizar(): void {
   const filtros = leerFiltros();
-  const filtrados = ordenarCasos(filtrarCasos(TODOS_LOS_CASOS, filtros));
+  const filtrados = filtrarCasos(TODOS_LOS_CASOS, filtros);
+  const grupos = ordenarGruposPorUrgencia(agruparPorApoderado(filtrados));
 
-  const tabla = $<HTMLTableElement>('#db-tabla')!;
+  const contenedor = $<HTMLElement>('#db-familias')!;
   const vacio = $<HTMLElement>('#db-vacio')!;
-  const cuerpo = $<HTMLElement>('#db-tabla-body')!;
+  contenedor.innerHTML = '';
 
-  cuerpo.innerHTML = '';
-
-  if (filtrados.length === 0) {
-    tabla.hidden = true;
+  if (grupos.length === 0) {
+    contenedor.hidden = true;
     vacio.hidden = false;
     return;
   }
 
   vacio.hidden = true;
-  tabla.hidden = false;
+  contenedor.hidden = false;
   const frag = document.createDocumentFragment();
-  filtrados.forEach((c) => frag.appendChild(filaTabla(c)));
-  cuerpo.appendChild(frag);
+  grupos.forEach((g) => frag.appendChild(tarjetaFamilia(g)));
+  contenedor.appendChild(frag);
 }
 
 function poblarSelectResponsables(): void {

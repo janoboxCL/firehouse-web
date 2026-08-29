@@ -73,25 +73,10 @@ import {
     </div>
   </section>
 
-  <section class="admin-card db-tabla-wrap">
+  <section class="admin-card db-lista-wrap">
     <p id="db-cargando" class="admin-spinner">Cargando casos…</p>
     <p id="db-vacio" class="admin-vacio" hidden>No hay casos que coincidan con estos filtros.</p>
-
-    <table class="db-tabla" id="db-tabla" hidden>
-      <thead>
-        <tr>
-          <th>Atleta</th>
-          <th>Edad</th>
-          <th>Apoderado</th>
-          <th>Journey</th>
-          <th>Estado</th>
-          <th>Próxima acción</th>
-          <th>Fecha</th>
-          <th>Responsable</th>
-        </tr>
-      </thead>
-      <tbody id="db-tabla-body"></tbody>
-    </table>
+    <div id="db-familias" hidden></div>
   </section>
 </AdminBase>
 
@@ -112,17 +97,37 @@ import {
 .db-filtros__fila{ display: grid; grid-template-columns: repeat(4, 1fr) 1.6fr; gap: 14px; align-items: end; }
 .db-filtro--busqueda input{ min-width: 0; }
 
-.db-tabla-wrap{ padding: 0; overflow-x: auto; }
-.db-tabla{ width: 100%; border-collapse: collapse; font-size: 14px; }
-.db-tabla th{
-  text-align: left; padding: 12px 16px; font-size: 12px; text-transform: uppercase;
-  letter-spacing: .04em; color: #6B6259; border-bottom: 1px solid #E4DFD6; white-space: nowrap;
+.db-lista-wrap{ padding: 20px; }
+#db-cargando, #db-vacio{ padding: 12px; }
+
+.familia-card{
+  border: 1px solid #E4DFD6; border-radius: 12px; margin-bottom: 14px; overflow: hidden;
 }
-.db-tabla td{ padding: 14px 16px; border-bottom: 1px solid #EFEBE4; vertical-align: middle; }
-.db-tabla tbody tr{ cursor: pointer; }
-.db-tabla tbody tr:hover{ background: #FAF8F4; }
+.familia-card:last-child{ margin-bottom: 0; }
+
+.familia-card__header{
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 14px 18px; cursor: pointer; background: #FAF8F4;
+}
+.familia-card__header:hover{ background: #F4EFE6; }
+.familia-card__nombre{ font-weight: 600; margin: 0; }
+.familia-card__contacto{ font-size: 13px; color: #6B6259; margin: 2px 0 0; }
+
+.familia-card__atletas{ width: 100%; border-collapse: collapse; font-size: 14px; }
+.familia-card__atletas td{
+  padding: 12px 18px; border-top: 1px solid #EFEBE4; vertical-align: middle; cursor: pointer;
+}
+.familia-card__atletas tr:hover td{ background: #FAF8F4; }
+.familia-card__atletas td:first-child{ font-weight: 500; }
 .db-fila__vencido{ color: var(--fire-red); font-weight: 500; }
-#db-cargando, #db-vacio{ padding: 32px; }
+
+@media (max-width: 700px){
+  .familia-card__atletas, .familia-card__atletas tbody, .familia-card__atletas tr, .familia-card__atletas td{
+    display: block; width: 100%;
+  }
+  .familia-card__atletas tr{ padding: 10px 18px; border-top: 1px solid #EFEBE4; }
+  .familia-card__atletas td{ border: none; padding: 2px 0; }
+}
 
 @media (max-width: 1000px){
   .db-kpis{ grid-template-columns: repeat(2, 1fr); }

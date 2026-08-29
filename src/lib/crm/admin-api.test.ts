@@ -7,6 +7,9 @@ import {
   filtrarCasos,
   coincideBusqueda,
   casoSinProximaAccion,
+  agruparPorApoderado,
+  ordenarGruposPorUrgencia,
+  rellenarPlantilla,
   type CasoResumen,
 } from './admin-api.ts';
 
@@ -111,4 +114,37 @@ test('casoSinProximaAccion: true si está abierto y sin próxima acción', () =>
 test('casoSinProximaAccion: false si está cerrado aunque no tenga próxima acción', () => {
   const c = caso({ id: '1', estado: 'INSCRITO', proxima_accion: null });
   assert.equal(casoSinProximaAccion(c), false);
+});
+
+test('agruparPorApoderado: dos atletas del mismo apoderado quedan en un solo grupo', () => {
+  const sofia = caso({ id: 'sofia', atleta: { ...caso({ id: 'x' }).atleta, id: 'a1', nombre: 'Sofía' } });
+  const sol = caso({
+    id: 'sol',
+    atleta: { ...caso({ id: 'x' }).atleta, id: 'a2', nombre: 'Sol' },
+  });
+  const grupos = agruparPorApoderado([sofia, sol]);
+  assert.equal(grupos.length, 1);
+  assert.equal(grupos[0].casos.length, 2);
+  assert.equal(grupos[0].apoderado.id, 'ap1');
+});
+
+test('ordenarGruposPorUrgencia: una familia con un caso vencido sube primero aunque su otro caso no sea urgente', () => {
+  const familiaUrgente = {
+    apoderado: caso({ id: 'x' }).atleta.apoderado,
+    casos: [
+      caso({ id: 'urgente', estado: 'CONTACTADO', fecha_proxima_accion: '2026-08-01T00:00:00Z' }),
+      caso({ id: 'no-urgente', estado: 'SEGUIMIENTO', fecha_proxima_accion: '2026-12-01T00:00:00Z' }),
+    ],
+  };
+  const familiaTranquila = {
+    apoderado: { ...caso({ id: 'x' }).atleta.apoderado, id: 'ap2' },
+    casos: [caso({ id: 'nuevo', estado: 'NUEVO', fecha_proxima_accion: null })],
+  };
+  const orden = ordenarGruposPorUrgencia([familiaTranquila, familiaUrgente], AHORA);
+  assert.equal(orden[0].apoderado.id, 'ap1');
+});
+
+test('rellenarPlantilla: reemplaza ambos placeholders', () => {
+  const texto = rellenarPlantilla('Hola {nombre_apoderado}, esto es sobre {nombre_atleta}.', 'Carolina Pérez', 'Martina');
+  assert.equal(texto, 'Hola Carolina, esto es sobre Martina.');
 });
