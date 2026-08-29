@@ -5,7 +5,7 @@ import AdminBase from '../../layouts/AdminBase.astro';
   <a href="/admin" class="ficha-volver">← Volver al listado de casos</a>
 
   <h1 class="db-titulo">Contactos</h1>
-  <p class="apoderados-intro">
+  <p class="admin-intro">
     Selecciona exactamente dos contactos para fusionarlos manualmente, o elimina uno
     directamente. Ambas acciones son irreversibles.
   </p>
@@ -44,7 +44,7 @@ import AdminBase from '../../layouts/AdminBase.astro';
   <div id="fusion-panel" class="fusion-panel" hidden>
     <div class="admin-card fusion-panel__card">
       <h2 class="ficha-bloque__titulo">¿Cuál contacto quieres mantener?</h2>
-      <p class="apoderados-intro">
+      <p class="admin-intro">
         Todos los atletas del que descartes se van a mover al que mantengas. El
         descartado se elimina.
       </p>
@@ -60,7 +60,6 @@ import AdminBase from '../../layouts/AdminBase.astro';
 </script>
 
 <style is:global>
-.apoderados-intro{ font-size: 14px; color: #6B6259; margin: 0 0 20px; max-width: 60ch; }
 
 .apoderados-filtros{ margin-bottom: 16px; }
 

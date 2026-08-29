@@ -26,13 +26,14 @@ import { LIMITES } from '../../lib/crm/constants.ts';
           </div>
 
           <div class="ap-plantilla">
-            <label class="admin-label" for="ap-select-plantilla">Usar una plantilla</label>
+            <p class="ap-plantilla__titulo">✉️ Enviar un mensaje</p>
+            <label class="admin-label" for="ap-select-plantilla">Elegir plantilla</label>
             <select id="ap-select-plantilla" class="admin-select">
               <option value="">Elegir plantilla…</option>
             </select>
             <div class="ap-plantilla__acciones">
-              <button type="button" id="ap-btn-plantilla-whatsapp" class="admin-btn admin-btn--whatsapp" disabled>Abrir WhatsApp con esta plantilla</button>
-              <button type="button" id="ap-btn-plantilla-email" class="admin-btn admin-btn--secundario" disabled>Enviar por correo</button>
+              <button type="button" id="ap-btn-plantilla-whatsapp" class="admin-btn admin-btn--whatsapp" disabled>💬 Abrir WhatsApp</button>
+              <button type="button" id="ap-btn-plantilla-email" class="admin-btn admin-btn--secundario" disabled>✉️ Enviar por correo</button>
             </div>
             <p id="ap-plantilla-estado" class="ficha-guardado" hidden></p>
           </div>
@@ -40,7 +41,7 @@ import { LIMITES } from '../../lib/crm/constants.ts';
 
         <section class="admin-card ficha-bloque">
           <h2 class="ficha-bloque__titulo">Notas de la familia</h2>
-          <p class="apoderados-intro">
+          <p class="admin-intro">
             Bitácora aparte del historial de cada atleta — para anotar algo que aplica
             a toda la familia (ej. "ambas niñas vinieron hoy").
           </p>
@@ -56,6 +57,16 @@ import { LIMITES } from '../../lib/crm/constants.ts';
         <section class="admin-card ficha-bloque">
           <h2 class="ficha-bloque__titulo">Atletas</h2>
           <table class="familia-card__atletas" id="ap-atletas-tabla">
+            <thead>
+              <tr>
+                <th>Atleta</th>
+                <th>Journey</th>
+                <th>Estado</th>
+                <th>Próxima acción</th>
+                <th>Fecha</th>
+                <th>Responsable</th>
+              </tr>
+            </thead>
             <tbody id="ap-atletas-body"></tbody>
           </table>
         </section>
@@ -81,10 +92,13 @@ import { LIMITES } from '../../lib/crm/constants.ts';
 </script>
 
 <style is:global>
-.ap-plantilla{ margin-top: 20px; border-top: 1px solid #EFEBE4; padding-top: 16px; }
-.ap-plantilla__acciones{ display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
+.ap-plantilla{
+  margin-top: 20px; padding: 16px; border-radius: 12px;
+  background: #FAF8F4; border: 1px solid #EFEBE4;
+}
+.ap-plantilla__titulo{ font-weight: 600; margin: 0 0 12px; font-size: 14px; }
+.ap-plantilla__acciones{ display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
 #ap-form-nota{ border-top: 1px solid #EFEBE4; padding-top: 16px; margin-top: 4px; }
 #ap-form-nota textarea{ margin-bottom: 10px; }
 .familia-card__atletas tr{ cursor: pointer; }
-.familia-card__atletas tr:hover td{ background: #FAF8F4; }
 </style>

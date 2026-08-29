@@ -112,22 +112,8 @@ import {
 .familia-card__header:hover{ background: #F4EFE6; }
 .familia-card__nombre{ font-weight: 600; margin: 0; }
 .familia-card__contacto{ font-size: 13px; color: #6B6259; margin: 2px 0 0; }
-
-.familia-card__atletas{ width: 100%; border-collapse: collapse; font-size: 14px; }
-.familia-card__atletas td{
-  padding: 12px 18px; border-top: 1px solid #EFEBE4; vertical-align: middle; cursor: pointer;
-}
-.familia-card__atletas tr:hover td{ background: #FAF8F4; }
-.familia-card__atletas td:first-child{ font-weight: 500; }
-.db-fila__vencido{ color: var(--fire-red); font-weight: 500; }
-
-@media (max-width: 700px){
-  .familia-card__atletas, .familia-card__atletas tbody, .familia-card__atletas tr, .familia-card__atletas td{
-    display: block; width: 100%;
-  }
-  .familia-card__atletas tr{ padding: 10px 18px; border-top: 1px solid #EFEBE4; }
-  .familia-card__atletas td{ border: none; padding: 2px 0; }
-}
+.familia-card .familia-card__atletas{ padding-inline: 4px; }
+.familia-card .familia-card__atletas td{ padding-inline: 14px; }
 
 @media (max-width: 1000px){
   .db-kpis{ grid-template-columns: repeat(2, 1fr); }

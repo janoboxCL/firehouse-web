@@ -91,6 +91,10 @@ body.admin-tema a{ color: var(--fire-red); }
   background: #fff; color: var(--ember); border: 1px solid #D8D2C8;
 }
 .admin-btn--secundario:hover{ border-color: var(--ember); background: #fff; }
+.admin-btn--whatsapp{ background: #25D366; color: #08380F; font-weight: 600; }
+.admin-btn--whatsapp:hover{ background: #1FB958; }
+.admin-btn--peligro{ background: #fff; color: var(--fire-red); border: 1px solid rgba(197,21,21,.4); }
+.admin-btn--peligro:hover{ background: rgba(197,21,21,.06); border-color: var(--fire-red); }
 
 .admin-input, .admin-select, .admin-textarea{
   width: 100%; box-sizing: border-box; background: #fff; color: var(--ember);
@@ -116,8 +120,78 @@ body.admin-tema a{ color: var(--fire-red); }
 
 .admin-spinner{ color: #6B6259; font-size: 14px; padding: 24px 0; }
 .admin-vacio{ color: #6B6259; font-size: 14px; padding: 32px 0; text-align: center; }
+.admin-intro{ font-size: 14px; color: #6B6259; margin: 0 0 20px; max-width: 60ch; }
 .admin-error{
   background: #FBE3E3; border: 1px solid #E8A6A6; color: #7A1414;
   border-radius: 10px; padding: 12px 14px; font-size: 14px; margin-bottom: 16px;
+}
+
+/* ---------------------------------------------------------------------------
+   Estilos de "ficha" compartidos entre /admin/caso y /admin/apoderado — viven
+   acá (y no en cada página) para que ambas fichas se vean consistentes.
+--------------------------------------------------------------------------- */
+.ficha-volver{ display: inline-block; margin-bottom: 16px; font-size: 14px; color: #6B6259; text-decoration: none; }
+.ficha-volver:hover{ color: var(--fire-red); }
+
+.ficha-duplicado{ margin-bottom: 20px; }
+
+.ficha-grid{ display: grid; grid-template-columns: 1.2fr 1fr; gap: 20px; align-items: start; }
+.ficha-col{ display: flex; flex-direction: column; gap: 20px; }
+
+.ficha-bloque__titulo{ font-size: 1.1rem; margin: 0 0 16px; }
+.ficha-bloque__subtitulo{ font-size: 14px; font-weight: 500; margin: 0 0 10px; }
+
+.ficha-datos{ display: grid; grid-template-columns: auto 1fr; gap: 10px 18px; margin: 0; font-size: 14px; }
+.ficha-datos dt{ color: #6B6259; }
+.ficha-datos dd{ margin: 0; font-weight: 500; }
+
+.ficha-acciones{ display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+.ficha-whatsapp-nota{ font-size: 12px; color: #6B6259; margin-top: 10px; }
+
+.ficha-aviso{
+  background: #FFF3D6; color: #8A5A00; border-radius: 8px; padding: 10px 12px;
+  font-size: 13px; margin-bottom: 16px;
+}
+.ficha-guardado{ color: #1E7A34; font-size: 13px; margin-top: 10px; }
+.ficha-ayuda-journey{ font-size: 12px; color: #6B6259; margin-top: 6px; }
+
+.ficha-peligro{ margin-top: 20px; border-color: rgba(197,21,21,.25); }
+.ficha-peligro__texto{ font-size: 13px; color: #6B6259; margin: 0 0 14px; }
+
+.ficha-historial{ margin-top: 20px; }
+.ficha-timeline{ list-style: none; margin: 0 0 24px; padding: 0; }
+.ficha-timeline li{ padding: 12px 0; border-bottom: 1px solid #EFEBE4; font-size: 14px; }
+.ficha-timeline li:last-child{ border-bottom: none; }
+.ficha-timeline__meta{ color: #6B6259; font-size: 12px; }
+.ficha-timeline__tipo{ font-weight: 500; }
+
+.ficha-nueva-interaccion{ border-top: 1px solid #EFEBE4; padding-top: 20px; }
+.ficha-nueva-interaccion__fila{ max-width: 220px; margin-bottom: 10px; }
+.ficha-contador{ font-size: 12px; color: #6B6259; text-align: right; margin: 6px 0 12px; }
+
+/* Mini-tabla de atletas, reutilizada en el dashboard y en la ficha de apoderado */
+.familia-card__atletas{ width: 100%; border-collapse: collapse; font-size: 14px; }
+.familia-card__atletas th{
+  text-align: left; padding: 8px 4px; font-size: 11px; text-transform: uppercase;
+  letter-spacing: .04em; color: #6B6259; border-bottom: 1px solid #E4DFD6;
+}
+.familia-card__atletas td{
+  padding: 12px 4px; border-top: 1px solid #EFEBE4; vertical-align: middle; cursor: pointer;
+}
+.familia-card__atletas tr:first-child td{ border-top: none; }
+.familia-card__atletas tr:hover td{ background: #FAF8F4; }
+.familia-card__atletas td:first-child{ font-weight: 500; }
+.db-fila__vencido{ color: var(--fire-red); font-weight: 500; }
+
+@media (max-width: 900px){
+  .ficha-grid{ grid-template-columns: 1fr; }
+}
+@media (max-width: 700px){
+  .familia-card__atletas thead{ display: none; }
+  .familia-card__atletas, .familia-card__atletas tbody, .familia-card__atletas tr, .familia-card__atletas td{
+    display: block; width: 100%;
+  }
+  .familia-card__atletas tr{ padding: 10px 0; border-top: 1px solid #EFEBE4; }
+  .familia-card__atletas td{ border: none; padding: 2px 0; }
 }
 </style>
