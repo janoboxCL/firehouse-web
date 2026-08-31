@@ -56,6 +56,19 @@ function construirHtml(datos: DatosCorreoConfirmacion): string {
 </html>`;
 }
 
+/** Copia oculta por defecto en todo correo que sale del CRM. Se puede reemplazar
+ * con la variable de entorno EMAIL_BCC (lista separada por comas) sin tocar código. */
+const BCC_POR_DEFECTO = ['ben.beltran.m@gmail.com', 'alejandro.cespedesd@gmail.com'];
+
+export function resolverBcc(valorEnv: string | undefined): string[] {
+  if (!valorEnv) return BCC_POR_DEFECTO;
+  const lista = valorEnv
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean);
+  return lista.length > 0 ? lista : BCC_POR_DEFECTO;
+}
+
 /** Llamada cruda a la API de Resend. La usan tanto el correo de confirmación
  * automático como el envío manual desde el panel admin. */
 export async function enviarCorreoGenerico(
@@ -64,6 +77,7 @@ export async function enviarCorreoGenerico(
   destinatario: string,
   asunto: string,
   html: string,
+  bcc?: string[],
 ): Promise<void> {
   const res = await fetch('https://api.resend.com/emails', {
     method: 'POST',
@@ -71,7 +85,13 @@ export async function enviarCorreoGenerico(
       Authorization: `Bearer ${apiKey}`,
       'content-type': 'application/json',
     },
-    body: JSON.stringify({ from: remitente, to: destinatario, subject: asunto, html }),
+    body: JSON.stringify({
+      from: remitente,
+      to: destinatario,
+      subject: asunto,
+      html,
+      ...(bcc && bcc.length > 0 ? { bcc } : {}),
+    }),
   });
 
   if (!res.ok) {
@@ -88,6 +108,7 @@ export async function enviarCorreoConfirmacion(
   apiKey: string,
   remitente: string,
   datos: DatosCorreoConfirmacion,
+  bcc?: string[],
 ): Promise<void> {
   await enviarCorreoGenerico(
     apiKey,
@@ -95,5 +116,6 @@ export async function enviarCorreoConfirmacion(
     datos.apoderadoEmail,
     '¡Recibimos tu registro en Firehouse! 🔥',
     construirHtml(datos),
+    bcc,
   );
 }

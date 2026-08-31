@@ -5,13 +5,14 @@
 // que quien llama sea un admin activo antes de enviar nada.
 
 import { createClient } from '@supabase/supabase-js';
-import { enviarCorreoGenerico } from '../../lib/resend.ts';
+import { enviarCorreoGenerico, resolverBcc } from '../../lib/resend.ts';
 
 interface Env {
   SUPABASE_URL: string;
   SUPABASE_SERVICE_ROLE_KEY: string;
   RESEND_API_KEY?: string;
   EMAIL_FROM?: string;
+  EMAIL_BCC?: string;
 }
 
 const MAX_HTML = 20_000;
@@ -78,7 +79,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
   }
 
   try {
-    await enviarCorreoGenerico(env.RESEND_API_KEY, env.EMAIL_FROM, to, subject, html);
+    await enviarCorreoGenerico(env.RESEND_API_KEY, env.EMAIL_FROM, to, subject, html, resolverBcc(env.EMAIL_BCC));
   } catch (err) {
     console.error('admin_enviar_correo_error', (err as Error).message?.slice(0, 200));
     return jsonResponse(500, { error: 'INTERNAL_ERROR', message: 'No pudimos enviar el correo.' });

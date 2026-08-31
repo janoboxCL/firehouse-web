@@ -7,7 +7,7 @@
 
 import { createClient } from '@supabase/supabase-js';
 import { validarRegistroPublico } from '../../src/lib/crm/registro.ts';
-import { enviarCorreoConfirmacion } from '../lib/resend.ts';
+import { enviarCorreoConfirmacion, resolverBcc } from '../lib/resend.ts';
 
 interface Env {
   SUPABASE_URL: string;
@@ -17,6 +17,7 @@ interface Env {
   RATE_LIMIT_KV?: KVNamespace;
   RESEND_API_KEY?: string;
   EMAIL_FROM?: string;
+  EMAIL_BCC?: string;
 }
 
 const MAX_BODY_BYTES = 20_000;
@@ -128,11 +129,16 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
   // todavía, o si falla, el registro YA quedó guardado — nunca lo hacemos fallar por esto.
   if (env.RESEND_API_KEY && env.EMAIL_FROM) {
     try {
-      await enviarCorreoConfirmacion(env.RESEND_API_KEY, env.EMAIL_FROM, {
-        apoderadoNombre: validacion.value.apoderado.nombre,
-        apoderadoEmail: validacion.value.apoderado.email,
-        nombresAtletas,
-      });
+      await enviarCorreoConfirmacion(
+        env.RESEND_API_KEY,
+        env.EMAIL_FROM,
+        {
+          apoderadoNombre: validacion.value.apoderado.nombre,
+          apoderadoEmail: validacion.value.apoderado.email,
+          nombresAtletas,
+        },
+        resolverBcc(env.EMAIL_BCC),
+      );
     } catch (err) {
       console.error('email_confirmacion_error', (err as Error).message?.slice(0, 200));
     }
