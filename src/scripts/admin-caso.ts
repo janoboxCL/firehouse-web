@@ -24,6 +24,7 @@ import {
   LIMITES,
 } from '../lib/crm/constants.ts';
 import { formatearFecha, formatearFechaHora, aFechaLocalInput, mensajeWhatsappSugerido } from '../lib/crm/format.ts';
+import { etiquetaFechaClasePrueba } from '../lib/crm/clase-prueba.ts';
 import type { SupabaseClient } from '@supabase/supabase-js';
 
 function $<T extends Element>(selector: string): T | null {
@@ -64,6 +65,12 @@ function renderBloqueAtleta(caso: CasoResumen): void {
     dd('Tiempo de experiencia', a.anos_experiencia ? EXPERIENCIA_RANGOS_LABEL[a.anos_experiencia] ?? '—' : '—'),
     dd('Academia anterior', a.academia_anterior || '—'),
     dd('Journey', CRM_JOURNEYS_LABEL[caso.journey] ?? caso.journey),
+    dd(
+      'Clase de prueba',
+      caso.quiere_clase_prueba
+        ? `Sí — ${caso.fecha_clase_prueba ? etiquetaFechaClasePrueba(caso.fecha_clase_prueba) : ''}`
+        : 'No solicitada',
+    ),
   ].join('');
 }
 

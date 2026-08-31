@@ -4,6 +4,7 @@
 // vuelve a calcularla y es la única fuente de verdad.
 
 import { LIMITES, EXPERIENCIA_RANGOS_LABEL } from '../lib/crm/constants.ts';
+import { proximasFechasClasePrueba, etiquetaFechaClasePrueba } from '../lib/crm/clase-prueba.ts';
 
 const TOTAL_PASOS = 3;
 const MAX_ATLETAS = LIMITES.MAX_ATLETAS_POR_REGISTRO;
@@ -50,6 +51,12 @@ function calcularEdadDesde(fechaISO: string): number | null {
 function opcionesExperiencia(): string {
   return Object.entries(EXPERIENCIA_RANGOS_LABEL)
     .map(([valor, etiqueta]) => `<option value="${valor}">${etiqueta}</option>`)
+    .join('');
+}
+
+function opcionesFechaClasePrueba(): string {
+  return proximasFechasClasePrueba(8)
+    .map((fecha) => `<option value="${fecha}">${etiquetaFechaClasePrueba(fecha)}</option>`)
     .join('');
 }
 
@@ -139,6 +146,24 @@ function plantillaAtleta(numero: number): string {
           </label>
         </div>
       </div>
+
+      <div class="campo">
+        <p class="campo__label">¿Quieren venir a una clase de prueba antes de decidir?</p>
+        <div class="pills" data-grupo="quiereClasePrueba">
+          <label class="pill"><input type="radio" name="${idBase}-clase-prueba" value="si" /> Sí</label>
+          <label class="pill"><input type="radio" name="${idBase}-clase-prueba" value="no" /> No, todavía no</label>
+        </div>
+      </div>
+
+      <div class="atleta-card__bloque" data-bloque="fecha-clase-prueba" hidden>
+        <div class="campo">
+          <label for="${idBase}-fecha-clase">¿Qué día?</label>
+          <select id="${idBase}-fecha-clase" data-campo="fechaClasePrueba" required>
+            <option value="">Selecciona una fecha</option>
+            ${opcionesFechaClasePrueba()}
+          </select>
+        </div>
+      </div>
     </div>
   </fieldset>`;
 }
@@ -156,6 +181,7 @@ function inicializarTarjetaAtleta(card: HTMLElement, numero: number): void {
   const bloqueSi = $<HTMLElement>('[data-bloque="firehouse-si"]', card)!;
   const bloqueNo = $<HTMLElement>('[data-bloque="firehouse-no"]', card)!;
   const bloqueExperienciaDetalle = $<HTMLElement>('[data-bloque="experiencia-detalle"]', card)!;
+  const bloqueFechaClasePrueba = $<HTMLElement>('[data-bloque="fecha-clase-prueba"]', card)!;
 
   $all<HTMLInputElement>('[data-grupo="firehouseActual"] input', card).forEach((radio) => {
     radio.addEventListener('change', () => {
@@ -171,6 +197,12 @@ function inicializarTarjetaAtleta(card: HTMLElement, numero: number): void {
   $all<HTMLInputElement>('[data-grupo="tieneExperiencia"] input', card).forEach((radio) => {
     radio.addEventListener('change', () => {
       if (radio.checked) actualizarRequeridosBloque(bloqueExperienciaDetalle, radio.value === 'si');
+    });
+  });
+
+  $all<HTMLInputElement>('[data-grupo="quiereClasePrueba"] input', card).forEach((radio) => {
+    radio.addEventListener('change', () => {
+      if (radio.checked) actualizarRequeridosBloque(bloqueFechaClasePrueba, radio.value === 'si');
     });
   });
 
@@ -266,6 +298,9 @@ function validarPasoActual(): boolean {
       if (bloqueNo && !bloqueNo.hidden) {
         const interesElegido = $all<HTMLInputElement>('[data-grupo="interes"] input', card).some((r) => r.checked);
         if (!interesElegido) valido = false;
+
+        const clasePruebaElegida = $all<HTMLInputElement>('[data-grupo="quiereClasePrueba"] input', card).some((r) => r.checked);
+        if (!clasePruebaElegida) valido = false;
       }
     });
   }
@@ -314,6 +349,8 @@ function leerAtleta(card: HTMLElement) {
     aniosExperiencia: null as string | null,
     academiaAnterior: null as string | null,
     interes: null as string | null,
+    quiereClasePrueba: false,
+    fechaClasePrueba: null as string | null,
   };
 
   if (firehouseActual) {
@@ -331,6 +368,14 @@ function leerAtleta(card: HTMLElement) {
     }
     const grupoInteres = $<HTMLInputElement>('[data-grupo="interes"] input', card);
     base.interes = grupoInteres ? valorRadioSeleccionado(grupoInteres.name, card) : null;
+
+    const grupoClasePrueba = $<HTMLInputElement>('[data-grupo="quiereClasePrueba"] input', card);
+    const quiereClase = grupoClasePrueba ? valorRadioSeleccionado(grupoClasePrueba.name, card) : null;
+    base.quiereClasePrueba = quiereClase === 'si';
+    if (base.quiereClasePrueba) {
+      const fecha = $<HTMLSelectElement>('[data-campo="fechaClasePrueba"]', card);
+      base.fechaClasePrueba = fecha?.value || null;
+    }
   }
 
   return base;

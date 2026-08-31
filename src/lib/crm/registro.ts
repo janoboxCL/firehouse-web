@@ -3,6 +3,7 @@
 
 import { LIMITES, INTERES_OPCIONES, COMO_CONOCIO_OPCIONES, CANAL_PREFERIDO, RELACION_APODERADO, INTENCION_INICIAL, PRIVACY_POLICY_VERSION } from './constants.ts';
 import { clasificarJourney } from './journey.ts';
+import { esFechaClasePruebaValida } from './clase-prueba.ts';
 import {
   validarNombre,
   validarEmail,
@@ -26,6 +27,8 @@ export interface AtletaValidado {
   aniosExperiencia: string | null;
   academiaAnterior: string | null;
   journey: Journey;
+  quiereClasePrueba: boolean;
+  fechaClasePrueba: string | null;
 }
 
 export interface RegistroValidado {
@@ -152,6 +155,8 @@ export function validarRegistroPublico(payload: any): { ok: true; value: Registr
     let tieneExperiencia: boolean | null = null;
     let aniosExperiencia: string | null = null;
     let academiaAnterior: string | null = null;
+    let quiereClasePrueba = false;
+    let fechaClasePrueba: string | null = null;
 
     if (firehouseActual) {
       if (a?.intencionInicial === INTENCION_INICIAL.CONTINUAR || a?.intencionInicial === INTENCION_INICIAL.INDECISO) {
@@ -183,6 +188,17 @@ export function validarRegistroPublico(payload: any): { ok: true; value: Registr
       } else {
         tieneExperiencia = false;
       }
+
+      // Pregunta aparte de "interes": pueden pedir clase de prueba sin importar
+      // qué temporada les interese, o incluso sin saberlo todavía.
+      if (a?.quiereClasePrueba === true) {
+        if (typeof a?.fechaClasePrueba === 'string' && esFechaClasePruebaValida(a.fechaClasePrueba)) {
+          quiereClasePrueba = true;
+          fechaClasePrueba = a.fechaClasePrueba;
+        } else {
+          errors.push({ field: `${prefijo}.fechaClasePrueba`, message: 'Selecciona un viernes o sábado disponible.' });
+        }
+      }
     }
 
     if (!edadInfo) return; // no seguimos calculando journey si la fecha es inválida
@@ -206,6 +222,8 @@ export function validarRegistroPublico(payload: any): { ok: true; value: Registr
       aniosExperiencia,
       academiaAnterior,
       journey,
+      quiereClasePrueba,
+      fechaClasePrueba,
     });
   });
 

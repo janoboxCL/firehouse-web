@@ -43,6 +43,8 @@ export interface CasoResumen {
   proxima_accion: string | null;
   fecha_proxima_accion: string | null;
   prioridad: string;
+  quiere_clase_prueba: boolean;
+  fecha_clase_prueba: string | null;
   created_at: string;
   updated_at: string;
   atleta: AtletaResumen;
@@ -65,7 +67,8 @@ export interface AdminMini {
 
 const SELECT_CASO = `
   id, journey, estado, intencion_inicial, como_conocio, comentario_inicial,
-  responsable_id, proxima_accion, fecha_proxima_accion, prioridad, created_at, updated_at,
+  responsable_id, proxima_accion, fecha_proxima_accion, prioridad,
+  quiere_clase_prueba, fecha_clase_prueba, created_at, updated_at,
   atleta:atletas (
     id, nombre, apellidos, fecha_nacimiento, firehouse_actual, tiene_experiencia,
     anos_experiencia, academia_anterior, fuera_rango_habitual,
