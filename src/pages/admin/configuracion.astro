@@ -1,0 +1,57 @@
+---
+import AdminBase from '../../layouts/AdminBase.astro';
+---
+<AdminBase titulo="Configuración">
+  <a href="/admin" class="ficha-volver">← Volver al listado de casos</a>
+  <h1 class="db-titulo">Configuración</h1>
+  <p class="admin-intro">
+    Controla qué días de la semana se ofrecen para "Asistir a clase de prueba"
+    en el formulario público. Si desmarcas un día, esa opción deja de aparecer
+    para los apoderados de inmediato.
+  </p>
+
+  <div id="cfg-error" class="admin-error" hidden></div>
+  <p id="cfg-guardado" class="ficha-guardado" hidden>Cambios guardados.</p>
+
+  <section class="admin-card">
+    <p id="cfg-cargando" class="admin-spinner">Cargando…</p>
+
+    <form id="cfg-form" hidden>
+      <h2 class="ficha-bloque__titulo">Clase de prueba — días disponibles</h2>
+
+      <label class="cfg-dia">
+        <input type="checkbox" id="cfg-viernes" />
+        <div>
+          <p class="cfg-dia__nombre">Viernes</p>
+          <p class="cfg-dia__detalle">Cheer, 18:00–20:00</p>
+        </div>
+      </label>
+
+      <label class="cfg-dia">
+        <input type="checkbox" id="cfg-sabado" />
+        <div>
+          <p class="cfg-dia__nombre">Sábado</p>
+          <p class="cfg-dia__detalle">Gimnasia, 16:00–18:00</p>
+        </div>
+      </label>
+
+      <button type="submit" class="admin-btn">Guardar</button>
+    </form>
+  </section>
+</AdminBase>
+
+<script>
+  import { iniciarConfiguracion } from '../../scripts/admin-configuracion.ts';
+  iniciarConfiguracion();
+</script>
+
+<style is:global>
+.cfg-dia{
+  display: flex; align-items: center; gap: 14px; padding: 14px 0;
+  border-bottom: 1px solid #EFEBE4; cursor: pointer;
+}
+.cfg-dia:last-of-type{ border-bottom: none; margin-bottom: 20px; }
+.cfg-dia input{ width: 22px; height: 22px; accent-color: var(--fire-red); flex-shrink: 0; }
+.cfg-dia__nombre{ font-weight: 600; margin: 0; }
+.cfg-dia__detalle{ font-size: 13px; color: #6B6259; margin: 2px 0 0; }
+</style>

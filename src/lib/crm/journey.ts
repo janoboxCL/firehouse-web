@@ -20,6 +20,7 @@ export interface DatosClasificacion {
  * SI interes = PRETEMPORADA               → PRETEMPORADA
  * SI interes = TEMPORADA_2027 + experiencia    → EXPERIMENTADA_2027
  * SI interes = TEMPORADA_2027 + sin experiencia → PRINCIPIANTE_2027
+ * SI interes = CLASE_PRUEBA               → CLASE_PRUEBA
  * SI interes = NO_SEGURO                  → POR_CLASIFICAR
  */
 export function clasificarJourney(datos: DatosClasificacion): ClasificacionJourney {
@@ -38,6 +39,8 @@ export function clasificarJourney(datos: DatosClasificacion): ClasificacionJourn
           : CRM_JOURNEYS.PRINCIPIANTE_2027,
         intencionInicial: null,
       };
+    case INTERES_OPCIONES.CLASE_PRUEBA:
+      return { journey: CRM_JOURNEYS.CLASE_PRUEBA, intencionInicial: null };
     case INTERES_OPCIONES.NO_SEGURO:
     default:
       return { journey: CRM_JOURNEYS.POR_CLASIFICAR, intencionInicial: null };

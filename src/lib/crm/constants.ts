@@ -7,6 +7,7 @@ export const CRM_JOURNEYS = {
   PRETEMPORADA: 'PRETEMPORADA',
   EXPERIMENTADA_2027: 'EXPERIMENTADA_2027',
   PRINCIPIANTE_2027: 'PRINCIPIANTE_2027',
+  CLASE_PRUEBA: 'CLASE_PRUEBA',
   POR_CLASIFICAR: 'POR_CLASIFICAR',
 } as const;
 
@@ -15,6 +16,7 @@ export const CRM_JOURNEYS_LABEL: Record<string, string> = {
   PRETEMPORADA: 'Pretemporada',
   EXPERIMENTADA_2027: 'Experimentada 2027',
   PRINCIPIANTE_2027: 'Principiante 2027',
+  CLASE_PRUEBA: 'Clase de prueba',
   POR_CLASIFICAR: 'Por clasificar',
 };
 
@@ -79,8 +81,19 @@ export const INTERACCION_TIPOS_LABEL: Record<string, string> = {
 export const INTERES_OPCIONES = {
   PRETEMPORADA: 'PRETEMPORADA',
   TEMPORADA_2027: 'TEMPORADA_2027',
+  CLASE_PRUEBA: 'CLASE_PRUEBA',
   NO_SEGURO: 'NO_SEGURO',
 } as const;
+
+export const DIA_CLASE_PRUEBA = {
+  VIERNES: 'VIERNES',
+  SABADO: 'SABADO',
+} as const;
+
+export const DIA_CLASE_PRUEBA_LABEL: Record<string, string> = {
+  VIERNES: 'Viernes',
+  SABADO: 'Sábado',
+};
 
 export const EXPERIENCIA_RANGOS = {
   LT_1: 'LT_1',

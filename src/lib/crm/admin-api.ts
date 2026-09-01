@@ -44,6 +44,7 @@ export interface CasoResumen {
   fecha_proxima_accion: string | null;
   prioridad: string;
   quiere_clase_prueba: boolean;
+  dia_clase_prueba: string | null;
   fecha_clase_prueba: string | null;
   created_at: string;
   updated_at: string;
@@ -68,7 +69,7 @@ export interface AdminMini {
 const SELECT_CASO = `
   id, journey, estado, intencion_inicial, como_conocio, comentario_inicial,
   responsable_id, proxima_accion, fecha_proxima_accion, prioridad,
-  quiere_clase_prueba, fecha_clase_prueba, created_at, updated_at,
+  quiere_clase_prueba, dia_clase_prueba, fecha_clase_prueba, created_at, updated_at,
   atleta:atletas (
     id, nombre, apellidos, fecha_nacimiento, firehouse_actual, tiene_experiencia,
     anos_experiencia, academia_anterior, fuera_rango_habitual,
@@ -483,4 +484,31 @@ export async function fusionarApoderados(
   });
   if (error) throw error;
   return data as ResultadoFusion;
+}
+
+// ---------------------------------------------------------------------------
+// Configuración de días de clase de prueba (el "mantenedor").
+// ---------------------------------------------------------------------------
+
+export interface DiasHabilitadosAdmin {
+  viernes: boolean;
+  sabado: boolean;
+}
+
+export async function obtenerDiasClasePrueba(supabase: SupabaseClient): Promise<DiasHabilitadosAdmin> {
+  const { data, error } = await supabase.from('configuracion_clase_prueba').select('dia, habilitado');
+  if (error) throw error;
+  return {
+    viernes: data?.find((d) => d.dia === 'VIERNES')?.habilitado === true,
+    sabado: data?.find((d) => d.dia === 'SABADO')?.habilitado === true,
+  };
+}
+
+export async function guardarDiasClasePrueba(supabase: SupabaseClient, dias: DiasHabilitadosAdmin): Promise<void> {
+  const [r1, r2] = await Promise.all([
+    supabase.from('configuracion_clase_prueba').update({ habilitado: dias.viernes }).eq('dia', 'VIERNES'),
+    supabase.from('configuracion_clase_prueba').update({ habilitado: dias.sabado }).eq('dia', 'SABADO'),
+  ]);
+  if (r1.error) throw r1.error;
+  if (r2.error) throw r2.error;
 }

@@ -6,7 +6,9 @@
 // fn_crear_registro con la service role key (nunca expuesta al cliente).
 
 import { createClient } from '@supabase/supabase-js';
+import type { SupabaseClient } from '@supabase/supabase-js';
 import { validarRegistroPublico } from '../../src/lib/crm/registro.ts';
+import type { DiasHabilitados } from '../../src/lib/crm/clase-prueba.ts';
 import { enviarCorreoConfirmacion, resolverBcc } from '../lib/resend.ts';
 
 interface Env {
@@ -57,6 +59,19 @@ async function bajoLimiteDeTasa(kv: KVNamespace | undefined, ip: string): Promis
   return true;
 }
 
+async function obtenerDiasHabilitados(supabase: SupabaseClient): Promise<DiasHabilitados> {
+  try {
+    const { data, error } = await supabase.from('configuracion_clase_prueba').select('dia, habilitado');
+    if (error || !data) return { viernes: false, sabado: false };
+    return {
+      viernes: data.find((d) => d.dia === 'VIERNES')?.habilitado === true,
+      sabado: data.find((d) => d.dia === 'SABADO')?.habilitado === true,
+    };
+  } catch {
+    return { viernes: false, sabado: false };
+  }
+}
+
 export const onRequestPost: PagesFunction<Env> = async (context) => {
   const { request, env } = context;
 
@@ -97,11 +112,6 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     }
   }
 
-  const validacion = validarRegistroPublico(body);
-  if (!validacion.ok) {
-    return jsonResponse(400, { error: 'VALIDATION_ERROR', fields: validacion.errors });
-  }
-
   if (!env.SUPABASE_URL || !env.SUPABASE_SERVICE_ROLE_KEY) {
     console.error('registro_config_error missing_supabase_env');
     return jsonResponse(500, { error: 'INTERNAL_ERROR', message: 'No pudimos guardar el registro. Inténtalo nuevamente.' });
@@ -110,6 +120,15 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
   const supabase = createClient(env.SUPABASE_URL, env.SUPABASE_SERVICE_ROLE_KEY, {
     auth: { persistSession: false },
   });
+
+  // Nunca confiamos en qué días dice el navegador que están habilitados — se
+  // vuelve a comprobar acá contra la configuración real antes de validar.
+  const diasHabilitados = await obtenerDiasHabilitados(supabase);
+
+  const validacion = validarRegistroPublico(body, diasHabilitados);
+  if (!validacion.ok) {
+    return jsonResponse(400, { error: 'VALIDATION_ERROR', fields: validacion.errors });
+  }
 
   const { data, error } = await supabase.rpc('fn_crear_registro', { payload: validacion.value });
 

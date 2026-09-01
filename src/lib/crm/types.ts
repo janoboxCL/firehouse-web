@@ -42,10 +42,8 @@ export interface AtletaInput {
   academiaAnterior: string | null;
   /** Sólo relevante si firehouseActual = false */
   interes: Interest | null;
-  /** Independiente de "interes": pueden pedir clase de prueba sin importar qué
-   * temporada les interese. Sólo relevante si firehouseActual = false. */
-  quiereClasePrueba: boolean;
-  fechaClasePrueba: string | null; // ISO yyyy-mm-dd, sólo viernes o sábado
+  /** Sólo se llena cuando interes = CLASE_PRUEBA. Día de la semana, no fecha exacta. */
+  diaClasePrueba: 'VIERNES' | 'SABADO' | null;
 }
 
 /** Resultado de clasificar un atleta: journey + intención derivada. */

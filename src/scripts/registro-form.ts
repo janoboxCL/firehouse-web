@@ -3,8 +3,8 @@
 // por fetch. Toda la clasificación de journey mostrada acá es sólo para UX — el servidor
 // vuelve a calcularla y es la única fuente de verdad.
 
-import { LIMITES, EXPERIENCIA_RANGOS_LABEL } from '../lib/crm/constants.ts';
-import { proximasFechasClasePrueba, etiquetaFechaClasePrueba } from '../lib/crm/clase-prueba.ts';
+import { LIMITES, EXPERIENCIA_RANGOS_LABEL, DIA_CLASE_PRUEBA_LABEL } from '../lib/crm/constants.ts';
+import { diaEstaHabilitado, type DiasHabilitados, type DiaClasePrueba } from '../lib/crm/clase-prueba.ts';
 
 const TOTAL_PASOS = 3;
 const MAX_ATLETAS = LIMITES.MAX_ATLETAS_POR_REGISTRO;
@@ -54,9 +54,30 @@ function opcionesExperiencia(): string {
     .join('');
 }
 
-function opcionesFechaClasePrueba(): string {
-  return proximasFechasClasePrueba(8)
-    .map((fecha) => `<option value="${fecha}">${etiquetaFechaClasePrueba(fecha)}</option>`)
+let DIAS_HABILITADOS: DiasHabilitados = { viernes: false, sabado: false };
+
+async function cargarDiasHabilitados(): Promise<void> {
+  try {
+    const res = await fetch('/api/config/dias-clase-prueba');
+    if (!res.ok) return;
+    const datos = await res.json();
+    DIAS_HABILITADOS = { viernes: datos?.viernes === true, sabado: datos?.sabado === true };
+  } catch {
+    // Sin conexión al endpoint: nos quedamos con "nada habilitado", que es lo
+    // más seguro (nunca ofrecer un día que en realidad no está disponible).
+  }
+}
+
+function hayAlgunDiaHabilitado(): boolean {
+  return DIAS_HABILITADOS.viernes || DIAS_HABILITADOS.sabado;
+}
+
+function pillsDiaClasePrueba(idBase: string): string {
+  const dias = (['VIERNES', 'SABADO'] as DiaClasePrueba[]).filter((d) => diaEstaHabilitado(d, DIAS_HABILITADOS));
+  return dias
+    .map(
+      (d) => `<label class="pill"><input type="radio" name="${idBase}-dia-clase" value="${d}" /> ${DIA_CLASE_PRUEBA_LABEL[d]}</label>`,
+    )
     .join('');
 }
 
@@ -139,6 +160,12 @@ function plantillaAtleta(numero: number): string {
             <span class="tarjeta-interes__titulo">⭐ Temporada Firehouse 2027</span>
             <span class="tarjeta-interes__texto">Desde marzo. Queremos conocer las opciones para incorporarse a los equipos Firehouse 2027.</span>
           </label>
+          ${hayAlgunDiaHabilitado() ? `
+          <label class="tarjeta-interes">
+            <input type="radio" name="${idBase}-interes" value="CLASE_PRUEBA" />
+            <span class="tarjeta-interes__titulo">📅 Asistir a clase de prueba</span>
+            <span class="tarjeta-interes__texto">Antes de decidir, quieren venir a probar una clase.</span>
+          </label>` : ''}
           <label class="tarjeta-interes">
             <input type="radio" name="${idBase}-interes" value="NO_SEGURO" />
             <span class="tarjeta-interes__titulo">❓ Todavía no estamos seguros</span>
@@ -147,21 +174,12 @@ function plantillaAtleta(numero: number): string {
         </div>
       </div>
 
-      <div class="campo">
-        <p class="campo__label">¿Quieren venir a una clase de prueba antes de decidir?</p>
-        <div class="pills" data-grupo="quiereClasePrueba">
-          <label class="pill"><input type="radio" name="${idBase}-clase-prueba" value="si" /> Sí</label>
-          <label class="pill"><input type="radio" name="${idBase}-clase-prueba" value="no" /> No, todavía no</label>
-        </div>
-      </div>
-
-      <div class="atleta-card__bloque" data-bloque="fecha-clase-prueba" hidden>
+      <div class="atleta-card__bloque" data-bloque="dia-clase-prueba" hidden>
         <div class="campo">
-          <label for="${idBase}-fecha-clase">¿Qué día?</label>
-          <select id="${idBase}-fecha-clase" data-campo="fechaClasePrueba" required>
-            <option value="">Selecciona una fecha</option>
-            ${opcionesFechaClasePrueba()}
-          </select>
+          <p class="campo__label">¿Qué día prefieren?</p>
+          <div class="pills" data-grupo="diaClasePrueba">
+            ${pillsDiaClasePrueba(idBase)}
+          </div>
         </div>
       </div>
     </div>
@@ -181,7 +199,7 @@ function inicializarTarjetaAtleta(card: HTMLElement, numero: number): void {
   const bloqueSi = $<HTMLElement>('[data-bloque="firehouse-si"]', card)!;
   const bloqueNo = $<HTMLElement>('[data-bloque="firehouse-no"]', card)!;
   const bloqueExperienciaDetalle = $<HTMLElement>('[data-bloque="experiencia-detalle"]', card)!;
-  const bloqueFechaClasePrueba = $<HTMLElement>('[data-bloque="fecha-clase-prueba"]', card)!;
+  const bloqueDiaClasePrueba = $<HTMLElement>('[data-bloque="dia-clase-prueba"]', card)!;
 
   $all<HTMLInputElement>('[data-grupo="firehouseActual"] input', card).forEach((radio) => {
     radio.addEventListener('change', () => {
@@ -200,9 +218,9 @@ function inicializarTarjetaAtleta(card: HTMLElement, numero: number): void {
     });
   });
 
-  $all<HTMLInputElement>('[data-grupo="quiereClasePrueba"] input', card).forEach((radio) => {
+  $all<HTMLInputElement>('[data-grupo="interes"] input', card).forEach((radio) => {
     radio.addEventListener('change', () => {
-      if (radio.checked) actualizarRequeridosBloque(bloqueFechaClasePrueba, radio.value === 'si');
+      if (radio.checked) actualizarRequeridosBloque(bloqueDiaClasePrueba, radio.value === 'CLASE_PRUEBA');
     });
   });
 
@@ -296,11 +314,15 @@ function validarPasoActual(): boolean {
       if (!firehouseElegido) valido = false;
 
       if (bloqueNo && !bloqueNo.hidden) {
-        const interesElegido = $all<HTMLInputElement>('[data-grupo="interes"] input', card).some((r) => r.checked);
+        const radioInteres = $all<HTMLInputElement>('[data-grupo="interes"] input', card);
+        const interesElegido = radioInteres.some((r) => r.checked);
         if (!interesElegido) valido = false;
 
-        const clasePruebaElegida = $all<HTMLInputElement>('[data-grupo="quiereClasePrueba"] input', card).some((r) => r.checked);
-        if (!clasePruebaElegida) valido = false;
+        const eligioClasePrueba = radioInteres.some((r) => r.checked && r.value === 'CLASE_PRUEBA');
+        if (eligioClasePrueba) {
+          const diaElegido = $all<HTMLInputElement>('[data-grupo="diaClasePrueba"] input', card).some((r) => r.checked);
+          if (!diaElegido) valido = false;
+        }
       }
     });
   }
@@ -349,8 +371,7 @@ function leerAtleta(card: HTMLElement) {
     aniosExperiencia: null as string | null,
     academiaAnterior: null as string | null,
     interes: null as string | null,
-    quiereClasePrueba: false,
-    fechaClasePrueba: null as string | null,
+    diaClasePrueba: null as string | null,
   };
 
   if (firehouseActual) {
@@ -369,12 +390,9 @@ function leerAtleta(card: HTMLElement) {
     const grupoInteres = $<HTMLInputElement>('[data-grupo="interes"] input', card);
     base.interes = grupoInteres ? valorRadioSeleccionado(grupoInteres.name, card) : null;
 
-    const grupoClasePrueba = $<HTMLInputElement>('[data-grupo="quiereClasePrueba"] input', card);
-    const quiereClase = grupoClasePrueba ? valorRadioSeleccionado(grupoClasePrueba.name, card) : null;
-    base.quiereClasePrueba = quiereClase === 'si';
-    if (base.quiereClasePrueba) {
-      const fecha = $<HTMLSelectElement>('[data-campo="fechaClasePrueba"]', card);
-      base.fechaClasePrueba = fecha?.value || null;
+    if (base.interes === 'CLASE_PRUEBA') {
+      const grupoDia = $<HTMLInputElement>('[data-grupo="diaClasePrueba"] input', card);
+      base.diaClasePrueba = grupoDia ? valorRadioSeleccionado(grupoDia.name, card) : null;
     }
   }
 
@@ -598,13 +616,14 @@ function inicializarContadorComentario(): void {
   actualizar();
 }
 
-export function iniciarFormularioRegistro(): void {
+export async function iniciarFormularioRegistro(): Promise<void> {
   const form = $<HTMLFormElement>('#form-registro');
   if (!form) return;
 
   ($('#f-submission-id') as HTMLInputElement).value = crypto.randomUUID();
   ($('#f-started-at') as HTMLInputElement).value = String(Date.now());
 
+  await cargarDiasHabilitados();
   agregarAtleta();
 
   $('#btn-agregar-atleta')?.addEventListener('click', agregarAtleta);

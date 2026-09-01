@@ -1,56 +1,49 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  tipoSesionPrueba,
-  proximasFechasClasePrueba,
-  esFechaClasePruebaValida,
-  etiquetaFechaClasePrueba,
+  esDiaClasePruebaValido,
+  diaEstaHabilitado,
+  proximaFechaParaDia,
+  etiquetaDia,
 } from './clase-prueba.ts';
 
 // 2026-08-31 es lunes.
 const LUNES = new Date(2026, 7, 31);
 
-test('tipoSesionPrueba: viernes es Cheer, sábado es Gimnasia', () => {
-  assert.equal(tipoSesionPrueba('2026-09-04'), 'CHEER'); // viernes
-  assert.equal(tipoSesionPrueba('2026-09-05'), 'GIMNASIA'); // sábado
+test('esDiaClasePruebaValido: sólo acepta VIERNES o SABADO', () => {
+  assert.equal(esDiaClasePruebaValido('VIERNES'), true);
+  assert.equal(esDiaClasePruebaValido('SABADO'), true);
+  assert.equal(esDiaClasePruebaValido('DOMINGO'), false);
+  assert.equal(esDiaClasePruebaValido(null), false);
 });
 
-test('tipoSesionPrueba: cualquier otro día no es una sesión válida', () => {
-  assert.equal(tipoSesionPrueba('2026-09-03'), null); // jueves
+test('diaEstaHabilitado: respeta la configuración del mantenedor', () => {
+  const habilitados = { viernes: false, sabado: true };
+  assert.equal(diaEstaHabilitado('SABADO', habilitados), true);
+  assert.equal(diaEstaHabilitado('VIERNES', habilitados), false);
 });
 
-test('proximasFechasClasePrueba: siempre devuelve sólo viernes y sábados, en orden', () => {
-  const fechas = proximasFechasClasePrueba(6, LUNES);
-  assert.equal(fechas.length, 6);
-  fechas.forEach((f) => assert.notEqual(tipoSesionPrueba(f), null));
-  const ordenadas = [...fechas].sort();
-  assert.deepEqual(fechas, ordenadas);
+test('proximaFechaParaDia: resuelve el próximo sábado desde un lunes', () => {
+  const fecha = proximaFechaParaDia('SABADO', LUNES);
+  const dow = new Date(`${fecha}T00:00:00`).getDay();
+  assert.equal(dow, 6);
+  // El lunes 31 de agosto de 2026, el próximo sábado es el 5 de septiembre.
+  assert.equal(fecha, '2026-09-05');
 });
 
-test('proximasFechasClasePrueba: empieza desde mañana, no desde hoy', () => {
-  const viernes = new Date(2026, 8, 4); // viernes 4 de septiembre 2026
-  const fechas = proximasFechasClasePrueba(1, viernes);
-  assert.notEqual(fechas[0], '2026-09-04'); // no debe incluir el propio viernes de "ahora"
+test('proximaFechaParaDia: resuelve el próximo viernes desde un lunes', () => {
+  const fecha = proximaFechaParaDia('VIERNES', LUNES);
+  assert.equal(fecha, '2026-09-04');
 });
 
-test('esFechaClasePruebaValida: acepta un viernes futuro', () => {
-  assert.equal(esFechaClasePruebaValida('2026-09-04', LUNES), true);
+test('proximaFechaParaDia: nunca devuelve el mismo día de "ahora", siempre uno futuro', () => {
+  const sabado = new Date(2026, 8, 5); // sábado 5 de septiembre 2026
+  const fecha = proximaFechaParaDia('SABADO', sabado);
+  assert.notEqual(fecha, '2026-09-05');
+  assert.equal(fecha, '2026-09-12');
 });
 
-test('esFechaClasePruebaValida: rechaza un día que no es viernes ni sábado', () => {
-  assert.equal(esFechaClasePruebaValida('2026-09-03', LUNES), false);
-});
-
-test('esFechaClasePruebaValida: rechaza una fecha pasada', () => {
-  assert.equal(esFechaClasePruebaValida('2026-08-01', LUNES), false);
-});
-
-test('esFechaClasePruebaValida: rechaza formato inválido', () => {
-  assert.equal(esFechaClasePruebaValida('no-es-fecha', LUNES), false);
-});
-
-test('etiquetaFechaClasePrueba: incluye el tipo de sesión', () => {
-  const texto = etiquetaFechaClasePrueba('2026-09-04');
-  assert.match(texto, /Cheer/);
-  assert.match(texto, /viernes/i);
+test('etiquetaDia: nombres legibles', () => {
+  assert.equal(etiquetaDia('VIERNES'), 'Viernes');
+  assert.equal(etiquetaDia('SABADO'), 'Sábado');
 });

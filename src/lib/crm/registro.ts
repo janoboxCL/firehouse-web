@@ -3,7 +3,7 @@
 
 import { LIMITES, INTERES_OPCIONES, COMO_CONOCIO_OPCIONES, CANAL_PREFERIDO, RELACION_APODERADO, INTENCION_INICIAL, PRIVACY_POLICY_VERSION } from './constants.ts';
 import { clasificarJourney } from './journey.ts';
-import { esFechaClasePruebaValida } from './clase-prueba.ts';
+import { esDiaClasePruebaValido, diaEstaHabilitado, type DiaClasePrueba, type DiasHabilitados } from './clase-prueba.ts';
 import {
   validarNombre,
   validarEmail,
@@ -27,8 +27,7 @@ export interface AtletaValidado {
   aniosExperiencia: string | null;
   academiaAnterior: string | null;
   journey: Journey;
-  quiereClasePrueba: boolean;
-  fechaClasePrueba: string | null;
+  diaClasePrueba: DiaClasePrueba | null;
 }
 
 export interface RegistroValidado {
@@ -60,7 +59,10 @@ function valorEnConjunto(valor: unknown, conjunto: Record<string, string>): bool
   return typeof valor === 'string' && Object.values(conjunto).includes(valor);
 }
 
-export function validarRegistroPublico(payload: any): { ok: true; value: RegistroValidado } | { ok: false; errors: ValidationError[] } {
+export function validarRegistroPublico(
+  payload: any,
+  diasHabilitados: DiasHabilitados = { viernes: false, sabado: false },
+): { ok: true; value: RegistroValidado } | { ok: false; errors: ValidationError[] } {
   const errors: ValidationError[] = [];
 
   if (!payload || typeof payload !== 'object') {
@@ -155,8 +157,7 @@ export function validarRegistroPublico(payload: any): { ok: true; value: Registr
     let tieneExperiencia: boolean | null = null;
     let aniosExperiencia: string | null = null;
     let academiaAnterior: string | null = null;
-    let quiereClasePrueba = false;
-    let fechaClasePrueba: string | null = null;
+    let diaClasePrueba: DiaClasePrueba | null = null;
 
     if (firehouseActual) {
       if (a?.intencionInicial === INTENCION_INICIAL.CONTINUAR || a?.intencionInicial === INTENCION_INICIAL.INDECISO) {
@@ -169,6 +170,13 @@ export function validarRegistroPublico(payload: any): { ok: true; value: Registr
         errors.push({ field: `${prefijo}.interes`, message: 'Selecciona qué alternativa les interesa.' });
       } else {
         interes = a.interes;
+        if (interes === INTERES_OPCIONES.CLASE_PRUEBA) {
+          if (esDiaClasePruebaValido(a?.diaClasePrueba) && diaEstaHabilitado(a.diaClasePrueba, diasHabilitados)) {
+            diaClasePrueba = a.diaClasePrueba;
+          } else {
+            errors.push({ field: `${prefijo}.diaClasePrueba`, message: 'Selecciona un día disponible (viernes o sábado).' });
+          }
+        }
       }
 
       if (typeof a?.tieneExperiencia === 'boolean') {
@@ -187,17 +195,6 @@ export function validarRegistroPublico(payload: any): { ok: true; value: Registr
         }
       } else {
         tieneExperiencia = false;
-      }
-
-      // Pregunta aparte de "interes": pueden pedir clase de prueba sin importar
-      // qué temporada les interese, o incluso sin saberlo todavía.
-      if (a?.quiereClasePrueba === true) {
-        if (typeof a?.fechaClasePrueba === 'string' && esFechaClasePruebaValida(a.fechaClasePrueba)) {
-          quiereClasePrueba = true;
-          fechaClasePrueba = a.fechaClasePrueba;
-        } else {
-          errors.push({ field: `${prefijo}.fechaClasePrueba`, message: 'Selecciona un viernes o sábado disponible.' });
-        }
       }
     }
 
@@ -222,8 +219,7 @@ export function validarRegistroPublico(payload: any): { ok: true; value: Registr
       aniosExperiencia,
       academiaAnterior,
       journey,
-      quiereClasePrueba,
-      fechaClasePrueba,
+      diaClasePrueba,
     });
   });
 

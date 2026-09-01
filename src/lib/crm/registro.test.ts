@@ -171,7 +171,7 @@ test('marca fuera_rango_habitual sin bloquear el registro', () => {
   }
 });
 
-test('clase de prueba: se puede combinar con cualquier interés, no lo reemplaza', () => {
+test('clase de prueba: es un journey propio, elegido como cualquiera de las 4 tarjetas', () => {
   const r = validarRegistroPublico(
     envio([
       {
@@ -179,22 +179,21 @@ test('clase de prueba: se puede combinar con cualquier interés, no lo reemplaza
         apellidos: 'Soto',
         fechaNacimiento: '2017-06-01',
         firehouseActual: false,
-        interes: 'TEMPORADA_2027',
+        interes: 'CLASE_PRUEBA',
         tieneExperiencia: false,
-        quiereClasePrueba: true,
-        fechaClasePrueba: '2026-09-04', // viernes
+        diaClasePrueba: 'SABADO',
       },
     ]),
+    { viernes: false, sabado: true },
   );
   assert.equal(r.ok, true);
   if (r.ok) {
-    assert.equal(r.value.atletas[0].journey, CRM_JOURNEYS.PRINCIPIANTE_2027); // el interés sigue mandando el journey
-    assert.equal(r.value.atletas[0].quiereClasePrueba, true);
-    assert.equal(r.value.atletas[0].fechaClasePrueba, '2026-09-04');
+    assert.equal(r.value.atletas[0].journey, CRM_JOURNEYS.CLASE_PRUEBA);
+    assert.equal(r.value.atletas[0].diaClasePrueba, 'SABADO');
   }
 });
 
-test('clase de prueba: rechaza si piden pero la fecha no es viernes/sábado', () => {
+test('clase de prueba: rechaza un día que el mantenedor no tiene habilitado', () => {
   const r = validarRegistroPublico(
     envio([
       {
@@ -202,17 +201,34 @@ test('clase de prueba: rechaza si piden pero la fecha no es viernes/sábado', ()
         apellidos: 'Soto',
         fechaNacimiento: '2017-06-01',
         firehouseActual: false,
-        interes: 'PRETEMPORADA',
+        interes: 'CLASE_PRUEBA',
         tieneExperiencia: false,
-        quiereClasePrueba: true,
-        fechaClasePrueba: '2026-09-03', // jueves
+        diaClasePrueba: 'VIERNES',
       },
     ]),
+    { viernes: false, sabado: true }, // sólo sábado habilitado
   );
   assert.equal(r.ok, false);
 });
 
-test('clase de prueba: no se pide (ni tiene sentido) si ya entrena en Firehouse', () => {
+test('clase de prueba: rechaza si no se eligió ningún día', () => {
+  const r = validarRegistroPublico(
+    envio([
+      {
+        nombre: 'Martina',
+        apellidos: 'Soto',
+        fechaNacimiento: '2017-06-01',
+        firehouseActual: false,
+        interes: 'CLASE_PRUEBA',
+        tieneExperiencia: false,
+      },
+    ]),
+    { viernes: false, sabado: true },
+  );
+  assert.equal(r.ok, false);
+});
+
+test('clase de prueba: no aplica (ni se exige día) si ya entrena en Firehouse', () => {
   const r = validarRegistroPublico(
     envio([
       {
@@ -221,14 +237,13 @@ test('clase de prueba: no se pide (ni tiene sentido) si ya entrena en Firehouse'
         fechaNacimiento: '2017-03-01',
         firehouseActual: true,
         intencionInicial: 'CONTINUAR',
-        quiereClasePrueba: true,
-        fechaClasePrueba: '2026-09-04',
       },
     ]),
+    { viernes: false, sabado: true },
   );
   assert.equal(r.ok, true);
   if (r.ok) {
-    assert.equal(r.value.atletas[0].quiereClasePrueba, false);
-    assert.equal(r.value.atletas[0].fechaClasePrueba, null);
+    assert.equal(r.value.atletas[0].journey, CRM_JOURNEYS.RENOVACION_2027);
+    assert.equal(r.value.atletas[0].diaClasePrueba, null);
   }
 });
