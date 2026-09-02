@@ -6,6 +6,7 @@ import {
   type ApoderadoConAtletas,
 } from '../lib/crm/admin-api.ts';
 import { RELACION_APODERADO_LABEL } from '../lib/crm/constants.ts';
+import { mensajeErrorSupabase } from '../lib/crm/format.ts';
 import type { SupabaseClient } from '@supabase/supabase-js';
 
 function $<T extends Element>(selector: string): T | null {
@@ -103,8 +104,8 @@ function filaApoderado(ap: ApoderadoConAtletas, supabase: SupabaseClient, onCamb
       await eliminarApoderado(supabase, ap.id);
       seleccionados.delete(ap.id);
       onCambio();
-    } catch {
-      mostrarError('No pudimos eliminar el contacto. Inténtalo nuevamente.');
+    } catch (err) {
+      mostrarError(mensajeErrorSupabase(err, 'No pudimos eliminar el contacto. Inténtalo nuevamente.'));
     }
   });
   celdaAccion.appendChild(btnEliminar);

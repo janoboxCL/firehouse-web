@@ -23,7 +23,7 @@ import {
   INTERACCION_TIPOS,
   LIMITES,
 } from '../lib/crm/constants.ts';
-import { formatearFecha, formatearFechaHora, aFechaLocalInput, mensajeWhatsappSugerido } from '../lib/crm/format.ts';
+import { formatearFecha, formatearFechaHora, aFechaLocalInput, mensajeWhatsappSugerido, mensajeErrorSupabase } from '../lib/crm/format.ts';
 import { etiquetaDia, type DiaClasePrueba } from '../lib/crm/clase-prueba.ts';
 import type { SupabaseClient } from '@supabase/supabase-js';
 
@@ -167,8 +167,8 @@ function conectarBotonesEliminar(supabase: SupabaseClient, caso: CasoResumen): v
     try {
       await eliminarAtleta(supabase, caso.atleta.id);
       window.location.href = '/admin';
-    } catch {
-      mostrarError('No pudimos eliminar el registro. Inténtalo nuevamente.');
+    } catch (err) {
+      mostrarError(mensajeErrorSupabase(err, 'No pudimos eliminar el registro. Inténtalo nuevamente.'));
     }
   });
 
@@ -180,8 +180,8 @@ function conectarBotonesEliminar(supabase: SupabaseClient, caso: CasoResumen): v
     try {
       await eliminarApoderado(supabase, caso.atleta.apoderado.id);
       window.location.href = '/admin';
-    } catch {
-      mostrarError('No pudimos eliminar el registro. Inténtalo nuevamente.');
+    } catch (err) {
+      mostrarError(mensajeErrorSupabase(err, 'No pudimos eliminar el registro. Inténtalo nuevamente.'));
     }
   });
 }

@@ -68,3 +68,16 @@ export function mensajeWhatsappSugerido(
       return `¡Hola ${nombrePila}! 👋 Somos de Firehouse. Vimos tu registro y queremos ayudarte a encontrar la mejor opción para ${atletaNombre}. ¿Tienes unos minutos para conversar?`;
   }
 }
+
+/**
+ * Extrae el mensaje real de un error de Supabase/Postgres en vez de mostrar un
+ * genérico. Es un panel interno para staff — ver el error real (ej. qué
+ * restricción de la base de datos bloqueó un borrado) ayuda a diagnosticar
+ * rápido, no hay riesgo de exponerlo a un público externo.
+ */
+export function mensajeErrorSupabase(err: unknown, fallback: string): string {
+  if (err && typeof err === 'object' && 'message' in err && typeof (err as any).message === 'string' && (err as any).message) {
+    return (err as any).message;
+  }
+  return fallback;
+}

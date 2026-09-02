@@ -17,7 +17,7 @@ import {
   type PlantillaMensaje,
 } from '../lib/crm/admin-api.ts';
 import { CRM_JOURNEYS_LABEL, CRM_ESTADOS_LABEL, RELACION_APODERADO_LABEL, CANAL_PREFERIDO_LABEL } from '../lib/crm/constants.ts';
-import { formatearFecha, formatearFechaHora, claseBadgeEstado, mensajeWhatsappSugerido } from '../lib/crm/format.ts';
+import { formatearFecha, formatearFechaHora, claseBadgeEstado, mensajeWhatsappSugerido, mensajeErrorSupabase } from '../lib/crm/format.ts';
 import type { SupabaseClient } from '@supabase/supabase-js';
 
 function $<T extends Element>(selector: string): T | null {
@@ -194,8 +194,8 @@ function conectarEliminar(supabase: SupabaseClient, apoderadoId: string, nombreC
     try {
       await eliminarApoderado(supabase, apoderadoId);
       window.location.href = '/admin';
-    } catch {
-      mostrarError('No pudimos eliminar el registro. Inténtalo nuevamente.');
+    } catch (err) {
+      mostrarError(mensajeErrorSupabase(err, 'No pudimos eliminar el registro. Inténtalo nuevamente.'));
     }
   });
 }
