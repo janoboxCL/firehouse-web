@@ -1,6 +1,5 @@
 ---
 import Etiqueta from './Etiqueta.astro';
-import { whatsapp } from '../data/sitio.js';
 const requisitos = ['Ropa deportiva cómoda', 'Botella de agua', 'Pelo largo tomado'];
 ---
 <section class="section prueba" id="clase-prueba">
@@ -37,7 +36,7 @@ const requisitos = ['Ropa deportiva cómoda', 'Botella de agua', 'Pelo largo tom
           ))}
         </ul>
         <p class="prueba__nada">Nada más. No hace falta uniforme, ni zapatillas especiales, ni experiencia.</p>
-        <a class="btn-sec" id="wa-home-prueba" href={whatsapp('hero')} target="_blank" rel="noopener">Ven a una clase de prueba gratis</a>
+        <a class="btn-sec" id="cta-home-prueba-registro" href="/registro">Ven a una clase de prueba gratis</a>
         <p class="prueba__ver"><a class="cta-texto" href="/clase-de-prueba">Cómo es la clase de prueba, paso a paso</a></p>
       </div>
     </div>

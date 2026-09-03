@@ -30,8 +30,11 @@ import { sitio, whatsapp } from '../data/sitio.js';
     </p>
 
     <p class="hero__acciones">
-      <a class="btn" id="wa-hero" href={whatsapp('hero')} target="_blank" rel="noopener">Ven a una clase de prueba gratis</a>
-      <a class="btn-quiet" href="/#precios">Ver cuánto cuesta la temporada</a>
+      <a class="btn" id="cta-hero-registro" href="/registro">Ven a una clase de prueba gratis</a>
+      <span class="hero__secundarios">
+        <a class="btn-quiet" href="/#precios">Ver cuánto cuesta la temporada</a>
+        <a class="btn-quiet" id="wa-hero-ayuda" href={whatsapp('ayudaRegistro')} target="_blank" rel="noopener">¿Dudas? Escríbenos</a>
+      </span>
     </p>
   </div>
 
@@ -89,6 +92,7 @@ import { sitio, whatsapp } from '../data/sitio.js';
 }
 .hero__acciones{ display:flex; flex-direction:column; align-items:center; gap:var(--e-2); }
 .hero__acciones .btn-quiet{ color:rgba(245,239,232,.8); text-shadow:0 1px 10px rgba(23,20,18,.9); }
+.hero__secundarios{ display:flex; align-items:center; gap:var(--e-3); flex-wrap:wrap; justify-content:center; }
 
 /* El corte diagonal se reemplaza por dos reglas: rojo sobre azul de tapiz */
 .hero__datos{
