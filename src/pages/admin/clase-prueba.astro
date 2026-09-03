@@ -25,18 +25,6 @@ import AdminBase from '../../layouts/AdminBase.astro';
     <form id="cp-form-visita">
       <div class="cp-visita-grid">
         <div class="admin-campo">
-          <label class="admin-label" for="vr-atleta-nombre">Nombre del/la atleta</label>
-          <input id="vr-atleta-nombre" class="admin-input" type="text" required />
-        </div>
-        <div class="admin-campo">
-          <label class="admin-label" for="vr-atleta-apellidos">Apellidos del/la atleta</label>
-          <input id="vr-atleta-apellidos" class="admin-input" type="text" />
-        </div>
-        <div class="admin-campo">
-          <label class="admin-label" for="vr-atleta-edad">Edad aproximada</label>
-          <input id="vr-atleta-edad" class="admin-input" type="number" min="1" max="99" />
-        </div>
-        <div class="admin-campo">
           <label class="admin-label" for="vr-apoderado-nombre">Nombre del apoderado</label>
           <input id="vr-apoderado-nombre" class="admin-input" type="text" required />
         </div>
@@ -52,6 +40,10 @@ import AdminBase from '../../layouts/AdminBase.astro';
           <label class="admin-label" for="vr-email">Correo</label>
           <input id="vr-email" class="admin-input" type="email" required />
         </div>
+      </div>
+      <div class="admin-campo">
+        <label class="admin-label" for="vr-nota">Nota</label>
+        <textarea id="vr-nota" class="admin-textarea" placeholder='Ej: "Dos niñas de 12 y 10 años"' required></textarea>
       </div>
       <label class="cp-consentimiento">
         <input type="checkbox" id="vr-consentimiento" required />
@@ -103,6 +95,7 @@ import AdminBase from '../../layouts/AdminBase.astro';
 .cp-fila__info{ min-width: 0; }
 .cp-fila__nombre{ font-weight: 600; margin: 0; }
 .cp-fila__detalle{ font-size: 13px; color: #6B6259; margin: 2px 0 0; }
+.cp-fila__nota{ font-size: 13px; color: var(--ember); margin: 6px 0 0; font-style: italic; }
 .cp-fila__accion{ flex-shrink: 0; }
 .cp-fila__confirmado{ color: #1E7A34; font-weight: 600; font-size: 14px; white-space: nowrap; }
 </style>

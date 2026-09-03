@@ -9,7 +9,7 @@ import {
 } from '../lib/crm/admin-api.ts';
 import { etiquetaDia, type DiaClasePrueba } from '../lib/crm/clase-prueba.ts';
 import { CRM_ESTADOS } from '../lib/crm/constants.ts';
-import { mensajeErrorSupabase } from '../lib/crm/format.ts';
+import { mensajeErrorSupabase, escaparHtml } from '../lib/crm/format.ts';
 import type { SupabaseClient } from '@supabase/supabase-js';
 
 function $<T extends Element>(selector: string): T | null {
@@ -40,6 +40,7 @@ function filaCaso(caso: CasoResumen, supabase: SupabaseClient): HTMLElement {
   info.innerHTML = `
     <p class="cp-fila__nombre">${caso.atleta.nombre} ${caso.atleta.apellidos}</p>
     <p class="cp-fila__detalle">${caso.atleta.apoderado.nombre} ${caso.atleta.apoderado.apellidos} · ${caso.atleta.apoderado.telefono}${dia ? ` · ${dia}` : ''}</p>
+    ${caso.comentario_inicial ? `<p class="cp-fila__nota">📝 ${escaparHtml(caso.comentario_inicial)}</p>` : ''}
   `;
 
   const accion = document.createElement('div');
@@ -127,13 +128,11 @@ function conectarVisitaRapida(supabase: SupabaseClient): void {
     guardado.hidden = true;
 
     const datos = {
-      atletaNombre: $<HTMLInputElement>('#vr-atleta-nombre')!.value,
-      atletaApellidos: $<HTMLInputElement>('#vr-atleta-apellidos')!.value,
-      atletaEdadAproximada: Number($<HTMLInputElement>('#vr-atleta-edad')!.value) || null,
       apoderadoNombre: $<HTMLInputElement>('#vr-apoderado-nombre')!.value,
       apoderadoApellidos: $<HTMLInputElement>('#vr-apoderado-apellidos')!.value,
       apoderadoTelefono: $<HTMLInputElement>('#vr-telefono')!.value,
       apoderadoEmail: $<HTMLInputElement>('#vr-email')!.value,
+      nota: $<HTMLTextAreaElement>('#vr-nota')!.value,
     };
 
     const errores = validarDatosVisitaRapida(datos);

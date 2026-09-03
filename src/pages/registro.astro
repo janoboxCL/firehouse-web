@@ -31,6 +31,10 @@ const descripcion = 'Registra tus datos para conocer las opciones de Firehouse C
         <h1 class="registro__titulo">Registro Firehouse</h1>
         <p class="registro__bajada">🔥 ¿Quieren agendar una clase de prueba o conocer nuestras alternativas para 2027? Cuéntanos sobre tu familia y te orientamos.</p>
         <p class="registro__tiempo">⏱ No te tomará más de 3 minutos</p>
+        <p class="registro__ayuda">
+          ¿Tienes dudas antes de partir?
+          <a href={whatsapp('ayudaRegistro')} target="_blank" rel="noopener">Necesito ayuda para elegir →</a>
+        </p>
       </div>
 
       <form id="form-registro" class="registro__form reveal" novalidate>
@@ -236,6 +240,8 @@ const descripcion = 'Registra tus datos para conocer las opciones de Firehouse C
   margin-top: var(--e-3); background: rgba(255,196,0,.12); color: var(--fire-yellow);
   border-radius: 999px; padding: 8px 16px; font-size: 13px; font-weight: 600;
 }
+.registro__ayuda{ margin-top: var(--e-3); font-size: 13px; color: var(--txt-faint); }
+.registro__ayuda a{ color: var(--chalk); text-decoration: underline; }
 
 /* Va pegado (sticky) arriba de la tarjeta mientras se hace scroll dentro del
    formulario, para que nunca se pierda de vista qué paso es — ni siquiera con

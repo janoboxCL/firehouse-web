@@ -2,7 +2,7 @@
 import Base from '../layouts/Base.astro';
 import Faq from '../components/Faq.astro';
 import BandaFoto from '../components/BandaFoto.astro';
-import { sitio, whatsapp } from '../data/sitio.js';
+import { sitio } from '../data/sitio.js';
 
 const titulo = 'Taller de verano de cheerleading en Santiago | Pretemporada Firehouse 2027';
 const descripcion = 'Cheerleading en diciembre y enero para niños y niñas desde 4 años, sin experiencia previa. 16 clases por $50.000 en La Cisterna, sin obligación de continuar.';
@@ -43,7 +43,7 @@ const preguntas = [
         previa y sin obligación de continuar en marzo.
       </p>
       <p class="pt-hero__cta">
-        <a class="pt-btn" href={whatsapp('pretemporada')} target="_blank" rel="noopener" id="wa-pt-hero">Quiero un cupo</a>
+        <a class="pt-btn" href="/registro" id="wa-pt-hero">Quiero un cupo</a>
         <a class="pt-btn-quiet" href="#marzo">Ver qué pasa en marzo</a>
       </p>
     </div>
@@ -192,7 +192,7 @@ const preguntas = [
       </svg>
       <h2 class="pt-title">¿Le damos un cupo para este verano?</h2>
       <p class="pt-parrafo">16 clases, $50.000, sin matrícula.</p>
-      <a class="pt-btn" href={whatsapp('pretemporada')} target="_blank" rel="noopener" id="wa-pt-cierre">Reservar mi cupo</a>
+      <a class="pt-btn" href="/registro" id="wa-pt-cierre">Reservar mi cupo</a>
       <p class="pt-ver"><a class="pt-cta-texto" href="/clase-de-prueba">¿Prefieres probar antes? Ven a una clase de prueba gratis</a></p>
     </div>
   </section>

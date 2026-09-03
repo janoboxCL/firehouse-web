@@ -81,3 +81,14 @@ export function mensajeErrorSupabase(err: unknown, fallback: string): string {
   }
   return fallback;
 }
+
+/** Para cuando texto que viene de un formulario (nombre, comentario, etc.) se
+ * inserta con innerHTML en vez de textContent — nunca debe poder ejecutarse
+ * como HTML. */
+export function escaparHtml(texto: string): string {
+  return texto
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}

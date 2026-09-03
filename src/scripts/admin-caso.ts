@@ -23,7 +23,7 @@ import {
   INTERACCION_TIPOS,
   LIMITES,
 } from '../lib/crm/constants.ts';
-import { formatearFecha, formatearFechaHora, aFechaLocalInput, mensajeWhatsappSugerido, mensajeErrorSupabase } from '../lib/crm/format.ts';
+import { formatearFecha, formatearFechaHora, aFechaLocalInput, mensajeWhatsappSugerido, mensajeErrorSupabase, escaparHtml } from '../lib/crm/format.ts';
 import { etiquetaDia, type DiaClasePrueba } from '../lib/crm/clase-prueba.ts';
 import type { SupabaseClient } from '@supabase/supabase-js';
 
@@ -71,6 +71,7 @@ function renderBloqueAtleta(caso: CasoResumen): void {
         ? `Sí — ${caso.dia_clase_prueba ? etiquetaDia(caso.dia_clase_prueba as DiaClasePrueba) : ''}${caso.fecha_clase_prueba ? ` (${formatearFecha(caso.fecha_clase_prueba)})` : ''}`
         : 'No solicitada',
     ),
+    dd('Comentario inicial', caso.comentario_inicial ? escaparHtml(caso.comentario_inicial) : '—'),
   ].join('');
 }
 

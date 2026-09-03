@@ -541,13 +541,11 @@ export async function guardarDiasClasePrueba(supabase: SupabaseClient, dias: Dia
 // ---------------------------------------------------------------------------
 
 export interface DatosVisitaRapida {
-  atletaNombre: string;
-  atletaApellidos: string;
-  atletaEdadAproximada: number | null;
   apoderadoNombre: string;
   apoderadoApellidos: string;
   apoderadoTelefono: string;
   apoderadoEmail: string;
+  nota: string;
 }
 
 export interface ResultadoVisitaRapida {
@@ -561,10 +559,10 @@ export interface ResultadoVisitaRapida {
  * una visita rápida quede con datos igual de limpios que un registro normal. */
 export function validarDatosVisitaRapida(datos: DatosVisitaRapida): string[] {
   const errores: string[] = [];
-  if (!datos.atletaNombre.trim()) errores.push('Falta el nombre del/la atleta.');
   if (!datos.apoderadoNombre.trim()) errores.push('Falta el nombre del apoderado.');
   if (!normalizarTelefonoCL(datos.apoderadoTelefono)) errores.push('El teléfono no es un celular chileno válido.');
   if (!validarEmail(datos.apoderadoEmail).email) errores.push('El correo no tiene un formato válido.');
+  if (!datos.nota.trim()) errores.push('Agrega una nota (ej: "dos niñas de 12 y 10 años").');
   return errores;
 }
 
@@ -584,11 +582,7 @@ export async function registrarVisitaRapida(
         telefono,
         email,
       },
-      atleta: {
-        nombre: datos.atletaNombre.trim(),
-        apellidos: datos.atletaApellidos.trim() || '—',
-        edadAproximada: datos.atletaEdadAproximada,
-      },
+      nota: datos.nota.trim(),
     },
   });
   if (error) throw error;

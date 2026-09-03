@@ -33,6 +33,7 @@ const mensajes = {
   contacto:  'Hola, quiero hacer una consulta sobre Firehouse.',
   pretemporada: 'Hola, quiero reservar un cupo para la Pretemporada Firehouse 2027.',
   registro:  'Hola, acabo de completar el formulario de registro y quería contarles un poco más.',
+  ayudaRegistro: 'Hola, tengo algunas dudas antes de registrarme en Firehouse. ¿Me pueden ayudar a elegir la mejor opción?',
 };
 
 export function whatsapp(clave = 'hero') {
