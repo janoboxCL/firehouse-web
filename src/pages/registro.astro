@@ -29,7 +29,7 @@ const descripcion = 'Registra tus datos para conocer las opciones de Firehouse C
       <div id="form-cabecera" class="registro__cabecera reveal">
         <p class="count">Registro</p>
         <h1 class="registro__titulo">Registro Firehouse</h1>
-        <p class="registro__bajada">Cuéntanos un poco sobre tu familia para poder orientarte mejor.</p>
+        <p class="registro__bajada">🔥 ¿Quieren agendar una clase de prueba o conocer nuestras alternativas para 2027? Cuéntanos sobre tu familia y te orientamos.</p>
         <p class="registro__tiempo">⏱ No te tomará más de 3 minutos</p>
       </div>
 
@@ -344,6 +344,14 @@ input.tocado:invalid, select.tocado:invalid, textarea.tocado:invalid{
 }
 input.tocado:invalid:focus-visible, select.tocado:invalid:focus-visible, textarea.tocado:invalid:focus-visible{
   box-shadow: 0 0 0 4px rgba(197,21,21,.16);
+}
+/* Campo completado correctamente: un borde distinto para dar confianza de que
+   "esto ya quedó bien" — nunca se pisa con el foco activo ni con el error. */
+input.con-contenido:valid:not(:focus-visible),
+select.con-contenido:valid:not(:focus-visible),
+textarea.con-contenido:valid:not(:focus-visible){
+  border-color: rgba(27,79,168,.55);
+  background: rgba(27,79,168,.06);
 }
 
 .campo__ayuda{ margin-top: 6px; font-size: 13px; color: var(--fire-yellow); min-height: 1em; }

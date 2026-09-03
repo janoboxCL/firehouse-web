@@ -2,7 +2,7 @@
 // están separadas de las funciones que hablan con Supabase para poder testearlas sin red.
 
 import type { SupabaseClient } from '@supabase/supabase-js';
-import { ESTADOS_CERRADOS, CRM_ESTADOS } from './constants.ts';
+import { ESTADOS_CERRADOS, CRM_ESTADOS, CRM_JOURNEYS } from './constants.ts';
 import { calcularEdad } from './validation.ts';
 
 export interface ApoderadoResumen {
@@ -306,6 +306,29 @@ export function ordenarGruposPorUrgencia(grupos: GrupoApoderado[], ahora: Date =
 
 export function casoSinProximaAccion(caso: Pick<CasoResumen, 'estado' | 'proxima_accion'>): boolean {
   return !casoEstaCerrado(caso) && !caso.proxima_accion;
+}
+
+export interface GrupoClasePrueba {
+  fecha: string; // ISO yyyy-mm-dd
+  casos: CasoResumen[];
+}
+
+/** Agrupa los casos de journey CLASE_PRUEBA por fecha concreta, ordenados del
+ * más próximo al más lejano — así el staff ve de un vistazo quién viene cada día. */
+export function agruparClasePruebaPorFecha(casos: CasoResumen[]): GrupoClasePrueba[] {
+  const relevantes = casos.filter((c) => c.journey === CRM_JOURNEYS.CLASE_PRUEBA && c.fecha_clase_prueba);
+  const mapa = new Map<string, CasoResumen[]>();
+  relevantes.forEach((c) => {
+    const key = c.fecha_clase_prueba!;
+    if (!mapa.has(key)) mapa.set(key, []);
+    mapa.get(key)!.push(c);
+  });
+  return Array.from(mapa.entries())
+    .map(([fecha, casos]) => ({
+      fecha,
+      casos: [...casos].sort((a, b) => a.atleta.apoderado.nombre.localeCompare(b.atleta.apoderado.nombre, 'es')),
+    }))
+    .sort((a, b) => a.fecha.localeCompare(b.fecha));
 }
 
 export function nombreAdminDe(admins: AdminMini[], id: string | null): string {

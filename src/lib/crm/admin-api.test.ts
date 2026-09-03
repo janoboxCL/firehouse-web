@@ -9,6 +9,7 @@ import {
   casoSinProximaAccion,
   agruparPorApoderado,
   ordenarGruposPorUrgencia,
+  agruparClasePruebaPorFecha,
   rellenarPlantilla,
   type CasoResumen,
 } from './admin-api.ts';
@@ -147,4 +148,27 @@ test('ordenarGruposPorUrgencia: una familia con un caso vencido sube primero aun
 test('rellenarPlantilla: reemplaza ambos placeholders', () => {
   const texto = rellenarPlantilla('Hola {nombre_apoderado}, esto es sobre {nombre_atleta}.', 'Carolina Pérez', 'Martina');
   assert.equal(texto, 'Hola Carolina, esto es sobre Martina.');
+});
+
+test('agruparClasePruebaPorFecha: sólo incluye journey CLASE_PRUEBA con fecha, ordenado por fecha', () => {
+  const sabado = caso({ id: 'a', journey: 'CLASE_PRUEBA', fecha_clase_prueba: '2026-09-05' });
+  const viernesSiguiente = caso({ id: 'b', journey: 'CLASE_PRUEBA', fecha_clase_prueba: '2026-09-11' });
+  const otroJourney = caso({ id: 'c', journey: 'PRETEMPORADA', fecha_clase_prueba: null });
+  const grupos = agruparClasePruebaPorFecha([viernesSiguiente, sabado, otroJourney]);
+  assert.equal(grupos.length, 2);
+  assert.equal(grupos[0].fecha, '2026-09-05');
+  assert.equal(grupos[1].fecha, '2026-09-11');
+});
+
+test('agruparClasePruebaPorFecha: agrupa varias familias en la misma fecha', () => {
+  const a = caso({ id: 'a', journey: 'CLASE_PRUEBA', fecha_clase_prueba: '2026-09-05' });
+  const b = caso({
+    id: 'b',
+    journey: 'CLASE_PRUEBA',
+    fecha_clase_prueba: '2026-09-05',
+    atleta: { ...caso({ id: 'x' }).atleta, apoderado: { ...caso({ id: 'x' }).atleta.apoderado, id: 'ap2', nombre: 'Ana' } },
+  });
+  const grupos = agruparClasePruebaPorFecha([a, b]);
+  assert.equal(grupos.length, 1);
+  assert.equal(grupos[0].casos.length, 2);
 });

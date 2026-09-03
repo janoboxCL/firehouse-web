@@ -9,6 +9,7 @@ import { createClient } from '@supabase/supabase-js';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { validarRegistroPublico } from '../../src/lib/crm/registro.ts';
 import type { DiasHabilitados } from '../../src/lib/crm/clase-prueba.ts';
+import { proximaFechaParaDia, type DiaClasePrueba } from '../../src/lib/crm/clase-prueba.ts';
 import { enviarCorreoConfirmacion, resolverBcc } from '../lib/resend.ts';
 
 interface Env {
@@ -148,6 +149,14 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
   // todavía, o si falla, el registro YA quedó guardado — nunca lo hacemos fallar por esto.
   if (env.RESEND_API_KEY && env.EMAIL_FROM) {
     try {
+      const atletaConClase = validacion.value.atletas.find((a) => a.diaClasePrueba);
+      const claseDePrueba = atletaConClase?.diaClasePrueba
+        ? {
+            dia: atletaConClase.diaClasePrueba,
+            fecha: proximaFechaParaDia(atletaConClase.diaClasePrueba as DiaClasePrueba),
+          }
+        : null;
+
       await enviarCorreoConfirmacion(
         env.RESEND_API_KEY,
         env.EMAIL_FROM,
@@ -155,6 +164,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
           apoderadoNombre: validacion.value.apoderado.nombre,
           apoderadoEmail: validacion.value.apoderado.email,
           nombresAtletas,
+          claseDePrueba,
         },
         resolverBcc(env.EMAIL_BCC),
       );

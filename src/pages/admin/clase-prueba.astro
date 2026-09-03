@@ -1,0 +1,46 @@
+---
+import AdminBase from '../../layouts/AdminBase.astro';
+---
+<AdminBase titulo="Clase de prueba">
+  <a href="/admin" class="ficha-volver">← Volver al listado de casos</a>
+  <h1 class="db-titulo">Clase de prueba — confirmados</h1>
+  <p class="admin-intro">
+    Todas las familias que pidieron clase de prueba, agrupadas por fecha. Toca
+    "Marcar asistencia" apenas lleguen — no hace falta código ni QR.
+  </p>
+
+  <div id="cp-error" class="admin-error" hidden></div>
+
+  <section class="admin-card cp-lista-wrap">
+    <p id="cp-cargando" class="admin-spinner">Cargando…</p>
+    <p id="cp-vacio" class="admin-vacio" hidden>No hay clases de prueba agendadas todavía.</p>
+    <div id="cp-grupos"></div>
+  </section>
+</AdminBase>
+
+<script>
+  import { iniciarClasePrueba } from '../../scripts/admin-clase-prueba.ts';
+  iniciarClasePrueba();
+</script>
+
+<style is:global>
+.cp-lista-wrap{ padding: 20px; }
+
+.cp-grupo{ margin-bottom: 24px; }
+.cp-grupo:last-child{ margin-bottom: 0; }
+.cp-grupo__titulo{
+  font-family: var(--font-display); font-weight: 800; font-size: 1.1rem;
+  margin: 0 0 12px; color: var(--ember);
+}
+
+.cp-fila{
+  display: flex; align-items: center; justify-content: space-between; gap: 14px;
+  padding: 14px 16px; border: 1px solid #E4DFD6; border-radius: 12px; margin-bottom: 10px;
+}
+.cp-fila--asistio{ background: #E3F3E5; border-color: #BFE2C4; }
+.cp-fila__info{ min-width: 0; }
+.cp-fila__nombre{ font-weight: 600; margin: 0; }
+.cp-fila__detalle{ font-size: 13px; color: #6B6259; margin: 2px 0 0; }
+.cp-fila__accion{ flex-shrink: 0; }
+.cp-fila__confirmado{ color: #1E7A34; font-weight: 600; font-size: 14px; white-space: nowrap; }
+</style>

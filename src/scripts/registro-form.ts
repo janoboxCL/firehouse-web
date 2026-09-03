@@ -595,6 +595,18 @@ function inicializarEstadoTocado(form: HTMLFormElement): void {
   );
 }
 
+/** Marca con .con-contenido cualquier campo (de texto, select o textarea) que
+ * ya tenga algo escrito — da una señal visual de "esto ya quedó listo" mientras
+ * se avanza en el formulario. No aplica a radios/checkboxes, esos ya tienen su
+ * propio estilo de seleccionado. */
+function inicializarEstadoConContenido(form: HTMLFormElement): void {
+  form.addEventListener('input', (evt) => {
+    const el = evt.target as HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement;
+    if (!el.matches?.('input:not([type="radio"]):not([type="checkbox"]), select, textarea')) return;
+    el.classList.toggle('con-contenido', el.value.trim().length > 0);
+  });
+}
+
 // ---------------------------------------------------------------------------
 // Inicialización
 // ---------------------------------------------------------------------------
@@ -641,6 +653,7 @@ export async function iniciarFormularioRegistro(): Promise<void> {
   inicializarFeedbackEmail();
   inicializarComunaOtra();
   inicializarEstadoTocado(form);
+  inicializarEstadoConContenido(form);
   inicializarContadorComentario();
   mostrarPaso(1);
 }
