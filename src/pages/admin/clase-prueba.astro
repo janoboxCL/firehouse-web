@@ -3,13 +3,66 @@ import AdminBase from '../../layouts/AdminBase.astro';
 ---
 <AdminBase titulo="Clase de prueba">
   <a href="/admin" class="ficha-volver">← Volver al listado de casos</a>
-  <h1 class="db-titulo">Clase de prueba — confirmados</h1>
+  <div class="cp-header">
+    <h1 class="db-titulo">Clase de prueba — confirmados</h1>
+    <button type="button" id="cp-btn-visita-rapida" class="admin-btn admin-btn--secundario">+ Agregar visita rápida</button>
+  </div>
   <p class="admin-intro">
     Todas las familias que pidieron clase de prueba, agrupadas por fecha. Toca
     "Marcar asistencia" apenas lleguen — no hace falta código ni QR.
   </p>
 
   <div id="cp-error" class="admin-error" hidden></div>
+  <p id="cp-visita-guardada" class="ficha-guardado" hidden></p>
+
+  <section class="admin-card cp-visita-form" id="cp-visita-form-wrap" hidden>
+    <h2 class="ficha-bloque__titulo">Visita rápida</h2>
+    <p class="admin-intro">
+      Para alguien que llegó a probar sin haberse registrado antes. Queda marcado
+      como asistió hoy mismo — más adelante le enviamos un link para completar
+      el resto del registro.
+    </p>
+    <form id="cp-form-visita">
+      <div class="cp-visita-grid">
+        <div class="admin-campo">
+          <label class="admin-label" for="vr-atleta-nombre">Nombre del/la atleta</label>
+          <input id="vr-atleta-nombre" class="admin-input" type="text" required />
+        </div>
+        <div class="admin-campo">
+          <label class="admin-label" for="vr-atleta-apellidos">Apellidos del/la atleta</label>
+          <input id="vr-atleta-apellidos" class="admin-input" type="text" />
+        </div>
+        <div class="admin-campo">
+          <label class="admin-label" for="vr-atleta-edad">Edad aproximada</label>
+          <input id="vr-atleta-edad" class="admin-input" type="number" min="1" max="99" />
+        </div>
+        <div class="admin-campo">
+          <label class="admin-label" for="vr-apoderado-nombre">Nombre del apoderado</label>
+          <input id="vr-apoderado-nombre" class="admin-input" type="text" required />
+        </div>
+        <div class="admin-campo">
+          <label class="admin-label" for="vr-apoderado-apellidos">Apellidos del apoderado</label>
+          <input id="vr-apoderado-apellidos" class="admin-input" type="text" />
+        </div>
+        <div class="admin-campo">
+          <label class="admin-label" for="vr-telefono">Teléfono</label>
+          <input id="vr-telefono" class="admin-input" type="tel" placeholder="9 1234 5678" required />
+        </div>
+        <div class="admin-campo">
+          <label class="admin-label" for="vr-email">Correo</label>
+          <input id="vr-email" class="admin-input" type="email" required />
+        </div>
+      </div>
+      <label class="cp-consentimiento">
+        <input type="checkbox" id="vr-consentimiento" required />
+        Confirmo que el apoderado autorizó verbalmente que Firehouse lo contacte.
+      </label>
+      <div class="ficha-acciones">
+        <button type="submit" class="admin-btn">Registrar visita</button>
+        <button type="button" id="cp-btn-cancelar-visita" class="admin-btn admin-btn--secundario">Cancelar</button>
+      </div>
+    </form>
+  </section>
 
   <section class="admin-card cp-lista-wrap">
     <p id="cp-cargando" class="admin-spinner">Cargando…</p>
@@ -24,7 +77,16 @@ import AdminBase from '../../layouts/AdminBase.astro';
 </script>
 
 <style is:global>
+.cp-header{ display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
 .cp-lista-wrap{ padding: 20px; }
+
+.cp-visita-form{ margin: 16px 0 20px; }
+.cp-visita-grid{ display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+.cp-consentimiento{
+  display: flex; align-items: flex-start; gap: 10px; font-size: 13px; color: #6B6259;
+  margin: 16px 0; cursor: pointer;
+}
+.cp-consentimiento input{ margin-top: 3px; width: 18px; height: 18px; accent-color: var(--fire-red); flex-shrink: 0; }
 
 .cp-grupo{ margin-bottom: 24px; }
 .cp-grupo:last-child{ margin-bottom: 0; }
@@ -44,3 +106,4 @@ import AdminBase from '../../layouts/AdminBase.astro';
 .cp-fila__accion{ flex-shrink: 0; }
 .cp-fila__confirmado{ color: #1E7A34; font-weight: 600; font-size: 14px; white-space: nowrap; }
 </style>
+

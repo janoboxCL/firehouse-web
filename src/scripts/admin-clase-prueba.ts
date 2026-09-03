@@ -1,7 +1,15 @@
 import { requireAdminSession, montarCabeceraAdmin } from '../lib/crm/auth.ts';
-import { obtenerCasos, agruparClasePruebaPorFecha, actualizarCaso, type CasoResumen } from '../lib/crm/admin-api.ts';
+import {
+  obtenerCasos,
+  agruparClasePruebaPorFecha,
+  actualizarCaso,
+  registrarVisitaRapida,
+  validarDatosVisitaRapida,
+  type CasoResumen,
+} from '../lib/crm/admin-api.ts';
 import { etiquetaDia, type DiaClasePrueba } from '../lib/crm/clase-prueba.ts';
 import { CRM_ESTADOS } from '../lib/crm/constants.ts';
+import { mensajeErrorSupabase } from '../lib/crm/format.ts';
 import type { SupabaseClient } from '@supabase/supabase-js';
 
 function $<T extends Element>(selector: string): T | null {
@@ -50,8 +58,8 @@ function filaCaso(caso: CasoResumen, supabase: SupabaseClient): HTMLElement {
         await actualizarCaso(supabase, caso.id, { estado: CRM_ESTADOS.ASISTIO });
         fila.classList.add('cp-fila--asistio');
         accion.innerHTML = '<span class="cp-fila__confirmado">✓ Asistió</span>';
-      } catch {
-        mostrarError('No pudimos marcar la asistencia. Inténtalo nuevamente.');
+      } catch (err) {
+        mostrarError(mensajeErrorSupabase(err, 'No pudimos marcar la asistencia. Inténtalo nuevamente.'));
         boton.disabled = false;
       }
     });
@@ -62,27 +70,27 @@ function filaCaso(caso: CasoResumen, supabase: SupabaseClient): HTMLElement {
   return fila;
 }
 
-export async function iniciarClasePrueba(): Promise<void> {
-  const { supabase, perfil } = await requireAdminSession();
-  montarCabeceraAdmin(perfil);
-
+async function renderizarLista(supabase: SupabaseClient): Promise<void> {
   let casos: CasoResumen[];
   try {
     casos = await obtenerCasos(supabase);
-  } catch {
-    mostrarError('No pudimos cargar la lista. Recarga la página o inténtalo más tarde.');
+  } catch (err) {
+    mostrarError(mensajeErrorSupabase(err, 'No pudimos cargar la lista. Recarga la página o inténtalo más tarde.'));
     return;
   }
 
   $('#cp-cargando')?.setAttribute('hidden', '');
+  const vacio = $<HTMLElement>('#cp-vacio')!;
+  const contenedor = $<HTMLElement>('#cp-grupos')!;
+  contenedor.innerHTML = '';
 
   const grupos = agruparClasePruebaPorFecha(casos);
   if (grupos.length === 0) {
-    $<HTMLElement>('#cp-vacio')!.hidden = false;
+    vacio.hidden = false;
     return;
   }
+  vacio.hidden = true;
 
-  const contenedor = $<HTMLElement>('#cp-grupos')!;
   grupos.forEach((grupo) => {
     const seccion = document.createElement('div');
     seccion.className = 'cp-grupo';
@@ -93,4 +101,71 @@ export async function iniciarClasePrueba(): Promise<void> {
     grupo.casos.forEach((c) => seccion.appendChild(filaCaso(c, supabase)));
     contenedor.appendChild(seccion);
   });
+}
+
+function limpiarFormularioVisita(): void {
+  $<HTMLFormElement>('#cp-form-visita')?.reset();
+}
+
+function conectarVisitaRapida(supabase: SupabaseClient): void {
+  const wrap = $<HTMLElement>('#cp-visita-form-wrap')!;
+  const btnAbrir = $<HTMLButtonElement>('#cp-btn-visita-rapida')!;
+  const btnCancelar = $<HTMLButtonElement>('#cp-btn-cancelar-visita')!;
+  const form = $<HTMLFormElement>('#cp-form-visita')!;
+  const guardado = $<HTMLElement>('#cp-visita-guardada')!;
+
+  btnAbrir.addEventListener('click', () => {
+    wrap.hidden = !wrap.hidden;
+  });
+  btnCancelar.addEventListener('click', () => {
+    wrap.hidden = true;
+    limpiarFormularioVisita();
+  });
+
+  form.addEventListener('submit', async (evt) => {
+    evt.preventDefault();
+    guardado.hidden = true;
+
+    const datos = {
+      atletaNombre: $<HTMLInputElement>('#vr-atleta-nombre')!.value,
+      atletaApellidos: $<HTMLInputElement>('#vr-atleta-apellidos')!.value,
+      atletaEdadAproximada: Number($<HTMLInputElement>('#vr-atleta-edad')!.value) || null,
+      apoderadoNombre: $<HTMLInputElement>('#vr-apoderado-nombre')!.value,
+      apoderadoApellidos: $<HTMLInputElement>('#vr-apoderado-apellidos')!.value,
+      apoderadoTelefono: $<HTMLInputElement>('#vr-telefono')!.value,
+      apoderadoEmail: $<HTMLInputElement>('#vr-email')!.value,
+    };
+
+    const errores = validarDatosVisitaRapida(datos);
+    if (errores.length > 0) {
+      mostrarError(errores.join(' '));
+      return;
+    }
+    $<HTMLElement>('#cp-error')!.hidden = true;
+
+    const boton = form.querySelector<HTMLButtonElement>('button[type="submit"]')!;
+    boton.disabled = true;
+    try {
+      const resultado = await registrarVisitaRapida(supabase, datos);
+      limpiarFormularioVisita();
+      wrap.hidden = true;
+      guardado.textContent = resultado.possibleDuplicate
+        ? 'Visita registrada — ojo, puede ser un contacto duplicado (revisa en Contactos).'
+        : 'Visita registrada y marcada como asistió.';
+      guardado.hidden = false;
+      await renderizarLista(supabase);
+    } catch (err) {
+      mostrarError(mensajeErrorSupabase(err, 'No pudimos registrar la visita. Inténtalo nuevamente.'));
+    } finally {
+      boton.disabled = false;
+    }
+  });
+}
+
+export async function iniciarClasePrueba(): Promise<void> {
+  const { supabase, perfil } = await requireAdminSession();
+  montarCabeceraAdmin(perfil);
+
+  conectarVisitaRapida(supabase);
+  await renderizarLista(supabase);
 }

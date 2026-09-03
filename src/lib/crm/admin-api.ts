@@ -3,7 +3,7 @@
 
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { ESTADOS_CERRADOS, CRM_ESTADOS, CRM_JOURNEYS } from './constants.ts';
-import { calcularEdad } from './validation.ts';
+import { calcularEdad, normalizarTelefonoCL, validarEmail } from './validation.ts';
 
 export interface ApoderadoResumen {
   id: string;
@@ -534,4 +534,63 @@ export async function guardarDiasClasePrueba(supabase: SupabaseClient, dias: Dia
   ]);
   if (r1.error) throw r1.error;
   if (r2.error) throw r2.error;
+}
+
+// ---------------------------------------------------------------------------
+// Visita rápida: alguien llega sin haberse registrado antes.
+// ---------------------------------------------------------------------------
+
+export interface DatosVisitaRapida {
+  atletaNombre: string;
+  atletaApellidos: string;
+  atletaEdadAproximada: number | null;
+  apoderadoNombre: string;
+  apoderadoApellidos: string;
+  apoderadoTelefono: string;
+  apoderadoEmail: string;
+}
+
+export interface ResultadoVisitaRapida {
+  apoderadoId: string;
+  atletaId: string;
+  casoId: string;
+  possibleDuplicate: boolean;
+}
+
+/** Mismas reglas de teléfono/correo que usa el formulario público — para que
+ * una visita rápida quede con datos igual de limpios que un registro normal. */
+export function validarDatosVisitaRapida(datos: DatosVisitaRapida): string[] {
+  const errores: string[] = [];
+  if (!datos.atletaNombre.trim()) errores.push('Falta el nombre del/la atleta.');
+  if (!datos.apoderadoNombre.trim()) errores.push('Falta el nombre del apoderado.');
+  if (!normalizarTelefonoCL(datos.apoderadoTelefono)) errores.push('El teléfono no es un celular chileno válido.');
+  if (!validarEmail(datos.apoderadoEmail).email) errores.push('El correo no tiene un formato válido.');
+  return errores;
+}
+
+export async function registrarVisitaRapida(
+  supabase: SupabaseClient,
+  datos: DatosVisitaRapida,
+): Promise<ResultadoVisitaRapida> {
+  const telefono = normalizarTelefonoCL(datos.apoderadoTelefono);
+  const { email } = validarEmail(datos.apoderadoEmail);
+  if (!telefono || !email) throw new Error('Datos de contacto inválidos.');
+
+  const { data, error } = await supabase.rpc('fn_registrar_visita_rapida', {
+    payload: {
+      apoderado: {
+        nombre: datos.apoderadoNombre.trim(),
+        apellidos: datos.apoderadoApellidos.trim() || '—',
+        telefono,
+        email,
+      },
+      atleta: {
+        nombre: datos.atletaNombre.trim(),
+        apellidos: datos.atletaApellidos.trim() || '—',
+        edadAproximada: datos.atletaEdadAproximada,
+      },
+    },
+  });
+  if (error) throw error;
+  return data as ResultadoVisitaRapida;
 }
