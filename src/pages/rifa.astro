@@ -251,15 +251,18 @@ const premios = [
         <form id="rifaFormDatos" novalidate>
           <div class="rifa-campo">
             <label for="rifaNombre">Nombre completo</label>
-            <input type="text" id="rifaNombre" required autocomplete="name" maxlength="150" />
+            <input type="text" id="rifaNombre" required autocomplete="name" maxlength="150" minlength="3" />
           </div>
           <div class="rifa-campo">
             <label for="rifaEmail">Correo electrónico</label>
             <input type="email" id="rifaEmail" required autocomplete="email" maxlength="254" />
+            <p class="rifa-campo__validacion" id="rifaEmailFeedback" aria-live="polite"></p>
           </div>
           <div class="rifa-campo">
             <label for="rifaTelefono">Celular / WhatsApp</label>
-            <input type="tel" inputmode="tel" id="rifaTelefono" required autocomplete="tel" placeholder="9 1234 5678" maxlength="20" />
+            <input type="tel" inputmode="tel" id="rifaTelefono" required autocomplete="tel"
+                   placeholder="9 1234 5678" maxlength="12" pattern="9 \d{4} \d{4}"
+                   title="Formato: 9 1234 5678" />
           </div>
           <div class="rifa-campo">
             <label for="rifaInstagram">Instagram <span class="rifa-campo__opcional">(opcional)</span></label>
@@ -269,8 +272,8 @@ const premios = [
             <label for="rifaRut">RUT <span class="rifa-campo__opcional">(opcional — te lo pedimos igual si ganas)</span></label>
             <input type="text" id="rifaRut" autocomplete="off" placeholder="11.111.111-1" maxlength="12" />
           </div>
-          <p id="rifaFormError" class="rifa-modal__error" hidden>Completa nombre, correo y celular para continuar.</p>
-          <button type="submit" class="btn rifa-modal__enviar">Continuar a pagar 🔥</button>
+          <p id="rifaFormError" class="rifa-modal__error" hidden>Completa nombre, correo y celular con un formato válido para continuar.</p>
+          <button type="submit" class="btn rifa-modal__enviar" id="rifaModalEnviar">Continuar a pagar 🔥</button>
         </form>
       </div>
     </div>
@@ -598,8 +601,26 @@ const premios = [
     outline:none; border-color:var(--fire-yellow);
     box-shadow:0 0 0 4px rgba(255,196,0,.2);
   }
+  /* El aviso de campo inválido sólo aparece después de que la persona ya
+     interactuó con él (clase .tocado agregada al salir del campo) — nunca
+     antes de que alcance a escribir. */
+  .rifa-campo input.tocado:invalid{
+    border-color:rgba(197,21,21,.5); background:rgba(197,21,21,.05);
+  }
+  .rifa-campo input.tocado:invalid:focus-visible{
+    box-shadow:0 0 0 4px rgba(197,21,21,.16);
+  }
+  /* Campo completado correctamente: borde distinto para dar confianza,
+     pero nunca se pisa con el foco activo. */
+  .rifa-campo input.con-contenido:valid:not(:focus-visible){
+    border-color:rgba(27,79,168,.55); background:rgba(27,79,168,.06);
+  }
+  .rifa-campo__validacion{ margin-top:6px; font-size:13px; min-height:1.2em; }
+  .rifa-campo__validacion.valido{ color:var(--fire-yellow); }
+  .rifa-campo__validacion.invalido{ color:rgba(197,21,21,.85); }
   .rifa-modal__error{ color:var(--fire-red); font-size:13px; margin-top:var(--e-2); }
   .rifa-modal__enviar{ width:100%; text-align:center; margin-top:var(--e-4); }
+  .rifa-modal__enviar:disabled{ opacity:.7; pointer-events:none; }
 
   @media (min-width:640px){
     .rifa-modal{ align-items:center; }

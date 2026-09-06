@@ -1,20 +1,8 @@
 // Lógica interactiva de /rifa: selección de números (manual o al azar), upsell de
-// pack de 2, chips de selección y resumen de compra.
-//
-// ⚠️ DATOS DE MUESTRA: el objeto `estados` de más abajo se genera al azar en el
-// navegador solo para poder mostrar y probar la interfaz. No hay todavía backend
-// real detrás (Supabase + Flow), así que:
-//   - el estado de cada número NO es el real y se reinicia cada vez que alguien
-//     carga la página;
-//   - el botón "Pagar con Flow" solo muestra un aviso, no cobra nada.
-// Cuando se conecte el backend, hay que reemplazar `generarEstadoDeMuestra()` por
-// una carga real (fetch a /api/rifa/numeros o similar) y `pagar()` por la creación
-// real de la orden en Flow, manteniendo el resto de la lógica (selección, upsell,
-// carrito) igual.
+// pack de 2, chips de selección, datos del comprador y conexión real con el
+// backend (Supabase + Flow) a través de /api/rifa/*.
 
 const TOTAL_NUMEROS = 800;
-const PRECIO_UNO = 3000;
-const PRECIO_PACK = 5000;
 
 type EstadoNumero = 'disponible' | 'reservado' | 'vendido' | 'seleccionado';
 
@@ -26,25 +14,95 @@ function $all<T extends Element>(selector: string, root: ParentNode = document):
 }
 
 const reduceMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-// ⚠️ Reemplazar por datos reales del backend cuando exista.
-function generarEstadoDeMuestra(): Record<number, EstadoNumero> {
-  const estados: Record<number, EstadoNumero> = {};
-  for (let i = 1; i <= TOTAL_NUMEROS; i++) {
-    const r = Math.random();
-    estados[i] = r < 0.55 ? 'vendido' : r < 0.6 ? 'reservado' : 'disponible';
+/** Trae el estado real de los 800 números desde el backend. Si por algo falla
+ * (sin conexión, backend caído), no rompe la página: deja todo "disponible"
+ * y avisa con un toast, para que al menos se pueda seguir mirando la interfaz. */
+async function cargarEstadosReales(avisarSiFalla: (msg: string) => void): Promise<Record<number, EstadoNumero>> {
+  try {
+    const res = await fetch('/api/rifa/numeros');
+    if (!res.ok) throw new Error(`http_${res.status}`);
+    const data = await res.json();
+    const estados: Record<number, EstadoNumero> = {};
+    for (const fila of data.numeros as { numero: number; estado: string }[]) {
+      estados[fila.numero] = fila.estado.toLowerCase() as EstadoNumero;
+    }
+    return estados;
+  } catch {
+    avisarSiFalla('No pudimos cargar el estado real de los números — mostrando todos como disponibles.');
+    const estados: Record<number, EstadoNumero> = {};
+    for (let i = 1; i <= TOTAL_NUMEROS; i++) estados[i] = 'disponible';
+    return estados;
   }
-  return estados;
 }
 
-export function iniciarRifa(): void {
+// ---------------------------------------------------------------------------
+// Helpers de validación de formulario (mismo patrón visual que /registro)
+// ---------------------------------------------------------------------------
+
+/** Formatea un input de teléfono chileno mientras se escribe: "9 1234 5678". */
+function formatearTelefonoInput(input: HTMLInputElement | null): void {
+  if (!input) return;
+  input.addEventListener('input', () => {
+    const digitos = input.value.replace(/\D/g, '').slice(0, 9);
+    if (digitos.length > 5) {
+      input.value = `${digitos.slice(0, 1)} ${digitos.slice(1, 5)} ${digitos.slice(5)}`;
+    } else if (digitos.length > 1) {
+      input.value = `${digitos.slice(0, 1)} ${digitos.slice(1)}`;
+    } else {
+      input.value = digitos;
+    }
+  });
+}
+
+/** Feedback en vivo bajo el campo de correo ("✓ Correo válido" / formato). */
+function inicializarFeedbackEmail(input: HTMLInputElement | null, feedback: HTMLElement | null): void {
+  if (!input || !feedback) return;
+  const actualizar = () => {
+    const valor = input.value.trim();
+    feedback.classList.remove('valido', 'invalido');
+    if (!valor) {
+      feedback.textContent = '';
+      return;
+    }
+    if (EMAIL_RE.test(valor)) {
+      feedback.textContent = '✓ Correo válido';
+      feedback.classList.add('valido');
+    } else {
+      feedback.textContent = 'Revisa el formato (ejemplo@correo.com)';
+      feedback.classList.add('invalido');
+    }
+  };
+  input.addEventListener('input', actualizar);
+  input.addEventListener('blur', actualizar);
+}
+
+/** Agrega .tocado recién al salir de un campo — el estilo de error nunca
+ * aparece antes de que la persona alcance a escribir algo. */
+function inicializarEstadoTocado(form: HTMLFormElement): void {
+  form.addEventListener(
+    'blur',
+    (evt) => {
+      const el = evt.target as HTMLElement;
+      if (el.matches?.('input')) el.classList.add('tocado');
+    },
+    true,
+  );
+}
+
+/** Marca .con-contenido en cualquier campo que ya tenga algo escrito. */
+function inicializarEstadoConContenido(form: HTMLFormElement): void {
+  form.addEventListener('input', (evt) => {
+    const el = evt.target as HTMLInputElement;
+    if (!el.matches?.('input')) return;
+    el.classList.toggle('con-contenido', el.value.trim().length > 0);
+  });
+}
+
+export async function iniciarRifa(): Promise<void> {
   const raiz = $('#rifa-jugar');
   if (!raiz) return;
-
-  const estados = generarEstadoDeMuestra();
-  let carrito: number[] = [];
-  let bloqueActivo = 1;
-  let modoActivo: 'azar' | 'elegir' = 'azar';
 
   const tickerNum = $<HTMLElement>('#rifaTickerNum');
   const tickerFill = $<HTMLElement>('#rifaTickerFill');
@@ -74,8 +132,16 @@ export function iniciarRifa(): void {
     toast.textContent = msg;
     toast.classList.add('activo');
     clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => toast.classList.remove('activo'), 2600);
+    toastTimer = setTimeout(() => toast.classList.remove('activo'), 3200);
   }
+
+  // Código de referido (?ref=FH-XXXXXX) para atribuir la venta a un atleta.
+  const rifaCodigoRef = new URLSearchParams(window.location.search).get('ref');
+
+  const estados = await cargarEstadosReales(mostrarToast);
+  let carrito: number[] = [];
+  let bloqueActivo = 1;
+  let modoActivo: 'azar' | 'elegir' = 'azar';
 
   function contarVendidos(): number {
     return Object.values(estados).filter((e) => e === 'vendido').length;
@@ -107,7 +173,6 @@ export function iniciarRifa(): void {
     return chip;
   }
 
-  // ---- chips (números elegidos, siempre visibles sin importar el modo) ----
   function renderChips(): void {
     if (!chipsWrap || !chipsLista) return;
     chipsLista.innerHTML = '';
@@ -116,14 +181,12 @@ export function iniciarRifa(): void {
       return;
     }
     chipsWrap.hidden = false;
-    [...carrito]
-      .sort((a, b) => a - b)
-      .forEach((n) => chipsLista.appendChild(crearChip(n)));
+    [...carrito].sort((a, b) => a - b).forEach((n) => chipsLista.appendChild(crearChip(n)));
   }
 
   function quitarNumero(n: number): void {
     carrito = carrito.filter((x) => x !== n);
-    estados[n] = 'disponible';
+    if (estados[n] === 'seleccionado') estados[n] = 'disponible';
     renderGrid();
     renderChips();
     actualizarCarrito();
@@ -204,8 +267,14 @@ export function iniciarRifa(): void {
     }, 50);
   }
 
+  const MAX_NUMEROS_POR_COMPRA = 20;
+
   // ---- agregar números al azar, con animación de ruleta ----
   function agregarNumeros(cantidad: number, conAnimacion: boolean): void {
+    if (carrito.length + cantidad > MAX_NUMEROS_POR_COMPRA) {
+      mostrarToast(`Máximo ${MAX_NUMEROS_POR_COMPRA} números por compra`);
+      return;
+    }
     const libres = disponibles();
     if (libres.length < cantidad) {
       mostrarToast('No quedan suficientes números disponibles');
@@ -277,7 +346,7 @@ export function iniciarRifa(): void {
     upsellBox.classList.add('activo');
   }
 
-  // ---- carrito / precio ----
+  // ---- carrito / precio (solo referencial: el monto real lo calcula el backend) ----
   function actualizarCarrito(): void {
     if (!cart || !cartNums || !cartTotal) return;
     if (carrito.length === 0) {
@@ -287,23 +356,15 @@ export function iniciarRifa(): void {
     cart.classList.add('activo');
     const pares = Math.floor(carrito.length / 2);
     const resto = carrito.length % 2;
-    const precio = pares * PRECIO_PACK + resto * PRECIO_UNO;
+    const precio = pares * 5000 + resto * 3000;
     cartNums.innerHTML = '';
-    [...carrito]
-      .sort((a, b) => a - b)
-      .forEach((n) => cartNums.appendChild(crearChip(n)));
+    [...carrito].sort((a, b) => a - b).forEach((n) => cartNums.appendChild(crearChip(n)));
     cartTotal.textContent = `$${precio.toLocaleString('es-CL')}`;
   }
 
-  // ---- datos del comprador (puede ser distinto al atleta del código) ----
-  interface DatosComprador {
-    nombre: string;
-    email: string;
-    telefono: string;
-    instagram: string;
-    rut: string;
-  }
-
+  // ---------------------------------------------------------------------
+  // Datos del comprador + conexión real con /api/rifa/reservar y Flow
+  // ---------------------------------------------------------------------
   const modalDatos = $<HTMLElement>('#rifaModalDatos');
   const modalFondo = $<HTMLElement>('#rifaModalFondo');
   const modalCerrar = $<HTMLButtonElement>('#rifaModalCerrar');
@@ -314,6 +375,8 @@ export function iniciarRifa(): void {
   const inputTelefono = $<HTMLInputElement>('#rifaTelefono');
   const inputInstagram = $<HTMLInputElement>('#rifaInstagram');
   const inputRut = $<HTMLInputElement>('#rifaRut');
+  const emailFeedback = $<HTMLElement>('#rifaEmailFeedback');
+  const botonEnviar = $<HTMLButtonElement>('#rifaModalEnviar');
 
   function abrirModalDatos(): void {
     if (carrito.length === 0) return;
@@ -330,18 +393,85 @@ export function iniciarRifa(): void {
     abrirModalDatos();
   }
 
-  function confirmarPago(datos: DatosComprador): void {
-    // ⚠️ Acá va la integración real: crear la venta + reservar números
-    // (POST /api/rifa/reservar con `datos` y `carrito`), y si la reserva
-    // funciona, redirigir a la URL que devuelve Flow. Por ahora solo simula.
-    cerrarModalDatos();
-    mostrarToast(`🔥 Vista previa — en el sitio real esto crea la orden en Flow para ${datos.nombre.split(' ')[0]}`);
+  function telefonoValido(valor: string): boolean {
+    return valor.replace(/\D/g, '').length >= 8;
+  }
+
+  async function confirmarPago(): Promise<void> {
+    const nombre = inputNombre?.value.trim() ?? '';
+    const email = inputEmail?.value.trim() ?? '';
+    const telefono = inputTelefono?.value.trim() ?? '';
+
+    const valido = Boolean(nombre) && EMAIL_RE.test(email) && telefonoValido(telefono);
+    if (!valido) {
+      [inputNombre, inputEmail, inputTelefono].forEach((el) => el?.classList.add('tocado'));
+      if (formError) formError.hidden = false;
+      return;
+    }
+    if (formError) formError.hidden = true;
+
+    if (botonEnviar) {
+      botonEnviar.disabled = true;
+      botonEnviar.textContent = 'Conectando con Flow…';
+    }
+
+    try {
+      const res = await fetch('/api/rifa/reservar', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          numeros: carrito,
+          rifaCodigo: rifaCodigoRef,
+          comprador: {
+            nombre,
+            email,
+            telefono,
+            instagram: inputInstagram?.value.trim() ?? '',
+            rut: inputRut?.value.trim() ?? '',
+          },
+        }),
+      });
+
+      const data = await res.json();
+
+      if (res.status === 409 && data.numeros) {
+        const perdidos: number[] = data.numeros;
+        perdidos.forEach((n) => {
+          carrito = carrito.filter((x) => x !== n);
+          estados[n] = 'vendido';
+        });
+        renderGrid();
+        renderChips();
+        actualizarCarrito();
+        actualizarUpsell();
+        mostrarToast(`😬 Alguien se adelantó con ${perdidos.map((n) => '#' + String(n).padStart(3, '0')).join(', ')} — elige otro`);
+        cerrarModalDatos();
+        return;
+      }
+
+      if (!res.ok || !data.url) {
+        mostrarToast('No pudimos conectar con Flow. Intenta de nuevo en un momento.');
+        return;
+      }
+
+      // Redirige el navegador al checkout real de Flow.
+      window.location.href = data.url;
+    } catch {
+      mostrarToast('No pudimos conectar con el servidor. Revisa tu conexión e intenta de nuevo.');
+    } finally {
+      if (botonEnviar) {
+        botonEnviar.disabled = false;
+        botonEnviar.textContent = 'Continuar a pagar 🔥';
+      }
+    }
   }
 
   // ---- cambio de modo: limpia la selección para evitar mezclar azar + manual ----
   function limpiarSeleccion(avisar: boolean): void {
     if (carrito.length === 0) return;
-    carrito.forEach((n) => (estados[n] = 'disponible'));
+    carrito.forEach((n) => {
+      if (estados[n] === 'seleccionado') estados[n] = 'disponible';
+    });
     carrito = [];
     renderGrid();
     renderChips();
@@ -381,27 +511,17 @@ export function iniciarRifa(): void {
 
   modalFondo?.addEventListener('click', cerrarModalDatos);
   modalCerrar?.addEventListener('click', cerrarModalDatos);
-
   formDatos?.addEventListener('submit', (e) => {
     e.preventDefault();
-    const nombre = inputNombre?.value.trim() ?? '';
-    const email = inputEmail?.value.trim() ?? '';
-    const telefono = inputTelefono?.value.trim() ?? '';
-
-    if (!nombre || !email || !telefono) {
-      if (formError) formError.hidden = false;
-      return;
-    }
-    if (formError) formError.hidden = true;
-
-    confirmarPago({
-      nombre,
-      email,
-      telefono,
-      instagram: inputInstagram?.value.trim() ?? '',
-      rut: inputRut?.value.trim() ?? '',
-    });
+    void confirmarPago();
   });
+
+  formatearTelefonoInput(inputTelefono);
+  inicializarFeedbackEmail(inputEmail, emailFeedback);
+  if (formDatos) {
+    inicializarEstadoTocado(formDatos);
+    inicializarEstadoConContenido(formDatos);
+  }
 
   actualizarTicker();
 }
