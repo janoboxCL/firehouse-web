@@ -89,6 +89,80 @@ export async function obtenerVentasConcurso(supabase: SupabaseClient): Promise<V
   }));
 }
 
+export interface AtletaLinkConcurso {
+  atletaId: string;
+  nombreCompleto: string;
+  codigo: string | null;
+  metaMinima: number;
+  ticketsVendidos: number;
+}
+
+export interface AtletasConLinksResultado {
+  atletas: AtletaLinkConcurso[];
+  ventaGenerica: number;
+}
+
+interface FilaCodigoCruda {
+  id: string;
+  atleta_id: string;
+  codigo: string;
+  meta_minima: number | null;
+}
+
+interface FilaNumeroVendidoCruda {
+  rifa_ventas: { rifa_codigo_id: string | null } | null;
+}
+
+/** Todos los atletas, tengan o no código y ventas todavía — a diferencia del
+ * ranking, acá aparece cualquier niña/niño aunque lleve 0 tickets vendidos. */
+export async function obtenerAtletasConLinks(supabase: SupabaseClient): Promise<AtletasConLinksResultado> {
+  const [{ data: atletas, error: errAtletas }, { data: codigos, error: errCodigos }, { data: config, error: errConfig }, { data: vendidos, error: errVendidos }] =
+    await Promise.all([
+      supabase.from('atletas').select('id, nombre, apellidos').order('nombre'),
+      supabase.from('rifa_codigos').select('id, atleta_id, codigo, meta_minima'),
+      supabase.from('rifa_config').select('meta_minima_atleta').eq('id', 1).single(),
+      supabase.from('rifa_numeros').select('rifa_ventas!inner ( rifa_codigo_id )').eq('estado', 'VENDIDO'),
+    ]);
+  if (errAtletas) throw errAtletas;
+  if (errCodigos) throw errCodigos;
+  if (errConfig) throw errConfig;
+  if (errVendidos) throw errVendidos;
+
+  const metaPorDefecto = config?.meta_minima_atleta ?? 16;
+
+  const conteoPorCodigoId = new Map<string, number>();
+  let ventaGenerica = 0;
+  for (const fila of (vendidos ?? []) as unknown as FilaNumeroVendidoCruda[]) {
+    const codigoId = fila.rifa_ventas?.rifa_codigo_id ?? null;
+    if (codigoId) conteoPorCodigoId.set(codigoId, (conteoPorCodigoId.get(codigoId) ?? 0) + 1);
+    else ventaGenerica++;
+  }
+
+  const codigoPorAtleta = new Map(((codigos ?? []) as FilaCodigoCruda[]).map((c) => [c.atleta_id, c]));
+
+  const resultado: AtletaLinkConcurso[] = (atletas ?? []).map((a) => {
+    const codigoRow = codigoPorAtleta.get(a.id);
+    return {
+      atletaId: a.id,
+      nombreCompleto: `${a.nombre} ${a.apellidos}`,
+      codigo: codigoRow?.codigo ?? null,
+      metaMinima: codigoRow?.meta_minima ?? metaPorDefecto,
+      ticketsVendidos: codigoRow ? conteoPorCodigoId.get(codigoRow.id) ?? 0 : 0,
+    };
+  });
+
+  return { atletas: resultado, ventaGenerica };
+}
+
+/** Genera un código para cada atleta que todavía no tenga uno. Se puede
+ * volver a llamar cuando se registren atletas nuevos — a quien ya tiene
+ * código no lo toca. Devuelve cuántos códigos nuevos se crearon. */
+export async function generarCodigosFaltantes(supabase: SupabaseClient): Promise<number> {
+  const { data, error } = await supabase.rpc('fn_generar_codigos_faltantes_rifa');
+  if (error) throw error;
+  return (data ?? []).length;
+}
+
 export interface RankingAtletaConcurso {
   atleta: string;
   codigo: string;

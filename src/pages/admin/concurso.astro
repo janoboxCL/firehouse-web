@@ -32,12 +32,18 @@ import AdminBase from '../../layouts/AdminBase.astro';
     </section>
 
     <section class="admin-card">
-      <h2 class="cc-bloque__titulo">Avance por atleta</h2>
+      <div class="cc-bloque__cabecera">
+        <h2 class="cc-bloque__titulo">Links por atleta</h2>
+        <button type="button" class="admin-btn admin-btn--secundario" id="cc-generar-codigos">
+          Generar códigos faltantes
+        </button>
+      </div>
+      <p id="cc-generar-mensaje" class="cc-sub" hidden></p>
       <table class="cc-tabla">
         <thead>
-          <tr><th>Atleta</th><th>Código</th><th>Tickets</th></tr>
+          <tr><th>Atleta</th><th>Link</th><th>Progreso</th><th></th></tr>
         </thead>
-        <tbody id="cc-ranking-body"></tbody>
+        <tbody id="cc-atletas-body"></tbody>
       </table>
     </section>
 
@@ -70,6 +76,26 @@ import AdminBase from '../../layouts/AdminBase.astro';
 .cc-metrica__label{ font-size: 13px; color: #6B6259; margin: 4px 0 0; }
 
 .cc-bloque__titulo{ font-family: var(--font-display); font-size: 1.15rem; margin: 0 0 14px; }
+.cc-bloque__cabecera{ display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 6px; }
+.cc-bloque__cabecera .cc-bloque__titulo{ margin-bottom: 0; }
+
+.cc-link-row{ display: flex; align-items: center; gap: 8px; }
+.cc-link-row code{
+  font-family: var(--font-count); font-size: 12px; background: #F4F1EC;
+  padding: 4px 8px; border-radius: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 220px;
+}
+.cc-link-btn{
+  border: 1px solid #E4DFD6; background: #fff; border-radius: 6px; padding: 4px 8px;
+  font-size: 12px; cursor: pointer; white-space: nowrap;
+}
+.cc-link-btn:hover{ border-color: var(--ember); }
+.cc-sin-codigo{ color: #8A8074; font-size: 13px; font-style: italic; }
+
+.cc-progreso{ min-width: 140px; }
+.cc-progreso__texto{ font-family: var(--font-count); font-size: 12.5px; margin: 0 0 4px; white-space: nowrap; }
+.cc-progreso__barra{ height: 6px; background: #EFEBE4; border-radius: 99px; overflow: hidden; }
+.cc-progreso__relleno{ height: 100%; background: var(--fire-red); border-radius: 99px; }
+.cc-progreso__relleno--cumplida{ background: #1B4FA8; }
 
 .cc-tabla-wrap{ overflow-x: auto; }
 .cc-tabla{ width: 100%; border-collapse: collapse; font-size: 13.5px; }
