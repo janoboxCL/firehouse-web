@@ -10,13 +10,15 @@ export interface ResumenConcurso {
   reservados: number;
   disponibles: number;
   recaudado: number;
+  recaudadoAtletas: number;
+  recaudadoVentaLibre: number;
   ventasPendientes: number;
 }
 
 export async function obtenerResumenConcurso(supabase: SupabaseClient): Promise<ResumenConcurso> {
   const [{ data: numeros, error: errNum }, { data: ventas, error: errVentas }] = await Promise.all([
     supabase.from('rifa_numeros').select('estado'),
-    supabase.from('rifa_ventas').select('estado, monto'),
+    supabase.from('rifa_ventas').select('estado, monto, rifa_codigo_id'),
   ]);
   if (errNum) throw errNum;
   if (errVentas) throw errVentas;
@@ -26,12 +28,13 @@ export async function obtenerResumenConcurso(supabase: SupabaseClient): Promise<
   const reservados = numeros?.filter((n) => n.estado === 'RESERVADO').length ?? 0;
   const disponibles = totalNumeros - vendidos - reservados;
 
-  const recaudado = (ventas ?? [])
-    .filter((v) => v.estado === 'PAGADA')
-    .reduce((acc, v) => acc + (v.monto ?? 0), 0);
+  const pagadas = (ventas ?? []).filter((v) => v.estado === 'PAGADA');
+  const recaudadoAtletas = pagadas.filter((v) => v.rifa_codigo_id).reduce((acc, v) => acc + (v.monto ?? 0), 0);
+  const recaudadoVentaLibre = pagadas.filter((v) => !v.rifa_codigo_id).reduce((acc, v) => acc + (v.monto ?? 0), 0);
+  const recaudado = recaudadoAtletas + recaudadoVentaLibre;
   const ventasPendientes = (ventas ?? []).filter((v) => v.estado === 'PENDIENTE').length;
 
-  return { totalNumeros, vendidos, reservados, disponibles, recaudado, ventasPendientes };
+  return { totalNumeros, vendidos, reservados, disponibles, recaudado, recaudadoAtletas, recaudadoVentaLibre, ventasPendientes };
 }
 
 export interface VentaConcursoResumen {

@@ -49,6 +49,8 @@ export async function iniciarAdminConcurso(): Promise<void> {
     // ---- tarjetas de resumen ----
     $('#cc-vendidos')!.textContent = `${resumen.vendidos} / ${resumen.totalNumeros}`;
     $('#cc-recaudado')!.textContent = formatearMonto(resumen.recaudado);
+    $('#cc-recaudado-atletas')!.textContent = formatearMonto(resumen.recaudadoAtletas);
+    $('#cc-recaudado-libre')!.textContent = formatearMonto(resumen.recaudadoVentaLibre);
     $('#cc-reservados')!.textContent = String(resumen.reservados);
     $('#cc-pendientes')!.textContent = String(resumen.ventasPendientes);
 

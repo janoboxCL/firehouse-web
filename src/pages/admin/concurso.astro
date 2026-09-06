@@ -19,7 +19,11 @@ import AdminBase from '../../layouts/AdminBase.astro';
       </div>
       <div class="admin-card cc-metrica">
         <p class="cc-metrica__valor" id="cc-recaudado">—</p>
-        <p class="cc-metrica__label">recaudado</p>
+        <p class="cc-metrica__label">recaudado total</p>
+        <div class="cc-metrica__desglose">
+          <span>Por atletas: <strong id="cc-recaudado-atletas">—</strong></span>
+          <span>Venta libre: <strong id="cc-recaudado-libre">—</strong></span>
+        </div>
       </div>
       <div class="admin-card cc-metrica">
         <p class="cc-metrica__valor" id="cc-reservados">—</p>
@@ -74,6 +78,11 @@ import AdminBase from '../../layouts/AdminBase.astro';
 .cc-metrica{ text-align: center; }
 .cc-metrica__valor{ font-family: var(--font-count); font-size: 1.7rem; font-weight: 700; margin: 0; color: var(--fire-red); }
 .cc-metrica__label{ font-size: 13px; color: #6B6259; margin: 4px 0 0; }
+.cc-metrica__desglose{
+  display: flex; flex-direction: column; gap: 2px; margin-top: 8px;
+  padding-top: 8px; border-top: 1px solid #EFEBE4; font-size: 12px; color: #6B6259;
+}
+.cc-metrica__desglose strong{ color: var(--ember); font-family: var(--font-count); font-weight: 700; }
 
 .cc-bloque__titulo{ font-family: var(--font-display); font-size: 1.15rem; margin: 0 0 14px; }
 .cc-bloque__cabecera{ display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 6px; }
