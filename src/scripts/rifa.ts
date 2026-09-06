@@ -93,6 +93,20 @@ export function iniciarRifa(): void {
       .filter((n) => estados[n] === 'disponible');
   }
 
+  // ---- chip reutilizable: se usa tanto en la lista de arriba como en el carrito fijo ----
+  function crearChip(n: number): HTMLElement {
+    const chip = document.createElement('span');
+    chip.className = 'rifa-chip';
+    chip.append(`#${String(n).padStart(3, '0')} `);
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.textContent = '×';
+    btn.setAttribute('aria-label', `Quitar número ${n}`);
+    btn.addEventListener('click', () => quitarNumero(n));
+    chip.appendChild(btn);
+    return chip;
+  }
+
   // ---- chips (números elegidos, siempre visibles sin importar el modo) ----
   function renderChips(): void {
     if (!chipsWrap || !chipsLista) return;
@@ -104,18 +118,7 @@ export function iniciarRifa(): void {
     chipsWrap.hidden = false;
     [...carrito]
       .sort((a, b) => a - b)
-      .forEach((n) => {
-        const chip = document.createElement('span');
-        chip.className = 'rifa-chip';
-        chip.append(`#${String(n).padStart(3, '0')} `);
-        const btn = document.createElement('button');
-        btn.type = 'button';
-        btn.textContent = '×';
-        btn.setAttribute('aria-label', `Quitar número ${n}`);
-        btn.addEventListener('click', () => quitarNumero(n));
-        chip.appendChild(btn);
-        chipsLista.appendChild(chip);
-      });
+      .forEach((n) => chipsLista.appendChild(crearChip(n)));
   }
 
   function quitarNumero(n: number): void {
@@ -285,12 +288,10 @@ export function iniciarRifa(): void {
     const pares = Math.floor(carrito.length / 2);
     const resto = carrito.length % 2;
     const precio = pares * PRECIO_PACK + resto * PRECIO_UNO;
-    cartNums.textContent =
-      'Tus números: ' +
-      [...carrito]
-        .sort((a, b) => a - b)
-        .map((n) => `#${String(n).padStart(3, '0')}`)
-        .join(' · ');
+    cartNums.innerHTML = '';
+    [...carrito]
+      .sort((a, b) => a - b)
+      .forEach((n) => cartNums.appendChild(crearChip(n)));
     cartTotal.textContent = `$${precio.toLocaleString('es-CL')}`;
   }
 
