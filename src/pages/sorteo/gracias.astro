@@ -1,0 +1,84 @@
+---
+import Base from '../../layouts/Base.astro';
+
+const titulo = 'Gracias — Concurso Firehouse';
+const descripcion = 'Confirmación de tu compra en el Gran Concurso Firehouse.';
+---
+<Base titulo={titulo} descripcion={descripcion} ruta="/sorteo/gracias" noindex={true}>
+  <section class="gracias">
+    <div class="wrap gracias__caja">
+      <div id="graciasCargando" class="gracias__estado">
+        <p class="gracias__spinner" aria-hidden="true">🔥</p>
+        <p class="gracias__texto-carga">Confirmando tu pago…</p>
+      </div>
+
+      <div id="graciasExito" class="gracias__estado" hidden>
+        <h1>🎉 ¡Ya estás participando!</h1>
+        <p>Te enviamos un correo con el detalle de tus tickets. ¡Gracias por apoyar a Firehouse! ❤️‍🔥</p>
+        <a class="btn" href="/sorteo">Volver al sorteo</a>
+      </div>
+
+      <div id="graciasPendiente" class="gracias__estado" hidden>
+        <h1>Tu pago sigue en proceso</h1>
+        <p>Esto puede tardar un momento. Si no se confirma solo, escríbenos con tu número de orden y lo revisamos.</p>
+        <a class="btn" href="/sorteo">Volver al sorteo</a>
+      </div>
+
+      <div id="graciasError" class="gracias__estado" hidden>
+        <h1>Tu pago no se pudo confirmar</h1>
+        <p>Si el dinero salió de tu cuenta, escríbenos por WhatsApp y lo resolvemos al tiro.</p>
+        <a class="btn" href="/sorteo">Volver a intentar</a>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<script>
+  const params = new URLSearchParams(window.location.search);
+  const orden = params.get('orden');
+
+  const cargando = document.getElementById('graciasCargando')!;
+  const exito = document.getElementById('graciasExito')!;
+  const pendiente = document.getElementById('graciasPendiente')!;
+  const error = document.getElementById('graciasError')!;
+
+  function mostrar(el: HTMLElement) {
+    cargando.hidden = true;
+    exito.hidden = el !== exito;
+    pendiente.hidden = el !== pendiente;
+    error.hidden = el !== error;
+  }
+
+  async function revisar(intentos = 0): Promise<void> {
+    if (!orden) return mostrar(error);
+    try {
+      const res = await fetch(`/api/sorteo/estado-orden?orden=${encodeURIComponent(orden)}`);
+      if (!res.ok) return mostrar(error);
+      const data = await res.json();
+
+      if (data.estado === 'PAGADA') return mostrar(exito);
+      if (data.estado === 'PENDIENTE' && intentos < 6) {
+        setTimeout(() => revisar(intentos + 1), 1500);
+        return;
+      }
+      if (data.estado === 'PENDIENTE') return mostrar(pendiente);
+      return mostrar(error);
+    } catch {
+      mostrar(error);
+    }
+  }
+
+  revisar();
+</script>
+
+<style is:global>
+.gracias{ background:#000; min-height:70vh; display:flex; align-items:center; padding:var(--e-6) 0; }
+.gracias__caja{ max-width:480px; text-align:center; }
+.gracias__estado h1{ font-family:var(--font-display); font-weight:800; font-size:clamp(1.6rem, 4vw, 2.2rem); }
+.gracias__estado p{ color:var(--txt-soft); margin-top:var(--e-3); }
+.gracias__estado .btn{ margin-top:var(--e-4); display:inline-block; }
+.gracias__spinner{ font-size:2.4rem; margin:0; animation:graciasPulso 1.1s ease-in-out infinite; }
+.gracias__texto-carga{ font-family:var(--font-count); color:var(--fire-yellow); margin-top:var(--e-2); }
+@keyframes graciasPulso{ 0%,100%{ opacity:.5; transform:scale(.94); } 50%{ opacity:1; transform:scale(1.05); } }
+@media (prefers-reduced-motion: reduce){ .gracias__spinner{ animation:none; } }
+</style>

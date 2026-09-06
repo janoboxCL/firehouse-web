@@ -157,3 +157,77 @@ export async function enviarCorreoConfirmacion(
     : '¡Recibimos tu registro en Firehouse! 🔥';
   await enviarCorreoGenerico(apiKey, remitente, datos.apoderadoEmail, asunto, construirHtml(datos), bcc);
 }
+
+// ---------------------------------------------------------------------------
+// Correo de confirmación de compra — Gran Concurso Firehouse
+// ---------------------------------------------------------------------------
+
+export interface DatosCorreoRifa {
+  compradorNombre: string;
+  compradorEmail: string;
+  numeros: number[];
+  monto: number;
+  commerceOrder: string;
+  /** timestamp ISO de rifa_config.fecha_sorteo — opcional, puede no estar definida aún. */
+  fechaSorteo?: string | null;
+}
+
+function construirHtmlRifa(datos: DatosCorreoRifa): string {
+  const nombre = escaparHtml(datos.compradorNombre.split(' ')[0]);
+  const numerosTexto = [...datos.numeros]
+    .sort((a, b) => a - b)
+    .map((n) => `#${String(n).padStart(3, '0')}`)
+    .join(' · ');
+  const montoTexto = `$${datos.monto.toLocaleString('es-CL')}`;
+
+  let fechaTexto = '';
+  if (datos.fechaSorteo) {
+    try {
+      fechaTexto = new Intl.DateTimeFormat('es-CL', { day: 'numeric', month: 'long', year: 'numeric' }).format(
+        new Date(datos.fechaSorteo),
+      );
+    } catch {
+      fechaTexto = '';
+    }
+  }
+
+  const cuerpo = `
+    <p style="font-size:15px;line-height:1.65;color:rgba(245,239,232,.86);margin:0 0 16px;">
+      Hola ${nombre}, ¡gracias por apoyar a Firehouse! 🔥
+    </p>
+    <p style="font-size:16px;line-height:1.65;color:#FFC400;font-weight:bold;margin:0 0 8px;">
+      Tus números: ${numerosTexto}
+    </p>
+    <p style="font-size:15px;line-height:1.65;color:rgba(245,239,232,.86);margin:0 0 8px;">
+      Monto pagado: <strong>${montoTexto}</strong>
+    </p>
+    ${
+      fechaTexto
+        ? `<p style="font-size:15px;line-height:1.65;color:rgba(245,239,232,.86);margin:0 0 28px;">📅 El sorteo se realiza el <strong>${fechaTexto}</strong>, en vivo por Instagram <strong>@firehouse.cheer</strong>.</p>`
+        : `<p style="font-size:15px;line-height:1.65;color:rgba(245,239,232,.86);margin:0 0 28px;">📅 Pronto anunciaremos la fecha del sorteo por Instagram <strong>@firehouse.cheer</strong>.</p>`
+    }
+    <p style="font-size:13px;line-height:1.6;color:rgba(245,239,232,.5);margin:0;">N° de orden: ${escaparHtml(datos.commerceOrder)}</p>
+  `;
+  return plantillaBase('Firehouse Cheerleading All Stars', '¡Ya estás participando en el Gran Concurso! 🎉', cuerpo);
+}
+
+/**
+ * Correo de confirmación de compra de números de la rifa. Mismo criterio
+ * "best effort" que el resto: si falla, no debe romper la confirmación del
+ * pago, que ya quedó guardada en la base antes de llegar acá.
+ */
+export async function enviarCorreoConfirmacionRifa(
+  apiKey: string,
+  remitente: string,
+  datos: DatosCorreoRifa,
+  bcc?: string[],
+): Promise<void> {
+  await enviarCorreoGenerico(
+    apiKey,
+    remitente,
+    datos.compradorEmail,
+    '¡Ya estás participando en el Gran Concurso Firehouse! 🎉',
+    construirHtmlRifa(datos),
+    bcc,
+  );
+}

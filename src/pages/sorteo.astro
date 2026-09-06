@@ -1,0 +1,633 @@
+---
+import Base from '../layouts/Base.astro';
+import Etiqueta from '../components/Etiqueta.astro';
+import { whatsapp } from '../data/sitio.js';
+
+const titulo = 'Gran Concurso Firehouse | Consigue tus tickets de la suerte';
+const descripcion =
+  'Participa en el Gran Concurso Firehouse: consigue tus tickets o prueba tu suerte al azar, y ayuda a nuestras niñas y niños a competir esta temporada.';
+
+// ⚠️ Los premios, la fecha del sorteo y la meta de números por deportista de esta
+// página son de ejemplo. Mientras no estén confirmados, dejamos la página fuera
+// de los buscadores (noindex) — igual que se hizo con Pretemporada hasta tener
+// los datos definitivos. Quita noindex cuando la información esté cerrada.
+const noindex = true;
+
+const premios = [
+  { tag: 'Premio 1', titulo: '$200.000 en efectivo', desc: 'Para gastar en lo que quieras', principal: true },
+  { tag: 'Premio 2', titulo: 'Pack sorpresa', desc: 'Donado por una marca amiga' },
+  { tag: 'Premio 3', titulo: 'Por confirmar', desc: 'Se anuncia antes del sorteo' },
+  { tag: 'Premio 4', titulo: 'Un mes gratis', desc: 'De entrenamiento en Firehouse' },
+];
+---
+<Base titulo={titulo} descripcion={descripcion} ruta="/sorteo" noindex={noindex}>
+  <div class="rifa">
+
+    <!-- HERO -->
+    <section class="rifa-hero">
+      <div class="wrap rifa-hero__fila">
+        <div class="rifa-hero__texto">
+          <picture class="rifa-hero__logo">
+            <source srcset="/logo.webp" type="image/webp" />
+            <img src="/logo.png" alt="Firehouse Cheerleading All Stars" width="160" height="140" />
+          </picture>
+          <h1 class="rifa-hero__titulo">Bienvenido al Gran Concurso Firehouse</h1>
+          <p class="rifa-hero__sub"><span class="rifa-hero__sello">Consigue tu ticket de la suerte 🔥</span></p>
+          <p class="rifa-hero__bajada">
+            Cada número ayuda a que nuestras niñas y niños lleguen a sus competencias esta
+            temporada. Compra el tuyo, o duplica tu suerte con dos.
+          </p>
+          <a class="btn rifa-hero__cta" href="#sorteo-jugar">Quiero mi ticket 🔥</a>
+        </div>
+        <div class="rifa-hero__visual">
+          <img
+            class="rifa-mascota rifa-mascota--hero"
+            src="/media/sorteo-hero.png"
+            alt="Mascotas Firehouse invitando a participar en el sorteo"
+            width="520" height="668"
+            loading="eager"
+          />
+        </div>
+      </div>
+
+      <div class="wrap">
+        <div class="rifa-ticker">
+          <div class="rifa-ticker__fila">
+            <span class="rifa-ticker__num" id="rifaTickerNum">0</span>
+            <span class="rifa-ticker__total">/ 800</span>
+          </div>
+          <p class="rifa-ticker__label">tickets ya tienen dueño</p>
+          <div class="rifa-ticker__barra"><div class="rifa-ticker__relleno" id="rifaTickerFill"></div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- JUGAR -->
+    <section class="section rifa-jugar" id="sorteo-jugar">
+      <div class="wrap">
+        <div class="reveal">
+          <Etiqueta texto="Cómo jugar" />
+          <h2 class="section__title">¿Cómo quieres conseguir tu ticket?</h2>
+        </div>
+
+        <div class="rifa-chips" id="rifaChips" hidden>
+          <p class="rifa-chips__label">Tus tickets elegidos</p>
+          <div class="rifa-chips__lista" id="rifaChipsLista"></div>
+        </div>
+
+        <div class="rifa-modos">
+          <button type="button" class="rifa-modo activo" id="rifaModoAzar">
+            <span class="rifa-modo__emoji">🎲</span>Que el fuego elija
+          </button>
+          <button type="button" class="rifa-modo" id="rifaModoElegir">
+            <span class="rifa-modo__emoji">🖐️</span>Elijo yo
+          </button>
+        </div>
+
+        <!-- PANEL AZAR -->
+        <div class="rifa-panel activo" id="rifaPanelAzar">
+          <div class="rifa-azar">
+            <button type="button" class="rifa-azar__btn" data-rifa-azar="1">
+              <span class="rifa-azar__info">
+                <span class="rifa-azar__titulo">1 ticket al azar</span>
+                <span class="rifa-azar__sub">Una oportunidad</span>
+              </span>
+              <span class="rifa-azar__precio">$3.000</span>
+            </button>
+            <button type="button" class="rifa-azar__btn rifa-azar__btn--recomendado" data-rifa-azar="2">
+              <span class="rifa-azar__info">
+                <span class="rifa-azar__titulo">2 tickets al azar</span>
+                <span class="rifa-azar__sub">
+                  La opción recomendada<br />
+                  <span class="rifa-badge">Ahorras $1.000</span>
+                </span>
+              </span>
+              <span class="rifa-azar__precio">$5.000</span>
+            </button>
+          </div>
+          <div class="rifa-roll" id="rifaRollStage"></div>
+          <img
+            class="rifa-mascota rifa-mascota--azar"
+            src="/media/sorteo-azar.png"
+            alt="Mascota Firehouse con un ticket de la suerte entre llamas"
+            width="700" height="900"
+            loading="lazy"
+          />
+        </div>
+
+        <!-- PANEL ELEGIR -->
+        <div class="rifa-panel" id="rifaPanelElegir">
+          <img
+            class="rifa-mascota rifa-mascota--elegir"
+            src="/media/sorteo-elegir.png"
+            alt="Mascota Firehouse con un ticket del sorteo"
+            width="700" height="900"
+            loading="lazy"
+          />
+          <div class="rifa-buscar">
+            <input type="text" inputmode="numeric" placeholder="Busca tu ticket (ej: 147)" id="rifaBuscar" />
+          </div>
+          <label class="rifa-filtro">
+            <input type="checkbox" id="rifaSoloDisponibles" /> Mostrar solo disponibles
+          </label>
+
+          <div class="rifa-bloques" id="rifaBloques"></div>
+
+          <div class="rifa-leyenda">
+            <span><i class="rifa-punto rifa-punto--disp"></i>Disponible</span>
+            <span><i class="rifa-punto rifa-punto--res"></i>Reservado</span>
+            <span><i class="rifa-punto rifa-punto--vend"></i>Vendido</span>
+            <span><i class="rifa-punto rifa-punto--sel"></i>Elegido</span>
+          </div>
+
+          <div class="rifa-grid" id="rifaGrid"></div>
+        </div>
+
+        <!-- UPSELL compartido entre modos -->
+        <div class="rifa-upsell" id="rifaUpsell">
+          <p id="rifaUpsellTexto"></p>
+          <div class="rifa-upsell__btns">
+            <button type="button" class="primario" id="rifaUpsellBtnPrincipal"></button>
+            <button type="button" id="rifaUpsellBtnSecundario"></button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PREMIOS -->
+    <section class="section rifa-premios">
+      <div class="wrap">
+        <div class="reveal">
+          <Etiqueta texto="Los premios" />
+          <h2 class="section__title">Esto te puedes ganar</h2>
+        </div>
+        <img
+          class="rifa-mascota rifa-mascota--premios"
+          src="/media/sorteo-premios.png"
+          alt="Mascotas Firehouse en podio de premios"
+          width="700" height="900"
+          loading="lazy"
+        />
+        <div class="rifa-premios__grid">
+          {premios.map((p) => (
+            <div class:list={['rifa-premio', { 'rifa-premio--principal': p.principal }]}>
+              <p class="rifa-premio__tag">{p.tag}</p>
+              <p class="rifa-premio__titulo">{p.titulo}</p>
+              <p class="rifa-premio__desc">{p.desc}</p>
+            </div>
+          ))}
+        </div>
+        <p class="rifa-nota">* Premios de ejemplo — reemplaza estos textos por los definitivos antes de publicar.</p>
+      </div>
+    </section>
+
+    <!-- SORTEO -->
+    <section class="section rifa-sorteo">
+      <div class="wrap">
+        <div class="reveal">
+          <Etiqueta texto="El sorteo" />
+          <h2 class="section__title">¿Cómo se elige al ganador?</h2>
+        </div>
+        <div class="rifa-sorteo__card">
+          <img
+            class="rifa-mascota rifa-mascota--sorteo"
+            src="/media/sorteo-bola.png"
+            alt="Mascotas Firehouse junto a la bola del sorteo"
+            width="700" height="900"
+            loading="lazy"
+          />
+          <p class="rifa-sorteo__fecha">Sábado 12 de diciembre · Instagram Live</p>
+          <p class="rifa-sorteo__texto">
+            El sorteo se realiza en vivo por <strong>@firehouse.cheer</strong>, entre los números
+            efectivamente vendidos — nunca entre los 800. Un testigo acompaña el sorteo y el video
+            queda publicado como respaldo para que cualquier familia pueda revisarlo.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- COMPARTIR -->
+    <section class="section rifa-compartir">
+      <div class="wrap">
+        <div class="reveal">
+          <Etiqueta texto="Ayúdanos a llegar más lejos" />
+          <h2 class="section__title">Comparte el sorteo</h2>
+          <p class="section__intro">Mientras más personas la vean, más rápido llegamos a la meta.</p>
+        </div>
+        <div class="rifa-compartir__botones">
+          <a class="btn" href="#" data-rifa-compartir="whatsapp">Compartir por WhatsApp</a>
+          <a class="btn" href="#" data-rifa-compartir="instagram">Compartir en Instagram</a>
+        </div>
+        <p class="rifa-ayuda">
+          ¿Dudas antes de participar?
+          <a href={whatsapp('sorteo')} target="_blank" rel="noopener">Escríbenos por WhatsApp →</a>
+        </p>
+      </div>
+    </section>
+
+    <!-- CARRITO FIJO -->
+    <div class="rifa-cart" id="rifaCart">
+      <div class="wrap rifa-cart__fila">
+        <div class="rifa-cart__info">
+          <div class="rifa-cart__nums" id="rifaCartNums"></div>
+          <p class="rifa-cart__total" id="rifaCartTotal">$0</p>
+        </div>
+        <button type="button" class="btn" id="rifaCartPagar">Pagar con Flow 🔥</button>
+      </div>
+    </div>
+
+    <!-- MODAL: DATOS DEL COMPRADOR -->
+    <!-- Quien compra puede no ser el atleta al que se atribuye la venta (ej. un
+         familiar comprando con el link de una niña). Si esta venta gana un
+         premio, se contacta a esta persona — por eso se piden estos datos
+         antes de ir a pagar, no los del atleta. -->
+    <div class="rifa-modal" id="rifaModalDatos" hidden>
+      <div class="rifa-modal__fondo" id="rifaModalFondo"></div>
+      <div class="rifa-modal__caja" role="dialog" aria-modal="true" aria-labelledby="rifaModalTitulo">
+        <button type="button" class="rifa-modal__cerrar" id="rifaModalCerrar" aria-label="Cerrar">×</button>
+        <h3 id="rifaModalTitulo">Tus datos</h3>
+        <p class="rifa-modal__intro">Los usamos solo para contactarte si tu número resulta ganador.</p>
+
+        <form id="rifaFormDatos" novalidate>
+          <div class="rifa-campo">
+            <label for="rifaNombre">Nombre completo</label>
+            <input type="text" id="rifaNombre" required autocomplete="name" maxlength="150" minlength="3" />
+          </div>
+          <div class="rifa-campo">
+            <label for="rifaEmail">Correo electrónico</label>
+            <input type="email" id="rifaEmail" required autocomplete="email" maxlength="254" />
+            <p class="rifa-campo__validacion" id="rifaEmailFeedback" aria-live="polite"></p>
+          </div>
+          <div class="rifa-campo">
+            <label for="rifaTelefono">Celular / WhatsApp</label>
+            <input type="tel" inputmode="tel" id="rifaTelefono" required autocomplete="tel"
+                   placeholder="9 1234 5678" maxlength="12" pattern="9 \d{4} \d{4}"
+                   title="Formato: 9 1234 5678" />
+          </div>
+          <div class="rifa-campo">
+            <label for="rifaInstagram">Instagram <span class="rifa-campo__opcional">(opcional)</span></label>
+            <input type="text" id="rifaInstagram" autocomplete="off" placeholder="@tuusuario" maxlength="60" />
+          </div>
+          <div class="rifa-campo">
+            <label for="rifaRut">RUT <span class="rifa-campo__opcional">(opcional — te lo pedimos igual si ganas)</span></label>
+            <input type="text" id="rifaRut" autocomplete="off" placeholder="11.111.111-1" maxlength="12" />
+          </div>
+          <p id="rifaFormError" class="rifa-modal__error" hidden>Completa nombre, correo y celular con un formato válido para continuar.</p>
+          <button type="submit" class="btn rifa-modal__enviar" id="rifaModalEnviar">Continuar a pagar 🔥</button>
+        </form>
+      </div>
+    </div>
+
+    <div class="rifa-toast" id="rifaToast"></div>
+  </div>
+</Base>
+
+<script>
+  import { iniciarSorteo } from '../scripts/sorteo.ts';
+  iniciarSorteo();
+</script>
+
+<style is:global>
+  /* La rifa se ve intencionalmente más intensa que el resto del sitio: fondo negro
+     puro (no --ember) y más movimiento, tal como se pidió para esta página. */
+  .rifa{ background:#000; }
+
+  /* ---------- HERO ---------- */
+  .rifa-hero{
+    position:relative;
+    overflow:hidden;
+    padding:var(--e-6) 0 var(--e-6);
+  }
+  .rifa-hero::before{
+    content:'';
+    position:absolute;
+    top:-220px; left:50%;
+    width:900px; height:760px;
+    transform:translateX(-50%);
+    background:radial-gradient(ellipse 50% 50% at 50% 50%, rgba(197,21,21,.55), rgba(255,196,0,.28) 45%, transparent 72%);
+    filter:blur(10px);
+    pointer-events:none;
+  }
+
+  .rifa-hero__fila{
+    position:relative; z-index:1;
+    display:flex; flex-direction:column;
+    align-items:center; text-align:center;
+    gap:var(--e-5);
+  }
+  .rifa-hero__texto{ max-width:var(--wrap-texto); }
+  .rifa-hero__visual{ width:100%; max-width:380px; }
+
+  .rifa-hero__logo{ display:inline-block; margin-bottom:var(--e-3); }
+  .rifa-hero__logo img{ width:120px; height:auto; margin-inline:auto; }
+
+  .rifa-hero__titulo{
+    font-size:clamp(2rem, 6.6vw, 3.1rem);
+    line-height:1.04;
+    max-width:16ch;
+    margin:0 auto var(--e-3);
+  }
+  .rifa-hero__sub{ margin-bottom:var(--e-3); }
+  .rifa-hero__sello{
+    display:inline-block;
+    font-family:var(--font-display); font-weight:800;
+    font-size:clamp(1.15rem, 3vw, 1.6rem);
+    background:var(--fire-red);
+    color:var(--chalk);
+    padding:4px 16px 9px;
+    border-radius:4px;
+    transform:rotate(var(--tilt-xl));
+  }
+  .rifa-hero__bajada{
+    color:var(--txt-soft);
+    max-width:46ch;
+    margin:0 auto var(--e-4);
+    font-size:clamp(1.05rem, 1.6vw, 1.2rem);
+  }
+  .rifa-hero__cta{ transform:rotate(var(--tilt-xl)); }
+
+  @media (min-width:900px){
+    .rifa-hero__fila{
+      flex-direction:row; align-items:center; text-align:left;
+      gap:var(--e-7);
+    }
+    .rifa-hero__texto{ flex:1.15; max-width:none; }
+    .rifa-hero__visual{ flex:.85; max-width:440px; }
+    .rifa-hero__logo{ margin-bottom:var(--e-4); }
+    .rifa-hero__logo img{ width:160px; margin-inline:0; }
+    .rifa-hero__titulo{ max-width:12ch; margin:0 0 var(--e-3); font-size:clamp(2.6rem, 4.4vw, 3.8rem); }
+    .rifa-hero__bajada{ margin:0 0 var(--e-4); }
+  }
+  .rifa-mascota{ display:block; width:100%; height:auto; }
+  .rifa-mascota--hero{
+    max-width:340px;
+    margin:0 auto;
+    filter:drop-shadow(0 22px 30px rgba(0,0,0,.7));
+  }
+  @media (min-width:900px){
+    .rifa-mascota--hero{ max-width:100%; }
+  }
+
+  .rifa-ticker{
+    margin-top:var(--e-5);
+    padding:var(--e-3);
+    background:var(--ember-deep);
+    border:1px solid var(--hairline);
+    border-radius:12px;
+    position:relative; z-index:1;
+  }
+  .rifa-ticker__fila{ display:flex; justify-content:space-between; align-items:baseline; margin-bottom:10px; }
+  .rifa-ticker__num{
+    font-family:var(--font-count); font-weight:700;
+    font-size:clamp(2rem, 8vw, 2.8rem); color:var(--fire-yellow); line-height:1;
+  }
+  .rifa-ticker__total{ font-family:var(--font-count); font-size:15px; color:var(--txt-faint); }
+  .rifa-ticker__label{ font-size:14px; color:var(--txt-faint); }
+  .rifa-ticker__barra{ margin-top:14px; height:10px; background:var(--hairline); border-radius:var(--radio); overflow:hidden; }
+  .rifa-ticker__relleno{
+    height:100%; border-radius:var(--radio);
+    background:linear-gradient(90deg, var(--fire-red), var(--fire-yellow));
+    transition:width .6s ease;
+  }
+
+  /* ---------- MASCOTAS por sección ---------- */
+  .rifa-mascota--premios{ max-width:340px; margin:0 auto var(--e-3); filter:drop-shadow(0 16px 24px rgba(0,0,0,.65)); }
+  .rifa-mascota--azar{ max-width:220px; margin:var(--e-3) auto 0; filter:drop-shadow(0 14px 20px rgba(0,0,0,.6)); }
+  .rifa-mascota--elegir{ max-width:190px; margin:0 auto var(--e-3); filter:drop-shadow(0 14px 20px rgba(0,0,0,.6)); }
+  .rifa-mascota--sorteo{ max-width:280px; margin:0 auto var(--e-3); filter:drop-shadow(0 16px 24px rgba(0,0,0,.65)); }
+
+  /* ---------- PREMIOS ---------- */
+  .rifa-premios__grid{ display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:var(--e-4); }
+  .rifa-premio{ background:var(--ember-deep); border:1px solid var(--hairline); padding:var(--e-3); border-radius:12px; }
+  .rifa-premio--principal{
+    grid-column:1 / -1;
+    background:linear-gradient(135deg, #2a1414, var(--ember-deep));
+    border-color:var(--fire-red);
+  }
+  .rifa-premio__tag{ font-family:var(--font-count); font-size:12px; color:var(--fire-yellow); margin-bottom:6px; }
+  .rifa-premio__titulo{ font-family:var(--font-display); font-weight:800; font-size:1.25rem; margin-bottom:4px; }
+  .rifa-premio--principal .rifa-premio__titulo{ font-size:1.6rem; }
+  .rifa-premio__desc{ color:var(--txt-faint); font-size:14px; }
+  .rifa-nota{ margin-top:var(--e-3); font-size:12px; color:var(--txt-faint); }
+
+  /* ---------- CHIPS ---------- */
+  .rifa-chips{
+    margin:var(--e-4) 0; padding:var(--e-3);
+    background:var(--ember-deep); border:1px solid var(--fire-yellow); border-radius:12px;
+  }
+  .rifa-chips__label{ font-family:var(--font-count); font-size:12px; color:var(--fire-yellow); margin-bottom:8px; }
+  .rifa-chips__lista{ display:flex; flex-wrap:wrap; gap:8px; }
+  .rifa-chip{
+    display:inline-flex; align-items:center; gap:6px;
+    background:var(--fire-yellow); color:var(--ember);
+    font-family:var(--font-count); font-size:13px; font-weight:700;
+    padding:6px 6px 6px 10px; border-radius:var(--radio);
+  }
+  .rifa-chip button{
+    background:rgba(0,0,0,.2); border:none; color:var(--ember);
+    width:18px; height:18px; border-radius:50%; font-size:13px; line-height:1; cursor:pointer;
+  }
+
+  /* ---------- MODOS ---------- */
+  .rifa-modos{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:var(--e-3); }
+  .rifa-modo{
+    background:var(--ember-deep); border:2px solid var(--hairline); color:var(--txt);
+    padding:var(--e-3); font-family:var(--font-display); font-weight:700; font-size:15px;
+    border-radius:12px; cursor:pointer; text-align:center; line-height:1.3;
+  }
+  .rifa-modo__emoji{ display:block; font-size:26px; margin-bottom:6px; }
+  .rifa-modo.activo{ border-color:var(--fire-yellow); background:rgba(255,196,0,.08); color:var(--fire-yellow); }
+
+  .rifa-panel{ display:none; }
+  .rifa-panel.activo{ display:block; }
+
+  /* ---------- AL AZAR ---------- */
+  .rifa-azar{ display:flex; flex-direction:column; gap:10px; }
+  .rifa-azar__btn{
+    display:flex; justify-content:space-between; align-items:center; width:100%;
+    background:var(--ember-deep); border:1px solid var(--hairline); color:var(--txt);
+    padding:var(--e-3); border-radius:12px; cursor:pointer; font-family:var(--font-body);
+  }
+  .rifa-azar__info{ text-align:left; }
+  .rifa-azar__titulo{ font-family:var(--font-display); font-weight:700; font-size:17px; }
+  .rifa-azar__sub{ font-size:13px; color:var(--txt-faint); }
+  .rifa-azar__precio{ font-family:var(--font-count); font-size:18px; font-weight:700; }
+  .rifa-azar__btn--recomendado{
+    border-color:var(--fire-yellow);
+    background:linear-gradient(135deg, rgba(255,196,0,.1), var(--ember-deep));
+    transform:rotate(var(--tilt-xl));
+  }
+  .rifa-azar__btn--recomendado .rifa-azar__precio{ color:var(--fire-yellow); }
+  .rifa-badge{
+    display:inline-block; font-family:var(--font-count); font-size:11px;
+    background:var(--fire-yellow); color:var(--ember); padding:2px 7px; border-radius:var(--radio); margin-top:4px;
+  }
+
+  .rifa-roll{ margin-top:var(--e-3); display:none; gap:12px; justify-content:center; }
+  .rifa-roll.activo{ display:flex; }
+  .rifa-roll-num{
+    font-family:var(--font-count); font-size:34px; font-weight:700;
+    background:var(--fire-red); color:var(--chalk); padding:10px 16px; border-radius:8px;
+    min-width:90px; text-align:center;
+  }
+
+  /* ---------- ELEGIR ---------- */
+  .rifa-buscar{ margin-bottom:var(--e-2); }
+  .rifa-buscar input{
+    width:100%; background:var(--ember-deep); border:1px solid var(--hairline); color:var(--txt);
+    padding:12px 14px; font-family:var(--font-count); font-size:15px; border-radius:12px;
+  }
+  .rifa-filtro{ display:flex; align-items:center; gap:8px; font-size:13px; color:var(--txt-faint); margin-bottom:var(--e-3); }
+
+  .rifa-bloques{ display:flex; gap:6px; overflow-x:auto; padding-bottom:8px; margin-bottom:var(--e-3); }
+  .rifa-bloque{
+    flex:0 0 auto; background:var(--ember-deep); border:1px solid var(--hairline); color:var(--txt-faint);
+    font-family:var(--font-count); font-size:12px; padding:8px 12px; border-radius:var(--radio);
+    cursor:pointer; white-space:nowrap;
+  }
+  .rifa-bloque.activo{ background:var(--fire-yellow); color:var(--ember); border-color:var(--fire-yellow); font-weight:700; }
+
+  .rifa-leyenda{ display:flex; flex-wrap:wrap; gap:12px; margin-bottom:var(--e-3); font-size:12px; color:var(--txt-faint); }
+  .rifa-leyenda span{ display:inline-flex; align-items:center; gap:5px; }
+  .rifa-punto{ width:10px; height:10px; border-radius:3px; display:inline-block; }
+  .rifa-punto--disp{ background:var(--ember-deep); border:1px solid var(--hairline); }
+  .rifa-punto--res{ background:var(--mat-blue); }
+  .rifa-punto--vend{ background:#0a0a0a; border:1px solid var(--hairline); }
+  .rifa-punto--sel{ background:var(--fire-yellow); }
+
+  .rifa-grid{ display:grid; grid-template-columns:repeat(5, 1fr); gap:6px; margin-bottom:var(--e-2); }
+  .rifa-num{
+    aspect-ratio:1; display:flex; align-items:center; justify-content:center;
+    font-family:var(--font-count); font-size:13px; border-radius:6px; cursor:pointer;
+    background:var(--ember-deep); color:var(--txt); border:1px solid var(--hairline);
+  }
+  .rifa-num.reservado{ background:var(--mat-blue); color:var(--chalk); cursor:not-allowed; opacity:.75; }
+  .rifa-num.vendido{ background:#0a0a0a; color:#4a4a4a; cursor:not-allowed; border-color:#1e1e1e; }
+  .rifa-num.seleccionado{ background:var(--fire-yellow); color:var(--ember); font-weight:700; border-color:var(--fire-yellow); }
+  .rifa-num.resaltado{ box-shadow:0 0 0 3px var(--fire-red); }
+
+  @media (min-width:520px){ .rifa-grid{ grid-template-columns:repeat(8, 1fr); } }
+
+  /* ---------- UPSELL compartido ---------- */
+  .rifa-upsell{
+    display:none; margin-top:var(--e-3); padding:var(--e-3);
+    background:linear-gradient(135deg, #2a1414, var(--ember-deep));
+    border:1px solid var(--fire-red); border-radius:12px;
+  }
+  .rifa-upsell.activo{ display:block; }
+  .rifa-upsell p{ margin-bottom:var(--e-2); font-size:15px; }
+  .rifa-upsell strong{ color:var(--fire-yellow); }
+  .rifa-upsell__btns{ display:flex; gap:8px; flex-wrap:wrap; }
+  .rifa-upsell__btns button{
+    flex:1; min-width:140px; padding:12px; border-radius:var(--radio);
+    border:1px solid var(--fire-yellow); background:transparent; color:var(--fire-yellow);
+    font-weight:700; cursor:pointer; font-size:13px;
+  }
+  .rifa-upsell__btns button.primario{ background:var(--fire-yellow); color:var(--ember); }
+
+  /* ---------- SORTEO ---------- */
+  .rifa-sorteo__card{
+    background:var(--ember-deep); border:1px solid var(--hairline); border-radius:12px;
+    padding:var(--e-4); text-align:center; margin-top:var(--e-4);
+  }
+  .rifa-sorteo__fecha{ font-family:var(--font-count); font-size:1.3rem; color:var(--fire-yellow); margin-bottom:8px; }
+  .rifa-sorteo__texto{ font-size:14px; color:var(--txt-faint); line-height:1.6; text-align:left; }
+  .rifa-sorteo__texto strong{ color:var(--chalk); }
+
+  /* ---------- COMPARTIR ---------- */
+  .rifa-compartir__botones{ display:flex; gap:10px; margin-top:var(--e-4); flex-wrap:wrap; }
+  .rifa-compartir__botones .btn{ flex:1; min-width:200px; text-align:center; }
+  .rifa-ayuda{ margin-top:var(--e-3); font-size:14px; color:var(--txt-faint); }
+  .rifa-ayuda a{ color:var(--fire-yellow); }
+
+  /* ---------- CARRITO FIJO ---------- */
+  .rifa-cart{
+    position:fixed; left:0; right:0; bottom:0;
+    background:var(--ember-deep); border-top:1px solid var(--fire-yellow);
+    padding:var(--e-2) 0; transform:translateY(100%); transition:transform .3s ease; z-index:50;
+  }
+  .rifa-cart.activo{ transform:translateY(0); }
+  .rifa-cart__fila{ display:flex; align-items:center; justify-content:space-between; gap:var(--e-3); flex-wrap:wrap; }
+  .rifa-cart__info{ display:flex; align-items:center; gap:var(--e-3); flex-wrap:wrap; flex:1; min-width:0; }
+  .rifa-cart__nums{ display:flex; gap:6px; flex-wrap:wrap; max-height:72px; overflow-y:auto; }
+  .rifa-cart__total{ font-family:var(--font-count); font-size:20px; font-weight:700; color:var(--fire-yellow); white-space:nowrap; }
+
+  /* ---------- TOAST ---------- */
+  .rifa-toast{
+    position:fixed; left:50%; bottom:100px; transform:translate(-50%, 20px);
+    background:var(--chalk); color:var(--ember); padding:14px 20px; border-radius:8px;
+    font-size:14px; max-width:80vw; text-align:center; opacity:0; pointer-events:none;
+    transition:opacity .25s ease, transform .25s ease; z-index:100;
+  }
+  .rifa-toast.activo{ opacity:1; transform:translate(-50%, 0); }
+
+  /* ---------- MODAL DATOS DEL COMPRADOR ---------- */
+  .rifa-modal[hidden]{ display:none; }
+  .rifa-modal{
+    position:fixed; inset:0; z-index:200;
+    display:flex; align-items:flex-end; justify-content:center;
+  }
+  .rifa-modal__fondo{
+    position:absolute; inset:0;
+    background:rgba(0,0,0,.7);
+  }
+  .rifa-modal__caja{
+    position:relative;
+    width:100%; max-width:480px;
+    max-height:88vh; overflow-y:auto;
+    background:var(--ember-deep);
+    border:1px solid var(--hairline);
+    border-radius:16px 16px 0 0;
+    padding:var(--e-4);
+  }
+  .rifa-modal__cerrar{
+    position:absolute; top:12px; right:12px;
+    width:32px; height:32px; border-radius:50%;
+    background:rgba(245,239,232,.08); border:none; color:var(--txt);
+    font-size:18px; cursor:pointer;
+  }
+  .rifa-modal__caja h3{ font-family:var(--font-display); font-weight:800; font-size:1.4rem; padding-right:var(--e-4); }
+  .rifa-modal__intro{ color:var(--txt-faint); font-size:14px; margin-top:6px; margin-bottom:var(--e-3); }
+  .rifa-campo{ margin-top:var(--e-3); }
+  .rifa-campo label{ display:block; font-size:14px; color:var(--txt-soft); margin-bottom:6px; }
+  .rifa-campo__opcional{ color:var(--txt-faint); font-weight:400; }
+  .rifa-campo input{
+    width:100%; box-sizing:border-box;
+    background:var(--ember); color:var(--chalk);
+    border:1px solid var(--hairline); border-radius:12px;
+    padding:13px 14px; font-family:var(--font-body); font-size:16px; min-height:48px;
+  }
+  .rifa-campo input:focus-visible{
+    outline:none; border-color:var(--fire-yellow);
+    box-shadow:0 0 0 4px rgba(255,196,0,.2);
+  }
+  /* El aviso de campo inválido sólo aparece después de que la persona ya
+     interactuó con él (clase .tocado agregada al salir del campo) — nunca
+     antes de que alcance a escribir. */
+  .rifa-campo input.tocado:invalid{
+    border-color:rgba(197,21,21,.5); background:rgba(197,21,21,.05);
+  }
+  .rifa-campo input.tocado:invalid:focus-visible{
+    box-shadow:0 0 0 4px rgba(197,21,21,.16);
+  }
+  /* Campo completado correctamente: borde distinto para dar confianza,
+     pero nunca se pisa con el foco activo. */
+  .rifa-campo input.con-contenido:valid:not(:focus-visible){
+    border-color:rgba(27,79,168,.55); background:rgba(27,79,168,.06);
+  }
+  .rifa-campo__validacion{ margin-top:6px; font-size:13px; min-height:1.2em; }
+  .rifa-campo__validacion.valido{ color:var(--fire-yellow); }
+  .rifa-campo__validacion.invalido{ color:rgba(197,21,21,.85); }
+  .rifa-modal__error{ color:var(--fire-red); font-size:13px; margin-top:var(--e-2); }
+  .rifa-modal__enviar{ width:100%; text-align:center; margin-top:var(--e-4); }
+  .rifa-modal__enviar:disabled{ opacity:.7; pointer-events:none; }
+
+  @media (min-width:640px){
+    .rifa-modal{ align-items:center; }
+    .rifa-modal__caja{ border-radius:16px; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .rifa-cart, .rifa-toast, .rifa-ticker__relleno{ transition:none; }
+  }
+</style>
