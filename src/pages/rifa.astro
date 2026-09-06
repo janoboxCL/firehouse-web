@@ -236,6 +236,45 @@ const premios = [
       </div>
     </div>
 
+    <!-- MODAL: DATOS DEL COMPRADOR -->
+    <!-- Quien compra puede no ser el atleta al que se atribuye la venta (ej. un
+         familiar comprando con el link de una niña). Si esta venta gana un
+         premio, se contacta a esta persona — por eso se piden estos datos
+         antes de ir a pagar, no los del atleta. -->
+    <div class="rifa-modal" id="rifaModalDatos" hidden>
+      <div class="rifa-modal__fondo" id="rifaModalFondo"></div>
+      <div class="rifa-modal__caja" role="dialog" aria-modal="true" aria-labelledby="rifaModalTitulo">
+        <button type="button" class="rifa-modal__cerrar" id="rifaModalCerrar" aria-label="Cerrar">×</button>
+        <h3 id="rifaModalTitulo">Tus datos</h3>
+        <p class="rifa-modal__intro">Los usamos solo para contactarte si tu número resulta ganador.</p>
+
+        <form id="rifaFormDatos" novalidate>
+          <div class="rifa-campo">
+            <label for="rifaNombre">Nombre completo</label>
+            <input type="text" id="rifaNombre" required autocomplete="name" maxlength="150" />
+          </div>
+          <div class="rifa-campo">
+            <label for="rifaEmail">Correo electrónico</label>
+            <input type="email" id="rifaEmail" required autocomplete="email" maxlength="254" />
+          </div>
+          <div class="rifa-campo">
+            <label for="rifaTelefono">Celular / WhatsApp</label>
+            <input type="tel" inputmode="tel" id="rifaTelefono" required autocomplete="tel" placeholder="9 1234 5678" maxlength="20" />
+          </div>
+          <div class="rifa-campo">
+            <label for="rifaInstagram">Instagram <span class="rifa-campo__opcional">(opcional)</span></label>
+            <input type="text" id="rifaInstagram" autocomplete="off" placeholder="@tuusuario" maxlength="60" />
+          </div>
+          <div class="rifa-campo">
+            <label for="rifaRut">RUT <span class="rifa-campo__opcional">(opcional — te lo pedimos igual si ganas)</span></label>
+            <input type="text" id="rifaRut" autocomplete="off" placeholder="11.111.111-1" maxlength="12" />
+          </div>
+          <p id="rifaFormError" class="rifa-modal__error" hidden>Completa nombre, correo y celular para continuar.</p>
+          <button type="submit" class="btn rifa-modal__enviar">Continuar a pagar 🔥</button>
+        </form>
+      </div>
+    </div>
+
     <div class="rifa-toast" id="rifaToast"></div>
   </div>
 </Base>
@@ -518,6 +557,54 @@ const premios = [
     transition:opacity .25s ease, transform .25s ease; z-index:100;
   }
   .rifa-toast.activo{ opacity:1; transform:translate(-50%, 0); }
+
+  /* ---------- MODAL DATOS DEL COMPRADOR ---------- */
+  .rifa-modal[hidden]{ display:none; }
+  .rifa-modal{
+    position:fixed; inset:0; z-index:200;
+    display:flex; align-items:flex-end; justify-content:center;
+  }
+  .rifa-modal__fondo{
+    position:absolute; inset:0;
+    background:rgba(0,0,0,.7);
+  }
+  .rifa-modal__caja{
+    position:relative;
+    width:100%; max-width:480px;
+    max-height:88vh; overflow-y:auto;
+    background:var(--ember-deep);
+    border:1px solid var(--hairline);
+    border-radius:16px 16px 0 0;
+    padding:var(--e-4);
+  }
+  .rifa-modal__cerrar{
+    position:absolute; top:12px; right:12px;
+    width:32px; height:32px; border-radius:50%;
+    background:rgba(245,239,232,.08); border:none; color:var(--txt);
+    font-size:18px; cursor:pointer;
+  }
+  .rifa-modal__caja h3{ font-family:var(--font-display); font-weight:800; font-size:1.4rem; padding-right:var(--e-4); }
+  .rifa-modal__intro{ color:var(--txt-faint); font-size:14px; margin-top:6px; margin-bottom:var(--e-3); }
+  .rifa-campo{ margin-top:var(--e-3); }
+  .rifa-campo label{ display:block; font-size:14px; color:var(--txt-soft); margin-bottom:6px; }
+  .rifa-campo__opcional{ color:var(--txt-faint); font-weight:400; }
+  .rifa-campo input{
+    width:100%; box-sizing:border-box;
+    background:var(--ember); color:var(--chalk);
+    border:1px solid var(--hairline); border-radius:12px;
+    padding:13px 14px; font-family:var(--font-body); font-size:16px; min-height:48px;
+  }
+  .rifa-campo input:focus-visible{
+    outline:none; border-color:var(--fire-yellow);
+    box-shadow:0 0 0 4px rgba(255,196,0,.2);
+  }
+  .rifa-modal__error{ color:var(--fire-red); font-size:13px; margin-top:var(--e-2); }
+  .rifa-modal__enviar{ width:100%; text-align:center; margin-top:var(--e-4); }
+
+  @media (min-width:640px){
+    .rifa-modal{ align-items:center; }
+    .rifa-modal__caja{ border-radius:16px; }
+  }
 
   @media (prefers-reduced-motion: reduce){
     .rifa-cart, .rifa-toast, .rifa-ticker__relleno{ transition:none; }

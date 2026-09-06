@@ -295,9 +295,47 @@ export function iniciarRifa(): void {
     cartTotal.textContent = `$${precio.toLocaleString('es-CL')}`;
   }
 
+  // ---- datos del comprador (puede ser distinto al atleta del código) ----
+  interface DatosComprador {
+    nombre: string;
+    email: string;
+    telefono: string;
+    instagram: string;
+    rut: string;
+  }
+
+  const modalDatos = $<HTMLElement>('#rifaModalDatos');
+  const modalFondo = $<HTMLElement>('#rifaModalFondo');
+  const modalCerrar = $<HTMLButtonElement>('#rifaModalCerrar');
+  const formDatos = $<HTMLFormElement>('#rifaFormDatos');
+  const formError = $<HTMLElement>('#rifaFormError');
+  const inputNombre = $<HTMLInputElement>('#rifaNombre');
+  const inputEmail = $<HTMLInputElement>('#rifaEmail');
+  const inputTelefono = $<HTMLInputElement>('#rifaTelefono');
+  const inputInstagram = $<HTMLInputElement>('#rifaInstagram');
+  const inputRut = $<HTMLInputElement>('#rifaRut');
+
+  function abrirModalDatos(): void {
+    if (carrito.length === 0) return;
+    modalDatos?.removeAttribute('hidden');
+    inputNombre?.focus();
+  }
+
+  function cerrarModalDatos(): void {
+    modalDatos?.setAttribute('hidden', '');
+    if (formError) formError.hidden = true;
+  }
+
   function pagar(): void {
-    // ⚠️ Acá va la integración real con Flow (crear orden, redirigir al checkout).
-    mostrarToast('🔥 Vista previa — en el sitio real esto abre el checkout de Flow');
+    abrirModalDatos();
+  }
+
+  function confirmarPago(datos: DatosComprador): void {
+    // ⚠️ Acá va la integración real: crear la venta + reservar números
+    // (POST /api/rifa/reservar con `datos` y `carrito`), y si la reserva
+    // funciona, redirigir a la URL que devuelve Flow. Por ahora solo simula.
+    cerrarModalDatos();
+    mostrarToast(`🔥 Vista previa — en el sitio real esto crea la orden en Flow para ${datos.nombre.split(' ')[0]}`);
   }
 
   // ---- cambio de modo: limpia la selección para evitar mezclar azar + manual ----
@@ -340,6 +378,30 @@ export function iniciarRifa(): void {
   buscarInput?.addEventListener('input', (e) => buscarNumero((e.target as HTMLInputElement).value));
   soloDisponibles?.addEventListener('change', renderGrid);
   $('#rifaCartPagar')?.addEventListener('click', pagar);
+
+  modalFondo?.addEventListener('click', cerrarModalDatos);
+  modalCerrar?.addEventListener('click', cerrarModalDatos);
+
+  formDatos?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const nombre = inputNombre?.value.trim() ?? '';
+    const email = inputEmail?.value.trim() ?? '';
+    const telefono = inputTelefono?.value.trim() ?? '';
+
+    if (!nombre || !email || !telefono) {
+      if (formError) formError.hidden = false;
+      return;
+    }
+    if (formError) formError.hidden = true;
+
+    confirmarPago({
+      nombre,
+      email,
+      telefono,
+      instagram: inputInstagram?.value.trim() ?? '',
+      rut: inputRut?.value.trim() ?? '',
+    });
+  });
 
   actualizarTicker();
 }
