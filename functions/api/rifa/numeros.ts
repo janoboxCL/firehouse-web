@@ -17,14 +17,22 @@ function jsonResponse(status: number, body: unknown): Response {
 }
 
 export const onRequestGet: PagesFunction<Env> = async (context) => {
-  const supabase = createClient(context.env.SUPABASE_URL, context.env.SUPABASE_SERVICE_ROLE_KEY);
+  try {
+    if (!context.env.SUPABASE_URL || !context.env.SUPABASE_SERVICE_ROLE_KEY) {
+      return jsonResponse(500, { error: 'faltan_variables_de_entorno' });
+    }
 
-  // Libera reservas vencidas antes de responder, para que el estado se vea al día.
-  await supabase.rpc('fn_liberar_reservas_vencidas_rifa');
+    const supabase = createClient(context.env.SUPABASE_URL, context.env.SUPABASE_SERVICE_ROLE_KEY);
 
-  const { data, error } = await supabase.from('rifa_numeros').select('numero, estado').order('numero');
+    // Libera reservas vencidas antes de responder, para que el estado se vea al día.
+    await supabase.rpc('fn_liberar_reservas_vencidas_rifa');
 
-  if (error || !data) return jsonResponse(500, { error: 'no_se_pudo_leer_numeros' });
+    const { data, error } = await supabase.from('rifa_numeros').select('numero, estado').order('numero');
 
-  return jsonResponse(200, { numeros: data });
+    if (error || !data) return jsonResponse(500, { error: 'no_se_pudo_leer_numeros', detalle: error?.message });
+
+    return jsonResponse(200, { numeros: data });
+  } catch (e) {
+    return jsonResponse(500, { error: 'error_inesperado', detalle: e instanceof Error ? `${e.name}: ${e.message}` : String(e) });
+  }
 };
