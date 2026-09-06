@@ -1,0 +1,94 @@
+---
+import AdminBase from '../../layouts/AdminBase.astro';
+---
+<AdminBase titulo="Concurso">
+  <h1 class="cc-titulo">Gran Concurso Firehouse</h1>
+  <p class="admin-intro">
+    Resumen de ventas, recaudación y avance por atleta. Los datos del comprador de cada
+    venta son los que se usan para contactar al ganador si su ticket resulta premiado.
+  </p>
+
+  <div id="cc-error" class="admin-error" hidden></div>
+  <p id="cc-cargando" class="admin-spinner">Cargando…</p>
+
+  <div id="cc-contenido" hidden>
+    <section class="cc-resumen">
+      <div class="admin-card cc-metrica">
+        <p class="cc-metrica__valor" id="cc-vendidos">—</p>
+        <p class="cc-metrica__label">tickets vendidos</p>
+      </div>
+      <div class="admin-card cc-metrica">
+        <p class="cc-metrica__valor" id="cc-recaudado">—</p>
+        <p class="cc-metrica__label">recaudado</p>
+      </div>
+      <div class="admin-card cc-metrica">
+        <p class="cc-metrica__valor" id="cc-reservados">—</p>
+        <p class="cc-metrica__label">reservados ahora</p>
+      </div>
+      <div class="admin-card cc-metrica">
+        <p class="cc-metrica__valor" id="cc-pendientes">—</p>
+        <p class="cc-metrica__label">ventas pendientes de pago</p>
+      </div>
+    </section>
+
+    <section class="admin-card">
+      <h2 class="cc-bloque__titulo">Avance por atleta</h2>
+      <table class="cc-tabla">
+        <thead>
+          <tr><th>Atleta</th><th>Código</th><th>Tickets</th></tr>
+        </thead>
+        <tbody id="cc-ranking-body"></tbody>
+      </table>
+    </section>
+
+    <section class="admin-card">
+      <h2 class="cc-bloque__titulo">Ventas</h2>
+      <div class="cc-tabla-wrap">
+        <table class="cc-tabla">
+          <thead>
+            <tr><th>Fecha</th><th>Comprador</th><th>Tickets</th><th>Monto</th><th>Atleta</th><th>Estado</th><th>Orden</th></tr>
+          </thead>
+          <tbody id="cc-ventas-body"></tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+</AdminBase>
+
+<script>
+  import { iniciarAdminConcurso } from '../../scripts/admin-concurso.ts';
+  iniciarAdminConcurso();
+</script>
+
+<style is:global>
+.cc-titulo{ font-family: var(--font-display); font-size: 1.7rem; margin: 0 0 8px; }
+
+.cc-resumen{ display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 20px; }
+@media (min-width: 720px){ .cc-resumen{ grid-template-columns: repeat(4, 1fr); } }
+.cc-metrica{ text-align: center; }
+.cc-metrica__valor{ font-family: var(--font-count); font-size: 1.7rem; font-weight: 700; margin: 0; color: var(--fire-red); }
+.cc-metrica__label{ font-size: 13px; color: #6B6259; margin: 4px 0 0; }
+
+.cc-bloque__titulo{ font-family: var(--font-display); font-size: 1.15rem; margin: 0 0 14px; }
+
+.cc-tabla-wrap{ overflow-x: auto; }
+.cc-tabla{ width: 100%; border-collapse: collapse; font-size: 13.5px; }
+.cc-tabla th{
+  text-align: left; padding: 8px 10px; border-bottom: 2px solid #E4DFD6;
+  font-weight: 600; color: #6B6259; white-space: nowrap;
+}
+.cc-tabla td{ padding: 10px; border-bottom: 1px solid #EFEBE4; vertical-align: top; }
+.cc-tabla tbody tr:hover{ background: #FAF8F4; }
+.cc-num{ text-align: right; font-family: var(--font-count); white-space: nowrap; }
+.cc-mono{ font-family: var(--font-count); font-size: 12.5px; }
+.cc-sub{ color: #8A8074; font-size: 12px; }
+.cc-vacio{ text-align: center; color: #8A8074; padding: 24px 0 !important; }
+
+.cc-badge{
+  display: inline-block; padding: 3px 9px; border-radius: 99px; font-size: 12px; font-weight: 600;
+  white-space: nowrap;
+}
+.cc-badge--pagada{ background: rgba(27,79,168,.1); color: #1B4FA8; }
+.cc-badge--pendiente{ background: rgba(255,196,0,.18); color: #8a6d00; }
+.cc-badge--rechazada, .cc-badge--anulada, .cc-badge--expirada{ background: rgba(197,21,21,.1); color: var(--fire-red); }
+</style>
