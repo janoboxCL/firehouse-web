@@ -11,7 +11,7 @@
 
 import { createClient } from '@supabase/supabase-js';
 import { obtenerEstadoPagoFlow } from '../../lib/flow.ts';
-import { enviarCorreoConfirmacionRifa, resolverBcc } from '../../lib/resend.ts';
+import { enviarCorreoConfirmacionRifa } from '../../lib/resend.ts';
 
 interface Env {
   SUPABASE_URL: string;
@@ -21,7 +21,7 @@ interface Env {
   FLOW_BASE_URL: string;
   RESEND_API_KEY?: string;
   EMAIL_FROM?: string;
-  EMAIL_BCC?: string;
+  EMAIL_FROM_CONCURSO?: string;
 }
 
 export const onRequestPost: PagesFunction<Env> = async (context) => {
@@ -69,7 +69,8 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       });
 
       // Correo de confirmación al comprador (best effort — nunca rompe la confirmación del pago).
-      if (context.env.RESEND_API_KEY && context.env.EMAIL_FROM) {
+      // Solo al comprador, sin copia oculta, y desde el remitente propio del concurso.
+      if (context.env.RESEND_API_KEY && (context.env.EMAIL_FROM_CONCURSO || context.env.EMAIL_FROM)) {
         try {
           const { data: venta } = await supabase
             .from('rifa_ventas')
@@ -85,7 +86,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 
             await enviarCorreoConfirmacionRifa(
               context.env.RESEND_API_KEY,
-              context.env.EMAIL_FROM,
+              context.env.EMAIL_FROM_CONCURSO ?? context.env.EMAIL_FROM!,
               {
                 compradorNombre: venta.comprador_nombre,
                 compradorEmail: venta.comprador_email,
@@ -94,7 +95,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
                 commerceOrder: estado.commerceOrder,
                 fechaSorteo: config?.fecha_sorteo ?? null,
               },
-              resolverBcc(context.env.EMAIL_BCC),
+              [], // sin copia oculta: solo al comprador
             );
           }
         } catch (err) {

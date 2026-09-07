@@ -221,13 +221,13 @@ const premios = [
     <!-- CARRITO FIJO -->
     <div class="rifa-cart" id="rifaCart">
       <div class="wrap rifa-cart__fila">
-        <div class="rifa-cart__info">
-          <div class="rifa-cart__nums" id="rifaCartNums"></div>
+        <div class="rifa-cart__nums" id="rifaCartNums"></div>
+        <div class="rifa-cart__resumen">
           <p class="rifa-cart__total" id="rifaCartTotal">$0</p>
-        </div>
-        <div class="rifa-cart__acciones">
-          <button type="button" class="btn" id="rifaCartPagar">Continuar al pago 🔥</button>
-          <p class="rifa-cart__seguro">🔒 Pago seguro vía Flow</p>
+          <div class="rifa-cart__acciones">
+            <button type="button" class="btn" id="rifaCartPagar">Continuar al pago 🔥</button>
+            <p class="rifa-cart__seguro">🔒 Pago seguro</p>
+          </div>
         </div>
       </div>
     </div>
@@ -600,9 +600,13 @@ const premios = [
     padding:var(--e-2) 0; transform:translateY(100%); transition:transform .3s ease; z-index:50;
   }
   .rifa-cart.activo{ transform:translateY(0); }
-  .rifa-cart__fila{ display:flex; align-items:center; justify-content:space-between; gap:var(--e-3); flex-wrap:wrap; }
-  .rifa-cart__info{ display:flex; align-items:center; gap:var(--e-3); flex-wrap:wrap; flex:1; min-width:0; }
-  .rifa-cart__nums{ display:flex; gap:6px; flex-wrap:wrap; max-height:72px; overflow-y:auto; }
+  .rifa-cart__fila{ display:flex; flex-direction:column; gap:10px; }
+  .rifa-cart__nums{
+    display:flex; gap:6px; flex-wrap:nowrap; overflow-x:auto; overflow-y:hidden;
+    padding-bottom:2px; -webkit-overflow-scrolling:touch;
+  }
+  .rifa-cart__nums .rifa-chip{ flex:0 0 auto; }
+  .rifa-cart__resumen{ display:flex; align-items:center; justify-content:space-between; gap:var(--e-3); }
   .rifa-cart__total{ font-family:var(--font-count); font-size:20px; font-weight:700; color:var(--fire-yellow); white-space:nowrap; }
   .rifa-cart__acciones{ text-align:center; }
   .rifa-cart__seguro{ margin:4px 0 0; font-size:11px; color:var(--txt-faint); }

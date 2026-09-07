@@ -13,18 +13,21 @@
 
 import { createClient } from '@supabase/supabase-js';
 import { crearPagoFlow } from '../../lib/flow.ts';
+import { crearPagoKhipu } from '../../lib/khipu.ts';
 
 interface Env {
   SUPABASE_URL: string;
   SUPABASE_SERVICE_ROLE_KEY: string;
-  FLOW_API_KEY: string;
-  FLOW_SECRET_KEY: string;
-  FLOW_BASE_URL: string;
+  FLOW_API_KEY?: string;
+  FLOW_SECRET_KEY?: string;
+  FLOW_BASE_URL?: string;
+  KHIPU_API_KEY?: string;
+  KHIPU_BASE_URL?: string;
   /** ej. https://firehousecheer.cl — si no está seteada, se usa ese valor por defecto. */
   SITE_URL?: string;
 }
 
-const VARIABLES_REQUERIDAS = ['SUPABASE_URL', 'SUPABASE_SERVICE_ROLE_KEY', 'FLOW_API_KEY', 'FLOW_SECRET_KEY', 'FLOW_BASE_URL'] as const;
+const VARIABLES_BASE = ['SUPABASE_URL', 'SUPABASE_SERVICE_ROLE_KEY'] as const;
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const MAX_NUMEROS_POR_COMPRA = 20;
@@ -45,7 +48,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
   try {
     // Falla rápido y con un mensaje claro si falta alguna variable de entorno,
     // en vez de dejar que un error opaco de una librería tumbe la función.
-    const faltantes = VARIABLES_REQUERIDAS.filter((k) => !context.env[k]);
+    const faltantes = VARIABLES_BASE.filter((k) => !context.env[k]);
     if (faltantes.length > 0) {
       return jsonResponse(500, { error: 'faltan_variables_de_entorno', variables: faltantes });
     }
@@ -79,11 +82,19 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 
     const { data: config, error: errConfig } = await supabase
       .from('rifa_config')
-      .select('precio_uno, precio_pack')
+      .select('precio_uno, precio_pack, pasarela_activa')
       .eq('id', 1)
       .single();
     if (errConfig || !config) {
       return jsonResponse(500, { error: 'config_no_disponible', detalle: errConfig?.message ?? 'sin fila en rifa_config' });
+    }
+
+    const pasarela = config.pasarela_activa === 'KHIPU' ? 'KHIPU' : 'FLOW';
+    if (pasarela === 'FLOW' && (!context.env.FLOW_API_KEY || !context.env.FLOW_SECRET_KEY || !context.env.FLOW_BASE_URL)) {
+      return jsonResponse(500, { error: 'faltan_variables_de_entorno', variables: ['FLOW_API_KEY', 'FLOW_SECRET_KEY', 'FLOW_BASE_URL'] });
+    }
+    if (pasarela === 'KHIPU' && (!context.env.KHIPU_API_KEY || !context.env.KHIPU_BASE_URL)) {
+      return jsonResponse(500, { error: 'faltan_variables_de_entorno', variables: ['KHIPU_API_KEY', 'KHIPU_BASE_URL'] });
     }
 
     const pares = Math.floor(numeros.length / 2);
@@ -114,6 +125,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
         comprador_instagram: instagram,
         comprador_rut: rut,
         rifa_codigo_id: rifaCodigoId,
+        pasarela,
       })
       .select('id')
       .single();
@@ -139,13 +151,33 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     }
 
     const siteUrl = context.env.SITE_URL ?? 'https://firehousecheer.cl';
+    const asunto = `Concurso Firehouse - ${numeros.length} ticket${numeros.length > 1 ? 's' : ''}`;
 
     try {
+      if (pasarela === 'KHIPU') {
+        const pago = await crearPagoKhipu(
+          { apiKey: context.env.KHIPU_API_KEY!, baseUrl: context.env.KHIPU_BASE_URL! },
+          {
+            transactionId: commerceOrder,
+            subject: asunto,
+            amount: monto,
+            returnUrl: `${siteUrl}/sorteo/gracias?orden=${commerceOrder}`,
+            cancelUrl: `${siteUrl}/sorteo/gracias?orden=${commerceOrder}`,
+            notifyUrl: `${siteUrl}/api/sorteo/khipu-webhook`,
+            payerEmail: email,
+          },
+        );
+
+        await supabase.from('rifa_ventas').update({ khipu_payment_id: pago.paymentId }).eq('id', venta.id);
+
+        return jsonResponse(200, { url: pago.paymentUrl });
+      }
+
       const pago = await crearPagoFlow(
-        { apiKey: context.env.FLOW_API_KEY, secretKey: context.env.FLOW_SECRET_KEY, baseUrl: context.env.FLOW_BASE_URL },
+        { apiKey: context.env.FLOW_API_KEY!, secretKey: context.env.FLOW_SECRET_KEY!, baseUrl: context.env.FLOW_BASE_URL! },
         {
           commerceOrder,
-          subject: `Concurso Firehouse - ${numeros.length} ticket${numeros.length > 1 ? 's' : ''}`,
+          subject: asunto,
           amount: monto,
           email,
           urlConfirmation: `${siteUrl}/api/sorteo/flow-webhook`,
@@ -158,9 +190,9 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 
       return jsonResponse(200, { url: `${pago.url}?token=${pago.token}` });
     } catch (e) {
-      // Si Flow falla, no dejamos los números atrapados en RESERVADO 10 minutos por nada.
+      // Si la pasarela falla, no dejamos los números atrapados en RESERVADO 10 minutos por nada.
       await supabase.rpc('fn_marcar_venta_no_pagada_rifa', { p_commerce_order: commerceOrder, p_estado: 'ANULADA' });
-      return jsonResponse(502, { error: 'flow_no_disponible', detalle: e instanceof Error ? e.message : 'desconocido' });
+      return jsonResponse(502, { error: 'pasarela_no_disponible', pasarela, detalle: e instanceof Error ? e.message : 'desconocido' });
     }
   } catch (e) {
     return jsonResponse(500, {
