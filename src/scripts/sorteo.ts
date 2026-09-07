@@ -137,6 +137,9 @@ export async function iniciarSorteo(): Promise<void> {
 
   // Código de referido (?ref=FH-XXXXXX) para atribuir la venta a un atleta.
   const rifaCodigoRef = new URLSearchParams(window.location.search).get('ref');
+  if (rifaCodigoRef) {
+    $<HTMLElement>('#rifaReferidoBanner')?.removeAttribute('hidden');
+  }
 
   const estados = await cargarEstadosReales(mostrarToast);
   let carrito: number[] = [];
@@ -147,8 +150,19 @@ export async function iniciarSorteo(): Promise<void> {
     return Object.values(estados).filter((e) => e === 'vendido').length;
   }
 
+  const UMBRAL_CONTADOR = 30;
+  const tickerInicio = $<HTMLElement>('#rifaTickerInicio');
+  const tickerNormal = $<HTMLElement>('#rifaTickerNormal');
+
   function actualizarTicker(): void {
     const vendidos = contarVendidos();
+    if (vendidos < UMBRAL_CONTADOR) {
+      tickerInicio?.removeAttribute('hidden');
+      tickerNormal?.setAttribute('hidden', '');
+      return;
+    }
+    tickerInicio?.setAttribute('hidden', '');
+    tickerNormal?.removeAttribute('hidden');
     if (tickerNum) tickerNum.textContent = String(vendidos);
     if (tickerFill) tickerFill.style.width = `${(vendidos / TOTAL_NUMEROS) * 100}%`;
   }
@@ -377,6 +391,15 @@ export async function iniciarSorteo(): Promise<void> {
   const inputRut = $<HTMLInputElement>('#rifaRut');
   const emailFeedback = $<HTMLElement>('#rifaEmailFeedback');
   const botonEnviar = $<HTMLButtonElement>('#rifaModalEnviar');
+  const toggleOpcionales = $<HTMLButtonElement>('#rifaToggleOpcionales');
+  const camposOpcionales = $<HTMLElement>('#rifaCamposOpcionales');
+
+  toggleOpcionales?.addEventListener('click', () => {
+    const abierto = !camposOpcionales?.hidden;
+    if (camposOpcionales) camposOpcionales.hidden = abierto;
+    toggleOpcionales.setAttribute('aria-expanded', String(!abierto));
+    toggleOpcionales.textContent = abierto ? '+ Agregar Instagram o RUT (opcional)' : '− Ocultar campos opcionales';
+  });
 
   function abrirModalDatos(): void {
     if (carrito.length === 0) return;

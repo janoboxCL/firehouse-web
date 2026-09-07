@@ -4,9 +4,9 @@ import TopBar from '../components/TopBar.astro';
 import Nav from '../components/Nav.astro';
 import Pie from '../components/Pie.astro';
 import Arriba from '../components/Arriba.astro';
-import { sitio } from '../data/sitio.js';
+import { sitio, whatsapp } from '../data/sitio.js';
 
-const { titulo, descripcion, ruta = '', preguntas = null, miga = null, noindex = false } = Astro.props;
+const { titulo, descripcion, ruta = '', preguntas = null, miga = null, noindex = false, minimal = false } = Astro.props;
 const canonical = `${sitio.url}${ruta}`;
 
 const schema = {
@@ -95,13 +95,36 @@ const schema = {
   })} />}
 </head>
 <body>
-  <TopBar />
-  <Nav interior={ruta !== ''} />
+  {minimal ? (
+    <header class="header-minimo">
+      <a href="/" class="header-minimo__logo">
+        <picture>
+          <source srcset="/logo.webp" type="image/webp" />
+          <img src="/logo.png" alt={sitio.nombre} width="36" height="31" />
+        </picture>
+        <span>Gran Concurso</span>
+      </a>
+      <a href={whatsapp('sorteo')} class="header-minimo__ayuda" target="_blank" rel="noopener">¿Dudas? WhatsApp</a>
+    </header>
+  ) : (
+    <>
+      <TopBar />
+      <Nav interior={ruta !== ''} />
+    </>
+  )}
   <main>
     <slot />
   </main>
-  <Pie />
-  <Arriba />
+  {minimal ? (
+    <footer class="footer-minimo">
+      <p>© {new Date().getFullYear()} {sitio.nombre}</p>
+    </footer>
+  ) : (
+    <>
+      <Pie />
+      <Arriba />
+    </>
+  )}
   <script is:inline>
     (() => {
       const objetivos = document.querySelectorAll('.reveal');
@@ -121,3 +144,22 @@ const schema = {
   </script>
 </body>
 </html>
+
+<style>
+  .header-minimo{
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 20px; background: #000; border-bottom: 1px solid #232323;
+    position: sticky; top: 0; z-index: 40;
+  }
+  .header-minimo__logo{
+    display: flex; align-items: center; gap: 10px; text-decoration: none;
+    color: var(--chalk); font-family: var(--font-display); font-weight: 800; font-size: 15px;
+  }
+  .header-minimo__logo img{ display: block; height: 32px; width: auto; }
+  .header-minimo__ayuda{
+    color: var(--fire-yellow); font-size: 13px; font-weight: 600; text-decoration: none;
+    white-space: nowrap;
+  }
+  .footer-minimo{ background: #000; padding: 20px; text-align: center; }
+  .footer-minimo p{ color: #6B6259; font-size: 12px; margin: 0; }
+</style>

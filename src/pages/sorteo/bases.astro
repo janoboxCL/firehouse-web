@@ -1,0 +1,74 @@
+---
+import Base from '../../layouts/Base.astro';
+
+const titulo = 'Bases del Concurso | Gran Concurso Firehouse';
+const descripcion = 'Bases y condiciones del Gran Concurso Firehouse.';
+
+// ⚠️ Borrador de trabajo. Falta: confirmar fecha exacta del sorteo, premios
+// definitivos, y revisión de un abogado antes de publicar en serio — mismo
+// criterio que la política de privacidad. Mientras tanto queda noindex.
+const noindex = true;
+---
+<Base titulo={titulo} descripcion={descripcion} ruta="/sorteo/bases" noindex={noindex} minimal={true}>
+  <section class="bases">
+    <div class="wrap bases__caja">
+      <h1>Bases del Concurso</h1>
+      <p class="bases__aviso">
+        Este documento resume cómo funciona el Gran Concurso Firehouse. Está sujeto a
+        confirmación final antes del lanzamiento oficial.
+      </p>
+
+      <h2>Organizador</h2>
+      <p>Firehouse Cheerleading All Stars, academia de cheerleading ubicada en Santa Corina 197, La Cisterna, Santiago.</p>
+
+      <h2>Cómo participar</h2>
+      <p>
+        Cada ticket comprado y confirmado como pagado participa en el sorteo. Los precios vigentes son
+        $3.000 por un ticket o $5.000 por dos tickets. El ticket queda confirmado únicamente cuando
+        el pago es aprobado por la pasarela de pago.
+      </p>
+
+      <h2>Mecanismo del sorteo</h2>
+      <p>
+        El ganador se determina por sorteo (al azar), en vivo por Instagram
+        (<strong>@firehouse.cheer</strong>), entre los tickets efectivamente vendidos y pagados — nunca
+        entre los tickets no vendidos. Un testigo no participante acompaña el sorteo, y el video queda
+        publicado como respaldo.
+      </p>
+
+      <h2>Premios</h2>
+      <p>
+        Los premios se informan en la página del concurso y se confirman antes del inicio oficial.
+        Ningún premio es en dinero salvo que se indique expresamente como tal.
+      </p>
+
+      <h2>Comunicación al ganador</h2>
+      <p>
+        Se contactará a la persona que realizó la compra (no necesariamente al deportista cuyo enlace
+        se haya usado) a través del correo y teléfono entregados al momento de comprar. Puede
+        solicitarse RUT adicional para la entrega del premio.
+      </p>
+
+      <h2>Datos personales</h2>
+      <p>
+        Los datos de contacto se usan exclusivamente para gestionar la participación y, en caso de
+        resultar ganador, la entrega del premio. No se comparten con terceros.
+      </p>
+
+      <p class="bases__pendiente">
+        * Documento en revisión — fecha exacta del sorteo y detalle final de premios se confirman
+        antes del lanzamiento.
+      </p>
+    </div>
+  </section>
+</Base>
+
+<style is:global>
+.bases{ background:#000; min-height:70vh; padding:var(--e-6) 0; }
+.bases__caja{ max-width:640px; color:var(--txt-soft); }
+.bases__caja h1{ font-family:var(--font-display); color:var(--chalk); font-size:1.8rem; margin-bottom:var(--e-3); }
+.bases__caja h2{ font-family:var(--font-display); color:var(--chalk); font-size:1.05rem; margin:var(--e-4) 0 8px; }
+.bases__caja p{ font-size:14.5px; line-height:1.65; margin:0 0 var(--e-2); }
+.bases__aviso{ color:var(--fire-yellow); font-size:13px; }
+.bases__pendiente{ margin-top:var(--e-4); font-size:12px; color:var(--txt-faint); border-top:1px solid var(--hairline); padding-top:var(--e-3); }
+</style>

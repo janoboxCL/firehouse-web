@@ -30,13 +30,18 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
     const supabase = createClient(context.env.SUPABASE_URL, context.env.SUPABASE_SERVICE_ROLE_KEY);
     const { data, error } = await supabase
       .from('rifa_ventas')
-      .select('estado, cantidad_numeros, monto')
+      .select('estado, cantidad_numeros, monto, rifa_codigo_id')
       .eq('commerce_order', orden)
       .maybeSingle();
 
     if (error || !data) return jsonResponse(404, { error: 'orden_no_encontrada', detalle: error?.message });
 
-    return jsonResponse(200, data);
+    return jsonResponse(200, {
+      estado: data.estado,
+      cantidadNumeros: data.cantidad_numeros,
+      monto: data.monto,
+      atribuido: Boolean(data.rifa_codigo_id),
+    });
   } catch (e) {
     return jsonResponse(500, { error: 'error_inesperado', detalle: e instanceof Error ? `${e.name}: ${e.message}` : String(e) });
   }

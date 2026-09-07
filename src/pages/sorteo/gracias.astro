@@ -4,7 +4,7 @@ import Base from '../../layouts/Base.astro';
 const titulo = 'Gracias — Concurso Firehouse';
 const descripcion = 'Confirmación de tu compra en el Gran Concurso Firehouse.';
 ---
-<Base titulo={titulo} descripcion={descripcion} ruta="/sorteo/gracias" noindex={true}>
+<Base titulo={titulo} descripcion={descripcion} ruta="/sorteo/gracias" noindex={true} minimal={true}>
   <section class="gracias">
     <div class="wrap gracias__caja">
       <div id="graciasCargando" class="gracias__estado">
@@ -15,6 +15,7 @@ const descripcion = 'Confirmación de tu compra en el Gran Concurso Firehouse.';
       <div id="graciasExito" class="gracias__estado" hidden>
         <h1>🎉 ¡Ya estás participando!</h1>
         <p>Te enviamos un correo con el detalle de tus tickets. ¡Gracias por apoyar a Firehouse! ❤️‍🔥</p>
+        <p id="graciasAtribuido" class="gracias__atribuido" hidden></p>
         <a class="btn" href="/sorteo">Volver al sorteo</a>
       </div>
 
@@ -56,7 +57,17 @@ const descripcion = 'Confirmación de tu compra en el Gran Concurso Firehouse.';
       if (!res.ok) return mostrar(error);
       const data = await res.json();
 
-      if (data.estado === 'PAGADA') return mostrar(exito);
+      if (data.estado === 'PAGADA') {
+        if (data.atribuido) {
+          const atribuidoEl = document.getElementById('graciasAtribuido');
+          if (atribuidoEl) {
+            const cantidad = data.cantidadNumeros ?? 1;
+            atribuidoEl.textContent = `✅ Tu${cantidad > 1 ? 's' : ''} ${cantidad} ticket${cantidad > 1 ? 's' : ''} quedaron asociados a su campaña Firehouse.`;
+            atribuidoEl.hidden = false;
+          }
+        }
+        return mostrar(exito);
+      }
       if (data.estado === 'PENDIENTE' && intentos < 6) {
         setTimeout(() => revisar(intentos + 1), 1500);
         return;
@@ -76,6 +87,7 @@ const descripcion = 'Confirmación de tu compra en el Gran Concurso Firehouse.';
 .gracias__caja{ max-width:480px; text-align:center; }
 .gracias__estado h1{ font-family:var(--font-display); font-weight:800; font-size:clamp(1.6rem, 4vw, 2.2rem); }
 .gracias__estado p{ color:var(--txt-soft); margin-top:var(--e-3); }
+.gracias__atribuido{ color:var(--fire-yellow) !important; font-size:13px; }
 .gracias__estado .btn{ margin-top:var(--e-4); display:inline-block; }
 .gracias__spinner{ font-size:2.4rem; margin:0; animation:graciasPulso 1.1s ease-in-out infinite; }
 .gracias__texto-carga{ font-family:var(--font-count); color:var(--fire-yellow); margin-top:var(--e-2); }

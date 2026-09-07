@@ -20,44 +20,49 @@ const premios = [
   { tag: 'Premio 4', titulo: 'Un mes gratis', desc: 'De entrenamiento en Firehouse' },
 ];
 ---
-<Base titulo={titulo} descripcion={descripcion} ruta="/sorteo" noindex={noindex}>
+<Base titulo={titulo} descripcion={descripcion} ruta="/sorteo" noindex={noindex} minimal={true}>
   <div class="rifa">
 
     <!-- HERO -->
     <section class="rifa-hero">
       <div class="wrap rifa-hero__fila">
         <div class="rifa-hero__texto">
-          <picture class="rifa-hero__logo">
-            <source srcset="/logo.webp" type="image/webp" />
-            <img src="/logo.png" alt="Firehouse Cheerleading All Stars" width="160" height="140" />
-          </picture>
           <h1 class="rifa-hero__titulo">Bienvenido al Gran Concurso Firehouse</h1>
           <p class="rifa-hero__sub"><span class="rifa-hero__sello">Consigue tu ticket de la suerte 🔥</span></p>
           <p class="rifa-hero__bajada">
             Cada número ayuda a que nuestras niñas y niños lleguen a sus competencias esta
             temporada. Compra el tuyo, o duplica tu suerte con dos.
           </p>
-          <a class="btn rifa-hero__cta" href="#sorteo-jugar">Quiero mi ticket 🔥</a>
+          <div class="rifa-hero__precios">
+            <span class="rifa-hero__precio">1 ticket <strong>$3.000</strong></span>
+            <span class="rifa-hero__precio rifa-hero__precio--destacado">🔥 2 tickets <strong>$5.000</strong></span>
+          </div>
+          <a class="btn rifa-hero__cta" href="#sorteo-jugar">Quiero mis tickets 🔥</a>
+          <p class="rifa-hero__referido" id="rifaReferidoBanner" hidden>
+            ❤️‍🔥 Esta compra apoyará al deportista que te compartió este enlace
+          </p>
         </div>
         <div class="rifa-hero__visual">
-          <img
-            class="rifa-mascota rifa-mascota--hero"
-            src="/media/sorteo-hero.png"
-            alt="Mascotas Firehouse invitando a participar en el sorteo"
-            width="520" height="668"
-            loading="eager"
-          />
+          <picture class="rifa-mascota rifa-mascota--hero">
+              <source srcset="/media/sorteo-hero.webp" type="image/webp" />
+              <img src="/media/sorteo-hero.png" alt="Mascotas Firehouse invitando a participar en el sorteo" width="520" height="668" loading="eager" />
+            </picture>
         </div>
       </div>
 
       <div class="wrap">
         <div class="rifa-ticker">
-          <div class="rifa-ticker__fila">
-            <span class="rifa-ticker__num" id="rifaTickerNum">0</span>
-            <span class="rifa-ticker__total">/ 800</span>
+          <div id="rifaTickerInicio" class="rifa-ticker__inicio">
+            <p>🔥 ¡El fuego recién comienza! 800 tickets disponibles — elige el tuyo.</p>
           </div>
-          <p class="rifa-ticker__label">tickets ya tienen dueño</p>
-          <div class="rifa-ticker__barra"><div class="rifa-ticker__relleno" id="rifaTickerFill"></div></div>
+          <div id="rifaTickerNormal" class="rifa-ticker__normal" hidden>
+            <div class="rifa-ticker__fila">
+              <span class="rifa-ticker__num" id="rifaTickerNum">0</span>
+              <span class="rifa-ticker__total">/ 800</span>
+            </div>
+            <p class="rifa-ticker__label">tickets ya tienen dueño</p>
+            <div class="rifa-ticker__barra"><div class="rifa-ticker__relleno" id="rifaTickerFill"></div></div>
+          </div>
         </div>
       </div>
     </section>
@@ -69,6 +74,10 @@ const premios = [
           <Etiqueta texto="Cómo jugar" />
           <h2 class="section__title">¿Cómo quieres conseguir tu ticket?</h2>
         </div>
+
+        <a href="#sorteo-premios" class="rifa-teaser-premios">
+          🥇 Premio principal + otros premios · <span>Ver todos los premios ↓</span>
+        </a>
 
         <div class="rifa-chips" id="rifaChips" hidden>
           <p class="rifa-chips__label">Tus tickets elegidos</p>
@@ -87,16 +96,9 @@ const premios = [
         <!-- PANEL AZAR -->
         <div class="rifa-panel activo" id="rifaPanelAzar">
           <div class="rifa-azar">
-            <button type="button" class="rifa-azar__btn" data-rifa-azar="1">
-              <span class="rifa-azar__info">
-                <span class="rifa-azar__titulo">1 ticket al azar</span>
-                <span class="rifa-azar__sub">Una oportunidad</span>
-              </span>
-              <span class="rifa-azar__precio">$3.000</span>
-            </button>
             <button type="button" class="rifa-azar__btn rifa-azar__btn--recomendado" data-rifa-azar="2">
               <span class="rifa-azar__info">
-                <span class="rifa-azar__titulo">2 tickets al azar</span>
+                <span class="rifa-azar__titulo">🔥 Quiero 2 tickets</span>
                 <span class="rifa-azar__sub">
                   La opción recomendada<br />
                   <span class="rifa-badge">Ahorras $1.000</span>
@@ -104,26 +106,23 @@ const premios = [
               </span>
               <span class="rifa-azar__precio">$5.000</span>
             </button>
+            <button type="button" class="rifa-azar__btn rifa-azar__btn--secundario" data-rifa-azar="1">
+              <span class="rifa-azar__info">
+                <span class="rifa-azar__titulo">1 ticket al azar</span>
+                <span class="rifa-azar__sub">Una oportunidad</span>
+              </span>
+              <span class="rifa-azar__precio">$3.000</span>
+            </button>
           </div>
           <div class="rifa-roll" id="rifaRollStage"></div>
-          <img
-            class="rifa-mascota rifa-mascota--azar"
-            src="/media/sorteo-azar.png"
-            alt="Mascota Firehouse con un ticket de la suerte entre llamas"
-            width="700" height="900"
-            loading="lazy"
-          />
+          <picture class="rifa-mascota rifa-mascota--azar">
+              <source srcset="/media/sorteo-azar.webp" type="image/webp" />
+              <img src="/media/sorteo-azar.png" alt="Mascota Firehouse con un ticket de la suerte entre llamas" width="700" height="900" loading="lazy" />
+            </picture>
         </div>
 
         <!-- PANEL ELEGIR -->
         <div class="rifa-panel" id="rifaPanelElegir">
-          <img
-            class="rifa-mascota rifa-mascota--elegir"
-            src="/media/sorteo-elegir.png"
-            alt="Mascota Firehouse con un ticket del sorteo"
-            width="700" height="900"
-            loading="lazy"
-          />
           <div class="rifa-buscar">
             <input type="text" inputmode="numeric" placeholder="Busca tu ticket (ej: 147)" id="rifaBuscar" />
           </div>
@@ -155,19 +154,16 @@ const premios = [
     </section>
 
     <!-- PREMIOS -->
-    <section class="section rifa-premios">
+    <section class="section rifa-premios" id="sorteo-premios">
       <div class="wrap">
         <div class="reveal">
           <Etiqueta texto="Los premios" />
           <h2 class="section__title">Esto te puedes ganar</h2>
         </div>
-        <img
-          class="rifa-mascota rifa-mascota--premios"
-          src="/media/sorteo-premios.png"
-          alt="Mascotas Firehouse en podio de premios"
-          width="700" height="900"
-          loading="lazy"
-        />
+        <picture class="rifa-mascota rifa-mascota--premios">
+            <source srcset="/media/sorteo-premios.webp" type="image/webp" />
+            <img src="/media/sorteo-premios.png" alt="Mascotas Firehouse en podio de premios" width="700" height="900" loading="lazy" />
+          </picture>
         <div class="rifa-premios__grid">
           {premios.map((p) => (
             <div class:list={['rifa-premio', { 'rifa-premio--principal': p.principal }]}>
@@ -177,7 +173,7 @@ const premios = [
             </div>
           ))}
         </div>
-        <p class="rifa-nota">* Premios de ejemplo — reemplaza estos textos por los definitivos antes de publicar.</p>
+        <p class="rifa-nota">* Los premios se confirman antes del inicio oficial del concurso.</p>
       </div>
     </section>
 
@@ -189,13 +185,10 @@ const premios = [
           <h2 class="section__title">¿Cómo se elige al ganador?</h2>
         </div>
         <div class="rifa-sorteo__card">
-          <img
-            class="rifa-mascota rifa-mascota--sorteo"
-            src="/media/sorteo-bola.png"
-            alt="Mascotas Firehouse junto a la bola del sorteo"
-            width="700" height="900"
-            loading="lazy"
-          />
+          <picture class="rifa-mascota rifa-mascota--sorteo">
+              <source srcset="/media/sorteo-bola.webp" type="image/webp" />
+              <img src="/media/sorteo-bola.png" alt="Mascotas Firehouse junto a la bola del sorteo" width="700" height="900" loading="lazy" />
+            </picture>
           <p class="rifa-sorteo__fecha">Sábado 12 de diciembre · Instagram Live</p>
           <p class="rifa-sorteo__texto">
             El sorteo se realiza en vivo por <strong>@firehouse.cheer</strong>, entre los números
@@ -232,7 +225,10 @@ const premios = [
           <div class="rifa-cart__nums" id="rifaCartNums"></div>
           <p class="rifa-cart__total" id="rifaCartTotal">$0</p>
         </div>
-        <button type="button" class="btn" id="rifaCartPagar">Pagar con Flow 🔥</button>
+        <div class="rifa-cart__acciones">
+          <button type="button" class="btn" id="rifaCartPagar">Continuar al pago 🔥</button>
+          <p class="rifa-cart__seguro">🔒 Pago seguro vía Flow</p>
+        </div>
       </div>
     </div>
 
@@ -264,16 +260,33 @@ const premios = [
                    placeholder="9 1234 5678" maxlength="12" pattern="9 \d{4} \d{4}"
                    title="Formato: 9 1234 5678" />
           </div>
-          <div class="rifa-campo">
-            <label for="rifaInstagram">Instagram <span class="rifa-campo__opcional">(opcional)</span></label>
-            <input type="text" id="rifaInstagram" autocomplete="off" placeholder="@tuusuario" maxlength="60" />
+
+          <button type="button" class="rifa-campo-toggle" id="rifaToggleOpcionales" aria-expanded="false">
+            + Agregar Instagram o RUT (opcional)
+          </button>
+          <div class="rifa-campos-opcionales" id="rifaCamposOpcionales" hidden>
+            <div class="rifa-campo">
+              <label for="rifaInstagram">Instagram <span class="rifa-campo__opcional">(opcional)</span></label>
+              <input type="text" id="rifaInstagram" autocomplete="off" placeholder="@tuusuario" maxlength="60" />
+            </div>
+            <div class="rifa-campo">
+              <label for="rifaRut">RUT <span class="rifa-campo__opcional">(opcional — te lo pedimos igual si ganas)</span></label>
+              <input type="text" id="rifaRut" autocomplete="off" placeholder="11.111.111-1" maxlength="12" />
+            </div>
           </div>
-          <div class="rifa-campo">
-            <label for="rifaRut">RUT <span class="rifa-campo__opcional">(opcional — te lo pedimos igual si ganas)</span></label>
-            <input type="text" id="rifaRut" autocomplete="off" placeholder="11.111.111-1" maxlength="12" />
-          </div>
+
           <p id="rifaFormError" class="rifa-modal__error" hidden>Completa nombre, correo y celular con un formato válido para continuar.</p>
-          <button type="submit" class="btn rifa-modal__enviar" id="rifaModalEnviar">Continuar a pagar 🔥</button>
+
+          <div class="rifa-confianza">
+            <p>🔒 Pago seguro procesado por Flow</p>
+            <p>✅ Tus tickets quedan confirmados al aprobarse el pago</p>
+            <p>✉️ Recibirás tus números por correo</p>
+          </div>
+
+          <button type="submit" class="btn rifa-modal__enviar" id="rifaModalEnviar">Continuar al pago 🔥</button>
+          <p class="rifa-modal__legal">
+            Pago seguro vía Flow. Al participar aceptas las <a href="/sorteo/bases" target="_blank" rel="noopener">Bases del Concurso</a>.
+          </p>
         </form>
       </div>
     </div>
@@ -346,6 +359,25 @@ const premios = [
   }
   .rifa-hero__cta{ transform:rotate(var(--tilt-xl)); }
 
+  .rifa-hero__precios{ display:flex; gap:10px; flex-wrap:wrap; margin-bottom:var(--e-3); justify-content:center; }
+  @media (min-width:900px){ .rifa-hero__precios{ justify-content:flex-start; } }
+  .rifa-hero__precio{
+    font-family:var(--font-body); font-size:14px; color:var(--txt-soft);
+    background:var(--ember-deep); border:1px solid var(--hairline); border-radius:99px;
+    padding:6px 14px;
+  }
+  .rifa-hero__precio strong{ font-family:var(--font-count); color:var(--chalk); }
+  .rifa-hero__precio--destacado{
+    background:rgba(255,196,0,.12); border-color:var(--fire-yellow); color:var(--chalk); font-weight:600;
+  }
+  .rifa-hero__precio--destacado strong{ color:var(--fire-yellow); }
+
+  .rifa-hero__referido{
+    margin-top:var(--e-3); font-size:13px; color:var(--fire-yellow);
+    background:rgba(255,196,0,.08); border:1px solid rgba(255,196,0,.3);
+    padding:8px 14px; border-radius:99px; display:inline-block;
+  }
+
   @media (min-width:900px){
     .rifa-hero__fila{
       flex-direction:row; align-items:center; text-align:left;
@@ -359,6 +391,7 @@ const premios = [
     .rifa-hero__bajada{ margin:0 0 var(--e-4); }
   }
   .rifa-mascota{ display:block; width:100%; height:auto; }
+  .rifa-mascota img{ display:block; width:100%; height:auto; }
   .rifa-mascota--hero{
     max-width:340px;
     margin:0 auto;
@@ -389,6 +422,18 @@ const premios = [
     background:linear-gradient(90deg, var(--fire-red), var(--fire-yellow));
     transition:width .6s ease;
   }
+  .rifa-ticker__inicio p{
+    margin:0; font-family:var(--font-display); font-weight:700; font-size:15px;
+    color:var(--fire-yellow); text-align:center;
+  }
+
+  .rifa-teaser-premios{
+    display:block; text-align:center; margin:0 0 var(--e-3);
+    padding:12px 14px; background:linear-gradient(135deg, rgba(255,196,0,.1), var(--ember-deep));
+    border:1px solid rgba(255,196,0,.35); border-radius:12px;
+    color:var(--chalk); text-decoration:none; font-size:14px; font-weight:600;
+  }
+  .rifa-teaser-premios span{ color:var(--fire-yellow); text-decoration:underline; }
 
   /* ---------- MASCOTAS por sección ---------- */
   .rifa-mascota--premios{ max-width:340px; margin:0 auto var(--e-3); filter:drop-shadow(0 16px 24px rgba(0,0,0,.65)); }
@@ -453,11 +498,19 @@ const premios = [
   .rifa-azar__sub{ font-size:13px; color:var(--txt-faint); }
   .rifa-azar__precio{ font-family:var(--font-count); font-size:18px; font-weight:700; }
   .rifa-azar__btn--recomendado{
-    border-color:var(--fire-yellow);
-    background:linear-gradient(135deg, rgba(255,196,0,.1), var(--ember-deep));
+    border:2px solid var(--fire-yellow);
+    background:linear-gradient(135deg, rgba(255,196,0,.16), var(--ember-deep));
     transform:rotate(var(--tilt-xl));
+    padding:calc(var(--e-3) + 4px);
+    box-shadow:0 0 0 4px rgba(255,196,0,.08), 0 10px 24px rgba(0,0,0,.35);
   }
-  .rifa-azar__btn--recomendado .rifa-azar__precio{ color:var(--fire-yellow); }
+  .rifa-azar__btn--recomendado .rifa-azar__titulo{ font-size:19px; }
+  .rifa-azar__btn--recomendado .rifa-azar__precio{ color:var(--fire-yellow); font-size:22px; }
+  .rifa-azar__btn--secundario{
+    opacity:.85; padding:calc(var(--e-3) - 4px) var(--e-3);
+  }
+  .rifa-azar__btn--secundario .rifa-azar__titulo{ font-size:15px; }
+  .rifa-azar__btn--secundario .rifa-azar__precio{ font-size:16px; }
   .rifa-badge{
     display:inline-block; font-family:var(--font-count); font-size:11px;
     background:var(--fire-yellow); color:var(--ember); padding:2px 7px; border-radius:var(--radio); margin-top:4px;
@@ -551,6 +604,8 @@ const premios = [
   .rifa-cart__info{ display:flex; align-items:center; gap:var(--e-3); flex-wrap:wrap; flex:1; min-width:0; }
   .rifa-cart__nums{ display:flex; gap:6px; flex-wrap:wrap; max-height:72px; overflow-y:auto; }
   .rifa-cart__total{ font-family:var(--font-count); font-size:20px; font-weight:700; color:var(--fire-yellow); white-space:nowrap; }
+  .rifa-cart__acciones{ text-align:center; }
+  .rifa-cart__seguro{ margin:4px 0 0; font-size:11px; color:var(--txt-faint); }
 
   /* ---------- TOAST ---------- */
   .rifa-toast{
@@ -619,8 +674,26 @@ const premios = [
   .rifa-campo__validacion.valido{ color:var(--fire-yellow); }
   .rifa-campo__validacion.invalido{ color:rgba(197,21,21,.85); }
   .rifa-modal__error{ color:var(--fire-red); font-size:13px; margin-top:var(--e-2); }
-  .rifa-modal__enviar{ width:100%; text-align:center; margin-top:var(--e-4); }
+
+  .rifa-campo-toggle{
+    display:block; width:100%; text-align:left; margin-top:var(--e-3);
+    background:none; border:none; color:var(--fire-yellow); font-size:13px;
+    cursor:pointer; padding:6px 0;
+  }
+  .rifa-campos-opcionales{ padding-top:2px; }
+
+  .rifa-confianza{
+    margin-top:var(--e-4); padding:var(--e-2) var(--e-3);
+    background:var(--ember); border:1px solid var(--hairline); border-radius:12px;
+  }
+  .rifa-confianza p{ font-size:12.5px; color:var(--txt-soft); margin:4px 0; }
+
+  .rifa-modal__enviar{ width:100%; text-align:center; margin-top:var(--e-3); }
   .rifa-modal__enviar:disabled{ opacity:.7; pointer-events:none; }
+  .rifa-modal__legal{
+    margin-top:10px; font-size:11.5px; color:var(--txt-faint); text-align:center;
+  }
+  .rifa-modal__legal a{ color:var(--fire-yellow); }
 
   @media (min-width:640px){
     .rifa-modal{ align-items:center; }
