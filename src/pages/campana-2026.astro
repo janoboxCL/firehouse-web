@@ -1,0 +1,572 @@
+---
+import Base from '../layouts/Base.astro';
+import Etiqueta from '../components/Etiqueta.astro';
+import { whatsapp } from '../data/sitio.js';
+
+const titulo = 'Campaña Firehouse 2026 | Sobres digitales Blaze y Nova';
+const descripcion =
+  'Elige tu sobre digital Blaze, Nova o el pack Blaze + Nova, recibe tu colección y participa en la promoción Firehouse 2026. Tu compra apoya la temporada deportiva de nuestras niñas y niños.';
+
+// ⚠️ Los 4 premios de esta página son de ejemplo mientras se cierra la consulta
+// a Flow y se redactan las bases de la promoción. Igual que se hizo con /sorteo,
+// la dejamos fuera de buscadores (noindex) hasta tener todo definitivo — saca
+// noindex recién cuando premios y bases estén cerrados.
+const noindex = true;
+
+const productos = [
+  {
+    id: 'blaze',
+    nombre: 'Sobre Blaze',
+    precioTexto: '$3.000',
+    img: 'campana2026-blaze',
+    alt: 'Sobres digitales Firehouse 2026 de Blaze',
+    contenido: ['Láminas digitales Blaze HD', 'Wallpaper de Blaze', 'Stickers digitales', 'Lámina especial Firehouse'],
+    cta: 'Quiero Blaze',
+  },
+  {
+    id: 'nova',
+    nombre: 'Sobre Nova',
+    precioTexto: '$3.000',
+    img: 'campana2026-nova',
+    alt: 'Sobres digitales Firehouse 2026 de Nova',
+    contenido: ['Láminas digitales Nova HD', 'Wallpaper de Nova', 'Stickers digitales', 'Lámina especial Firehouse'],
+    cta: 'Quiero Nova',
+  },
+  {
+    id: 'blaze-nova',
+    nombre: 'Pack Blaze + Nova',
+    precioTexto: '$5.000',
+    img: 'campana2026-pack',
+    alt: 'Pack digital Firehouse 2026 de Blaze y Nova',
+    contenido: ['Colección completa Blaze', 'Colección completa Nova', 'Wallpapers de ambos personajes', 'Lámina especial exclusiva del pack'],
+    cta: 'Quiero a Blaze + Nova',
+    destacado: true,
+  },
+];
+
+const premios = [
+  { tag: 'Premio 1', titulo: '$200.000 en efectivo', desc: 'Para gastar en lo que quieras', principal: true },
+  { tag: 'Premio 2', titulo: 'Por confirmar', desc: 'Se anuncia antes del sorteo' },
+  { tag: 'Premio 3', titulo: 'Por confirmar', desc: 'Se anuncia antes del sorteo' },
+  { tag: 'Premio 4', titulo: 'Por confirmar', desc: 'Se anuncia antes del sorteo' },
+];
+
+const pasos = [
+  { n: 1, titulo: 'Elige tu sobre', desc: 'Blaze, Nova o el pack Blaze + Nova.' },
+  { n: 2, titulo: 'Completa tu compra', desc: 'El pago se procesa con el medio habilitado.' },
+  { n: 3, titulo: 'Recibe tu colección', desc: 'Acceso inmediato a tus productos digitales.' },
+  { n: 4, titulo: 'Recibe tu código', desc: 'Tu participación promocional, asignada automáticamente.' },
+  { n: 5, titulo: 'Sigue el sorteo', desc: 'Transmisión en vivo el 12 de diciembre por Instagram.' },
+];
+---
+<Base
+  titulo={titulo}
+  descripcion={descripcion}
+  ruta="/campana-2026"
+  noindex={noindex}
+  minimal={true}
+  ogImagen="/media/campana2026-og.jpg"
+>
+  <div class="camp2026">
+
+    <!-- HERO -->
+    <section class="camp-hero">
+      <div class="wrap camp-hero__fila">
+        <div class="camp-hero__texto">
+          <h1 class="camp-hero__titulo">Campaña Firehouse 2026</h1>
+          <p class="camp-hero__bajada">
+            Colecciona, participa y ayúdanos a llegar más lejos. Adquiere nuestros sobres
+            digitales de Blaze y Nova y apoya directamente la temporada deportiva de
+            nuestras niñas y niños.
+          </p>
+          <div class="camp-hero__precios">
+            <span class="camp-hero__precio">🔥 Blaze <strong>$3.000</strong></span>
+            <span class="camp-hero__precio">⚡ Nova <strong>$3.000</strong></span>
+            <span class="camp-hero__precio camp-hero__precio--destacado">🔥⚡ Pack <strong>$5.000</strong></span>
+          </div>
+          <a class="btn camp-hero__cta" href="#campana-elegir">Ver colección</a>
+          <p class="camp-hero__legal">Los productos participantes incluyen beneficios promocionales conforme a las bases de la campaña.</p>
+          <p class="camp-hero__referido" id="campReferidoBanner" hidden>
+            ❤️‍🔥 Tu compra apoyará al deportista que te compartió este enlace
+          </p>
+        </div>
+        <div class="camp-hero__visual">
+          <picture class="camp-mascota camp-mascota--hero">
+            <source srcset="/media/campana2026-hero.webp" type="image/webp" />
+            <img src="/media/campana2026-hero.jpg" alt="Blaze y Nova junto a los tres sobres digitales de la Campaña Firehouse 2026" width="760" height="950" loading="eager" />
+          </picture>
+        </div>
+      </div>
+
+      <!-- CONTADOR -->
+      <div class="wrap">
+        <div class="camp-contador">
+          <div id="campContInicio" class="camp-contador__inicio">
+            <p>🔥 ¡Sé el primero en sumar tu pack a la meta de la campaña!</p>
+          </div>
+          <div id="campContNormal" class="camp-contador__normal" hidden>
+            <div class="camp-contador__fila">
+              <span class="camp-contador__num" id="campContNum">0</span>
+              <span class="camp-contador__total">/ 800</span>
+            </div>
+            <p class="camp-contador__label">packs Firehouse adquiridos</p>
+            <div class="camp-contador__barra"><div class="camp-contador__relleno" id="campContFill"></div></div>
+          </div>
+          <div class="camp-contador__desglose">
+            <div><span class="camp-contador__mini">🔥</span><span id="campContBlaze">0</span><p>Blaze</p></div>
+            <div><span class="camp-contador__mini">⚡</span><span id="campContNova">0</span><p>Nova</p></div>
+            <div><span class="camp-contador__mini">🔥⚡</span><span id="campContPack">0</span><p>Blaze + Nova</p></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ELIGE TU COLECCIÓN -->
+    <section class="section camp-productos" id="campana-elegir">
+      <div class="wrap">
+        <div class="reveal">
+          <Etiqueta texto="La colección 2026" />
+          <h2 class="section__title">Elige tu colección</h2>
+          <p class="section__intro">
+            Compra tu sobre Firehouse, recibe tu colección y participa. Cada producto es
+            un contenido digital real — el código de participación llega por separado.
+          </p>
+        </div>
+
+        <div class="camp-productos__grid">
+          {productos.map((p) => (
+            <div class:list={['camp-producto', { 'camp-producto--destacado': p.destacado }]}>
+              {p.destacado && <span class="camp-producto__badge">Más elegido</span>}
+              <picture class="camp-producto__img">
+                <source srcset={`/media/${p.img}.webp`} type="image/webp" />
+                <img src={`/media/${p.img}.jpg`} alt={p.alt} width="560" height="700" loading="lazy" />
+              </picture>
+              <p class="camp-producto__nombre">{p.nombre}</p>
+              <ul class="camp-producto__lista">
+                {p.contenido.map((item) => <li>{item}</li>)}
+              </ul>
+              <p class="camp-producto__precio">{p.precioTexto}</p>
+              <button type="button" class="camp-producto__btn" data-camp-producto={p.id}>{p.cta}</button>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <!-- QUÉ INCLUYE -->
+    <section class="section camp-preview" id="campana-contenido">
+      <div class="wrap">
+        <div class="reveal">
+          <Etiqueta texto="Producto real" />
+          <h2 class="section__title">Qué incluye tu sobre</h2>
+          <p class="section__intro">
+            Cada sobre entrega archivos descargables concretos — no es una lámina con un
+            número impreso. El código de participación se entrega por separado.
+          </p>
+        </div>
+        <div class="camp-preview__grid">
+          <figure class="camp-preview__item">
+            <picture>
+              <source srcset="/media/campana2026-preview-blaze.webp" type="image/webp" />
+              <img src="/media/campana2026-preview-blaze.jpg" alt="Muestra de láminas digitales coleccionables de Blaze" width="560" height="700" loading="lazy" />
+            </picture>
+            <figcaption>Colección Blaze</figcaption>
+          </figure>
+          <figure class="camp-preview__item">
+            <picture>
+              <source srcset="/media/campana2026-preview-nova.webp" type="image/webp" />
+              <img src="/media/campana2026-preview-nova.jpg" alt="Muestra de láminas digitales coleccionables de Nova" width="560" height="700" loading="lazy" />
+            </picture>
+            <figcaption>Colección Nova</figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <!-- PROPÓSITO -->
+    <section class="section camp-proposito">
+      <div class="wrap reveal camp-proposito__caja">
+        <p class="camp-proposito__titulo">❤️‍🔥 Tu compra apoya a Firehouse</p>
+        <p class="camp-proposito__texto">
+          Los recursos obtenidos a través de esta campaña se destinan a apoyar las
+          actividades deportivas y competitivas de nuestras niñas y niños durante la
+          temporada Firehouse 2026.
+        </p>
+      </div>
+    </section>
+
+    <!-- PROMOCIÓN Y PREMIOS -->
+    <section class="section camp-premios" id="campana-premios">
+      <div class="wrap">
+        <div class="reveal">
+          <Etiqueta texto="Y además, participa" />
+          <h2 class="section__title">Tu compra participa</h2>
+          <p class="section__intro">
+            Al adquirir productos participantes de la colección Firehouse recibes, sin
+            costo adicional, una participación en la promoción Firehouse 2026, conforme a
+            sus bases.
+          </p>
+        </div>
+        <div class="camp-premios__grid">
+          {premios.map((p) => (
+            <div class:list={['camp-premio', { 'camp-premio--principal': p.principal }]}>
+              <p class="camp-premio__tag">{p.tag}</p>
+              <p class="camp-premio__titulo">{p.titulo}</p>
+              <p class="camp-premio__desc">{p.desc}</p>
+            </div>
+          ))}
+        </div>
+        <p class="camp-nota">* Los premios se confirman antes del inicio oficial de la campaña.</p>
+      </div>
+    </section>
+
+    <!-- CÓMO FUNCIONA -->
+    <section class="section camp-pasos">
+      <div class="wrap">
+        <div class="reveal">
+          <Etiqueta texto="Paso a paso" />
+          <h2 class="section__title">Cómo funciona</h2>
+        </div>
+        <ol class="camp-pasos__lista">
+          {pasos.map((p) => (
+            <li class="camp-paso">
+              <span class="camp-paso__num">{p.n}</span>
+              <div>
+                <p class="camp-paso__titulo">{p.titulo}</p>
+                <p class="camp-paso__desc">{p.desc}</p>
+              </div>
+            </li>
+          ))}
+        </ol>
+      </div>
+    </section>
+
+    <!-- PARTICIPACIÓN SIN COMPRA -->
+    <section class="section camp-gratis" id="campana-gratis">
+      <div class="wrap camp-gratis__caja reveal">
+        <div>
+          <p class="camp-gratis__titulo">También puedes participar sin compra</p>
+          <p class="camp-gratis__texto">
+            La promoción Firehouse 2026 contempla una modalidad gratuita: una
+            participación por persona durante toda la vigencia de la campaña, según las
+            bases.
+          </p>
+        </div>
+        <button type="button" class="btn camp-gratis__btn" id="campGratisBtn">Participar sin compra</button>
+      </div>
+    </section>
+
+    <!-- SORTEO -->
+    <section class="section camp-sorteo" id="campana-sorteo">
+      <div class="wrap">
+        <div class="reveal">
+          <Etiqueta texto="El sorteo" />
+          <h2 class="section__title">Sorteo en vivo</h2>
+        </div>
+        <div class="camp-sorteo__card">
+          <p class="camp-sorteo__fecha">Sábado 12 de diciembre · Instagram Live</p>
+          <p class="camp-sorteo__texto">
+            El sorteo se realiza en vivo por <strong>@firehouse.cheer</strong>, entre todas
+            las participaciones válidamente registradas conforme a las bases — se realiza
+            en la fecha publicada, se alcance o no la meta comercial. Un testigo acompaña
+            el sorteo y el video queda publicado como respaldo.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- COMPARTIR -->
+    <section class="section camp-compartir" id="campana-compartir">
+      <div class="wrap">
+        <div class="reveal">
+          <Etiqueta texto="Ayúdanos a llegar más lejos" />
+          <h2 class="section__title">Comparte la campaña</h2>
+          <p class="section__intro">Mientras más personas conozcan nuestra colección, más cerca estaremos de nuestra meta.</p>
+        </div>
+        <div class="camp-compartir__botones">
+          <a class="btn" href="#" data-camp-compartir="whatsapp">Compartir por WhatsApp</a>
+          <a class="btn" href="#" data-camp-compartir="instagram">Compartir en Instagram</a>
+        </div>
+        <p class="camp-ayuda">
+          ¿Dudas antes de participar?
+          <a href={whatsapp('campana2026')} target="_blank" rel="noopener">Escríbenos por WhatsApp →</a>
+        </p>
+      </div>
+    </section>
+
+    <!-- TRANSPARENCIA -->
+    <section class="camp-transparencia">
+      <div class="wrap">
+        <p class="camp-transparencia__titulo">Transparencia Firehouse</p>
+        <ul class="camp-transparencia__lista">
+          <li><span>Bases de la promoción</span><em>(publicaremos pronto)</em></li>
+          <li><a href="#campana-gratis">Participación sin compra</a></li>
+          <li><a href="#campana-premios">Premios</a></li>
+          <li><a href="#campana-sorteo">Fecha del sorteo</a></li>
+          <li><span>Resultados</span><em>(se publican después del sorteo)</em></li>
+          <li><a href="/privacidad">Política de privacidad</a></li>
+          <li><a href={whatsapp('campana2026')} target="_blank" rel="noopener">Contacto</a></li>
+          <li><span>Información del organizador</span><em>(por definir)</em></li>
+        </ul>
+        <p class="camp-transparencia__pie">Organizado por Firehouse Cheer.</p>
+      </div>
+    </section>
+
+    <!-- CARRITO FIJO -->
+    <div class="camp-cart" id="campCart">
+      <div class="wrap camp-cart__fila">
+        <div class="camp-cart__chips" id="campCartChips"></div>
+        <div class="camp-cart__resumen">
+          <p class="camp-cart__total" id="campCartTotal">$0</p>
+          <button type="button" class="btn" id="campCartPagar">Continuar al pago</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- AVISO (pago en validación / participación gratuita) -->
+    <div class="camp-aviso" id="campAviso" hidden>
+      <div class="camp-aviso__fondo" id="campAvisoFondo"></div>
+      <div class="camp-aviso__caja" role="dialog" aria-modal="true" aria-labelledby="campAvisoTitulo">
+        <button type="button" class="camp-aviso__cerrar" id="campAvisoCerrar" aria-label="Cerrar">×</button>
+        <h3 id="campAvisoTitulo">Medio de pago en proceso de validación</h3>
+        <p id="campAvisoTexto">Estamos terminando de habilitar el pago en línea. Vuelve a intentarlo en unos días.</p>
+        <a class="btn camp-aviso__wa" id="campAvisoWa" href={whatsapp('campana2026Pago')} target="_blank" rel="noopener">Escríbenos por WhatsApp</a>
+      </div>
+    </div>
+
+    <!-- enlaces de WhatsApp con mensaje distinto según el aviso que los abrió -->
+    <a href={whatsapp('campana2026Pago')} id="campAvisoWaPago" hidden>·</a>
+    <a href={whatsapp('campana2026Gratis')} id="campAvisoWaGratis" hidden>·</a>
+
+    <div class="camp-toast" id="campToast"></div>
+  </div>
+</Base>
+
+<script>
+  import { iniciarCampana2026 } from '../scripts/campana2026.ts';
+  iniciarCampana2026();
+</script>
+
+<style is:global>
+  .camp2026{ background:#000; }
+
+  /* ---------- HERO ---------- */
+  .camp-hero{ position:relative; overflow:hidden; padding:var(--e-6) 0 var(--e-6); }
+  .camp-hero::before{
+    content:''; position:absolute; top:-220px; left:50%; width:900px; height:760px;
+    transform:translateX(-50%);
+    background:radial-gradient(ellipse 50% 50% at 50% 50%, rgba(197,21,21,.55), rgba(255,196,0,.28) 45%, transparent 72%);
+    filter:blur(10px); pointer-events:none;
+  }
+  .camp-hero__fila{
+    position:relative; z-index:1; display:flex; flex-direction:column;
+    align-items:center; text-align:center; gap:var(--e-5);
+  }
+  .camp-hero__texto{ max-width:var(--wrap-texto); }
+  .camp-hero__visual{ width:100%; max-width:380px; }
+  .camp-hero__titulo{
+    font-size:clamp(2.1rem, 6.6vw, 3.4rem); line-height:1.04;
+    max-width:15ch; margin:0 auto var(--e-3);
+  }
+  .camp-hero__bajada{
+    color:var(--txt-soft); max-width:46ch; margin:0 auto var(--e-4);
+    font-size:clamp(1.05rem, 1.6vw, 1.2rem);
+  }
+  .camp-hero__precios{ display:flex; gap:10px; flex-wrap:wrap; margin-bottom:var(--e-3); justify-content:center; }
+  .camp-hero__precio{
+    font-family:var(--font-body); font-size:14px; color:var(--txt-soft);
+    background:var(--ember-deep); border:1px solid var(--hairline); border-radius:99px; padding:6px 14px;
+  }
+  .camp-hero__precio strong{ font-family:var(--font-count); color:var(--chalk); }
+  .camp-hero__precio--destacado{ background:rgba(255,196,0,.12); border-color:var(--fire-yellow); color:var(--chalk); font-weight:600; }
+  .camp-hero__precio--destacado strong{ color:var(--fire-yellow); }
+  .camp-hero__cta{ transform:rotate(var(--tilt-xl)); }
+  .camp-hero__legal{ margin-top:var(--e-3); font-size:12.5px; color:var(--txt-faint); max-width:42ch; margin-inline:auto; }
+  .camp-hero__referido{
+    margin-top:var(--e-2); font-size:13px; color:var(--fire-yellow);
+    background:rgba(255,196,0,.08); border:1px solid rgba(255,196,0,.3);
+    padding:8px 14px; border-radius:99px; display:inline-block;
+  }
+  @media (min-width:900px){
+    .camp-hero__fila{ flex-direction:row; align-items:center; text-align:left; gap:var(--e-7); }
+    .camp-hero__texto{ flex:1.15; max-width:none; }
+    .camp-hero__visual{ flex:.85; max-width:420px; }
+    .camp-hero__titulo{ max-width:none; margin:0 0 var(--e-3); font-size:clamp(2.6rem, 4.4vw, 3.8rem); }
+    .camp-hero__bajada{ margin:0 0 var(--e-4); }
+    .camp-hero__precios{ justify-content:flex-start; }
+    .camp-hero__legal{ margin-inline:0; }
+  }
+  .camp-mascota{ display:block; width:100%; height:auto; }
+  .camp-mascota img{ display:block; width:100%; height:auto; }
+  .camp-mascota--hero{ max-width:360px; margin:0 auto; filter:drop-shadow(0 22px 30px rgba(0,0,0,.7)); }
+  @media (min-width:900px){ .camp-mascota--hero{ max-width:100%; } }
+
+  /* ---------- CONTADOR ---------- */
+  .camp-contador{
+    margin-top:var(--e-5); padding:var(--e-3); background:var(--ember-deep);
+    border:1px solid var(--hairline); border-radius:12px; position:relative; z-index:1;
+  }
+  .camp-contador__inicio p{
+    margin:0; font-family:var(--font-display); font-weight:700; font-size:15px;
+    color:var(--fire-yellow); text-align:center;
+  }
+  .camp-contador__fila{ display:flex; justify-content:space-between; align-items:baseline; margin-bottom:10px; }
+  .camp-contador__num{ font-family:var(--font-count); font-weight:700; font-size:clamp(2rem, 8vw, 2.8rem); color:var(--fire-yellow); line-height:1; }
+  .camp-contador__total{ font-family:var(--font-count); font-size:15px; color:var(--txt-faint); }
+  .camp-contador__label{ font-size:14px; color:var(--txt-faint); }
+  .camp-contador__barra{ margin-top:14px; height:10px; background:var(--hairline); border-radius:var(--radio); overflow:hidden; }
+  .camp-contador__relleno{ height:100%; border-radius:var(--radio); width:0; background:linear-gradient(90deg, var(--fire-red), var(--fire-yellow)); transition:width .6s ease; }
+  .camp-contador__desglose{
+    display:grid; grid-template-columns:repeat(3, 1fr); gap:10px; margin-top:var(--e-3);
+    padding-top:var(--e-3); border-top:1px solid var(--hairline); text-align:center;
+  }
+  .camp-contador__desglose div{ display:flex; flex-direction:column; align-items:center; gap:2px; }
+  .camp-contador__mini{ font-size:16px; }
+  .camp-contador__desglose span:nth-child(2){ font-family:var(--font-count); font-weight:700; font-size:18px; color:var(--chalk); }
+  .camp-contador__desglose p{ font-size:11.5px; color:var(--txt-faint); margin:0; }
+
+  /* ---------- PRODUCTOS ---------- */
+  .camp-productos__grid{ display:grid; gap:var(--e-3); margin-top:var(--e-4); }
+  @media (min-width:760px){ .camp-productos__grid{ grid-template-columns:repeat(3, 1fr); } }
+  .camp-producto{
+    position:relative; background:var(--ember-deep); border:1px solid var(--hairline);
+    border-radius:16px; padding:var(--e-3); display:flex; flex-direction:column; gap:10px;
+  }
+  .camp-producto--destacada,
+  .camp-producto--destacado{ border:2px solid var(--fire-yellow); box-shadow:0 0 0 4px rgba(255,196,0,.08); }
+  .camp-producto__badge{
+    position:absolute; top:-12px; left:var(--e-3); background:var(--fire-yellow); color:var(--ember);
+    font-family:var(--font-count); font-size:11px; font-weight:700; padding:4px 10px; border-radius:var(--radio);
+  }
+  .camp-producto__img{ border-radius:10px; overflow:hidden; }
+  .camp-producto__img img{ width:100%; height:auto; display:block; }
+  .camp-producto__nombre{ font-family:var(--font-display); font-weight:800; font-size:1.2rem; }
+  .camp-producto__lista{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:4px; }
+  .camp-producto__lista li{ font-size:13px; color:var(--txt-faint); padding-left:16px; position:relative; }
+  .camp-producto__lista li::before{ content:'🔥'; position:absolute; left:0; font-size:10px; top:3px; }
+  .camp-producto__precio{ font-family:var(--font-count); font-size:1.4rem; font-weight:700; color:var(--fire-yellow); margin-top:auto; }
+  .camp-producto__btn{
+    background:var(--fire-red); color:#fff; font-family:var(--font-body); font-weight:500;
+    font-size:15px; padding:12px; border:none; border-radius:99px; cursor:pointer;
+    transition:background var(--t-interfaz) ease;
+  }
+  .camp-producto__btn:hover{ background:#a91111; }
+  .camp-producto__btn.activo{ background:var(--mat-blue); }
+
+  /* ---------- PREVIEW CONTENIDO ---------- */
+  .camp-preview__grid{ display:grid; gap:var(--e-3); margin-top:var(--e-4); }
+  @media (min-width:640px){ .camp-preview__grid{ grid-template-columns:1fr 1fr; } }
+  .camp-preview__item{ margin:0; background:var(--ember-deep); border:1px solid var(--hairline); border-radius:16px; overflow:hidden; }
+  .camp-preview__item img{ width:100%; height:auto; display:block; }
+  .camp-preview__item figcaption{ padding:10px 14px; font-family:var(--font-count); font-size:12px; color:var(--fire-yellow); text-align:center; }
+
+  /* ---------- PROPÓSITO ---------- */
+  .camp-proposito__caja{ text-align:center; max-width:var(--wrap-texto); }
+  .camp-proposito__titulo{ font-family:var(--font-display); font-weight:800; font-size:1.5rem; margin-bottom:var(--e-2); }
+  .camp-proposito__texto{ color:var(--txt-soft); font-size:1.05rem; }
+
+  /* ---------- PREMIOS ---------- */
+  .camp-premios__grid{ display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:var(--e-4); }
+  .camp-premio{ background:var(--ember-deep); border:1px solid var(--hairline); padding:var(--e-3); border-radius:12px; }
+  .camp-premio--principal{
+    grid-column:1 / -1; background:linear-gradient(135deg, #2a1414, var(--ember-deep)); border-color:var(--fire-red);
+  }
+  .camp-premio__tag{ font-family:var(--font-count); font-size:12px; color:var(--fire-yellow); margin-bottom:6px; }
+  .camp-premio__titulo{ font-family:var(--font-display); font-weight:800; font-size:1.25rem; margin-bottom:4px; }
+  .camp-premio--principal .camp-premio__titulo{ font-size:1.6rem; }
+  .camp-premio__desc{ color:var(--txt-faint); font-size:14px; }
+  .camp-nota{ margin-top:var(--e-3); font-size:12px; color:var(--txt-faint); }
+
+  /* ---------- PASOS ---------- */
+  .camp-pasos__lista{ list-style:none; margin:var(--e-4) 0 0; padding:0; display:flex; flex-direction:column; gap:var(--e-3); }
+  .camp-paso{ display:flex; gap:14px; align-items:flex-start; }
+  .camp-paso__num{
+    flex:0 0 auto; width:32px; height:32px; border-radius:50%; background:var(--ember-deep);
+    border:1px solid var(--fire-yellow); color:var(--fire-yellow); font-family:var(--font-count);
+    font-weight:700; display:flex; align-items:center; justify-content:center; font-size:14px;
+  }
+  .camp-paso__titulo{ font-family:var(--font-display); font-weight:700; font-size:1rem; margin-bottom:2px; }
+  .camp-paso__desc{ font-size:14px; color:var(--txt-faint); }
+
+  /* ---------- PARTICIPACIÓN SIN COMPRA ---------- */
+  .camp-gratis__caja{
+    display:flex; flex-direction:column; gap:var(--e-3); align-items:flex-start;
+    background:var(--ember-deep); border:1px solid var(--hairline); border-radius:16px; padding:var(--e-4);
+  }
+  .camp-gratis__titulo{ font-family:var(--font-display); font-weight:800; font-size:1.2rem; margin-bottom:6px; }
+  .camp-gratis__texto{ color:var(--txt-faint); font-size:14px; }
+  .camp-gratis__btn{ align-self:stretch; text-align:center; }
+  @media (min-width:640px){
+    .camp-gratis__caja{ flex-direction:row; align-items:center; justify-content:space-between; }
+    .camp-gratis__btn{ align-self:auto; white-space:nowrap; }
+  }
+
+  /* ---------- SORTEO ---------- */
+  .camp-sorteo__card{ background:var(--ember-deep); border:1px solid var(--hairline); border-radius:12px; padding:var(--e-4); text-align:center; margin-top:var(--e-4); }
+  .camp-sorteo__fecha{ font-family:var(--font-count); font-size:1.3rem; color:var(--fire-yellow); margin-bottom:8px; }
+  .camp-sorteo__texto{ font-size:14px; color:var(--txt-faint); line-height:1.6; text-align:left; }
+  .camp-sorteo__texto strong{ color:var(--chalk); }
+
+  /* ---------- COMPARTIR ---------- */
+  .camp-compartir__botones{ display:flex; gap:10px; margin-top:var(--e-4); flex-wrap:wrap; }
+  .camp-compartir__botones .btn{ flex:1; min-width:200px; text-align:center; }
+  .camp-ayuda{ margin-top:var(--e-3); font-size:14px; color:var(--txt-faint); }
+  .camp-ayuda a{ color:var(--fire-yellow); }
+
+  /* ---------- TRANSPARENCIA ---------- */
+  .camp-transparencia{ padding:var(--e-4) 0 calc(var(--e-6) + 80px); border-top:1px solid var(--hairline); }
+  .camp-transparencia__titulo{ font-family:var(--font-count); font-size:12px; color:var(--txt-faint); letter-spacing:.1em; text-transform:uppercase; margin-bottom:var(--e-2); }
+  .camp-transparencia__lista{ list-style:none; margin:0; padding:0; display:flex; flex-wrap:wrap; gap:14px; }
+  .camp-transparencia__lista li{ font-size:12.5px; color:var(--txt-faint); }
+  .camp-transparencia__lista a{ color:var(--txt-soft); text-decoration:underline; }
+  .camp-transparencia__lista em{ font-style:normal; color:var(--ash); margin-left:4px; }
+  .camp-transparencia__pie{ margin-top:var(--e-3); font-size:12px; color:var(--ash); }
+
+  /* ---------- CARRITO FIJO ---------- */
+  .camp-cart{
+    position:fixed; left:0; right:0; bottom:0; background:var(--ember-deep);
+    border-top:1px solid var(--fire-yellow); padding:var(--e-2) 0;
+    transform:translateY(100%); transition:transform .3s ease; z-index:50;
+  }
+  .camp-cart.activo{ transform:translateY(0); }
+  .camp-cart__fila{ display:flex; flex-direction:column; gap:10px; }
+  .camp-cart__chips{ display:flex; gap:6px; flex-wrap:nowrap; overflow-x:auto; -webkit-overflow-scrolling:touch; }
+  .camp-chip{
+    display:inline-flex; align-items:center; gap:6px; flex:0 0 auto;
+    background:var(--fire-yellow); color:var(--ember); font-family:var(--font-count);
+    font-size:12px; font-weight:700; padding:6px 6px 6px 10px; border-radius:var(--radio); white-space:nowrap;
+  }
+  .camp-chip button{ background:rgba(0,0,0,.2); border:none; color:var(--ember); width:18px; height:18px; border-radius:50%; font-size:13px; line-height:1; cursor:pointer; }
+  .camp-cart__resumen{ display:flex; align-items:center; justify-content:space-between; gap:var(--e-3); }
+  .camp-cart__total{ font-family:var(--font-count); font-size:20px; font-weight:700; color:var(--fire-yellow); white-space:nowrap; }
+
+  /* ---------- AVISO ---------- */
+  .camp-aviso[hidden]{ display:none; }
+  .camp-aviso{ position:fixed; inset:0; z-index:200; display:flex; align-items:flex-end; justify-content:center; }
+  .camp-aviso__fondo{ position:absolute; inset:0; background:rgba(0,0,0,.7); }
+  .camp-aviso__caja{
+    position:relative; width:100%; max-width:440px; background:var(--ember-deep);
+    border:1px solid var(--hairline); border-radius:16px 16px 0 0; padding:var(--e-4);
+  }
+  .camp-aviso__cerrar{
+    position:absolute; top:12px; right:12px; width:32px; height:32px; border-radius:50%;
+    background:rgba(245,239,232,.08); border:none; color:var(--txt); font-size:18px; cursor:pointer;
+  }
+  .camp-aviso__caja h3{ font-family:var(--font-display); font-weight:800; font-size:1.25rem; padding-right:var(--e-4); margin-bottom:10px; }
+  .camp-aviso__caja p{ color:var(--txt-soft); font-size:14px; margin-bottom:var(--e-3); }
+  .camp-aviso__wa{ display:block; text-align:center; }
+  @media (min-width:640px){ .camp-aviso{ align-items:center; } .camp-aviso__caja{ border-radius:16px; } }
+
+  /* ---------- TOAST ---------- */
+  .camp-toast{
+    position:fixed; left:50%; bottom:100px; transform:translate(-50%, 20px);
+    background:var(--chalk); color:var(--ember); padding:14px 20px; border-radius:8px;
+    font-size:14px; max-width:80vw; text-align:center; opacity:0; pointer-events:none;
+    transition:opacity .25s ease, transform .25s ease; z-index:100;
+  }
+  .camp-toast.activo{ opacity:1; transform:translate(-50%, 0); }
+
+  @media (prefers-reduced-motion: reduce){
+    .camp-cart, .camp-toast, .camp-contador__relleno{ transition:none; }
+  }
+</style>
