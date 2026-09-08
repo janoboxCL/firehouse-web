@@ -6,8 +6,9 @@ import Pie from '../components/Pie.astro';
 import Arriba from '../components/Arriba.astro';
 import { sitio, whatsapp } from '../data/sitio.js';
 
-const { titulo, descripcion, ruta = '', preguntas = null, miga = null, noindex = false, minimal = false } = Astro.props;
+const { titulo, descripcion, ruta = '', preguntas = null, miga = null, noindex = false, minimal = false, ogImagen = null } = Astro.props;
 const canonical = `${sitio.url}${ruta}`;
+const imagenOg = ogImagen ? `${sitio.url}${ogImagen}` : `${sitio.url}/og.jpg`;
 
 const schema = {
   '@context': 'https://schema.org',
@@ -58,7 +59,7 @@ const schema = {
   <meta property="og:description" content={descripcion} />
   <meta property="og:url" content={canonical} />
   <meta property="og:locale" content="es_CL" />
-  <meta property="og:image" content={`${sitio.url}/og.jpg`} />
+  <meta property="og:image" content={imagenOg} />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
   <meta name="twitter:card" content="summary_large_image" />
