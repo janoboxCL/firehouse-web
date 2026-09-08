@@ -105,9 +105,8 @@ export function iniciarCampana2026(): void {
   }
   cargarContador();
 
-  // ---------- Selección de sobres + barra fija de dos estados ----------
-  const cartIdle = $<HTMLElement>('#campCartIdle');
-  const cartResumen = $<HTMLElement>('#campCartResumen');
+  // ---------- Selección de sobres + carrito fijo (oculto hasta elegir algo) ----------
+  const cart = $<HTMLElement>('#campCart');
   const cartChips = $<HTMLElement>('#campCartChips');
   const cartTotal = $<HTMLElement>('#campCartTotal');
   const cartPagarBtn = $<HTMLButtonElement>('#campCartPagar');
@@ -126,10 +125,9 @@ export function iniciarCampana2026(): void {
   }
 
   function actualizarCarrito(): void {
-    if (!cartIdle || !cartResumen || !cartChips || !cartTotal || !cartPagarBtn) return;
+    if (!cart || !cartChips || !cartTotal || !cartPagarBtn) return;
     const hayAlgo = seleccion.size > 0;
-    cartIdle.toggleAttribute('hidden', hayAlgo);
-    cartResumen.toggleAttribute('hidden', !hayAlgo);
+    cart.classList.toggle('activo', hayAlgo);
     if (!hayAlgo) return;
 
     cartChips.innerHTML = '';
