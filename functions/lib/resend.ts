@@ -231,3 +231,144 @@ export async function enviarCorreoConfirmacionRifa(
     bcc,
   );
 }
+
+// ---------------------------------------------------------------------------
+// Correo de confirmación de compra — Campaña Firehouse 2026
+// ---------------------------------------------------------------------------
+
+export const NOMBRE_PRODUCTO_CAMPANA: Record<string, string> = {
+  BLAZE: 'Sobre Blaze',
+  NOVA: 'Sobre Nova',
+  BLAZE_NOVA: 'Pack Blaze + Nova',
+};
+
+export interface DatosCorreoCampana {
+  compradorNombre: string;
+  compradorEmail: string;
+  monto: number;
+  commerceOrder: string;
+  ordenId: string;
+  /** Uno por producto comprado, en el mismo orden que los ítems de la orden. */
+  productos: string[];
+  /** Uno por producto comprado (fn_confirmar_orden_campana genera un código por ítem). */
+  codigos: string[];
+  /** URL base del sitio, para armar el link a la página de descarga. */
+  siteUrl: string;
+}
+
+function construirHtmlCampana(datos: DatosCorreoCampana): string {
+  const nombre = escaparHtml(datos.compradorNombre.split(' ')[0]);
+  const montoTexto = `$${datos.monto.toLocaleString('es-CL')}`;
+  const urlDescarga = `${datos.siteUrl}/campana-2026/descarga?orden=${datos.ordenId}`;
+
+  const listaProductos = datos.productos
+    .map((p) => `<li style="margin-bottom:4px;">${escaparHtml(NOMBRE_PRODUCTO_CAMPANA[p] ?? p)}</li>`)
+    .join('');
+
+  const listaCodigos = datos.codigos
+    .map(
+      (c) =>
+        `<span style="display:inline-block;background:#171412;color:#FFC400;font-family:monospace;font-size:15px;padding:6px 12px;border-radius:6px;margin:0 6px 6px 0;">${escaparHtml(c)}</span>`,
+    )
+    .join('');
+
+  const cuerpo = `
+    <p style="font-size:15px;line-height:1.65;color:rgba(245,239,232,.86);margin:0 0 16px;">
+      Hola ${nombre}, ¡gracias por apoyar a Firehouse! 🔥
+    </p>
+    <p style="font-size:15px;line-height:1.65;color:rgba(245,239,232,.86);margin:0 0 8px;">
+      Tu compra incluye:
+    </p>
+    <ul style="font-size:15px;line-height:1.5;color:#F5EFE8;margin:0 0 20px;padding-left:20px;">
+      ${listaProductos}
+    </ul>
+    <p style="margin:0 0 28px;">
+      <a href="${urlDescarga}"
+         style="display:inline-block;background:#1B4FA8;color:#ffffff;text-decoration:none;
+                padding:13px 28px;border-radius:999px;font-size:14px;font-weight:500;">
+        Descargar tu colección
+      </a>
+    </p>
+    <p style="font-size:13px;line-height:1.6;color:rgba(245,239,232,.6);margin:0 0 8px;">
+      Además, tu compra incluye una participación en la promoción Firehouse 2026 — este es tu código:
+    </p>
+    <p style="margin:0 0 24px;">${listaCodigos}</p>
+    <p style="font-size:15px;line-height:1.65;color:rgba(245,239,232,.86);margin:0 0 8px;">
+      Monto pagado: <strong>${montoTexto}</strong>
+    </p>
+    <p style="font-size:13px;line-height:1.6;color:rgba(245,239,232,.5);margin:0;">N° de orden: ${escaparHtml(datos.commerceOrder)}</p>
+  `;
+  return plantillaBase('Firehouse Cheerleading All Stars', '¡Ya tienes tu colección Firehouse 2026! 🎉', cuerpo);
+}
+
+/**
+ * Correo de confirmación de compra de la Campaña Firehouse 2026. A propósito
+ * mantiene el producto (el link de descarga) y la participación (el código)
+ * en bloques separados dentro del mismo correo — la separación conceptual
+ * que sostiene todo este modelo no se pierde ni siquiera acá.
+ *
+ * Mismo criterio "best effort" que el resto: si falla, no debe romper la
+ * confirmación del pago, que ya quedó guardada en la base antes de llegar acá.
+ */
+export async function enviarCorreoConfirmacionCampana(
+  apiKey: string,
+  remitente: string,
+  datos: DatosCorreoCampana,
+  bcc?: string[],
+): Promise<void> {
+  await enviarCorreoGenerico(
+    apiKey,
+    remitente,
+    datos.compradorEmail,
+    '¡Ya tienes tu colección Firehouse 2026! 🎉',
+    construirHtmlCampana(datos),
+    bcc,
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Correo de confirmación — participación sin compra, Campaña Firehouse 2026
+// ---------------------------------------------------------------------------
+
+export interface DatosCorreoParticipacionGratis {
+  nombre: string;
+  email: string;
+  codigo: string;
+}
+
+function construirHtmlParticipacionGratis(datos: DatosCorreoParticipacionGratis): string {
+  const nombre = escaparHtml(datos.nombre.split(' ')[0]);
+  const cuerpo = `
+    <p style="font-size:15px;line-height:1.65;color:rgba(245,239,232,.86);margin:0 0 16px;">
+      Hola ${nombre}, ¡ya estás participando en la promoción Firehouse 2026! 🔥
+    </p>
+    <p style="font-size:13px;line-height:1.6;color:rgba(245,239,232,.6);margin:0 0 8px;">
+      Tu código de participación:
+    </p>
+    <p style="margin:0 0 24px;">
+      <span style="display:inline-block;background:#171412;color:#FFC400;font-family:monospace;font-size:15px;padding:6px 12px;border-radius:6px;">${escaparHtml(datos.codigo)}</span>
+    </p>
+    <p style="font-size:13px;line-height:1.6;color:rgba(245,239,232,.6);margin:0;">
+      Guarda este correo — este código entra al mismo sorteo que las participaciones de quienes
+      compraron un sobre. El sorteo se transmite en vivo por Instagram <strong>@firehouse.cheer</strong>.
+    </p>
+  `;
+  return plantillaBase('Firehouse Cheerleading All Stars', '¡Ya estás participando! 🎉', cuerpo);
+}
+
+/** Best effort — si Resend falla, no debe romper el registro, que ya quedó guardado. */
+export async function enviarCorreoParticipacionGratisCampana(
+  apiKey: string,
+  remitente: string,
+  datos: DatosCorreoParticipacionGratis,
+  bcc?: string[],
+): Promise<void> {
+  await enviarCorreoGenerico(
+    apiKey,
+    remitente,
+    datos.email,
+    '¡Ya estás participando en la promoción Firehouse 2026! 🎉',
+    construirHtmlParticipacionGratis(datos),
+    bcc,
+  );
+}

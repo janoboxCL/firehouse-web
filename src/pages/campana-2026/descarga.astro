@@ -1,0 +1,84 @@
+---
+import Base from '../../layouts/Base.astro';
+import { whatsapp } from '../../data/sitio.js';
+
+const titulo = 'Tu colección Firehouse | Campaña 2026';
+const descripcion = 'Descarga tu colección digital Firehouse 2026 y revisa tu código de participación.';
+---
+<Base
+  titulo={titulo}
+  descripcion={descripcion}
+  ruta="/campana-2026/descarga"
+  noindex={true}
+  minimal={true}
+  etiquetaMinima="Campaña 2026"
+  mensajeWhatsappMinima="campana2026"
+>
+  <section class="dg">
+    <div class="wrap dg__caja">
+
+      <div id="dgEstado-cargando" class="dg__estado">
+        <p class="dg__titulo">Confirmando tu compra…</p>
+        <p class="dg__texto">Un momento, estamos verificando tu pago.</p>
+      </div>
+
+      <div id="dgEstado-pendiente" class="dg__estado" hidden>
+        <p class="dg__titulo">Confirmando tu pago…</p>
+        <p class="dg__texto">Puede tardar unos segundos. Esta página se actualiza sola — no hace falta que la recargues.</p>
+        <button type="button" class="btn-quiet" id="dgReintentarBtn" hidden>Reintentar ahora</button>
+      </div>
+
+      <div id="dgEstado-pagada" class="dg__estado" hidden>
+        <p class="dg__titulo">¡Gracias, <span id="dgNombre">!</span> 🔥</p>
+        <p class="dg__texto">Tu colección Firehouse ya está lista.</p>
+        <div id="dgProductos" class="dg__productos"></div>
+
+        <p class="dg__subtitulo">Además, tu compra incluye una participación en la promoción Firehouse 2026:</p>
+        <div id="dgCodigos" class="dg__codigos"></div>
+        <p class="dg__nota">Guarda esta página o el correo que te enviamos — ahí también quedaron tus códigos y links de descarga.</p>
+      </div>
+
+      <div id="dgEstado-rechazada" class="dg__estado" hidden>
+        <p class="dg__titulo">Tu pago no se pudo confirmar</p>
+        <p class="dg__texto">
+          Si el dinero fue descontado de tu cuenta, escríbenos y lo revisamos — no te preocupes,
+          nada se pierde.
+        </p>
+        <a class="btn" href={whatsapp('campana2026')} target="_blank" rel="noopener">Escríbenos por WhatsApp</a>
+      </div>
+
+      <div id="dgEstado-error" class="dg__estado" hidden>
+        <p class="dg__titulo">No encontramos esta orden</p>
+        <p class="dg__texto">Revisa que el link sea el mismo que recibiste por correo, o escríbenos si crees que es un error.</p>
+        <a class="btn" href={whatsapp('campana2026')} target="_blank" rel="noopener">Escríbenos por WhatsApp</a>
+      </div>
+
+    </div>
+  </section>
+</Base>
+
+<script>
+  import { iniciarDescargaCampana2026 } from '../../scripts/campana-2026-descarga.ts';
+  iniciarDescargaCampana2026();
+</script>
+
+<style is:global>
+  .dg{ background:#000; min-height:80vh; padding:var(--e-6) 0; display:flex; align-items:center; }
+  .dg__caja{ max-width:520px; text-align:center; }
+  .dg__estado{ color:var(--txt-soft); }
+  .dg__titulo{ font-family:var(--font-display); color:var(--chalk); font-weight:800; font-size:1.6rem; margin-bottom:10px; }
+  .dg__texto{ font-size:14.5px; line-height:1.6; margin-bottom:var(--e-3); }
+  .dg__productos{ display:flex; flex-direction:column; gap:10px; margin:var(--e-3) 0 var(--e-4); }
+  .dg-producto{
+    display:flex; align-items:center; justify-content:space-between; gap:14px;
+    background:var(--ember-deep); border:1px solid var(--hairline); border-radius:12px; padding:14px 16px;
+  }
+  .dg-producto__nombre{ font-family:var(--font-display); font-weight:700; font-size:15px; color:var(--chalk); }
+  .dg__subtitulo{ font-size:13.5px; color:var(--txt-faint); margin:var(--e-3) 0 10px; }
+  .dg__codigos{ display:flex; flex-wrap:wrap; justify-content:center; gap:8px; margin-bottom:var(--e-3); }
+  .dg-codigo{
+    font-family:var(--font-count); font-size:15px; font-weight:700; color:var(--fire-yellow);
+    background:var(--ember-deep); border:1px solid var(--hairline); padding:6px 14px; border-radius:8px;
+  }
+  .dg__nota{ font-size:12px; color:var(--txt-faint); }
+</style>

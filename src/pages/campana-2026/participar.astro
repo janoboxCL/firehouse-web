@@ -1,0 +1,114 @@
+---
+import Base from '../../layouts/Base.astro';
+import { whatsapp } from '../../data/sitio.js';
+
+const titulo = 'Participa sin compra | Campaña Firehouse 2026';
+const descripcion = 'Participa sin costo en la promoción Firehouse 2026: una participación gratuita por persona durante toda la campaña.';
+const noindex = true;
+---
+<Base
+  titulo={titulo}
+  descripcion={descripcion}
+  ruta="/campana-2026/participar"
+  noindex={noindex}
+  minimal={true}
+  etiquetaMinima="Campaña 2026"
+  mensajeWhatsappMinima="campana2026"
+>
+  <section class="pg">
+    <div class="wrap pg__caja">
+
+      <div id="pgForm">
+        <p class="pg__titulo">Participa sin compra</p>
+        <p class="pg__texto">
+          La promoción Firehouse 2026 contempla una modalidad gratuita de participación, sin
+          necesidad de adquirir productos: una (1) participación por persona y RUT durante toda
+          la vigencia de la campaña, conforme a las
+          <a href="/campana-2026/bases" target="_blank" rel="noopener">Bases de la Promoción</a>.
+        </p>
+
+        <form id="pgFormulario" novalidate>
+          <div class="pg-campo">
+            <label for="pgNombre">Nombre completo</label>
+            <input type="text" id="pgNombre" required autocomplete="name" maxlength="150" minlength="3" />
+          </div>
+          <div class="pg-campo">
+            <label for="pgRut">RUT</label>
+            <input type="text" id="pgRut" required inputmode="text" placeholder="11.111.111-1" maxlength="12" />
+          </div>
+          <div class="pg-campo">
+            <label for="pgEmail">Correo electrónico</label>
+            <input type="email" id="pgEmail" required autocomplete="email" maxlength="254" />
+          </div>
+          <div class="pg-campo">
+            <label for="pgTelefono">Celular / WhatsApp</label>
+            <input type="tel" inputmode="tel" id="pgTelefono" required autocomplete="tel" placeholder="9 1234 5678" maxlength="12" />
+          </div>
+
+          <label class="pg-check">
+            <input type="checkbox" id="pgAcepta" required />
+            <span>Acepto las <a href="/campana-2026/bases" target="_blank" rel="noopener">Bases de la Promoción</a>.</span>
+          </label>
+
+          <p id="pgFormError" class="pg__error" hidden></p>
+
+          <button type="submit" class="btn pg__enviar" id="pgEnviar">Participar sin compra</button>
+        </form>
+      </div>
+
+      <div id="pgExito" class="pg__estado" hidden>
+        <p class="pg__titulo">¡Ya estás participando! 🔥</p>
+        <p class="pg__texto">Tu código de participación:</p>
+        <p class="pg-codigo" id="pgCodigo"></p>
+        <p class="pg__texto">
+          Te enviamos este código también por correo. Entra al mismo sorteo que las
+          participaciones de quienes compraron un sobre — se transmite en vivo por Instagram
+          <strong>@firehouse.cheer</strong>.
+        </p>
+      </div>
+
+      <div id="pgYaParticipa" class="pg__estado" hidden>
+        <p class="pg__titulo">Este RUT ya está participando</p>
+        <p class="pg__texto">
+          Sólo se permite una participación gratuita por persona durante toda la campaña. Si
+          crees que esto es un error, escríbenos.
+        </p>
+        <a class="btn" href={whatsapp('campana2026')} target="_blank" rel="noopener">Escríbenos por WhatsApp</a>
+      </div>
+
+    </div>
+  </section>
+</Base>
+
+<script>
+  import { iniciarParticiparGratis } from '../../scripts/campana-2026-participar.ts';
+  iniciarParticiparGratis();
+</script>
+
+<style is:global>
+  .pg{ background:#000; min-height:80vh; padding:var(--e-6) 0; }
+  .pg__caja{ max-width:480px; }
+  .pg__titulo{ font-family:var(--font-display); color:var(--chalk); font-weight:800; font-size:1.5rem; margin-bottom:10px; text-align:center; }
+  .pg__texto{ font-size:14px; line-height:1.65; color:var(--txt-soft); margin-bottom:var(--e-3); text-align:center; }
+  .pg__texto a{ color:var(--fire-yellow); }
+  .pg-campo{ margin-top:var(--e-3); }
+  .pg-campo label{ display:block; font-size:14px; color:var(--txt-soft); margin-bottom:6px; }
+  .pg-campo input{
+    width:100%; box-sizing:border-box; background:var(--ember-deep); color:var(--chalk);
+    border:1px solid var(--hairline); border-radius:12px; padding:13px 14px; font-family:var(--font-body);
+    font-size:16px; min-height:48px;
+  }
+  .pg-campo input:focus-visible{ outline:none; border-color:var(--fire-yellow); box-shadow:0 0 0 4px rgba(255,196,0,.2); }
+  .pg-check{ display:flex; align-items:flex-start; gap:10px; margin-top:var(--e-3); font-size:13px; color:var(--txt-faint); cursor:pointer; }
+  .pg-check input{ margin-top:3px; }
+  .pg-check a{ color:var(--fire-yellow); }
+  .pg__error{ color:var(--fire-red); font-size:13px; margin-top:var(--e-2); text-align:center; }
+  .pg__enviar{ width:100%; text-align:center; margin-top:var(--e-4); }
+  .pg__enviar:disabled{ opacity:.7; pointer-events:none; }
+  .pg__estado{ text-align:center; }
+  .pg-codigo{
+    font-family:var(--font-count); font-weight:700; font-size:1.6rem; color:var(--fire-yellow);
+    background:var(--ember-deep); border:1px solid var(--hairline); border-radius:12px;
+    padding:12px; display:inline-block; margin-bottom:var(--e-3);
+  }
+</style>

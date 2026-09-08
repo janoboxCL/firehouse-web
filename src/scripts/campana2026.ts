@@ -1,10 +1,11 @@
 // Lógica de cliente para /campana-2026.
 //
-// A diferencia de /sorteo, esta página TODAVÍA NO tiene checkout real: no
-// existe un endpoint que cree una orden ni una pasarela habilitada. Por eso
-// "Continuar al pago" no llama a ninguna API — abre un aviso que dice que el
-// medio de pago está en validación (ver brief de la Campaña Firehouse 2026,
-// punto 21) y ofrece WhatsApp como alternativa mientras tanto.
+// El checkout ya es real: al confirmar, este archivo llama a
+// /api/campana-2026/crear-orden. Mientras campana_config.checkout_habilitado
+// siga en false (default hasta que Flow apruebe el modelo), ese endpoint
+// responde 403 checkout_deshabilitado y acá mostramos el aviso de "medio de
+// pago en proceso de validación" en vez de redirigir a pagar — nadie llega a
+// pagar por error mientras el modelo sigue en revisión.
 //
 // El contador intenta leer /api/campana-2026/contador y, si el endpoint
 // todavía no existe (404 o error de red), parte en 0 sin romper la página.
@@ -14,6 +15,7 @@
 
 interface Producto {
   id: string;
+  codigoBackend: string;
   nombre: string;
   precio: number;
 }
@@ -26,9 +28,9 @@ function $all<T extends Element>(selector: string, root: ParentNode = document):
 }
 
 const PRODUCTOS: Record<string, Producto> = {
-  blaze: { id: 'blaze', nombre: 'Sobre Blaze', precio: 3000 },
-  nova: { id: 'nova', nombre: 'Sobre Nova', precio: 3000 },
-  'blaze-nova': { id: 'blaze-nova', nombre: 'Pack Blaze + Nova', precio: 5000 },
+  blaze: { id: 'blaze', codigoBackend: 'BLAZE', nombre: 'Sobre Blaze', precio: 3000 },
+  nova: { id: 'nova', codigoBackend: 'NOVA', nombre: 'Sobre Nova', precio: 3000 },
+  'blaze-nova': { id: 'blaze-nova', codigoBackend: 'BLAZE_NOVA', nombre: 'Pack Blaze + Nova', precio: 5000 },
 };
 
 const formatoCLP = new Intl.NumberFormat('es-CL', {
@@ -36,6 +38,44 @@ const formatoCLP = new Intl.NumberFormat('es-CL', {
   currency: 'CLP',
   maximumFractionDigits: 0,
 });
+
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+function formatearTelefonoInput(input: HTMLInputElement | null): void {
+  if (!input) return;
+  input.addEventListener('input', () => {
+    const digitos = input.value.replace(/\D/g, '').slice(0, 9);
+    if (digitos.length <= 1) { input.value = digitos; return; }
+    const resto = digitos.slice(1);
+    input.value = resto.length > 4 ? `${digitos[0]} ${resto.slice(0, 4)} ${resto.slice(4)}` : `${digitos[0]} ${resto}`;
+  });
+}
+
+function inicializarFeedbackEmail(input: HTMLInputElement | null, feedback: HTMLElement | null): void {
+  if (!input || !feedback) return;
+  const actualizar = () => {
+    const valor = input.value.trim();
+    if (!valor) { feedback.textContent = ''; feedback.className = 'camp-campo__validacion'; return; }
+    const valido = EMAIL_RE.test(valor);
+    feedback.textContent = valido ? '' : 'Revisa el formato del correo.';
+    feedback.className = `camp-campo__validacion ${valido ? 'valido' : 'invalido'}`;
+  };
+  input.addEventListener('input', actualizar);
+  input.addEventListener('blur', actualizar);
+}
+
+function inicializarEstadoTocado(form: HTMLFormElement): void {
+  form.addEventListener('blur', (evt) => {
+    const el = evt.target as HTMLElement;
+    if (el instanceof HTMLInputElement) el.classList.add('tocado');
+  }, true);
+}
+function inicializarEstadoConContenido(form: HTMLFormElement): void {
+  form.addEventListener('input', (evt) => {
+    const el = evt.target as HTMLInputElement;
+    el.classList.toggle('con-contenido', el.value.trim().length > 0);
+  });
+}
 
 export function iniciarCampana2026(): void {
   // ---------- Referido por deportista (?ref=FH-XXXXXX) ----------
@@ -78,6 +118,7 @@ export function iniciarCampana2026(): void {
   const contBlaze = $<HTMLElement>('#campContBlaze');
   const contNova = $<HTMLElement>('#campContNova');
   const contPack = $<HTMLElement>('#campContPack');
+  const contDesglose = $<HTMLElement>('#campContDesglose');
 
   function pintarContador(blaze: number, nova: number, pack: number): void {
     const total = blaze + nova + pack;
@@ -89,6 +130,10 @@ export function iniciarCampana2026(): void {
     const hayVentas = total > 0;
     contInicio?.toggleAttribute('hidden', hayVentas);
     contNormal?.toggleAttribute('hidden', !hayVentas);
+    // A propósito: nunca se inventan ventas, pero tampoco se le muestra a la
+    // primera persona que visita la página un desglose en 0 — eso se ve como
+    // prueba social negativa. El desglose aparece solo, apenas hay una venta real.
+    contDesglose?.toggleAttribute('hidden', !hayVentas);
   }
 
   async function cargarContador(): Promise<void> {
@@ -98,8 +143,8 @@ export function iniciarCampana2026(): void {
       const data = (await res.json()) as { blaze?: number; nova?: number; pack?: number };
       pintarContador(data.blaze ?? 0, data.nova ?? 0, data.pack ?? 0);
     } catch {
-      // Todavía no hay endpoint ni compras reales: partimos en 0 sin avisar con un
-      // toast, porque este es el estado normal antes del lanzamiento, no un error.
+      // Todavía no hay compras reales: partimos en 0 sin avisar con un toast,
+      // porque este es el estado normal antes del lanzamiento, no un error.
       pintarContador(0, 0, 0);
     }
   }
@@ -168,7 +213,7 @@ export function iniciarCampana2026(): void {
     btn.addEventListener('click', () => toggleProducto(btn.dataset.campProducto!));
   });
 
-  // ---------- Aviso (pago / participación gratuita) ----------
+  // ---------- Aviso (checkout deshabilitado / participación gratuita) ----------
   const aviso = $<HTMLElement>('#campAviso');
   const avisoFondo = $<HTMLElement>('#campAvisoFondo');
   const avisoCerrar = $<HTMLButtonElement>('#campAvisoCerrar');
@@ -198,28 +243,99 @@ export function iniciarCampana2026(): void {
   avisoFondo?.addEventListener('click', cerrarAviso);
   avisoCerrar?.addEventListener('click', cerrarAviso);
 
+  // ---------- Modal de datos del comprador + checkout real ----------
+  const modal = $<HTMLElement>('#campModalDatos');
+  const modalFondo = $<HTMLElement>('#campModalFondo');
+  const modalCerrar = $<HTMLButtonElement>('#campModalCerrar');
+  const modalResumen = $<HTMLElement>('#campModalResumen');
+  const form = $<HTMLFormElement>('#campFormDatos');
+  const nombreInput = $<HTMLInputElement>('#campNombre');
+  const emailInput = $<HTMLInputElement>('#campEmail');
+  const emailFeedback = $<HTMLElement>('#campEmailFeedback');
+  const telefonoInput = $<HTMLInputElement>('#campTelefono');
+  const formError = $<HTMLElement>('#campFormError');
+  const enviarBtn = $<HTMLButtonElement>('#campModalEnviar');
+
+  formatearTelefonoInput(telefonoInput);
+  inicializarFeedbackEmail(emailInput, emailFeedback);
+  if (form) {
+    inicializarEstadoTocado(form);
+    inicializarEstadoConContenido(form);
+  }
+
+  function abrirModal(): void {
+    if (!modal || !modalResumen) return;
+    const { texto, total } = resumenSeleccion();
+    modalResumen.textContent = `${texto} — ${formatoCLP.format(total)}`;
+    formError?.setAttribute('hidden', '');
+    modal.removeAttribute('hidden');
+  }
+  function cerrarModal(): void {
+    modal?.setAttribute('hidden', '');
+  }
+  modalFondo?.addEventListener('click', cerrarModal);
+  modalCerrar?.addEventListener('click', cerrarModal);
+
   cartPagarBtn?.addEventListener('click', () => {
     if (seleccion.size === 0) {
       mostrarToast('Elige al menos un sobre para continuar');
       return;
     }
-    const { texto, total } = resumenSeleccion();
-    const waHref = $<HTMLAnchorElement>('#campAvisoWaPago')?.getAttribute('href') ?? '#';
-    abrirAviso({
-      titulo: 'Medio de pago en proceso de validación',
-      resumen: `Estás apoyando a Firehouse con: ${texto} — ${formatoCLP.format(total)}`,
-      texto: 'Estamos terminando de habilitar el pago en línea con Flow. Escríbenos por WhatsApp y te avisamos apenas puedas completar tu compra.',
-      waHref,
-    });
+    abrirModal();
   });
 
-  $('#campGratisBtn')?.addEventListener('click', () => {
-    const waHref = $<HTMLAnchorElement>('#campAvisoWaGratis')?.getAttribute('href') ?? '#';
-    abrirAviso({
-      titulo: 'Muy pronto',
-      texto: 'La participación sin compra se habilita junto con las bases de la promoción. Escríbenos por WhatsApp y te avisamos apenas esté disponible.',
-      waHref,
-    });
+  form?.addEventListener('submit', async (evt) => {
+    evt.preventDefault();
+    const nombre = nombreInput?.value.trim() ?? '';
+    const email = emailInput?.value.trim() ?? '';
+    const telefono = telefonoInput?.value.trim() ?? '';
+    const telefonoDigitos = telefono.replace(/\D/g, '');
+
+    if (nombre.length < 3 || !EMAIL_RE.test(email) || telefonoDigitos.length < 8) {
+      formError?.removeAttribute('hidden');
+      return;
+    }
+    formError?.setAttribute('hidden', '');
+
+    const productos = [...seleccion].map((id) => PRODUCTOS[id]?.codigoBackend).filter(Boolean);
+    if (enviarBtn) { enviarBtn.disabled = true; enviarBtn.textContent = 'Procesando…'; }
+
+    try {
+      const res = await fetch('/api/campana-2026/crear-orden', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          productos,
+          comprador: { nombre, email, telefono: `+56${telefonoDigitos}` },
+          ref: ref ?? null,
+        }),
+      });
+      const data = (await res.json().catch(() => ({}))) as { url?: string; error?: string };
+
+      if (res.ok && data.url) {
+        window.location.href = data.url;
+        return;
+      }
+
+      if (data.error === 'checkout_deshabilitado') {
+        cerrarModal();
+        const { texto, total } = resumenSeleccion();
+        const waHref = $<HTMLAnchorElement>('#campAvisoWaPago')?.getAttribute('href') ?? '#';
+        abrirAviso({
+          titulo: 'Medio de pago en proceso de validación',
+          resumen: `Estás apoyando a Firehouse con: ${texto} — ${formatoCLP.format(total)}`,
+          texto: 'Estamos terminando de habilitar el pago en línea con Flow. Escríbenos por WhatsApp y te avisamos apenas puedas completar tu compra.',
+          waHref,
+        });
+        return;
+      }
+
+      mostrarToast('No pudimos iniciar el pago. Inténtalo de nuevo en un momento.');
+    } catch {
+      mostrarToast('No pudimos conectarnos. Revisa tu conexión e inténtalo de nuevo.');
+    } finally {
+      if (enviarBtn) { enviarBtn.disabled = false; enviarBtn.textContent = 'Continuar al pago'; }
+    }
   });
 
   // ---------- Compartir ----------

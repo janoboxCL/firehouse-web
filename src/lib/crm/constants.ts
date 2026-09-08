@@ -199,4 +199,4 @@ export const LIMITES = {
   EDAD_HABITUAL_MAX: 19,
 } as const;
 
-export const PRIVACY_POLICY_VERSION = '2026-08-1';
+export const PRIVACY_POLICY_VERSION = '2026-09-1';

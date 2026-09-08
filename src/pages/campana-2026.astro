@@ -116,7 +116,7 @@ const detalle = [
           <p class="camp-hero__tagline">Ayúdanos a llegar más lejos esta temporada 🔥</p>
           <p class="camp-hero__bajada">
             Apoya a nuestras niñas y niños eligiendo uno de nuestros sobres digitales de
-            Blaze y Nova. Recibe tu colección Firehouse y además participa por increíbles
+            Blaze y Nova. Recibe tu colección Firehouse y, además, participa por increíbles
             premios.
           </p>
           <div class="camp-hero__precios">
@@ -158,7 +158,7 @@ const detalle = [
           <div class="camp-contador__principal">
             <p class="camp-contador__meta">🔥 Nuestra meta: 800 sobres Firehouse</p>
             <div id="campContInicio" class="camp-contador__inicio">
-              <p>Ayúdanos a llegar a nuestra meta de 800 sobres 🔥</p>
+              <p>¡La campaña acaba de comenzar!</p>
             </div>
             <div id="campContNormal" class="camp-contador__normal" hidden>
               <div class="camp-contador__fila">
@@ -170,7 +170,7 @@ const detalle = [
             </div>
             <p class="camp-contador__tagline">Cada sobre nos acerca un poco más a nuestra meta ❤️‍🔥</p>
           </div>
-          <div class="camp-contador__desglose">
+          <div class="camp-contador__desglose" id="campContDesglose" hidden>
             <div><span class="camp-contador__mini">🔥</span><span id="campContBlaze">0</span><p>Blaze</p></div>
             <div><span class="camp-contador__mini">⚡</span><span id="campContNova">0</span><p>Nova</p></div>
             <div><span class="camp-contador__mini">🔥⚡</span><span id="campContPack">0</span><p>Blaze + Nova</p></div>
@@ -333,7 +333,7 @@ const detalle = [
           <strong>Modalidad de participación sin compra.</strong> La promoción también
           contempla una modalidad gratuita de participación conforme a sus bases.
         </p>
-        <button type="button" class="btn-quiet camp-gratis__link" id="campGratisBtn">Consultar modalidad →</button>
+        <a class="btn-quiet camp-gratis__link" id="campGratisBtn" href="/campana-2026/participar">Participar sin compra →</a>
       </div>
     </section>
 
@@ -349,7 +349,7 @@ const detalle = [
           <li><span>Resultados</span><em>(se publican después del sorteo)</em></li>
           <li><a href="/privacidad">Política de privacidad</a></li>
           <li><a href={whatsapp('campana2026')} target="_blank" rel="noopener">Contacto</a></li>
-          <li><span>Información del organizador</span><em>(por definir)</em></li>
+          <li>Organizador: Benjamín Orlando Beltrán Maureira · <a href="/campana-2026/bases">Ver bases de la promoción</a></li>
         </ul>
         <p class="camp-transparencia__pie">Organizado por Firehouse Cheer.</p>
       </div>
@@ -363,6 +363,45 @@ const detalle = [
           <p class="camp-cart__total" id="campCartTotal">$0</p>
           <button type="button" class="btn" id="campCartPagar">Continuar al pago</button>
         </div>
+      </div>
+    </div>
+
+    <!-- MODAL: DATOS DEL COMPRADOR -->
+    <div class="camp-modal" id="campModalDatos" hidden>
+      <div class="camp-modal__fondo" id="campModalFondo"></div>
+      <div class="camp-modal__caja" role="dialog" aria-modal="true" aria-labelledby="campModalTitulo">
+        <button type="button" class="camp-modal__cerrar" id="campModalCerrar" aria-label="Cerrar">×</button>
+        <h3 id="campModalTitulo">Tus datos</h3>
+        <p class="camp-modal__resumen" id="campModalResumen"></p>
+
+        <form id="campFormDatos" novalidate>
+          <div class="camp-campo">
+            <label for="campNombre">Nombre completo</label>
+            <input type="text" id="campNombre" required autocomplete="name" maxlength="150" minlength="3" />
+          </div>
+          <div class="camp-campo">
+            <label for="campEmail">Correo electrónico</label>
+            <input type="email" id="campEmail" required autocomplete="email" maxlength="254" />
+            <p class="camp-campo__validacion" id="campEmailFeedback" aria-live="polite"></p>
+          </div>
+          <div class="camp-campo">
+            <label for="campTelefono">Celular / WhatsApp</label>
+            <input type="tel" inputmode="tel" id="campTelefono" required autocomplete="tel"
+                   placeholder="9 1234 5678" maxlength="12" pattern="9 \d{4} \d{4}" title="Formato: 9 1234 5678" />
+          </div>
+
+          <p id="campFormError" class="camp-modal__error" hidden>Completa nombre, correo y celular con un formato válido para continuar.</p>
+
+          <div class="camp-confianza">
+            <p>📦 Recibirás tu colección en tu correo apenas se apruebe el pago.</p>
+            <p>🎁 Tu código de participación se asigna automáticamente al confirmarse.</p>
+          </div>
+
+          <button type="submit" class="btn camp-modal__enviar" id="campModalEnviar">Continuar al pago</button>
+          <p class="camp-modal__legal">
+            Al continuar aceptas las <a href="/campana-2026/bases" target="_blank" rel="noopener">Bases de la promoción</a>.
+          </p>
+        </form>
       </div>
     </div>
 
@@ -380,7 +419,6 @@ const detalle = [
 
     <!-- enlaces de WhatsApp con mensaje distinto según el aviso que los abrió -->
     <a href={whatsapp('campana2026Pago')} id="campAvisoWaPago" hidden>·</a>
-    <a href={whatsapp('campana2026Gratis')} id="campAvisoWaGratis" hidden>·</a>
 
     <div class="camp-toast" id="campToast"></div>
   </div>
@@ -471,6 +509,7 @@ const detalle = [
     display:grid; grid-template-columns:repeat(3, 1fr); gap:10px; margin-top:var(--e-3);
     padding-top:var(--e-3); border-top:1px solid var(--hairline); text-align:center;
   }
+  .camp-contador__desglose[hidden]{ display:none; }
   .camp-contador__desglose div{ display:flex; flex-direction:column; align-items:center; gap:2px; }
   .camp-contador__mini{ font-size:16px; }
   .camp-contador__desglose span:nth-child(2){ font-family:var(--font-count); font-weight:700; font-size:18px; color:var(--chalk); }
@@ -599,6 +638,42 @@ const detalle = [
   .camp-chip button{ background:rgba(0,0,0,.2); border:none; color:var(--ember); width:18px; height:18px; border-radius:50%; font-size:13px; line-height:1; cursor:pointer; }
   .camp-cart__pagar{ display:flex; align-items:center; justify-content:space-between; gap:var(--e-3); }
   .camp-cart__total{ font-family:var(--font-count); font-size:20px; font-weight:700; color:var(--fire-yellow); white-space:nowrap; }
+
+  /* ---------- MODAL DATOS DEL COMPRADOR ---------- */
+  .camp-modal[hidden]{ display:none; }
+  .camp-modal{ position:fixed; inset:0; z-index:200; display:flex; align-items:flex-end; justify-content:center; }
+  .camp-modal__fondo{ position:absolute; inset:0; background:rgba(0,0,0,.7); }
+  .camp-modal__caja{
+    position:relative; width:100%; max-width:480px; max-height:88vh; overflow-y:auto;
+    background:var(--ember-deep); border:1px solid var(--hairline); border-radius:16px 16px 0 0; padding:var(--e-4);
+  }
+  .camp-modal__cerrar{
+    position:absolute; top:12px; right:12px; width:32px; height:32px; border-radius:50%;
+    background:rgba(245,239,232,.08); border:none; color:var(--txt); font-size:18px; cursor:pointer;
+  }
+  .camp-modal__caja h3{ font-family:var(--font-display); font-weight:800; font-size:1.3rem; padding-right:var(--e-4); }
+  .camp-modal__resumen{ font-family:var(--font-count); color:var(--fire-yellow); font-size:13px; margin:8px 0 var(--e-3); }
+  .camp-campo{ margin-top:var(--e-3); }
+  .camp-campo label{ display:block; font-size:14px; color:var(--txt-soft); margin-bottom:6px; }
+  .camp-campo input{
+    width:100%; box-sizing:border-box; background:var(--ember); color:var(--chalk);
+    border:1px solid var(--hairline); border-radius:12px; padding:13px 14px; font-family:var(--font-body);
+    font-size:16px; min-height:48px;
+  }
+  .camp-campo input:focus-visible{ outline:none; border-color:var(--fire-yellow); box-shadow:0 0 0 4px rgba(255,196,0,.2); }
+  .camp-campo input.tocado:invalid{ border-color:rgba(197,21,21,.5); background:rgba(197,21,21,.05); }
+  .camp-campo input.con-contenido:valid:not(:focus-visible){ border-color:rgba(27,79,168,.55); background:rgba(27,79,168,.06); }
+  .camp-campo__validacion{ margin-top:6px; font-size:13px; min-height:1.2em; }
+  .camp-campo__validacion.valido{ color:var(--fire-yellow); }
+  .camp-campo__validacion.invalido{ color:rgba(197,21,21,.85); }
+  .camp-modal__error{ color:var(--fire-red); font-size:13px; margin-top:var(--e-2); }
+  .camp-confianza{ margin-top:var(--e-4); padding:var(--e-2) var(--e-3); background:var(--ember); border:1px solid var(--hairline); border-radius:12px; }
+  .camp-confianza p{ font-size:12.5px; color:var(--txt-soft); margin:4px 0; }
+  .camp-modal__enviar{ width:100%; text-align:center; margin-top:var(--e-3); }
+  .camp-modal__enviar:disabled{ opacity:.7; pointer-events:none; }
+  .camp-modal__legal{ margin-top:10px; font-size:11.5px; color:var(--txt-faint); text-align:center; }
+  .camp-modal__legal a{ color:var(--fire-yellow); }
+  @media (min-width:640px){ .camp-modal{ align-items:center; } .camp-modal__caja{ border-radius:16px; } }
 
   /* ---------- AVISO ---------- */
   .camp-aviso[hidden]{ display:none; }
