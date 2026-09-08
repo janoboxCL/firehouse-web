@@ -122,7 +122,7 @@ function renderAtletas(atletas: AtletaLinkConcurso[], ventaGenerica: number): vo
     const meta = a.metaMinima || 1;
     const porcentaje = Math.min(100, Math.round((a.ticketsVendidos / meta) * 100));
     const cumplida = a.ticketsVendidos >= a.metaMinima;
-    const link = a.codigo ? `${SITIO_URL}/sorteo?ref=${a.codigo}` : '';
+    const link = a.codigo ? `${SITIO_URL}/campana-2026?ref=${a.codigo}` : '';
 
     fila.innerHTML = `
       <td>${escaparHtml(a.nombreCompleto)}</td>
