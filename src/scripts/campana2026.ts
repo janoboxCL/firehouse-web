@@ -1,15 +1,16 @@
 // Lógica de cliente para /campana-2026.
 //
-// A diferencia de /sorteo, esta página TODAVÍA NO tiene backend de compra:
-// no existe un endpoint que cree una orden ni una pasarela habilitada. Por
-// eso "Continuar al pago" no llama a ninguna API — abre un aviso que dice
-// que el medio de pago está en validación (ver brief de la Campaña Firehouse
-// 2026, punto 21) y ofrece WhatsApp como alternativa mientras tanto.
+// A diferencia de /sorteo, esta página TODAVÍA NO tiene checkout real: no
+// existe un endpoint que cree una orden ni una pasarela habilitada. Por eso
+// "Continuar al pago" no llama a ninguna API — abre un aviso que dice que el
+// medio de pago está en validación (ver brief de la Campaña Firehouse 2026,
+// punto 21) y ofrece WhatsApp como alternativa mientras tanto.
 //
 // El contador intenta leer /api/campana-2026/contador y, si el endpoint
 // todavía no existe (404 o error de red), parte en 0 sin romper la página.
-// Cuando se cree ese endpoint (y la tabla de órdenes detrás), esto empieza
-// a mostrar números reales sin tocar el resto del archivo.
+// El nombre del deportista referido sí es real: se resuelve contra
+// /api/campana-2026/deportista, que consulta la misma tabla rifa_codigos
+// que ya usa /sorteo.
 
 interface Producto {
   id: string;
@@ -40,7 +41,21 @@ export function iniciarCampana2026(): void {
   // ---------- Referido por deportista (?ref=FH-XXXXXX) ----------
   const ref = new URLSearchParams(window.location.search).get('ref');
   if (ref) {
-    $('#campReferidoBanner')?.removeAttribute('hidden');
+    const banner = $<HTMLElement>('#campReferidoBanner');
+    const texto = $<HTMLElement>('#campReferidoTexto');
+    banner?.removeAttribute('hidden');
+    // Mensaje genérico mientras se resuelve el nombre real (o si el código
+    // no existe / el endpoint falla, se queda así — nunca rompe la página).
+    fetch(`/api/campana-2026/deportista?codigo=${encodeURIComponent(ref)}`)
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data: { nombre?: string } | null) => {
+        if (data?.nombre && texto) {
+          texto.textContent = `Estás apoyando a ${data.nombre}`;
+        }
+      })
+      .catch(() => {
+        // Se queda con el mensaje genérico ya visible.
+      });
   }
 
   // ---------- Toast ----------
@@ -83,27 +98,44 @@ export function iniciarCampana2026(): void {
       const data = (await res.json()) as { blaze?: number; nova?: number; pack?: number };
       pintarContador(data.blaze ?? 0, data.nova ?? 0, data.pack ?? 0);
     } catch {
-      // Todavía no hay endpoint ni compras reales: partimos en 0 sin avisar con un toast,
-      // porque este es el estado normal antes del lanzamiento, no un error visible.
+      // Todavía no hay endpoint ni compras reales: partimos en 0 sin avisar con un
+      // toast, porque este es el estado normal antes del lanzamiento, no un error.
       pintarContador(0, 0, 0);
     }
   }
   cargarContador();
 
-  // ---------- Selección de sobres (carrito) ----------
-  const cart = $<HTMLElement>('#campCart');
+  // ---------- Selección de sobres + barra fija de dos estados ----------
+  const cartIdle = $<HTMLElement>('#campCartIdle');
+  const cartResumen = $<HTMLElement>('#campCartResumen');
   const cartChips = $<HTMLElement>('#campCartChips');
   const cartTotal = $<HTMLElement>('#campCartTotal');
+  const cartPagarBtn = $<HTMLButtonElement>('#campCartPagar');
   const seleccion = new Set<string>();
 
-  function actualizarCarrito(): void {
-    if (!cart || !cartChips || !cartTotal) return;
-    cartChips.innerHTML = '';
+  function resumenSeleccion(): { texto: string; total: number } {
     let total = 0;
+    const nombres: string[] = [];
     seleccion.forEach((id) => {
       const p = PRODUCTOS[id];
       if (!p) return;
       total += p.precio;
+      nombres.push(p.nombre);
+    });
+    return { texto: nombres.join(', '), total };
+  }
+
+  function actualizarCarrito(): void {
+    if (!cartIdle || !cartResumen || !cartChips || !cartTotal || !cartPagarBtn) return;
+    const hayAlgo = seleccion.size > 0;
+    cartIdle.toggleAttribute('hidden', hayAlgo);
+    cartResumen.toggleAttribute('hidden', !hayAlgo);
+    if (!hayAlgo) return;
+
+    cartChips.innerHTML = '';
+    seleccion.forEach((id) => {
+      const p = PRODUCTOS[id];
+      if (!p) return;
       const chip = document.createElement('span');
       chip.className = 'camp-chip';
       chip.append(p.nombre);
@@ -115,8 +147,10 @@ export function iniciarCampana2026(): void {
       chip.appendChild(btnQuitar);
       cartChips.appendChild(chip);
     });
+
+    const { total } = resumenSeleccion();
     cartTotal.textContent = formatoCLP.format(total);
-    cart?.classList.toggle('activo', seleccion.size > 0);
+    cartPagarBtn.textContent = `❤️‍🔥 Confirmar apoyo — ${formatoCLP.format(total)}`;
   }
 
   function toggleProducto(id: string, forzar?: boolean): void {
@@ -141,14 +175,23 @@ export function iniciarCampana2026(): void {
   const avisoFondo = $<HTMLElement>('#campAvisoFondo');
   const avisoCerrar = $<HTMLButtonElement>('#campAvisoCerrar');
   const avisoTitulo = $<HTMLElement>('#campAvisoTitulo');
+  const avisoResumen = $<HTMLElement>('#campAvisoResumen');
   const avisoTexto = $<HTMLElement>('#campAvisoTexto');
   const avisoWa = $<HTMLAnchorElement>('#campAvisoWa');
 
-  function abrirAviso(titulo: string, texto: string, waHref: string): void {
+  function abrirAviso(opts: { titulo: string; resumen?: string; texto: string; waHref: string }): void {
     if (!aviso || !avisoTitulo || !avisoTexto) return;
-    avisoTitulo.textContent = titulo;
-    avisoTexto.textContent = texto;
-    if (avisoWa) avisoWa.href = waHref;
+    avisoTitulo.textContent = opts.titulo;
+    avisoTexto.textContent = opts.texto;
+    if (avisoResumen) {
+      if (opts.resumen) {
+        avisoResumen.textContent = opts.resumen;
+        avisoResumen.removeAttribute('hidden');
+      } else {
+        avisoResumen.setAttribute('hidden', '');
+      }
+    }
+    if (avisoWa) avisoWa.href = opts.waHref;
     aviso.removeAttribute('hidden');
   }
   function cerrarAviso(): void {
@@ -157,31 +200,33 @@ export function iniciarCampana2026(): void {
   avisoFondo?.addEventListener('click', cerrarAviso);
   avisoCerrar?.addEventListener('click', cerrarAviso);
 
-  $('#campCartPagar')?.addEventListener('click', () => {
+  cartPagarBtn?.addEventListener('click', () => {
     if (seleccion.size === 0) {
       mostrarToast('Elige al menos un sobre para continuar');
       return;
     }
+    const { texto, total } = resumenSeleccion();
     const waHref = $<HTMLAnchorElement>('#campAvisoWaPago')?.getAttribute('href') ?? '#';
-    abrirAviso(
-      'Medio de pago en proceso de validación',
-      'Estamos terminando de habilitar el pago en línea con Flow. Escríbenos por WhatsApp y te avisamos apenas puedas completar tu compra.',
+    abrirAviso({
+      titulo: 'Medio de pago en proceso de validación',
+      resumen: `Estás apoyando a Firehouse con: ${texto} — ${formatoCLP.format(total)}`,
+      texto: 'Estamos terminando de habilitar el pago en línea con Flow. Escríbenos por WhatsApp y te avisamos apenas puedas completar tu compra.',
       waHref,
-    );
+    });
   });
 
   $('#campGratisBtn')?.addEventListener('click', () => {
     const waHref = $<HTMLAnchorElement>('#campAvisoWaGratis')?.getAttribute('href') ?? '#';
-    abrirAviso(
-      'Muy pronto',
-      'La participación sin compra se habilita junto con las bases de la promoción. Escríbenos por WhatsApp y te avisamos apenas esté disponible.',
+    abrirAviso({
+      titulo: 'Muy pronto',
+      texto: 'La participación sin compra se habilita junto con las bases de la promoción. Escríbenos por WhatsApp y te avisamos apenas esté disponible.',
       waHref,
-    );
+    });
   });
 
   // ---------- Compartir ----------
   const mensajeCompartir =
-    'Estoy participando en la Campaña Firehouse 2026 🔥 Elige tu sobre Blaze o Nova, apoya a nuestro equipo y participa por grandes premios:';
+    'Estoy apoyando a Firehouse en la Campaña 2026 🔥 Elige tu sobre Blaze o Nova, apoya a nuestro equipo y participa por grandes premios:';
 
   $('[data-camp-compartir="whatsapp"]')?.addEventListener('click', (e) => {
     e.preventDefault();

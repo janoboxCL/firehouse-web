@@ -6,7 +6,10 @@ import Pie from '../components/Pie.astro';
 import Arriba from '../components/Arriba.astro';
 import { sitio, whatsapp } from '../data/sitio.js';
 
-const { titulo, descripcion, ruta = '', preguntas = null, miga = null, noindex = false, minimal = false, ogImagen = null } = Astro.props;
+const {
+  titulo, descripcion, ruta = '', preguntas = null, miga = null, noindex = false, minimal = false, ogImagen = null,
+  etiquetaMinima = 'Gran Concurso', mensajeWhatsappMinima = 'sorteo',
+} = Astro.props;
 const canonical = `${sitio.url}${ruta}`;
 const imagenOg = ogImagen ? `${sitio.url}${ogImagen}` : `${sitio.url}/og.jpg`;
 
@@ -103,9 +106,9 @@ const schema = {
           <source srcset="/logo.webp" type="image/webp" />
           <img src="/logo.png" alt={sitio.nombre} width="36" height="31" />
         </picture>
-        <span>Gran Concurso</span>
+        <span>{etiquetaMinima}</span>
       </a>
-      <a href={whatsapp('sorteo')} class="header-minimo__ayuda" target="_blank" rel="noopener">¿Dudas? WhatsApp</a>
+      <a href={whatsapp(mensajeWhatsappMinima)} class="header-minimo__ayuda" target="_blank" rel="noopener">¿Dudas? WhatsApp</a>
     </header>
   ) : (
     <>
