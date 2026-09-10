@@ -29,6 +29,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
   try {
     const url = new URL(context.request.url);
     const tipo = url.searchParams.get('type') ?? url.searchParams.get('topic');
+    console.log('mercadopago_webhook_recibido', JSON.stringify({ tipo, query: url.search }));
     if (tipo && tipo !== 'payment') {
       return new Response('ok (tipo no procesado)', { status: 200 });
     }
@@ -46,6 +47,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     }
 
     const verificacion = await provider.verificarNotificacion(context.request);
+    console.log('mercadopago_verificacion', JSON.stringify(verificacion));
     if (!verificacion.valida || !verificacion.referenciaPago) {
       // 401, no 400: una firma inválida es exactamente el caso que esta
       // verificación existe para rechazar (posible intento de fraude).
@@ -55,7 +57,9 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     let estado;
     try {
       estado = await provider.obtenerEstadoPago(verificacion.referenciaPago);
-    } catch {
+      console.log('mercadopago_estado_pago', JSON.stringify({ estado: estado.estado, commerceOrder: estado.commerceOrder, monto: estado.monto }));
+    } catch (e) {
+      console.error('mercadopago_obtener_estado_error', e instanceof Error ? e.message.slice(0, 300) : String(e));
       return new Response('no se pudo confirmar con mercado pago', { status: 502 });
     }
 
