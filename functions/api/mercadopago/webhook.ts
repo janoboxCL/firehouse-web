@@ -1,10 +1,16 @@
 /// <reference types="@cloudflare/workers-types" />
-// POST /api/campana-2026/flow-webhook — urlConfirmation que recibe Flow.
+// POST /api/mercadopago/webhook
 //
-// Nunca confía en la notificación por sí sola: vuelve a preguntarle a Flow
-// el estado real (provider.obtenerEstadoPago) antes de confirmar nada.
-// Toda la lógica específica de Flow vive en functions/lib/payment-providers/flow.ts
-// — esto sólo orquesta: verificar → consultar → confirmar → entregar → avisar.
+// Mercado Pago puede notificar varios tipos de evento (payment, merchant_order,
+// chargebacks...) — sólo procesamos "payment"; el resto se responde 200 sin
+// hacer nada, para que Mercado Pago no reintente por algo que no vamos a usar.
+//
+// Orden de operaciones, tal como exige la integración:
+// 1. validar la firma (HMAC oficial, ver payment-providers/mercadopago.ts)
+// 2. consultar el pago DIRECTO a la API de Mercado Pago (nunca confiar en el body de la notificación)
+// 3. buscar la ORDEN por external_reference
+// 4. validar monto y moneda (fn_confirmar_pago_campana aborta si no calzan)
+// 5. confirmar de forma idempotente, liberar la entrega, enviar el correo
 
 import { createClient } from '@supabase/supabase-js';
 import { construirPaymentProvider, type PaymentProvidersEnv } from '../../lib/payment-providers/index.ts';
@@ -21,28 +27,36 @@ interface Env extends PaymentProvidersEnv {
 
 export const onRequestPost: PagesFunction<Env> = async (context) => {
   try {
+    const url = new URL(context.request.url);
+    const tipo = url.searchParams.get('type') ?? url.searchParams.get('topic');
+    if (tipo && tipo !== 'payment') {
+      return new Response('ok (tipo no procesado)', { status: 200 });
+    }
+
     if (!context.env.SUPABASE_URL || !context.env.SUPABASE_SERVICE_ROLE_KEY) {
-      // 500 hace que Flow reintente más tarde — mejor que perder la notificación.
+      // 500 hace que Mercado Pago reintente más tarde — mejor que perder la notificación.
       return new Response('faltan variables de entorno', { status: 500 });
     }
 
     let provider;
     try {
-      provider = construirPaymentProvider('FLOW', context.env);
+      provider = construirPaymentProvider('MERCADOPAGO', context.env);
     } catch (e) {
       return new Response(`pasarela mal configurada: ${e instanceof Error ? e.message : String(e)}`, { status: 500 });
     }
 
     const verificacion = await provider.verificarNotificacion(context.request);
     if (!verificacion.valida || !verificacion.referenciaPago) {
-      return new Response(`notificacion invalida: ${verificacion.motivoRechazo ?? 'desconocido'}`, { status: 400 });
+      // 401, no 400: una firma inválida es exactamente el caso que esta
+      // verificación existe para rechazar (posible intento de fraude).
+      return new Response(`notificacion invalida: ${verificacion.motivoRechazo ?? 'desconocido'}`, { status: 401 });
     }
 
     let estado;
     try {
       estado = await provider.obtenerEstadoPago(verificacion.referenciaPago);
     } catch {
-      return new Response('no se pudo confirmar con flow', { status: 502 });
+      return new Response('no se pudo confirmar con mercado pago', { status: 502 });
     }
 
     const supabase = createClient(context.env.SUPABASE_URL, context.env.SUPABASE_SERVICE_ROLE_KEY);
@@ -50,7 +64,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     if (estado.estado === 'APROBADO') {
       const { data: entradas, error: errConfirmar } = await supabase.rpc('fn_confirmar_pago_campana', {
         p_commerce_order: estado.commerceOrder,
-        p_pasarela: 'FLOW',
+        p_pasarela: 'MERCADOPAGO',
         p_pasarela_payment_id: estado.pasarelaPaymentId,
         p_monto: estado.monto,
         p_moneda: estado.moneda,
@@ -98,11 +112,11 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
         }
       }
     } else if (estado.estado === 'REEMBOLSADO') {
-      await supabase.rpc('fn_marcar_pago_reembolsado_campana', { p_commerce_order: estado.commerceOrder, p_pasarela: 'FLOW' });
+      await supabase.rpc('fn_marcar_pago_reembolsado_campana', { p_commerce_order: estado.commerceOrder, p_pasarela: 'MERCADOPAGO' });
     } else {
       await supabase.rpc('fn_marcar_pago_no_aprobado_campana', {
         p_commerce_order: estado.commerceOrder,
-        p_pasarela: 'FLOW',
+        p_pasarela: 'MERCADOPAGO',
         p_estado_pago: estado.estado === 'PENDIENTE' ? 'PENDIENTE' : 'RECHAZADO',
       });
     }

@@ -12,7 +12,8 @@ function $<T extends Element>(selector: string): T | null {
 interface ProductoDescarga {
   producto: string;
   nombre: string;
-  urlDescarga: string;
+  disponible: boolean;
+  urlDescarga: string | null;
 }
 
 interface RespuestaOrden {
@@ -43,13 +44,21 @@ function renderPagada(data: RespuestaOrden): void {
       const nombreEl = document.createElement('p');
       nombreEl.className = 'dg-producto__nombre';
       nombreEl.textContent = p.nombre;
-      const btn = document.createElement('a');
-      btn.className = 'btn';
-      btn.href = p.urlDescarga;
-      btn.textContent = 'Descargar';
-      btn.setAttribute('download', '');
       item.appendChild(nombreEl);
-      item.appendChild(btn);
+
+      if (p.disponible && p.urlDescarga) {
+        const btn = document.createElement('a');
+        btn.className = 'btn';
+        btn.href = p.urlDescarga;
+        btn.textContent = 'Descargar';
+        btn.setAttribute('download', '');
+        item.appendChild(btn);
+      } else {
+        const aviso = document.createElement('span');
+        aviso.className = 'dg-producto__no-disponible';
+        aviso.textContent = 'No disponible — escríbenos si crees que esto es un error';
+        item.appendChild(aviso);
+      }
       listaProductos.appendChild(item);
     });
   }

@@ -4,13 +4,12 @@
 // Endpoint de solo lectura para la página de descarga. El UUID de la orden
 // funciona como el "secreto" de acceso: sólo lo recibe el comprador, por
 // correo, y es imposible de adivinar (a diferencia del código de
-// participación FH-0001, FH-0002..., que es secuencial y está pensado para
-// mostrarse públicamente en el sorteo — por eso NO se usa como llave de
-// descarga).
+// participación FH-0001, FH-0002..., que es secuencial y se muestra
+// públicamente en el sorteo — por eso NO se usa como llave de descarga).
 //
-// Los archivos en sí viven en rutas estáticas no listadas bajo /entregas/ —
-// este endpoint sólo decide SI corresponde mostrarlas, arma sus URLs y
-// entrega los códigos de participación de esa orden.
+// La entrega depende exclusivamente de campana_entregas.estado (DIGITAL_DELIVERY),
+// no sólo de que la orden esté PAGADA — si algún ítem quedó en ERROR, este
+// endpoint lo refleja en vez de asumir que todo salió bien porque se pagó.
 
 import { createClient } from '@supabase/supabase-js';
 
@@ -45,6 +44,12 @@ const NOMBRE_POR_PRODUCTO: Record<string, string> = {
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
+interface OrdenItemFila {
+  id: string;
+  producto: string;
+  campana_entregas: { estado: string } | { estado: string }[] | null;
+}
+
 export const onRequestGet: PagesFunction<Env> = async (context) => {
   try {
     if (!context.env.SUPABASE_URL || !context.env.SUPABASE_SERVICE_ROLE_KEY) {
@@ -60,7 +65,7 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
 
     const { data: orden, error } = await supabase
       .from('campana_ordenes')
-      .select('id, estado, comprador_nombre, campana_orden_items ( id, producto )')
+      .select('id, estado, comprador_nombre, campana_orden_items ( id, producto, campana_entregas ( estado ) )')
       .eq('id', ordenId)
       .maybeSingle();
 
@@ -69,27 +74,32 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
 
     if (orden.estado !== 'PAGADA') {
       // 202: la orden existe pero el pago todavía no se confirma (puede estar
-      // en camino si el webhook de Flow no ha llegado todavía) o no se pudo
-      // completar. El frontend decide qué mostrar según el estado.
+      // en camino si el webhook no ha llegado todavía) o no se pudo completar.
       return jsonResponse(202, { estado: orden.estado });
     }
 
-    const items = (orden as unknown as { campana_orden_items: { id: string; producto: string }[] }).campana_orden_items ?? [];
+    const items = (orden as unknown as { campana_orden_items: OrdenItemFila[] }).campana_orden_items ?? [];
+
+    const productos = items.map((i) => {
+      const entrega = Array.isArray(i.campana_entregas) ? i.campana_entregas[0] : i.campana_entregas;
+      const lista = entrega?.estado === 'READY' || entrega?.estado === 'DELIVERED';
+      return {
+        producto: i.producto,
+        nombre: NOMBRE_POR_PRODUCTO[i.producto] ?? i.producto,
+        disponible: lista,
+        urlDescarga: lista ? `/entregas/${SLUG_ENTREGA}/${ARCHIVO_POR_PRODUCTO[i.producto] ?? ''}` : null,
+      };
+    });
 
     const { data: entradas, error: errEntradas } = await supabase
       .from('campana_entradas')
-      .select('codigo, orden_item_id')
+      .select('codigo, orden_item_id, status')
       .in(
         'orden_item_id',
         items.map((i) => i.id),
-      );
+      )
+      .eq('status', 'ACTIVE');
     if (errEntradas) return jsonResponse(500, { error: 'no_se_pudo_consultar_entradas', detalle: errEntradas.message });
-
-    const productos = items.map((i) => ({
-      producto: i.producto,
-      nombre: NOMBRE_POR_PRODUCTO[i.producto] ?? i.producto,
-      urlDescarga: `/entregas/${SLUG_ENTREGA}/${ARCHIVO_POR_PRODUCTO[i.producto] ?? ''}`,
-    }));
 
     return jsonResponse(200, {
       estado: 'PAGADA',

@@ -1,0 +1,112 @@
+---
+import AdminBase from '../../layouts/AdminBase.astro';
+---
+<AdminBase titulo="Campaña 2026">
+  <h1 class="cc-titulo">Campaña Firehouse 2026</h1>
+  <p class="admin-intro">
+    Órdenes, pagos y participaciones de la campaña de sobres digitales. Los montos y estados
+    de pago vienen directo de la pasarela correspondiente (Flow o Mercado Pago).
+  </p>
+
+  <div id="ca-error" class="admin-error" hidden></div>
+  <p id="ca-cargando" class="admin-spinner">Cargando…</p>
+
+  <div id="ca-contenido" hidden>
+    <section class="cc-resumen">
+      <div class="admin-card cc-metrica">
+        <p class="cc-metrica__valor" id="ca-ordenes-pagadas">—</p>
+        <p class="cc-metrica__label">órdenes pagadas</p>
+      </div>
+      <div class="admin-card cc-metrica">
+        <p class="cc-metrica__valor" id="ca-recaudado">—</p>
+        <p class="cc-metrica__label">recaudado total</p>
+        <div class="cc-metrica__desglose" id="ca-recaudado-desglose"></div>
+      </div>
+      <div class="admin-card cc-metrica">
+        <p class="cc-metrica__valor" id="ca-entradas-compra">—</p>
+        <p class="cc-metrica__label">participaciones por compra</p>
+      </div>
+      <div class="admin-card cc-metrica">
+        <p class="cc-metrica__valor" id="ca-entradas-gratis">—</p>
+        <p class="cc-metrica__label">participaciones sin compra</p>
+      </div>
+    </section>
+
+    <p id="ca-invalidadas" class="admin-aviso-cerrado" hidden></p>
+    <p id="ca-ordenes-pendientes-linea" class="cc-sub">Órdenes pendientes de pago: <strong id="ca-ordenes-pendientes">—</strong></p>
+
+    <section class="admin-card">
+      <h2 class="cc-bloque__titulo">Pasarelas</h2>
+      <div id="ca-pasarelas"></div>
+    </section>
+
+    <section class="admin-card">
+      <h2 class="cc-bloque__titulo">Órdenes</h2>
+      <div class="cc-tabla-wrap">
+        <table class="cc-tabla" id="ca-tabla-ordenes">
+          <thead>
+            <tr><th>Comprador</th><th>Productos</th><th>Monto</th><th>Pago</th><th>Estado</th><th>Código(s)</th><th>Fecha</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="admin-card">
+      <h2 class="cc-bloque__titulo">Participación sin compra</h2>
+      <div class="cc-tabla-wrap">
+        <table class="cc-tabla" id="ca-tabla-gratis">
+          <thead>
+            <tr><th>Nombre</th><th>RUT</th><th>Contacto</th><th>Código</th><th>Fecha</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+</AdminBase>
+
+<script>
+  import { iniciarAdminCampana2026 } from '../../scripts/admin-campana-2026.ts';
+  iniciarAdminCampana2026();
+</script>
+
+<style is:global>
+.cc-titulo{ font-family: var(--font-display); font-size: 1.7rem; margin: 0 0 8px; }
+
+.cc-resumen{ display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 20px; }
+@media (min-width: 720px){ .cc-resumen{ grid-template-columns: repeat(4, 1fr); } }
+.cc-metrica{ text-align: center; }
+.cc-metrica__valor{ font-family: var(--font-count); font-size: 1.7rem; font-weight: 700; margin: 0; color: var(--fire-red); }
+.cc-metrica__label{ font-size: 13px; color: #6B6259; margin: 4px 0 0; }
+.cc-metrica__desglose{
+  display: flex; flex-direction: column; gap: 2px; margin-top: 8px;
+  padding-top: 8px; border-top: 1px solid #EFEBE4; font-size: 12px; color: #6B6259;
+}
+.cc-metrica__desglose strong{ color: var(--ember); font-family: var(--font-count); font-weight: 700; }
+
+.cc-bloque__titulo{ font-family: var(--font-display); font-size: 1.15rem; margin: 0 0 14px; }
+
+#ca-pasarelas{ display: flex; gap: 8px; flex-wrap: wrap; }
+
+.cc-tabla-wrap{ overflow-x: auto; }
+.cc-tabla{ width: 100%; border-collapse: collapse; font-size: 13.5px; }
+.cc-tabla th{
+  text-align: left; padding: 8px 10px; border-bottom: 2px solid #E4DFD6;
+  font-weight: 600; color: #6B6259; white-space: nowrap;
+}
+.cc-tabla td{ padding: 10px; border-bottom: 1px solid #EFEBE4; vertical-align: top; }
+.cc-tabla tbody tr:hover{ background: #FAF8F4; }
+.cc-num{ text-align: right; font-family: var(--font-count); white-space: nowrap; }
+.cc-mono{ font-family: var(--font-count); font-size: 12.5px; }
+.cc-sub{ color: #8A8074; font-size: 12px; }
+.cc-vacio{ text-align: center; color: #8A8074; padding: 24px 0 !important; }
+
+.cc-badge{
+  display: inline-block; padding: 3px 9px; border-radius: 99px; font-size: 12px; font-weight: 600;
+  white-space: nowrap;
+}
+.cc-badge--pagada{ background: rgba(27,79,168,.1); color: #1B4FA8; }
+.cc-badge--pendiente{ background: rgba(255,196,0,.18); color: #8a6d00; }
+.cc-badge--rechazada, .cc-badge--anulada, .cc-badge--expirada{ background: rgba(197,21,21,.1); color: var(--fire-red); }
+</style>
