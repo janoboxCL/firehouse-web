@@ -23,8 +23,6 @@ import type {
 export interface MercadoPagoCredenciales {
   accessToken: string;
   webhookSecret: string;
-  /** 'test' usa sandbox_init_point; 'production' usa init_point. */
-  entorno: 'test' | 'production';
 }
 
 const API_BASE = 'https://api.mercadopago.com';
@@ -82,8 +80,13 @@ export class MercadoPagoProvider implements PaymentProvider {
       throw new Error(`mercadopago_create_http_${res.status}: ${cuerpo.slice(0, 300)}`);
     }
     const data = JSON.parse(cuerpo) as { id: string; init_point: string; sandbox_init_point: string };
-    const urlPago = this.creds.entorno === 'test' ? data.sandbox_init_point : data.init_point;
-    return { urlPago, referenciaExterna: data.id };
+    // Mercado Pago documenta que combinar sandbox_init_point con credenciales
+    // normales es justamente lo que produce el error "Oh, no, algo anduvo
+    // mal" — la forma confiable de probar es usar init_point junto con las
+    // credenciales de producción de una cuenta de prueba (ver README de esta
+    // carpeta o el mensaje de la entrega). "Test" vs "producción" queda
+    // determinado por QUÉ access token se usa, no por qué URL se lee acá.
+    return { urlPago: data.init_point, referenciaExterna: data.id };
   }
 
   async verificarNotificacion(request: Request): Promise<VerificacionNotificacion> {

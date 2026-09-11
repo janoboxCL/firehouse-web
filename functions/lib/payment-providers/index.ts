@@ -46,11 +46,13 @@ export function construirPaymentProvider(id: PasarelaId, env: PaymentProvidersEn
     if (!env.MERCADOPAGO_ACCESS_TOKEN || !env.MERCADOPAGO_WEBHOOK_SECRET) {
       throw new Error('faltan_variables_de_entorno_mercadopago');
     }
-    const entorno = env.MERCADOPAGO_ENV === 'production' ? 'production' : 'test';
+    // "Test" vs "producción" lo decide qué access token cargaste en Cloudflare
+    // (el de una cuenta de prueba, o el real) — el código no distingue entre
+    // ambos casos, así que MERCADOPAGO_ENV ya no cambia ningún comportamiento
+    // acá. Se mantiene sólo como referencia humana de qué credenciales están cargadas.
     return new MercadoPagoProvider({
       accessToken: env.MERCADOPAGO_ACCESS_TOKEN,
       webhookSecret: env.MERCADOPAGO_WEBHOOK_SECRET,
-      entorno,
     });
   }
   throw new Error(`pasarela_no_implementada: ${id}`);
