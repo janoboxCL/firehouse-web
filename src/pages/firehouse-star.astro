@@ -32,43 +32,53 @@ const preguntas = [
     <div class="star-hero__fondo" aria-hidden="true">
       <picture>
         <source srcset="/media/dia-cheer.webp" type="image/webp" />
-        <img src="/media/dia-cheer.jpg" alt="" loading="eager" />
+        <img class="star-hero__img" src="/media/dia-cheer.jpg" alt="" loading="eager" />
       </picture>
       <div class="star-hero__velo"></div>
+      <span class="star-chispa star-chispa--1">⭐</span>
+      <span class="star-chispa star-chispa--2">⭐</span>
+      <span class="star-chispa star-chispa--3">⭐</span>
+      <span class="star-chispa star-chispa--4">⭐</span>
     </div>
 
-    <Sparky pose="wave" size={104} class="star-hero__sparky sparky--entrada" />
+    <div class="star-hero__sparky-wrap">
+      <Sparky pose="wave" size={104} class="sparky--flota" />
+    </div>
 
     <div class="wrap star-hero__contenido">
-      <p class="star-count">SÁBADOS · 16:00 – 17:30</p>
-      <h1 class="star-hero__titulo">No necesita saber cheer.<br />Solo tener ganas de empezar. ⭐</h1>
-      <p class="star-hero__bajada">
+      <p class="star-count reveal star-reveal-1">SÁBADOS · 16:00 – 17:30</p>
+      <h1 class="star-hero__titulo reveal star-reveal-2">No necesita saber cheer.<br />Solo tener ganas de empezar. ⭐</h1>
+      <p class="star-hero__bajada reveal star-reveal-3">
         Firehouse Star es la primera experiencia Firehouse para niñas y niños desde los 4 años
         que quieren descubrir el cheer desde cero.
       </p>
 
-      <ul class="star-datos">
+      <ul class="star-datos reveal star-reveal-4">
         <li><span>Edad</span><b>Desde 4 años</b></li>
         <li><span>Cuándo</span><b>Sábados</b></li>
         <li><span>Duración</span><b>90 minutos</b></li>
         <li><span>Mensualidad</span><b>$30.000</b></li>
       </ul>
 
-      <p class="star-hero__cta">
-        <a class="star-btn" href="/registro" id="wa-star-hero">QUIERO EMPEZAR EN STAR ⭐</a>
+      <p class="star-hero__cta reveal star-reveal-5">
+        <a class="star-btn star-btn--brilla" href="/registro" id="wa-star-hero">QUIERO EMPEZAR EN STAR ⭐</a>
         <a class="star-btn-quiet" href="#clase">¿Qué va a hacer en la clase?</a>
       </p>
     </div>
   </section>
 
   <!-- ============ SPARKY TAMPOCO SABÍA CHEER ============ -->
-  <section class="star-section">
+  <section class="star-section star-section--objeto">
+    <svg class="star-objeto star-objeto--sol" viewBox="0 0 120 120" aria-hidden="true">
+      <path d="M60 8 74.6 45.2 114 47.9 83.6 73.1 93.4 111.4 60 89.2 26.6 111.4 36.4 73.1 6 47.9 45.4 45.2 60 8Z"
+            fill="none" stroke="currentColor" stroke-width="5" stroke-linejoin="round"/>
+    </svg>
     <div class="wrap star-split">
-      <div class="star-placeholder star-placeholder--ilustracion" aria-hidden="true">
+      <div class="star-placeholder star-placeholder--ilustracion reveal">
         <Sparky pose="dizzy" size={130} class="sparky--flota" />
         <p class="star-placeholder__nota">Ilustración final pendiente — escena: Sparky intentando un movimiento sencillo</p>
       </div>
-      <div>
+      <div class="reveal star-reveal-2">
         <p class="star-eyebrow">La idea central</p>
         <h2 class="star-title">Sparky tampoco sabía cheer.</h2>
         <p class="star-parrafo">
@@ -87,35 +97,35 @@ const preguntas = [
       <h2 class="star-title">¿Qué va a hacer realmente durante 90 minutos?</h2>
 
       <ol class="star-escenas">
-        <li class="star-escena">
+        <li class="star-escena reveal">
           <div class="star-placeholder" aria-hidden="true"><Sparky pose="idle" size={64} /></div>
           <div>
             <h3>Nos activamos 🔥</h3>
             <p>Empezamos moviéndonos, entrando en calor y preparando el cuerpo.</p>
           </div>
         </li>
-        <li class="star-escena">
+        <li class="star-escena reveal">
           <div class="star-placeholder" aria-hidden="true"><Sparky pose="dizzy" size={64} /></div>
           <div>
             <h3>Jugamos y nos movemos 🎯</h3>
             <p>Juegos, circuitos y pequeños desafíos para moverse, reaccionar y coordinar.</p>
           </div>
         </li>
-        <li class="star-escena">
+        <li class="star-escena reveal">
           <div class="star-placeholder" aria-hidden="true"><Sparky pose="idle" size={64} /></div>
           <div>
             <h3>Descubrimos el cheer ⭐</h3>
             <p>Aprendemos posiciones, movimientos, saltos y fundamentos adaptados a cada nivel.</p>
           </div>
         </li>
-        <li class="star-escena">
+        <li class="star-escena reveal">
           <div class="star-placeholder" aria-hidden="true"><Sparky pose="wave" size={64} /></div>
           <div>
             <h3>Lo hacemos juntos 🙌</h3>
             <p>Aprendemos a escuchar, esperar, colaborar y trabajar con otros.</p>
           </div>
         </li>
-        <li class="star-escena">
+        <li class="star-escena reveal">
           <div class="star-placeholder" aria-hidden="true"><Sparky pose="excited" size={64} /></div>
           <div>
             <h3>Celebramos lo aprendido 🎉</h3>
@@ -133,11 +143,11 @@ const preguntas = [
       <h2 class="star-title">Lo que va aprendiendo</h2>
 
       <div class="star-grid5">
-        <div class="star-card"><h3>Movimiento 🤸</h3><p>Equilibrio, coordinación, fuerza y control corporal.</p></div>
-        <div class="star-card"><h3>Cheer ⭐</h3><p>Primeros movimientos y fundamentos adaptados a su nivel.</p></div>
-        <div class="star-card"><h3>Equipo 🙌</h3><p>Escuchar, participar y hacer cosas junto a otros.</p></div>
-        <div class="star-card"><h3>Atreverse 🔥</h3><p>Intentar cosas nuevas, equivocarse y volver a probar.</p></div>
-        <div class="star-card"><h3>Diversión 😄</h3><p>Porque queremos que disfrute y tenga ganas de volver.</p></div>
+        <div class="star-card reveal"><h3>Movimiento 🤸</h3><p>Equilibrio, coordinación, fuerza y control corporal.</p></div>
+        <div class="star-card reveal"><h3>Cheer ⭐</h3><p>Primeros movimientos y fundamentos adaptados a su nivel.</p></div>
+        <div class="star-card reveal"><h3>Equipo 🙌</h3><p>Escuchar, participar y hacer cosas junto a otros.</p></div>
+        <div class="star-card reveal"><h3>Atreverse 🔥</h3><p>Intentar cosas nuevas, equivocarse y volver a probar.</p></div>
+        <div class="star-card reveal"><h3>Diversión 😄</h3><p>Porque queremos que disfrute y tenga ganas de volver.</p></div>
       </div>
     </div>
   </section>
@@ -150,10 +160,10 @@ const preguntas = [
   <!-- ============ ¿NUNCA HA HECHO CHEER? ============ -->
   <section class="star-section star-section--panel">
     <div class="wrap star-nunca">
-      <p class="star-eyebrow">La objeción número uno</p>
-      <h2 class="star-title">¿Nunca ha hecho cheer?</h2>
-      <p class="star-nunca__grande">Perfecto.</p>
-      <p class="star-parrafo">
+      <p class="star-eyebrow reveal">La objeción número uno</p>
+      <h2 class="star-title reveal">¿Nunca ha hecho cheer?</h2>
+      <p class="star-nunca__grande reveal">Perfecto.</p>
+      <p class="star-parrafo reveal">
         Firehouse Star está pensado justamente para empezar desde cero.<br />
         No necesita saber hacer piruetas.<br />
         No necesita haber entrenado antes.<br />
@@ -170,7 +180,7 @@ const preguntas = [
       <h2 class="star-title">Cuánto cuesta empezar</h2>
 
       <div class="star-precio">
-        <div class="star-precio__bloque star-precio__bloque--primero">
+        <div class="star-precio__bloque star-precio__bloque--primero reveal">
           <span class="star-precio__etq">Primer pago — antes de la primera clase</span>
           <span class="star-precio__num">$40.000</span>
           <ul class="star-precio__desglose">
@@ -178,7 +188,7 @@ const preguntas = [
             <li><span>Primera mensualidad</span><b>$30.000</b></li>
           </ul>
         </div>
-        <div class="star-precio__bloque">
+        <div class="star-precio__bloque reveal">
           <span class="star-precio__etq">Desde el segundo mes</span>
           <span class="star-precio__num">$30.000<small>/mes</small></span>
           <p class="star-precio__inc">Incluye 1 clase semanal de 90 minutos, sábados 16:00–17:30.</p>
@@ -187,7 +197,7 @@ const preguntas = [
 
       <p class="star-nota">Pago mes a mes, sin permanencia obligatoria. La inscripción incluye el kit de bienvenida.</p>
 
-      <div class="star-prorrateo">
+      <div class="star-prorrateo reveal">
         <p class="star-prorrateo__titulo">¿Te inscribes a mitad de mes? Pagas solo lo que queda:</p>
         <table class="star-tabla">
           <thead>
@@ -202,7 +212,7 @@ const preguntas = [
         </table>
       </div>
 
-      <div class="star-politica">
+      <div class="star-politica reveal">
         <p class="star-politica__titulo">Sin clase de prueba, con esta garantía:</p>
         <ul class="star-politica__lista">
           <li><b>Si el problema es nuestro</b> — ningún horario disponible resulta compatible con tu familia — reembolsamos completa la inscripción de $10.000.</li>
@@ -222,10 +232,10 @@ const preguntas = [
       <p class="star-eyebrow">Incluido en la inscripción</p>
       <h2 class="star-title">Starter Pack Firehouse Star</h2>
       <div class="star-grid5 star-grid5--pack">
-        <div class="star-card"><h3>👕 Polera</h3><p>Polera oficial Firehouse Star.</p></div>
-        <div class="star-card"><h3>🎀 Accesorio</h3><p>Accesorio Firehouse para la primera clase.</p></div>
-        <div class="star-card"><h3>⭐ Tarjeta</h3><p>"Mi Primer Mes Star", para ir marcando el progreso.</p></div>
-        <div class="star-card"><h3>🐾 Sticker</h3><p>Sticker de Sparky.</p></div>
+        <div class="star-card reveal"><h3>👕 Polera</h3><p>Polera oficial Firehouse Star.</p></div>
+        <div class="star-card reveal"><h3>🎀 Accesorio</h3><p>Accesorio Firehouse para la primera clase.</p></div>
+        <div class="star-card reveal"><h3>⭐ Tarjeta</h3><p>"Mi Primer Mes Star", para ir marcando el progreso.</p></div>
+        <div class="star-card reveal"><h3>🐾 Sticker</h3><p>Sticker de Sparky.</p></div>
       </div>
     </div>
   </section>
@@ -233,12 +243,16 @@ const preguntas = [
   <Faq preguntas={preguntas} titulo="Antes de decidir" />
 
   <!-- ============ CTA FINAL ============ -->
-  <section class="star-cierre">
-    <div class="wrap">
-      <Sparky pose="excited" size={110} class="sparky--flota" />
+  <section class="star-cierre star-section--objeto">
+    <svg class="star-objeto star-objeto--mono" viewBox="0 0 120 120" aria-hidden="true">
+      <path d="M60 8 74.6 45.2 114 47.9 83.6 73.1 93.4 111.4 60 89.2 26.6 111.4 36.4 73.1 6 47.9 45.4 45.2 60 8Z"
+            fill="none" stroke="currentColor" stroke-width="5" stroke-linejoin="round"/>
+    </svg>
+    <div class="wrap reveal">
+      <Sparky pose="excited" size={110} class="sparky--salta" />
       <h2 class="star-title">¿Empezamos? ⭐</h2>
       <p class="star-parrafo star-parrafo--centro">No tiene que llegar sabiendo.<br />Solo tiene que empezar.</p>
-      <a class="star-btn" href="/registro" id="wa-star-cierre">QUIERO INSCRIBIRLO EN FIREHOUSE STAR</a>
+      <a class="star-btn star-btn--brilla" href="/registro" id="wa-star-cierre">QUIERO INSCRIBIRLO EN FIREHOUSE STAR</a>
       <p class="star-nota">Sábados 16:00–17:30 · Santa Corina 197, La Cisterna</p>
     </div>
   </section>
@@ -282,6 +296,15 @@ const preguntas = [
 }
 .star-btn:hover{ background: #E6B000; transform: translateY(-2px); }
 .star-btn:focus-visible{ outline: 3px solid var(--chalk); outline-offset: 3px; }
+
+/* Brillo pulsante reservado a los dos CTA de mayor peso (hero y cierre) —
+   referencia literal a "sal brillando", no decoración genérica */
+.star-btn--brilla{ animation: star-brillo 2.6s ease-in-out infinite; }
+.star-btn--brilla:hover{ animation-play-state: paused; }
+@keyframes star-brillo{
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255,196,0,.55); }
+  50%      { box-shadow: 0 0 0 10px rgba(255,196,0,0); }
+}
 .star-btn-quiet{ color: rgba(245,239,232,.78); font-size: 15px; text-decoration: underline; }
 .star-hero__cta{ display: flex; flex-direction: column; align-items: center; gap: var(--e-2); margin-top: var(--e-5); }
 
@@ -295,8 +318,51 @@ const preguntas = [
     radial-gradient(ellipse 70% 55% at 18% 12%, rgba(255,196,0,.24) 0%, rgba(255,196,0,0) 60%),
     linear-gradient(180deg, rgba(23,20,18,.72) 0%, rgba(23,20,18,.50) 45%, rgba(23,20,18,.92) 100%);
 }
-.star-hero__sparky{ position: absolute; right: 6%; bottom: 0; z-index: 1; }
-@media (max-width: 700px){ .star-hero__sparky{ right: 4%; width: 72px; } }
+.star-hero__sparky-wrap{ position: absolute; right: 6%; bottom: 0; z-index: 1; animation: star-sparky-entra 900ms 300ms cubic-bezier(.22,.61,.36,1) both; }
+@media (max-width: 700px){ .star-hero__sparky-wrap{ right: 4%; width: 72px; } }
+@keyframes star-sparky-entra{
+  0%   { transform: translateY(46px) scale(.7); opacity: 0; }
+  60%  { transform: translateY(-8px) scale(1.04); opacity: 1; }
+  80%  { transform: translateY(3px) scale(.99); }
+  100% { transform: translateY(0) scale(1); }
+}
+
+/* Zoom lento y continuo sobre la foto del hero (Ken Burns) */
+.star-hero__img{ animation: star-kenburns 22s ease-in-out infinite alternate; }
+@keyframes star-kenburns{
+  from{ transform: scale(1); }
+  to{ transform: scale(1.08); }
+}
+
+/* Chispas/estrellas flotando en el hero — decorativas, ligadas al tema ⭐ */
+.star-chispa{
+  position: absolute; color: var(--fire-yellow); font-size: 18px; opacity: 0;
+  animation: star-titila 3.6s ease-in-out infinite;
+  text-shadow: 0 0 8px rgba(255,196,0,.7);
+}
+.star-chispa--1{ top: 18%; left: 12%; font-size: 14px; animation-delay: 0s; }
+.star-chispa--2{ top: 62%; left: 22%; font-size: 10px; animation-delay: .9s; }
+.star-chispa--3{ top: 28%; left: 82%; font-size: 16px; animation-delay: 1.8s; }
+.star-chispa--4{ top: 70%; left: 70%; font-size: 11px; animation-delay: 2.6s; }
+@keyframes star-titila{
+  0%, 100% { opacity: 0; transform: translateY(0) scale(.8); }
+  50%      { opacity: .85; transform: translateY(-10px) scale(1); }
+}
+
+/* Utilidades de retraso para escalonar textos que no son hijos repetidos */
+.star-reveal-1{ transition-delay: 0ms; }
+.star-reveal-2{ transition-delay: 90ms; }
+.star-reveal-3{ transition-delay: 170ms; }
+.star-reveal-4{ transition-delay: 250ms; }
+.star-reveal-5{ transition-delay: 330ms; }
+
+/* Objetos decorativos (estrellas de fondo, giro lento) */
+.star-section--objeto{ position: relative; overflow: hidden; }
+.star-objeto{ position: absolute; pointer-events: none; animation: star-objeto-gira 40s linear infinite; }
+.star-objeto--sol{ right: -24px; top: 12%; width: 170px; color: var(--fire-yellow); opacity: .10; }
+.star-objeto--mono{ left: -20px; bottom: -10px; width: 160px; color: var(--mat-blue); opacity: .12; animation-direction: reverse; }
+@keyframes star-objeto-gira{ from{ transform: rotate(0deg); } to{ transform: rotate(360deg); } }
+@media (max-width: 700px){ .star-objeto--sol, .star-objeto--mono{ width: 110px; } }
 
 .star-hero__contenido{ position: relative; padding: var(--e-8) 0 var(--e-7); text-align: center; max-width: 680px; margin-inline: auto; }
 .star-hero__titulo{ font-family: var(--font-display); font-weight: 800; font-size: clamp(2rem, 5vw, 3.2rem); line-height: 1.08; margin-top: var(--e-3); }
@@ -334,21 +400,36 @@ const preguntas = [
   content: counter(escena); flex: none; width: 30px; text-align: center;
   font-family: var(--font-count); font-weight: 700; color: var(--fire-yellow); font-size: 14px;
 }
-.star-escena .star-placeholder{ flex: none; width: 90px; height: 90px; padding: var(--e-2); }
+.star-escena .star-placeholder{ flex: none; width: 90px; height: 90px; padding: var(--e-2); transition: transform var(--t-interfaz) ease; }
+.star-escena:hover .star-placeholder{ transform: scale(1.06) rotate(-2deg); }
 .star-escena h3{ font-family: var(--font-display); font-weight: 800; font-size: 17px; }
 .star-escena p{ color: var(--txt-soft); font-size: 14.5px; margin-top: 4px; max-width: 52ch; }
 @media (max-width: 640px){ .star-escena{ gap: var(--e-3); } .star-escena::before{ width: 22px; } }
 
+.star-escenas .star-escena:nth-child(2){ transition-delay: 90ms; }
+.star-escenas .star-escena:nth-child(3){ transition-delay: 180ms; }
+.star-escenas .star-escena:nth-child(4){ transition-delay: 270ms; }
+.star-escenas .star-escena:nth-child(5){ transition-delay: 360ms; }
+
 /* ---- Tarjetas (aprendizaje / starter pack) ---- */
 .star-grid5{ display: grid; grid-template-columns: repeat(5,1fr); gap: var(--e-3); margin-top: var(--e-5); }
 .star-grid5--pack{ grid-template-columns: repeat(4,1fr); }
-.star-card{ background: var(--ember-deep); padding: var(--e-4); border-top: 3px solid var(--fire-yellow); }
+.star-card{
+  background: var(--ember-deep); padding: var(--e-4); border-top: 3px solid var(--fire-yellow);
+  transition: transform var(--t-interfaz) ease, box-shadow var(--t-interfaz) ease;
+}
 .star-card:nth-child(2n){ border-top-color: var(--mat-blue); }
 .star-card:nth-child(3n){ border-top-color: var(--fire-red); }
+.star-card:hover{ transform: translateY(-5px); box-shadow: 0 10px 22px rgba(0,0,0,.28); }
 .star-card h3{ font-family: var(--font-display); font-weight: 800; font-size: 15px; }
 .star-card p{ color: var(--txt-soft); font-size: 13.5px; margin-top: 6px; }
 @media (max-width: 900px){ .star-grid5, .star-grid5--pack{ grid-template-columns: repeat(2,1fr); } }
 @media (max-width: 480px){ .star-grid5, .star-grid5--pack{ grid-template-columns: 1fr; } }
+
+.star-grid5 .star-card:nth-child(2){ transition-delay: 70ms; }
+.star-grid5 .star-card:nth-child(3){ transition-delay: 140ms; }
+.star-grid5 .star-card:nth-child(4){ transition-delay: 210ms; }
+.star-grid5 .star-card:nth-child(5){ transition-delay: 280ms; }
 
 /* ---- ¿Nunca ha hecho cheer? ---- */
 .star-nunca{ text-align: center; max-width: 620px; margin-inline: auto; }
@@ -357,6 +438,13 @@ const preguntas = [
   font-size: clamp(2.4rem, 7vw, 4rem); line-height: 1; margin-top: var(--e-2);
 }
 .star-nunca .star-parrafo{ margin-inline: auto; }
+
+/* El remate "Perfecto." merece su propio gesto: no un fade, un rebote */
+html.js .star-nunca__grande.reveal{
+  transform: scale(.4); opacity: 0; transition-delay: 120ms;
+  transition: opacity 400ms ease, transform 550ms cubic-bezier(.34,1.56,.64,1) 120ms;
+}
+html.js .star-nunca__grande.reveal.visible{ transform: scale(1); opacity: 1; }
 
 /* ---- Precio ---- */
 .star-precio{ display: flex; gap: var(--e-4); margin-top: var(--e-5); flex-wrap: wrap; }
@@ -391,5 +479,14 @@ const preguntas = [
 @media (prefers-reduced-motion: reduce){
   .star-btn{ transition: none; }
   .star-btn:hover{ transform: none; }
+  .star-btn--brilla{ animation: none; }
+  .star-hero__img{ animation: none; }
+  .star-hero__sparky-wrap{ animation: none; }
+  .star-chispa{ animation: none; opacity: .5; }
+  .star-objeto{ animation: none; }
+  .star-card{ transition: none; }
+  .star-card:hover{ transform: none; }
+  .star-escena .star-placeholder{ transition: none; }
+  html.js .star-nunca__grande.reveal{ transform: none; transition: opacity 200ms ease; }
 }
 </style>
