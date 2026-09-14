@@ -1,0 +1,395 @@
+---
+import Base from '../layouts/Base.astro';
+import Faq from '../components/Faq.astro';
+import BandaFoto from '../components/BandaFoto.astro';
+import Sparky from '../components/Sparky.astro';
+import { sitio } from '../data/sitio.js';
+
+const titulo = 'Firehouse Star — cheerleading desde cero para niñas y niños desde 4 años | Firehouse Cheer';
+const descripcion = 'Firehouse Star es la primera experiencia Firehouse: una clase semanal de cheerleading para empezar desde cero, sin necesidad de experiencia previa. Sábados en La Cisterna.';
+
+const preguntas = [
+  { p: 'Mi hijo nunca ha hecho cheer.',
+    r: 'Perfecto. Firehouse Star está pensado justamente para empezar desde cero.' },
+  { p: '¿Tiene que saber hacer piruetas?',
+    r: 'No. La clase parte con movimientos y ejercicios adaptados a su nivel, sin ninguna base previa.' },
+  { p: '¿Es muy exigente?',
+    r: 'Es una clase semanal de 90 minutos donde se mezclan movimiento, juegos y fundamentos del cheer. No es un entrenamiento de competencia.' },
+  { p: '¿Va a competir?',
+    r: 'No. Firehouse Star no compite: es la puerta de entrada al cheer. Si en marzo de 2027 quiere sumarse a un equipo de competencia, puede iniciar el proceso de incorporación a la temporada en ese momento.' },
+  { p: '¿Existe clase de prueba?',
+    r: 'Durante esta etapa, Firehouse Star funciona por inscripción directa, sin clase de prueba gratuita. Para bajar el riesgo de esa decisión, si ningún horario disponible resulta compatible con tu familia, la inscripción se reembolsa completa; y si te arrepientes antes de la primera clase sin que exista ese problema, el pago queda como crédito Firehouse por 90 días, para este hijo o para un hermano.' },
+  { p: '¿Existe permanencia mínima?',
+    r: 'No. La mensualidad funciona mes a mes, igual que en el resto de Firehouse.' },
+  { p: '¿Qué pasa si me inscribo a mitad de mes?',
+    r: 'La mensualidad se ajusta a las clases que queden en el mes: se paga solo por las semanas de clase a las que efectivamente se llega, nunca el mes completo si se entra después de la primera semana.' },
+];
+---
+<Base titulo={titulo} descripcion={descripcion} ruta="/firehouse-star" preguntas={preguntas} miga="Firehouse Star">
+
+  <!-- ============ HERO ============ -->
+  <section class="star-hero">
+    <div class="star-hero__fondo" aria-hidden="true">
+      <picture>
+        <source srcset="/media/dia-cheer.webp" type="image/webp" />
+        <img src="/media/dia-cheer.jpg" alt="" loading="eager" />
+      </picture>
+      <div class="star-hero__velo"></div>
+    </div>
+
+    <Sparky pose="wave" size={104} class="star-hero__sparky sparky--entrada" />
+
+    <div class="wrap star-hero__contenido">
+      <p class="star-count">SÁBADOS · 16:00 – 17:30</p>
+      <h1 class="star-hero__titulo">No necesita saber cheer.<br />Solo tener ganas de empezar. ⭐</h1>
+      <p class="star-hero__bajada">
+        Firehouse Star es la primera experiencia Firehouse para niñas y niños desde los 4 años
+        que quieren descubrir el cheer desde cero.
+      </p>
+
+      <ul class="star-datos">
+        <li><span>Edad</span><b>Desde 4 años</b></li>
+        <li><span>Cuándo</span><b>Sábados</b></li>
+        <li><span>Duración</span><b>90 minutos</b></li>
+        <li><span>Mensualidad</span><b>$30.000</b></li>
+      </ul>
+
+      <p class="star-hero__cta">
+        <a class="star-btn" href="/registro" id="wa-star-hero">QUIERO EMPEZAR EN STAR ⭐</a>
+        <a class="star-btn-quiet" href="#clase">¿Qué va a hacer en la clase?</a>
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ SPARKY TAMPOCO SABÍA CHEER ============ -->
+  <section class="star-section">
+    <div class="wrap star-split">
+      <div class="star-placeholder star-placeholder--ilustracion" aria-hidden="true">
+        <Sparky pose="dizzy" size={130} class="sparky--flota" />
+        <p class="star-placeholder__nota">Ilustración final pendiente — escena: Sparky intentando un movimiento sencillo</p>
+      </div>
+      <div>
+        <p class="star-eyebrow">La idea central</p>
+        <h2 class="star-title">Sparky tampoco sabía cheer.</h2>
+        <p class="star-parrafo">
+          Y eso está perfecto.<br />
+          Porque aquí no tienes que llegar sabiendo.<br />
+          Aquí vienes a aprender.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ ASÍ SE VIVE UNA CLASE STAR ============ -->
+  <section class="star-section star-section--panel" id="clase">
+    <div class="wrap">
+      <p class="star-eyebrow">Así se vive una clase Star</p>
+      <h2 class="star-title">¿Qué va a hacer realmente durante 90 minutos?</h2>
+
+      <ol class="star-escenas">
+        <li class="star-escena">
+          <div class="star-placeholder" aria-hidden="true"><Sparky pose="idle" size={64} /></div>
+          <div>
+            <h3>Nos activamos 🔥</h3>
+            <p>Empezamos moviéndonos, entrando en calor y preparando el cuerpo.</p>
+          </div>
+        </li>
+        <li class="star-escena">
+          <div class="star-placeholder" aria-hidden="true"><Sparky pose="dizzy" size={64} /></div>
+          <div>
+            <h3>Jugamos y nos movemos 🎯</h3>
+            <p>Juegos, circuitos y pequeños desafíos para moverse, reaccionar y coordinar.</p>
+          </div>
+        </li>
+        <li class="star-escena">
+          <div class="star-placeholder" aria-hidden="true"><Sparky pose="idle" size={64} /></div>
+          <div>
+            <h3>Descubrimos el cheer ⭐</h3>
+            <p>Aprendemos posiciones, movimientos, saltos y fundamentos adaptados a cada nivel.</p>
+          </div>
+        </li>
+        <li class="star-escena">
+          <div class="star-placeholder" aria-hidden="true"><Sparky pose="wave" size={64} /></div>
+          <div>
+            <h3>Lo hacemos juntos 🙌</h3>
+            <p>Aprendemos a escuchar, esperar, colaborar y trabajar con otros.</p>
+          </div>
+        </li>
+        <li class="star-escena">
+          <div class="star-placeholder" aria-hidden="true"><Sparky pose="excited" size={64} /></div>
+          <div>
+            <h3>Celebramos lo aprendido 🎉</h3>
+            <p>Cada clase termina con algo nuevo que intentamos, aprendimos o conseguimos.</p>
+          </div>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ============ LO QUE VA APRENDIENDO ============ -->
+  <section class="star-section">
+    <div class="wrap">
+      <p class="star-eyebrow">Qué obtiene</p>
+      <h2 class="star-title">Lo que va aprendiendo</h2>
+
+      <div class="star-grid5">
+        <div class="star-card"><h3>Movimiento 🤸</h3><p>Equilibrio, coordinación, fuerza y control corporal.</p></div>
+        <div class="star-card"><h3>Cheer ⭐</h3><p>Primeros movimientos y fundamentos adaptados a su nivel.</p></div>
+        <div class="star-card"><h3>Equipo 🙌</h3><p>Escuchar, participar y hacer cosas junto a otros.</p></div>
+        <div class="star-card"><h3>Atreverse 🔥</h3><p>Intentar cosas nuevas, equivocarse y volver a probar.</p></div>
+        <div class="star-card"><h3>Diversión 😄</h3><p>Porque queremos que disfrute y tenga ganas de volver.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <BandaFoto src="/media/gal-equipo.jpg"
+             alt="Deportistas de Firehouse de distintas edades junto al coach en el tapete, incluyendo niñas pequeñas"
+             frase="Todos tuvieron alguna vez una primera clase."
+             alto="medio" foco="center 38%" />
+
+  <!-- ============ ¿NUNCA HA HECHO CHEER? ============ -->
+  <section class="star-section star-section--panel">
+    <div class="wrap star-nunca">
+      <p class="star-eyebrow">La objeción número uno</p>
+      <h2 class="star-title">¿Nunca ha hecho cheer?</h2>
+      <p class="star-nunca__grande">Perfecto.</p>
+      <p class="star-parrafo">
+        Firehouse Star está pensado justamente para empezar desde cero.<br />
+        No necesita saber hacer piruetas.<br />
+        No necesita haber entrenado antes.<br />
+        No necesita llegar preparado.<br />
+        Y no tiene que decidir hoy si quiere competir.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ PRECIO ============ -->
+  <section class="star-section" id="precio">
+    <div class="wrap">
+      <p class="star-eyebrow">Empezar es simple</p>
+      <h2 class="star-title">Cuánto cuesta empezar</h2>
+
+      <div class="star-precio">
+        <div class="star-precio__bloque star-precio__bloque--primero">
+          <span class="star-precio__etq">Primer pago — antes de la primera clase</span>
+          <span class="star-precio__num">$40.000</span>
+          <ul class="star-precio__desglose">
+            <li><span>Inscripción Star</span><b>$10.000</b></li>
+            <li><span>Primera mensualidad</span><b>$30.000</b></li>
+          </ul>
+        </div>
+        <div class="star-precio__bloque">
+          <span class="star-precio__etq">Desde el segundo mes</span>
+          <span class="star-precio__num">$30.000<small>/mes</small></span>
+          <p class="star-precio__inc">Incluye 1 clase semanal de 90 minutos, sábados 16:00–17:30.</p>
+        </div>
+      </div>
+
+      <p class="star-nota">Pago mes a mes, sin permanencia obligatoria. La inscripción incluye el kit de bienvenida.</p>
+
+      <div class="star-prorrateo">
+        <p class="star-prorrateo__titulo">¿Te inscribes a mitad de mes? Pagas solo lo que queda:</p>
+        <table class="star-tabla">
+          <thead>
+            <tr><th>Ingresas en</th><th>Pagas ese mes</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Semana 1</td><td>$30.000 <span class="star-tabla__nota">(mes completo)</span></td></tr>
+            <tr><td>Semana 2</td><td>$22.500</td></tr>
+            <tr><td>Semana 3</td><td>$15.000</td></tr>
+            <tr><td>Semana 4</td><td>$7.500</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="star-politica">
+        <p class="star-politica__titulo">Sin clase de prueba, con esta garantía:</p>
+        <ul class="star-politica__lista">
+          <li><b>Si el problema es nuestro</b> — ningún horario disponible resulta compatible con tu familia — reembolsamos completa la inscripción de $10.000.</li>
+          <li><b>Si cambias de opinión</b> antes de la primera clase, sin que exista ese problema, el pago no se devuelve en dinero, pero queda como <b>crédito Firehouse por 90 días</b>, usable para este hijo o un hermano.</li>
+        </ul>
+      </div>
+
+      <p class="star-hero__cta">
+        <a class="star-btn" href="/registro" id="wa-star-precio">QUIERO INSCRIBIRLO EN STAR ⭐</a>
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ KIT DE BIENVENIDA ============ -->
+  <section class="star-section star-section--panel">
+    <div class="wrap">
+      <p class="star-eyebrow">Incluido en la inscripción</p>
+      <h2 class="star-title">Starter Pack Firehouse Star</h2>
+      <div class="star-grid5 star-grid5--pack">
+        <div class="star-card"><h3>👕 Polera</h3><p>Polera oficial Firehouse Star.</p></div>
+        <div class="star-card"><h3>🎀 Accesorio</h3><p>Accesorio Firehouse para la primera clase.</p></div>
+        <div class="star-card"><h3>⭐ Tarjeta</h3><p>"Mi Primer Mes Star", para ir marcando el progreso.</p></div>
+        <div class="star-card"><h3>🐾 Sticker</h3><p>Sticker de Sparky.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <Faq preguntas={preguntas} titulo="Antes de decidir" />
+
+  <!-- ============ CTA FINAL ============ -->
+  <section class="star-cierre">
+    <div class="wrap">
+      <Sparky pose="excited" size={110} class="sparky--flota" />
+      <h2 class="star-title">¿Empezamos? ⭐</h2>
+      <p class="star-parrafo star-parrafo--centro">No tiene que llegar sabiendo.<br />Solo tiene que empezar.</p>
+      <a class="star-btn" href="/registro" id="wa-star-cierre">QUIERO INSCRIBIRLO EN FIREHOUSE STAR</a>
+      <p class="star-nota">Sábados 16:00–17:30 · Santa Corina 197, La Cisterna</p>
+    </div>
+  </section>
+
+</Base>
+
+<style>
+/*
+  Paleta Firehouse Star: se apoya en los tokens de marca (sin inventar
+  colores nuevos). El amarillo pasa a ser el acento dominante —
+  coherente con la estrella y con "sal brillando"— y los botones usan
+  color sólido, sin degradados decorativos, según preferencia expresa.
+*/
+
+.star-eyebrow{
+  font-family: var(--font-count); font-size: 11px; letter-spacing: .3em;
+  color: var(--fire-yellow); text-transform: uppercase;
+  display: flex; align-items: center; gap: 12px;
+}
+.star-eyebrow::before{ content:''; width:30px; height:3px; background: rgba(245,239,232,.38); transform: skewX(var(--tilt-sm)); }
+
+.star-count{
+  display: inline-flex; align-items: center; gap: 14px;
+  font-family: var(--font-count); font-weight: 700; font-size: 14px; letter-spacing: .28em;
+  color: var(--fire-yellow); margin-bottom: var(--e-2);
+}
+.star-count::before, .star-count::after{ content:''; width:30px; height:3px; background: var(--fire-yellow); transform: skewX(var(--tilt-sm)); }
+
+.star-title{ font-family: var(--font-display); font-weight: 800; font-size: clamp(1.7rem, 3.6vw, 2.6rem); line-height: 1.05; margin-top: var(--e-3); }
+.star-parrafo{ color: var(--txt-soft); max-width: var(--wrap-texto); margin-top: var(--e-3); font-size: clamp(1rem,1.5vw,1.15rem); line-height: 1.6; }
+.star-parrafo--centro{ margin-inline: auto; text-align: center; }
+.star-nota{ color: var(--txt-faint); font-size: 14px; margin-top: var(--e-3); max-width: var(--wrap-texto); }
+
+/* Botón sólido — sin degradados, color con significado (amarillo = Star) */
+.star-btn{
+  display: inline-flex; align-items: center; justify-content: center; min-height: 48px;
+  background: var(--fire-yellow); color: var(--ember); font-weight: 800; font-size: 16px;
+  font-family: var(--font-display);
+  padding: 14px 30px; border-radius: var(--radio); text-decoration: none;
+  transition: transform var(--t-interfaz) ease, background var(--t-interfaz) ease;
+}
+.star-btn:hover{ background: #E6B000; transform: translateY(-2px); }
+.star-btn:focus-visible{ outline: 3px solid var(--chalk); outline-offset: 3px; }
+.star-btn-quiet{ color: rgba(245,239,232,.78); font-size: 15px; text-decoration: underline; }
+.star-hero__cta{ display: flex; flex-direction: column; align-items: center; gap: var(--e-2); margin-top: var(--e-5); }
+
+/* ---- Hero ---- */
+.star-hero{ position: relative; overflow: hidden; isolation: isolate; border-bottom: 3px solid var(--fire-yellow); }
+.star-hero__fondo{ position: absolute; inset: 0; z-index: -1; }
+.star-hero__fondo img{ position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center 30%; }
+.star-hero__velo{
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 70% 55% at 18% 12%, rgba(255,196,0,.24) 0%, rgba(255,196,0,0) 60%),
+    linear-gradient(180deg, rgba(23,20,18,.72) 0%, rgba(23,20,18,.50) 45%, rgba(23,20,18,.92) 100%);
+}
+.star-hero__sparky{ position: absolute; right: 6%; bottom: 0; z-index: 1; }
+@media (max-width: 700px){ .star-hero__sparky{ right: 4%; width: 72px; } }
+
+.star-hero__contenido{ position: relative; padding: var(--e-8) 0 var(--e-7); text-align: center; max-width: 680px; margin-inline: auto; }
+.star-hero__titulo{ font-family: var(--font-display); font-weight: 800; font-size: clamp(2rem, 5vw, 3.2rem); line-height: 1.08; margin-top: var(--e-3); }
+.star-hero__bajada{ color: rgba(245,239,232,.92); font-size: clamp(1.05rem,1.6vw,1.2rem); margin-top: var(--e-3); max-width: 46ch; margin-inline: auto; text-shadow: 0 1px 12px rgba(23,20,18,.9); }
+
+.star-datos{ display: grid; grid-template-columns: repeat(auto-fit,minmax(130px,1fr)); gap: 2px; background: var(--hairline); margin: var(--e-5) 0 0; padding: 0; list-style: none; max-width: 560px; margin-inline: auto; }
+.star-datos li{ background: var(--ember-deep); padding: var(--e-3); }
+.star-datos span{ display: block; font-family: var(--font-count); font-size: 10.5px; letter-spacing: .12em; color: var(--fire-yellow); text-transform: uppercase; }
+.star-datos b{ display: block; margin-top: 6px; font-family: var(--font-display); font-weight: 800; font-size: 16px; }
+
+/* ---- Secciones genéricas ---- */
+.star-section{ padding: var(--e-7) 0; }
+.star-section--panel{ background: var(--ember-deep); }
+
+.star-split{ display: flex; gap: var(--e-6); align-items: center; }
+.star-split > *{ flex: 1; }
+@media (max-width: 900px){ .star-split{ flex-direction: column; } }
+
+/* ---- Placeholders de ilustración (mientras no exista arte final) ---- */
+.star-placeholder{
+  position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: var(--e-2); text-align: center; padding: var(--e-4);
+  background:
+    repeating-linear-gradient(135deg, rgba(255,196,0,.07) 0 14px, transparent 14px 28px),
+    var(--ember-deep);
+  border: 1.5px dashed rgba(255,196,0,.35); border-radius: 18px;
+}
+.star-placeholder--ilustracion{ min-height: 240px; }
+.star-placeholder__nota{ color: var(--txt-faint); font-size: 12px; font-family: var(--font-count); max-width: 26ch; }
+
+/* ---- Escenas de clase (sí es una secuencia real → numerarla tiene sentido) ---- */
+.star-escenas{ list-style: none; margin: var(--e-6) 0 0; padding: 0; display: flex; flex-direction: column; gap: var(--e-4); counter-reset: escena; }
+.star-escena{ display: flex; align-items: center; gap: var(--e-4); counter-increment: escena; position: relative; }
+.star-escena::before{
+  content: counter(escena); flex: none; width: 30px; text-align: center;
+  font-family: var(--font-count); font-weight: 700; color: var(--fire-yellow); font-size: 14px;
+}
+.star-escena .star-placeholder{ flex: none; width: 90px; height: 90px; padding: var(--e-2); }
+.star-escena h3{ font-family: var(--font-display); font-weight: 800; font-size: 17px; }
+.star-escena p{ color: var(--txt-soft); font-size: 14.5px; margin-top: 4px; max-width: 52ch; }
+@media (max-width: 640px){ .star-escena{ gap: var(--e-3); } .star-escena::before{ width: 22px; } }
+
+/* ---- Tarjetas (aprendizaje / starter pack) ---- */
+.star-grid5{ display: grid; grid-template-columns: repeat(5,1fr); gap: var(--e-3); margin-top: var(--e-5); }
+.star-grid5--pack{ grid-template-columns: repeat(4,1fr); }
+.star-card{ background: var(--ember-deep); padding: var(--e-4); border-top: 3px solid var(--fire-yellow); }
+.star-card:nth-child(2n){ border-top-color: var(--mat-blue); }
+.star-card:nth-child(3n){ border-top-color: var(--fire-red); }
+.star-card h3{ font-family: var(--font-display); font-weight: 800; font-size: 15px; }
+.star-card p{ color: var(--txt-soft); font-size: 13.5px; margin-top: 6px; }
+@media (max-width: 900px){ .star-grid5, .star-grid5--pack{ grid-template-columns: repeat(2,1fr); } }
+@media (max-width: 480px){ .star-grid5, .star-grid5--pack{ grid-template-columns: 1fr; } }
+
+/* ---- ¿Nunca ha hecho cheer? ---- */
+.star-nunca{ text-align: center; max-width: 620px; margin-inline: auto; }
+.star-nunca__grande{
+  font-family: var(--font-display); font-weight: 800; color: var(--fire-yellow);
+  font-size: clamp(2.4rem, 7vw, 4rem); line-height: 1; margin-top: var(--e-2);
+}
+.star-nunca .star-parrafo{ margin-inline: auto; }
+
+/* ---- Precio ---- */
+.star-precio{ display: flex; gap: var(--e-4); margin-top: var(--e-5); flex-wrap: wrap; }
+.star-precio__bloque{ flex: 1; min-width: 240px; background: var(--ember-deep); padding: var(--e-4); border-top: 3px solid var(--fire-yellow); }
+.star-precio__bloque--primero{ border-top-color: var(--fire-red); }
+.star-precio__etq{ display: block; font-family: var(--font-count); font-size: 11px; letter-spacing: .1em; color: var(--txt-faint); text-transform: uppercase; }
+.star-precio__num{ display: block; font-family: var(--font-display); font-weight: 800; font-size: clamp(2rem,4.4vw,2.8rem); color: var(--fire-yellow); line-height: 1; margin-top: 8px; font-variant-numeric: tabular-nums; }
+.star-precio__num small{ font-size: 14px; font-weight: 500; color: var(--txt-soft); }
+.star-precio__desglose{ list-style: none; margin: var(--e-3) 0 0; padding: var(--e-3) 0 0; border-top: 1px solid var(--hairline); display: flex; flex-direction: column; gap: 6px; }
+.star-precio__desglose li{ display: flex; justify-content: space-between; font-size: 14px; color: var(--txt-soft); }
+.star-precio__desglose b{ color: var(--chalk); }
+.star-precio__inc{ color: var(--txt-soft); font-size: 13.5px; margin-top: var(--e-3); }
+
+.star-prorrateo{ margin-top: var(--e-5); }
+.star-prorrateo__titulo{ font-family: var(--font-display); font-weight: 700; font-size: 15px; margin-bottom: var(--e-2); }
+.star-tabla{ width: 100%; max-width: 480px; border-collapse: collapse; }
+.star-tabla th, .star-tabla td{ text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--hairline); font-size: 14.5px; }
+.star-tabla th{ font-family: var(--font-count); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--fire-yellow); }
+.star-tabla td:first-child{ font-weight: 600; }
+.star-tabla__nota{ color: var(--txt-faint); font-size: 12px; }
+
+.star-politica{ margin-top: var(--e-5); background: var(--ember-deep); border-left: 4px solid var(--mat-blue); padding: var(--e-4); max-width: var(--wrap-texto); }
+.star-politica__titulo{ font-family: var(--font-display); font-weight: 700; font-size: 15px; }
+.star-politica__lista{ margin: var(--e-3) 0 0; padding-left: 20px; color: var(--txt-soft); font-size: 14.5px; line-height: 1.6; display: flex; flex-direction: column; gap: 10px; }
+.star-politica__lista b{ color: var(--chalk); }
+
+/* ---- Cierre ---- */
+.star-cierre{ text-align: center; padding: var(--e-8) 0; background: var(--ember-deep); }
+.star-cierre .star-title{ max-width: 20ch; margin-inline: auto; margin-top: var(--e-4); }
+.star-cierre .star-btn{ margin-top: var(--e-4); }
+
+@media (prefers-reduced-motion: reduce){
+  .star-btn{ transition: none; }
+  .star-btn:hover{ transform: none; }
+}
+</style>
