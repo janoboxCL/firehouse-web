@@ -1,124 +1,46 @@
 ---
 /*
-  SPARKY — mascota placeholder V1.
+  SPARKY — arte final.
   ---------------------------------------------------------------
-  Esto NO es el diseño final de Sparky. Es un placeholder de código
-  (SVG simple, sin ilustrador) para poder lanzar la página ya, con
-  "uso amplio de Sparky" desde el día uno.
+  Usa las ilustraciones definitivas en /public/media/star/. El prop
+  `pose` sigue siendo la referencia de qué gesto va en cada sección:
 
-  Cuando exista la ilustración final (dioramas/escenas 3D según la
-  estrategia), reemplazar este componente por <img>/<picture> con el
-  archivo definitivo, manteniendo el mismo prop `pose` como referencia
-  de qué gesto va en cada sección:
-
-    idle     → parado, neutro (hero, navegación)
-    wave     → saludando (sección "Sparky tampoco sabía cheer")
-    dizzy    → mareado / recién intentando algo (escenas de clase)
-    excited  → celebrando, brazos arriba (CTA final, logros)
+    idle     → parado, neutro (secciones informativas)
+    wave     → saludando con una pata (hero)
+    dizzy    → mareado / intentando algo (escenas de aprendizaje)
+    excited  → celebrando, brazos arriba (CTA, logros)
     tired    → tirado, agotado (cierre divertido)
 
-  Prop `size` en px (ancho). El alto se ajusta solo (viewBox 100x120).
+  Prop `size`: ancho en px. El alto se ajusta solo según la imagen real
+  (cada pose tiene su propia proporción, ya no un viewBox fijo).
 */
-const { pose = 'idle', size = 120, flip = false, class: claseExtra = '' } = Astro.props;
+const {
+  pose = 'idle', size = 120, flip = false,
+  class: claseExtra = '', alt = 'Sparky, la mascota de Firehouse',
+} = Astro.props;
+
+const base = `/media/star/sparky-${pose}`;
 ---
-<div
-  class:list={['sparky', `sparky--${pose}`, claseExtra]}
+<picture
+  class:list={['sparky', claseExtra]}
   style={`--sparky-size:${size}px; --sparky-flip:${flip ? -1 : 1}`}
-  role="img"
-  aria-label="Sparky, la mascota de Firehouse"
 >
-  <svg viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg" class="sparky__svg">
-    <!-- sombra de piso -->
-    <ellipse class="sparky__sombra" cx="50" cy="114" rx="26" ry="5" />
-
-    <!-- piernas -->
-    <g class="sparky__piernas">
-      <rect x="36" y="92" width="10" height="18" rx="5" class="sparky__pierna" />
-      <rect x="54" y="92" width="10" height="18" rx="5" class="sparky__pierna" />
-    </g>
-
-    <!-- cuerpo: flama que remata en punta de estrella -->
-    <path
-      class="sparky__cuerpo"
-      d="M50 6
-         C 66 6 74 22 70 36
-         C 82 40 90 52 88 66
-         C 86 84 70 98 50 98
-         C 30 98 14 84 12 66
-         C 10 52 18 40 30 36
-         C 26 22 34 6 50 6 Z"
-    />
-
-    <!-- panza -->
-    <ellipse class="sparky__panza" cx="50" cy="64" rx="20" ry="24" />
-
-    <!-- estrella insignia en el pecho -->
-    <path class="sparky__insignia"
-      d="M50 50 L53.5 58 62 58.6 55.4 64 57.6 72.4 50 67.6 42.4 72.4 44.6 64 38 58.6 46.5 58 Z" />
-
-    <!-- brazos (varían con la pose) -->
-    <g class="sparky__brazos">
-      <path class="sparky__brazo sparky__brazo--izq" d="M22 60 Q6 66 8 80" />
-      <path class="sparky__brazo sparky__brazo--der" d="M78 60 Q94 66 92 80" />
-    </g>
-
-    <!-- cara -->
-    <g class="sparky__cara">
-      <ellipse class="sparky__ojo" cx="41" cy="46" rx="6.5" ry="8" />
-      <ellipse class="sparky__ojo" cx="59" cy="46" rx="6.5" ry="8" />
-      <circle class="sparky__pupila" cx="42.5" cy="48" r="2.6" />
-      <circle class="sparky__pupila" cx="60.5" cy="48" r="2.6" />
-      <path class="sparky__boca" d="M42 58 Q50 66 58 58" />
-      <ellipse class="sparky__cachete" cx="33" cy="54" rx="4" ry="2.6" />
-      <ellipse class="sparky__cachete" cx="67" cy="54" rx="4" ry="2.6" />
-    </g>
-  </svg>
-</div>
+  <source srcset={`${base}.webp`} type="image/webp" />
+  <img src={`${base}.png`} alt={alt} loading="lazy" decoding="async" />
+</picture>
 
 <style>
 .sparky{
   --sparky-size: 120px;
   --sparky-flip: 1;
-  width: var(--sparky-size);
-  aspect-ratio: 100 / 120;
   display: inline-block;
+  width: var(--sparky-size);
   transform: scaleX(var(--sparky-flip));
-  filter: drop-shadow(0 6px 10px rgba(23,20,18,.35));
+  filter: drop-shadow(0 6px 10px rgba(23,20,18,.45));
 }
-.sparky__svg{ width:100%; height:100%; overflow:visible; }
+.sparky img{ display: block; width: 100%; height: auto; }
 
-.sparky__sombra{ fill: rgba(23,20,18,.30); }
-.sparky__cuerpo{ fill: var(--fire-yellow); stroke: var(--ember); stroke-width: 2.5; }
-.sparky__panza{ fill: var(--chalk); opacity:.92; }
-.sparky__insignia{ fill: var(--fire-red); }
-.sparky__pierna{ fill: var(--fire-red); }
-.sparky__brazo{ fill:none; stroke: var(--fire-red); stroke-width: 8; stroke-linecap: round; }
-.sparky__ojo{ fill: var(--chalk); }
-.sparky__pupila{ fill: var(--ember); }
-.sparky__boca{ fill:none; stroke: var(--ember); stroke-width: 3; stroke-linecap: round; }
-.sparky__cachete{ fill: var(--fire-red); opacity:.4; }
-
-/* ---- variantes de pose (placeholder: gesto vía transform, no arte nuevo) ---- */
-.sparky--wave .sparky__brazo--der{ d: path('M78 58 Q98 42 90 26'); }
-.sparky--wave .sparky__ojo{ ry: 8.5; }
-
-.sparky--dizzy .sparky__ojo{ ry: 5; }
-.sparky--dizzy .sparky__pupila{ r: 3.4; }
-.sparky--dizzy .sparky__cuerpo{ transform-origin: 50px 60px; transform: rotate(-6deg); }
-.sparky--dizzy .sparky__brazo--izq{ d: path('M22 62 Q2 54 4 40'); }
-
-.sparky--excited .sparky__brazo--izq{ d: path('M22 58 Q0 40 10 20'); }
-.sparky--excited .sparky__brazo--der{ d: path('M78 58 Q100 40 90 20'); }
-.sparky--excited .sparky__boca{ d: path('M40 58 Q50 70 60 58'); }
-
-.sparky--tired{ transform-origin: 50% 100%; }
-.sparky--tired .sparky__cuerpo{ transform-origin: 50px 90px; transform: rotate(-90deg) translate(-6px,-4px); }
-.sparky--tired .sparky__panza{ transform-origin: 50px 90px; transform: rotate(-90deg) translate(-6px,-4px); }
-.sparky--tired .sparky__piernas,
-.sparky--tired .sparky__insignia{ opacity: .0; }
-.sparky--tired .sparky__ojo{ ry: 2.4; }
-
-/* ---- animación de entrada (usada en el hero) ---- */
+/* ---- animación de entrada (hero) ---- */
 @keyframes sparky-entra{
   0%   { transform: scaleX(var(--sparky-flip)) translateY(46px) scale(.7); opacity: 0; }
   60%  { transform: scaleX(var(--sparky-flip)) translateY(-8px) scale(1.04); opacity: 1; }

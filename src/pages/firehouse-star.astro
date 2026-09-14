@@ -74,9 +74,8 @@ const preguntas = [
             fill="none" stroke="currentColor" stroke-width="5" stroke-linejoin="round"/>
     </svg>
     <div class="wrap star-split">
-      <div class="star-placeholder star-placeholder--ilustracion reveal">
-        <Sparky pose="dizzy" size={130} class="sparky--flota" />
-        <p class="star-placeholder__nota">Ilustración final pendiente — escena: Sparky intentando un movimiento sencillo</p>
+      <div class="star-panel-img reveal">
+        <Sparky pose="dizzy" size={220} class="sparky--flota" alt="Sparky mareado, intentando un movimiento sencillo" />
       </div>
       <div class="reveal star-reveal-2">
         <p class="star-eyebrow">La idea central</p>
@@ -98,36 +97,66 @@ const preguntas = [
 
       <ol class="star-escenas">
         <li class="star-escena reveal">
-          <div class="star-placeholder" aria-hidden="true"><Sparky pose="idle" size={64} /></div>
-          <div>
+          <div class="star-escena__img">
+            <picture>
+              <source srcset="/media/star/escena-activamos.webp" type="image/webp" />
+              <img src="/media/star/escena-activamos.jpg" alt="Sparky y los niños estirando antes de empezar la clase Star" loading="lazy" decoding="async" />
+            </picture>
+          </div>
+          <div class="star-escena__texto">
+            <span class="star-escena__num">1</span>
             <h3>Nos activamos 🔥</h3>
             <p>Empezamos moviéndonos, entrando en calor y preparando el cuerpo.</p>
           </div>
         </li>
         <li class="star-escena reveal">
-          <div class="star-placeholder" aria-hidden="true"><Sparky pose="dizzy" size={64} /></div>
-          <div>
+          <div class="star-escena__img">
+            <picture>
+              <source srcset="/media/star/escena-jugamos.webp" type="image/webp" />
+              <img src="/media/star/escena-jugamos.jpg" alt="Sparky y los niños en un circuito de conos, jugando y moviéndose" loading="lazy" decoding="async" />
+            </picture>
+          </div>
+          <div class="star-escena__texto">
+            <span class="star-escena__num">2</span>
             <h3>Jugamos y nos movemos 🎯</h3>
             <p>Juegos, circuitos y pequeños desafíos para moverse, reaccionar y coordinar.</p>
           </div>
         </li>
         <li class="star-escena reveal">
-          <div class="star-placeholder" aria-hidden="true"><Sparky pose="idle" size={64} /></div>
-          <div>
+          <div class="star-escena__img">
+            <picture>
+              <source srcset="/media/star/escena-descubrimos.webp" type="image/webp" />
+              <img src="/media/star/escena-descubrimos.jpg" alt="Niños de Star practicando una posición de cheer junto a Sparky" loading="lazy" decoding="async" />
+            </picture>
+          </div>
+          <div class="star-escena__texto">
+            <span class="star-escena__num">3</span>
             <h3>Descubrimos el cheer ⭐</h3>
             <p>Aprendemos posiciones, movimientos, saltos y fundamentos adaptados a cada nivel.</p>
           </div>
         </li>
         <li class="star-escena reveal">
-          <div class="star-placeholder" aria-hidden="true"><Sparky pose="wave" size={64} /></div>
-          <div>
+          <div class="star-escena__img">
+            <picture>
+              <source srcset="/media/star/escena-juntos.webp" type="image/webp" />
+              <img src="/media/star/escena-juntos.jpg" alt="Sparky y los niños de Star con las manos juntas al centro, en equipo" loading="lazy" decoding="async" />
+            </picture>
+          </div>
+          <div class="star-escena__texto">
+            <span class="star-escena__num">4</span>
             <h3>Lo hacemos juntos 🙌</h3>
             <p>Aprendemos a escuchar, esperar, colaborar y trabajar con otros.</p>
           </div>
         </li>
         <li class="star-escena reveal">
-          <div class="star-placeholder" aria-hidden="true"><Sparky pose="excited" size={64} /></div>
-          <div>
+          <div class="star-escena__img">
+            <picture>
+              <source srcset="/media/star/escena-celebramos.webp" type="image/webp" />
+              <img src="/media/star/escena-celebramos.jpg" alt="Sparky y los niños de Star celebrando saltando, con estrellas alrededor" loading="lazy" decoding="async" />
+            </picture>
+          </div>
+          <div class="star-escena__texto">
+            <span class="star-escena__num">5</span>
             <h3>Celebramos lo aprendido 🎉</h3>
             <p>Cada clase termina con algo nuevo que intentamos, aprendimos o conseguimos.</p>
           </div>
@@ -381,30 +410,39 @@ const preguntas = [
 .star-split > *{ flex: 1; }
 @media (max-width: 900px){ .star-split{ flex-direction: column; } }
 
-/* ---- Placeholders de ilustración (mientras no exista arte final) ---- */
-.star-placeholder{
-  position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center;
-  gap: var(--e-2); text-align: center; padding: var(--e-4);
-  background:
-    repeating-linear-gradient(135deg, rgba(255,196,0,.07) 0 14px, transparent 14px 28px),
-    var(--ember-deep);
-  border: 1.5px dashed rgba(255,196,0,.35); border-radius: 18px;
+/* ---- Panel de imagen (sección "Sparky tampoco sabía cheer") ---- */
+.star-panel-img{
+  display: flex; align-items: center; justify-content: center;
+  min-height: 240px; padding: var(--e-4);
 }
-.star-placeholder--ilustracion{ min-height: 240px; }
-.star-placeholder__nota{ color: var(--txt-faint); font-size: 12px; font-family: var(--font-count); max-width: 26ch; }
 
 /* ---- Escenas de clase (sí es una secuencia real → numerarla tiene sentido) ---- */
-.star-escenas{ list-style: none; margin: var(--e-6) 0 0; padding: 0; display: flex; flex-direction: column; gap: var(--e-4); counter-reset: escena; }
-.star-escena{ display: flex; align-items: center; gap: var(--e-4); counter-increment: escena; position: relative; }
-.star-escena::before{
-  content: counter(escena); flex: none; width: 30px; text-align: center;
-  font-family: var(--font-count); font-weight: 700; color: var(--fire-yellow); font-size: 14px;
+.star-escenas{ list-style: none; margin: var(--e-6) 0 0; padding: 0; display: flex; flex-direction: column; gap: var(--e-5); }
+.star-escena{ display: flex; align-items: center; gap: var(--e-5); position: relative; }
+.star-escena:nth-child(even){ flex-direction: row-reverse; }
+
+.star-escena__img{
+  flex: none; width: 42%; max-width: 380px; aspect-ratio: 16 / 10;
+  overflow: hidden; border-radius: 4px; position: relative;
+  border-top: 3px solid var(--fire-yellow); transition: transform var(--t-interfaz) ease;
 }
-.star-escena .star-placeholder{ flex: none; width: 90px; height: 90px; padding: var(--e-2); transition: transform var(--t-interfaz) ease; }
-.star-escena:hover .star-placeholder{ transform: scale(1.06) rotate(-2deg); }
-.star-escena h3{ font-family: var(--font-display); font-weight: 800; font-size: 17px; }
-.star-escena p{ color: var(--txt-soft); font-size: 14.5px; margin-top: 4px; max-width: 52ch; }
-@media (max-width: 640px){ .star-escena{ gap: var(--e-3); } .star-escena::before{ width: 22px; } }
+.star-escena:nth-child(2) .star-escena__img{ border-top-color: var(--mat-blue); }
+.star-escena:nth-child(3) .star-escena__img{ border-top-color: var(--fire-red); }
+.star-escena:nth-child(4) .star-escena__img{ border-top-color: var(--mat-blue); }
+.star-escena:hover .star-escena__img{ transform: scale(1.02); }
+.star-escena__img picture, .star-escena__img img{ width: 100%; height: 100%; object-fit: cover; display: block; }
+
+.star-escena__texto{ flex: 1; position: relative; }
+.star-escena__num{
+  display: inline-block; font-family: var(--font-count); font-weight: 700;
+  color: var(--fire-yellow); font-size: 13px; margin-bottom: 4px;
+}
+.star-escena h3{ font-family: var(--font-display); font-weight: 800; font-size: 19px; }
+.star-escena p{ color: var(--txt-soft); font-size: 15px; margin-top: 6px; max-width: 46ch; }
+@media (max-width: 760px){
+  .star-escena, .star-escena:nth-child(even){ flex-direction: column; gap: var(--e-3); }
+  .star-escena__img{ width: 100%; max-width: none; }
+}
 
 .star-escenas .star-escena:nth-child(2){ transition-delay: 90ms; }
 .star-escenas .star-escena:nth-child(3){ transition-delay: 180ms; }
@@ -486,7 +524,7 @@ html.js .star-nunca__grande.reveal.visible{ transform: scale(1); opacity: 1; }
   .star-objeto{ animation: none; }
   .star-card{ transition: none; }
   .star-card:hover{ transform: none; }
-  .star-escena .star-placeholder{ transition: none; }
+  .star-escena__img{ transition: none; }
   html.js .star-nunca__grande.reveal{ transform: none; transition: opacity 200ms ease; }
 }
 </style>
