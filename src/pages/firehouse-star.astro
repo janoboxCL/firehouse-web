@@ -203,10 +203,14 @@ const navEnlacesStar = [
         </svg>
 
         <div class="star-camino__lado reveal star-reveal-2">
-          <div class="star-camino__foto">
+          <div class="star-camino__duo">
             <picture>
-              <source srcset="/media/gal-stunt.webp" type="image/webp" />
-              <img src="/media/gal-stunt.jpg" alt="Deportistas del equipo de competencia Firehouse entrenando un stunt" loading="lazy" decoding="async" />
+              <source srcset="/media/star/blaze.webp" type="image/webp" />
+              <img src="/media/star/blaze.png" alt="Blaze, personaje de Firehouse All Star" loading="lazy" decoding="async" />
+            </picture>
+            <picture>
+              <source srcset="/media/star/nova.webp" type="image/webp" />
+              <img src="/media/star/nova.png" alt="Nova, personaje de Firehouse All Star" loading="lazy" decoding="async" />
             </picture>
           </div>
           <p class="star-camino__marca">FIREHOUSE ALL STAR</p>
@@ -535,14 +539,16 @@ const navEnlacesStar = [
 /* ---- El camino Firehouse ---- */
 .star-camino__grid{ display: flex; align-items: center; gap: var(--e-4); margin-top: var(--e-6); }
 .star-camino__lado{ flex: 1; text-align: center; }
-.star-camino__foto{ aspect-ratio: 1; max-width: 170px; margin-inline: auto; overflow: hidden; border-radius: 50%; border: 3px solid var(--fire-red); }
-.star-camino__foto picture, .star-camino__foto img{ width: 100%; height: 100%; object-fit: cover; display: block; }
+.star-camino__duo{ display: flex; justify-content: center; align-items: flex-end; }
+.star-camino__duo img{ display: block; height: 175px; width: auto; filter: drop-shadow(0 6px 10px rgba(23,20,18,.45)); }
+.star-camino__duo picture:last-child img{ margin-left: -22px; }
 .star-camino__marca{ font-family: var(--font-display); font-weight: 800; font-size: 15px; margin-top: var(--e-3); }
 .star-camino__accion{ color: var(--txt-faint); font-size: 12px; font-family: var(--font-count); text-transform: uppercase; letter-spacing: .08em; margin-top: 2px; }
 .star-camino__flecha{ width: 70px; color: var(--fire-yellow); flex: none; opacity: .8; }
 @media (max-width: 760px){
   .star-camino__grid{ flex-direction: column; }
   .star-camino__flecha{ width: 34px; transform: rotate(90deg); }
+  .star-camino__duo img{ height: 140px; }
 }
 
 /* ---- Tarjetas (aprendizaje / starter pack) ---- */
