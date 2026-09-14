@@ -133,7 +133,15 @@ const { pose = 'idle', size = 120, flip = false, class: claseExtra = '' } = Astr
 }
 .sparky--flota{ animation: sparky-flota 3.2s ease-in-out infinite; }
 
+@keyframes sparky-salta{
+  0%, 100% { transform: scaleX(var(--sparky-flip)) translateY(0) scale(1); }
+  30%      { transform: scaleX(var(--sparky-flip)) translateY(-14px) scale(1.03); }
+  50%      { transform: scaleX(var(--sparky-flip)) translateY(0) scale(.98); }
+  65%      { transform: scaleX(var(--sparky-flip)) translateY(-4px) scale(1.01); }
+}
+.sparky--salta{ animation: sparky-salta 1.8s ease-in-out infinite; }
+
 @media (prefers-reduced-motion: reduce){
-  .sparky--entrada, .sparky--flota{ animation: none; }
+  .sparky--entrada, .sparky--flota, .sparky--salta{ animation: none; }
 }
 </style>
