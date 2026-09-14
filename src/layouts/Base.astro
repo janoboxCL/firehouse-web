@@ -9,7 +9,7 @@ import { sitio, whatsapp } from '../data/sitio.js';
 const {
   titulo, descripcion, ruta = '', preguntas = null, miga = null, noindex = false, minimal = false, ogImagen = null,
   etiquetaMinima = 'Gran Concurso', mensajeWhatsappMinima = 'sorteo',
-  navCtaHref = null, navCtaTexto = null, navCtaTextoCorto = null, navCtaExterno = true,
+  navCtaHref = null, navCtaTexto = null, navCtaTextoCorto = null, navCtaExterno = true, navEnlaces = null,
 } = Astro.props;
 const canonical = `${sitio.url}${ruta}`;
 const imagenOg = ogImagen ? `${sitio.url}${ogImagen}` : `${sitio.url}/og.jpg`;
@@ -118,6 +118,7 @@ const schema = {
            {...(navCtaHref ? { ctaHref: navCtaHref } : {})}
            {...(navCtaTexto ? { ctaTexto: navCtaTexto } : {})}
            {...(navCtaTextoCorto ? { ctaTextoCorto: navCtaTextoCorto } : {})}
+           {...(navEnlaces ? { enlaces: navEnlaces } : {})}
            ctaExterno={navCtaExterno} />
     </>
   )}

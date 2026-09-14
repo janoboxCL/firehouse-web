@@ -4,7 +4,7 @@ import Faq from '../components/Faq.astro';
 import Sparky from '../components/Sparky.astro';
 
 const titulo = 'Firehouse Star — cheerleading desde cero para niñas y niños desde 4 años | Firehouse Cheer';
-const descripcion = 'Firehouse Star es la primera experiencia Firehouse: una clase semanal de cheerleading para empezar desde cero, sin necesidad de experiencia previa. Sábados en La Cisterna.';
+const descripcion = 'Firehouse Star es el programa de iniciación de Firehouse Cheer: una clase semanal para descubrir el cheer desde cero, sin experiencia previa. Sábados en La Cisterna.';
 
 const preguntas = [
   { p: 'Mi hijo nunca ha hecho cheer.',
@@ -14,7 +14,7 @@ const preguntas = [
   { p: '¿Es muy exigente?',
     r: 'Es una clase semanal de 90 minutos donde se mezclan movimiento, juegos y fundamentos del cheer. No es un entrenamiento de competencia.' },
   { p: '¿Va a competir?',
-    r: 'No. Firehouse Star no compite: es la puerta de entrada al cheer. Si en marzo de 2027 quiere sumarse a un equipo de competencia, puede iniciar el proceso de incorporación a la temporada en ese momento.' },
+    r: 'No. Firehouse Star no compite: es la puerta de entrada al cheer. Si en marzo de 2027 quiere sumarse a un equipo de competencia (Firehouse All Star), puede iniciar el proceso de incorporación a la temporada en ese momento.' },
   { p: '¿Existe clase de prueba?',
     r: 'Durante esta etapa, Firehouse Star funciona por inscripción directa, sin clase de prueba gratuita. Para bajar el riesgo de esa decisión, si ningún horario disponible resulta compatible con tu familia, la inscripción se reembolsa completa; y si te arrepientes antes de la primera clase sin que exista ese problema, el pago queda como crédito Firehouse por 90 días, para este hijo o para un hermano.' },
   { p: '¿Existe permanencia mínima?',
@@ -22,23 +22,38 @@ const preguntas = [
   { p: '¿Qué pasa si me inscribo a mitad de mes?',
     r: 'La mensualidad se ajusta a las clases que queden en el mes: se paga solo por las semanas de clase a las que efectivamente se llega, nunca el mes completo si se entra después de la primera semana.' },
 ];
+
+const navEnlacesStar = [
+  { href: '/', texto: 'Inicio' },
+  { href: '/firehouse-star#clase', texto: 'Cómo es una clase' },
+  { href: '/firehouse-star#camino', texto: 'El camino Firehouse' },
+  { href: '/firehouse-star#precio', texto: 'Precio' },
+  { href: '/firehouse-star#preguntas', texto: 'Preguntas' },
+];
 ---
 <Base titulo={titulo} descripcion={descripcion} ruta="/firehouse-star" preguntas={preguntas} miga="Firehouse Star"
-      navCtaHref="/registro?origen=star" navCtaTexto="Inscríbete en Star ⭐" navCtaTextoCorto="Star ⭐" navCtaExterno={false}>
+      navCtaHref="/registro?origen=star" navCtaTexto="Inscríbete en Star ⭐" navCtaTextoCorto="Star ⭐"
+      navCtaExterno={false} navEnlaces={navEnlacesStar}>
 
   <!-- ============ HERO ============ -->
   <section class="star-hero">
     <div class="star-hero__glow" aria-hidden="true"></div>
-    <svg class="star-hero__estrella" viewBox="0 0 120 120" aria-hidden="true">
-      <path d="M60 8 74.6 45.2 114 47.9 83.6 73.1 93.4 111.4 60 89.2 26.6 111.4 36.4 73.1 6 47.9 45.4 45.2 60 8Z" fill="currentColor"/>
-    </svg>
 
     <div class="wrap star-hero__grid">
       <div class="star-hero__texto">
-        <p class="star-hero__logo reveal star-reveal-1">FIREHOUSE <span>STAR</span></p>
-        <p class="star-count reveal star-reveal-1">⭐ DESDE LOS 4 AÑOS · SIN EXPERIENCIA PREVIA</p>
-        <h1 class="star-hero__titulo reveal star-reveal-2">No necesita saber cheer.</h1>
-        <p class="star-hero__bajada reveal star-reveal-3">Solo tener ganas de empezar.</p>
+        <p class="star-hero__kicker reveal star-reveal-1">EL PROGRAMA DE INICIACIÓN DE FIREHOUSE CHEER</p>
+
+        <picture class="star-hero__logo reveal star-reveal-1">
+          <source srcset="/media/star/logo-firehouse-star.webp" type="image/webp" />
+          <img src="/media/star/logo-firehouse-star.png" alt="Firehouse Star" width="360" />
+        </picture>
+
+        <h1 class="star-hero__titulo reveal star-reveal-2">Aquí comienzan las próximas estrellas de Firehouse.</h1>
+        <p class="star-hero__bajada reveal star-reveal-3">
+          Desde los 4 años · sin experiencia previa · una primera experiencia de cheer
+          para descubrir, aprender y crecer dentro de Firehouse.
+        </p>
+        <p class="star-hero__submensaje reveal star-reveal-3">No necesita saber cheer. Solo ganas de empezar. ⭐</p>
 
         <ul class="star-datos reveal star-reveal-4">
           <li>
@@ -66,7 +81,7 @@ const preguntas = [
       </div>
 
       <div class="star-hero__sparky-wrap">
-        <Sparky pose="wave" size={380} class="sparky--flota" alt="Sparky saludando, dando la bienvenida a Firehouse Star" />
+        <Sparky pose="wave" size={340} class="sparky--flota" alt="Sparky saludando, dando la bienvenida a Firehouse Star" />
       </div>
     </div>
   </section>
@@ -161,6 +176,42 @@ const preguntas = [
             <p>Algo nuevo logrado, en cada clase.</p>
           </div>
         </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ EL CAMINO FIREHOUSE ============ -->
+  <section class="star-section star-camino" id="camino">
+    <div class="wrap">
+      <p class="star-eyebrow">El camino Firehouse</p>
+      <h2 class="star-title">Star es donde comienza el camino.</h2>
+      <p class="star-parrafo">
+        Firehouse Star es nuestra puerta de entrada al cheer. Quienes quieran seguir
+        creciendo podrán, cuando corresponda, dar el siguiente paso hacia los equipos
+        de competencia Firehouse.
+      </p>
+
+      <div class="star-camino__grid">
+        <div class="star-camino__lado reveal">
+          <Sparky pose="idle" size={120} alt="Sparky representa el punto de partida en Firehouse Star" />
+          <p class="star-camino__marca">FIREHOUSE STAR</p>
+          <p class="star-camino__accion">Descubrir · jugar · aprender</p>
+        </div>
+
+        <svg class="star-camino__flecha" viewBox="0 0 120 40" aria-hidden="true">
+          <path d="M4 20h100M84 6l20 14-20 14" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+
+        <div class="star-camino__lado reveal star-reveal-2">
+          <div class="star-camino__foto">
+            <picture>
+              <source srcset="/media/gal-stunt.webp" type="image/webp" />
+              <img src="/media/gal-stunt.jpg" alt="Deportistas del equipo de competencia Firehouse entrenando un stunt" loading="lazy" decoding="async" />
+            </picture>
+          </div>
+          <p class="star-camino__marca">FIREHOUSE ALL STAR</p>
+          <p class="star-camino__accion">Entrenar · crecer · competir</p>
+        </div>
       </div>
     </div>
   </section>
@@ -275,14 +326,7 @@ const preguntas = [
             </tbody>
           </table>
         </details>
-
-        <details class="star-detalle">
-          <summary>¿Qué pasa si no funciona el horario, o me arrepiento?</summary>
-          <ul class="star-politica__lista">
-            <li><b>Si el problema es nuestro</b> — ningún horario disponible resulta compatible con tu familia — reembolsamos completa la inscripción de $10.000.</li>
-            <li><b>Si cambias de opinión</b> antes de la primera clase, sin que exista ese problema, el pago queda como <b>crédito Firehouse por 90 días</b>, usable para este hijo o un hermano.</li>
-          </ul>
-        </details>
+        <p class="star-nota">¿Qué pasa si no funciona el horario o me arrepiento? Está respondido en las preguntas frecuentes, más abajo.</p>
       </div>
     </div>
   </section>
@@ -311,6 +355,7 @@ const preguntas = [
   <!-- ============ CTA FINAL ============ -->
   <section class="star-cierre">
     <div class="wrap reveal">
+      <p class="star-cierre__previo">Toda estrella de Firehouse tuvo un primer día.</p>
       <Sparky pose="excited" size={110} class="sparky--salta" alt="Sparky celebrando con los brazos arriba" />
       <h2 class="star-title">¿Empezamos? ⭐</h2>
       <p class="star-parrafo star-parrafo--centro">No tiene que llegar sabiendo.<br />Solo tiene que empezar.</p>
@@ -319,14 +364,34 @@ const preguntas = [
     </div>
   </section>
 
+  <!-- ============ BARRA FIJA MÓVIL ============ -->
+  <div class="star-barra-fija" id="star-barra-fija">
+    <div class="star-barra-fija__info"><b>STAR</b><span>$30.000/mes</span></div>
+    <a class="star-btn star-btn--chica" href="/registro?origen=star" id="wa-star-barra">QUIERO EMPEZAR ⭐</a>
+  </div>
+
 </Base>
+
+<script>
+  (() => {
+    const barra = document.getElementById('star-barra-fija');
+    const hero = document.querySelector('.star-hero');
+    if (!barra || !hero || !('IntersectionObserver' in window)) return;
+    const obs = new IntersectionObserver(([entrada]) => {
+      barra.classList.toggle('visible', !entrada.isIntersecting);
+    }, { rootMargin: '-10% 0px 0px 0px' });
+    obs.observe(hero);
+  })();
+</script>
 
 <style>
 /*
-  Paleta Firehouse Star: se apoya en los tokens de marca (sin inventar
-  colores nuevos). Amarillo = acento dominante de Star. Botones en color
-  sólido, sin degradados. Decoración reducida a lo que tiene función —
-  nada de estrellitas/fuego rellenando espacio porque sí.
+  Sistema de color Firehouse Star (revisado): el rojo Firehouse vuelve a
+  ser el color de acción (CTA), tal como en el resto del sitio. El
+  amarillo se reserva para acentos, bordes, íconos y números — no para
+  rellenos grandes. La única sección que rompe la base oscura es
+  "Sparky tampoco sabía cheer" (fondo crema), una decisión deliberada,
+  no un accidente.
 */
 
 .star-eyebrow{
@@ -345,30 +410,31 @@ const preguntas = [
 .star-title{ font-family: var(--font-display); font-weight: 800; font-size: clamp(1.7rem, 3.6vw, 2.6rem); line-height: 1.05; margin-top: var(--e-3); }
 .star-parrafo{ color: var(--txt-soft); max-width: var(--wrap-texto); margin-top: var(--e-3); font-size: clamp(1rem,1.5vw,1.15rem); line-height: 1.6; }
 .star-parrafo--centro{ margin-inline: auto; text-align: center; }
-.star-nota{ color: var(--txt-faint); font-size: 14px; margin-top: var(--e-3); max-width: var(--wrap-texto); }
+.star-nota{ color: var(--txt-faint); font-size: 13px; margin-top: var(--e-3); max-width: var(--wrap-texto); }
 .star-cta-texto{ color: var(--fire-yellow); text-decoration: none; border-bottom: 2px solid var(--fire-yellow); font-size: 15px; }
 .star-cta-texto:hover{ color: var(--chalk); border-bottom-color: var(--chalk); }
 
-/* Botón sólido — sin degradados */
+/* Botón sólido — rojo Firehouse, como el resto del sitio */
 .star-btn{
   display: inline-flex; align-items: center; justify-content: center; min-height: 48px;
-  background: var(--fire-yellow); color: var(--ember); font-weight: 800; font-size: 16px;
+  background: var(--fire-red); color: #fff; font-weight: 800; font-size: 16px;
   font-family: var(--font-display);
   padding: 14px 30px; border-radius: var(--radio); text-decoration: none;
   transition: transform var(--t-interfaz) ease, background var(--t-interfaz) ease;
 }
-.star-btn:hover{ background: #E6B000; transform: translateY(-2px); }
-.star-btn:focus-visible{ outline: 3px solid var(--chalk); outline-offset: 3px; }
+.star-btn:hover{ background: #a91111; transform: translateY(-2px); }
+.star-btn:focus-visible{ outline: 3px solid var(--fire-yellow); outline-offset: 3px; }
 .star-btn--full{ display: flex; width: 100%; margin-top: var(--e-4); }
+.star-btn--chica{ padding: 10px 18px; font-size: 13px; min-height: 40px; }
 .star-btn-quiet{ color: rgba(245,239,232,.78); font-size: 15px; text-decoration: underline; }
 .star-hero__cta{ display: flex; flex-direction: column; align-items: flex-start; gap: var(--e-2); margin-top: var(--e-5); }
 
-/* Brillo pulsante reservado a los CTA de mayor peso — referencia literal
-   a "sal brillando", no decoración porque sí */
+/* Brillo pulsante dorado alrededor del botón rojo — referencia literal
+   a "sal brillando"; se conserva aunque el botón cambió de color */
 .star-btn--brilla{ animation: star-brillo 2.6s ease-in-out infinite; }
 .star-btn--brilla:hover{ animation-play-state: paused; }
 @keyframes star-brillo{
-  0%, 100% { box-shadow: 0 0 0 0 rgba(255,196,0,.55); }
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255,196,0,.5); }
   50%      { box-shadow: 0 0 0 10px rgba(255,196,0,0); }
 }
 
@@ -377,16 +443,17 @@ const preguntas = [
 .star-hero__glow{
   position: absolute; right: -8%; top: 50%; transform: translateY(-50%);
   width: 56vw; max-width: 640px; aspect-ratio: 1; border-radius: 50%;
-  background: radial-gradient(circle, rgba(255,196,0,.22) 0%, rgba(255,196,0,0) 70%);
+  background: radial-gradient(circle, rgba(255,196,0,.20) 0%, rgba(255,196,0,0) 70%);
   pointer-events: none;
 }
-.star-hero__estrella{ position: absolute; right: -4%; top: 50%; transform: translateY(-50%); width: 42vw; max-width: 520px; color: var(--fire-yellow); opacity: .07; pointer-events: none; }
-
 .star-hero__grid{ position: relative; display: grid; grid-template-columns: 1.15fr 1fr; gap: var(--e-6); align-items: center; }
-.star-hero__logo{ font-family: var(--font-display); font-weight: 800; font-size: 15px; letter-spacing: .1em; color: var(--chalk); text-transform: uppercase; }
-.star-hero__logo span{ color: var(--fire-yellow); }
-.star-hero__titulo{ font-family: var(--font-display); font-weight: 800; font-size: clamp(2.1rem, 4.4vw, 3.4rem); line-height: 1.05; margin-top: var(--e-3); }
-.star-hero__bajada{ font-family: var(--font-display); font-weight: 800; font-size: clamp(1.3rem, 2.4vw, 1.9rem); color: var(--fire-yellow); margin-top: 2px; }
+
+.star-hero__kicker{ font-family: var(--font-count); font-weight: 700; font-size: 11.5px; letter-spacing: .18em; color: var(--txt-faint); text-transform: uppercase; }
+.star-hero__logo{ display: block; margin: var(--e-2) 0; }
+.star-hero__logo img{ width: min(360px, 100%); height: auto; display: block; }
+.star-hero__titulo{ font-family: var(--font-display); font-weight: 800; font-size: clamp(1.9rem, 4vw, 3rem); line-height: 1.08; margin-top: var(--e-2); }
+.star-hero__bajada{ color: rgba(245,239,232,.9); font-size: clamp(.95rem,1.3vw,1.05rem); margin-top: var(--e-3); max-width: 46ch; line-height: 1.55; }
+.star-hero__submensaje{ font-family: var(--font-display); font-weight: 800; font-size: clamp(1.05rem, 1.6vw, 1.25rem); color: var(--fire-yellow); margin-top: var(--e-3); }
 
 .star-hero__sparky-wrap{ position: relative; display: flex; justify-content: center; animation: star-sparky-entra 900ms 300ms cubic-bezier(.22,.61,.36,1) both; }
 @keyframes star-sparky-entra{
@@ -399,17 +466,18 @@ const preguntas = [
 @media (max-width: 900px){
   .star-hero__grid{ grid-template-columns: 1fr; text-align: center; }
   .star-hero__texto{ order: 2; }
+  .star-hero__logo img{ margin-inline: auto; }
   .star-hero__cta{ align-items: center; }
-  .star-hero__sparky-wrap{ order: 1; max-width: 240px; margin-inline: auto; }
-  .star-hero__estrella, .star-hero__glow{ opacity: .5; }
+  .star-hero__sparky-wrap{ order: 1; max-width: 220px; margin-inline: auto; }
+  .star-hero__glow{ opacity: .6; }
   .star-datos{ margin-inline: auto; }
 }
 
 .star-datos{ display: grid; grid-template-columns: repeat(auto-fit,minmax(130px,1fr)); gap: 10px; margin: var(--e-5) 0 0; padding: 0; list-style: none; max-width: 480px; }
-.star-datos li{ background: var(--fire-yellow); color: var(--ember); padding: var(--e-3) var(--e-2); border-radius: 10px; display: flex; flex-direction: column; align-items: center; gap: 2px; }
-.star-datos__icono{ width: 26px; height: 26px; color: var(--ember); margin-bottom: 4px; }
-.star-datos span{ display: block; font-family: var(--font-count); font-size: 10.5px; letter-spacing: .1em; color: rgba(23,20,18,.65); text-transform: uppercase; }
-.star-datos b{ display: block; margin-top: 2px; font-family: var(--font-display); font-weight: 800; font-size: 16px; color: var(--ember); }
+.star-datos li{ background: var(--ember-deep); border-top: 3px solid var(--fire-yellow); padding: var(--e-3) var(--e-2); border-radius: 6px; display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.star-datos__icono{ width: 24px; height: 24px; color: var(--fire-yellow); margin-bottom: 4px; }
+.star-datos span{ display: block; font-family: var(--font-count); font-size: 10.5px; letter-spacing: .1em; color: var(--txt-faint); text-transform: uppercase; }
+.star-datos b{ display: block; margin-top: 2px; font-family: var(--font-display); font-weight: 800; font-size: 15px; color: var(--chalk); }
 
 /* ---- Secciones genéricas ---- */
 .star-section{ padding: var(--e-7) 0; }
@@ -447,11 +515,23 @@ const preguntas = [
 
 @media (min-width: 901px){
   .star-escenas{ display: grid; grid-template-columns: repeat(6, 1fr); overflow: visible; margin: var(--e-6) 0 0; padding: 0; }
-  .star-escena{ width: auto; max-width: none; grid-column: span 2; }
+  .star-escena{ width: auto; max-width: none; grid-column: span 2; transition: transform var(--t-interfaz) ease, box-shadow var(--t-interfaz) ease; }
   .star-escena:nth-child(4){ grid-column: 2 / span 2; }
   .star-escena:nth-child(5){ grid-column: 4 / span 2; }
-  .star-escena{ transition: transform var(--t-interfaz) ease, box-shadow var(--t-interfaz) ease; }
   .star-escena:hover{ transform: translateY(-4px); box-shadow: 0 10px 22px rgba(0,0,0,.28); }
+}
+
+/* ---- El camino Firehouse ---- */
+.star-camino__grid{ display: flex; align-items: center; gap: var(--e-4); margin-top: var(--e-6); }
+.star-camino__lado{ flex: 1; text-align: center; }
+.star-camino__foto{ aspect-ratio: 1; max-width: 170px; margin-inline: auto; overflow: hidden; border-radius: 50%; border: 3px solid var(--fire-red); }
+.star-camino__foto picture, .star-camino__foto img{ width: 100%; height: 100%; object-fit: cover; display: block; }
+.star-camino__marca{ font-family: var(--font-display); font-weight: 800; font-size: 15px; margin-top: var(--e-3); }
+.star-camino__accion{ color: var(--txt-faint); font-size: 12px; font-family: var(--font-count); text-transform: uppercase; letter-spacing: .08em; margin-top: 2px; }
+.star-camino__flecha{ width: 70px; color: var(--fire-yellow); flex: none; opacity: .8; }
+@media (max-width: 760px){
+  .star-camino__grid{ flex-direction: column; }
+  .star-camino__flecha{ width: 34px; transform: rotate(90deg); }
 }
 
 /* ---- Tarjetas (aprendizaje / starter pack) ---- */
@@ -463,7 +543,7 @@ const preguntas = [
 .star-card:nth-child(2n){ border-top-color: var(--mat-blue); }
 .star-card:nth-child(3n){ border-top-color: var(--fire-red); }
 .star-card:hover{ transform: translateY(-5px); box-shadow: 0 10px 22px rgba(0,0,0,.28); }
-.star-card__icono{ display: block; width: 34px; height: 34px; color: var(--fire-yellow); margin-bottom: var(--e-2); }
+.star-card__icono{ display: block; width: 42px; height: 42px; color: var(--fire-yellow); margin-bottom: var(--e-2); }
 .star-card:nth-child(2n) .star-card__icono{ color: var(--mat-blue); }
 .star-card:nth-child(3n) .star-card__icono{ color: var(--fire-red); }
 .star-card h3{ font-family: var(--font-display); font-weight: 800; font-size: 20px; }
@@ -522,8 +602,6 @@ html.js .star-nunca__grande.reveal.visible{ transform: scale(1); opacity: 1; }
 .star-tabla th{ font-family: var(--font-count); font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--fire-yellow); }
 .star-tabla td:first-child{ font-weight: 600; }
 .star-tabla__nota{ color: var(--txt-faint); font-size: 11.5px; }
-.star-detalle .star-politica__lista{ margin: var(--e-3) 0 0; padding-left: 20px; color: var(--txt-soft); font-size: 14px; line-height: 1.6; display: flex; flex-direction: column; gap: 10px; }
-.star-detalle .star-politica__lista b{ color: var(--chalk); }
 
 /* ---- Starter Pack: composición tipo "boxed set" ---- */
 .star-pack{ display: flex; align-items: center; gap: var(--e-5); margin-top: var(--e-5); max-width: 620px; background: var(--ember); border: 2px solid var(--fire-yellow); border-radius: 12px; padding: var(--e-5); }
@@ -535,8 +613,22 @@ html.js .star-nunca__grande.reveal.visible{ transform: scale(1); opacity: 1; }
 
 /* ---- Cierre ---- */
 .star-cierre{ text-align: center; padding: var(--e-8) 0; background: var(--ember-deep); }
+.star-cierre__previo{ font-family: var(--font-count); font-size: 12.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--fire-yellow); }
 .star-cierre .star-title{ max-width: 20ch; margin-inline: auto; margin-top: var(--e-4); }
 .star-cierre .star-btn{ margin-top: var(--e-4); }
+
+/* ---- Barra fija móvil ---- */
+.star-barra-fija{
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 60;
+  display: flex; align-items: center; justify-content: space-between; gap: var(--e-3);
+  background: var(--ember); border-top: 2px solid var(--fire-yellow);
+  padding: 10px 16px; transform: translateY(100%); transition: transform var(--t-interfaz) ease;
+}
+.star-barra-fija.visible{ transform: translateY(0); }
+.star-barra-fija__info{ display: flex; flex-direction: column; line-height: 1.15; }
+.star-barra-fija__info b{ font-family: var(--font-display); font-weight: 800; font-size: 14px; color: var(--fire-yellow); }
+.star-barra-fija__info span{ font-size: 12px; color: var(--txt-soft); }
+@media (min-width: 901px){ .star-barra-fija{ display: none; } }
 
 @media (prefers-reduced-motion: reduce){
   .star-btn{ transition: none; }
@@ -546,6 +638,7 @@ html.js .star-nunca__grande.reveal.visible{ transform: scale(1); opacity: 1; }
   .star-card{ transition: none; }
   .star-card:hover{ transform: none; }
   .star-escena{ transition: none; }
+  .star-barra-fija{ transition: none; }
   html.js .star-nunca__grande.reveal{ transform: none; transition: opacity 200ms ease; }
 }
 </style>
