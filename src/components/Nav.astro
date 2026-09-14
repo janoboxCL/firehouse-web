@@ -1,6 +1,12 @@
 ---
 import { whatsapp, sitio } from '../data/sitio.js';
-const { interior = false } = Astro.props;
+const {
+  interior = false,
+  ctaHref = whatsapp('hero'),
+  ctaTexto = 'Clase de prueba gratis',
+  ctaTextoCorto = 'Clase gratis',
+  ctaExterno = true,
+} = Astro.props;
 
 const enlaces = [
   { href: '/clases-cheerleading-santiago', texto: 'Entrenamientos' },
@@ -23,9 +29,9 @@ const enlaces = [
       {enlaces.map(e => <a href={e.href}>{e.texto}</a>)}
     </nav>
 
-    <a class="nav__cta" id="wa-menu" href={whatsapp('hero')} target="_blank" rel="noopener">
-      <span class="nav__cta-largo">Clase de prueba gratis</span>
-      <span class="nav__cta-corto">Clase gratis</span>
+    <a class="nav__cta" id="wa-menu" href={ctaHref} target={ctaExterno ? '_blank' : undefined} rel={ctaExterno ? 'noopener' : undefined}>
+      <span class="nav__cta-largo">{ctaTexto}</span>
+      <span class="nav__cta-corto">{ctaTextoCorto}</span>
     </a>
 
     <button class="nav__boton" id="nav-boton" type="button"

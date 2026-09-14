@@ -1,9 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
 import Faq from '../components/Faq.astro';
-import BandaFoto from '../components/BandaFoto.astro';
 import Sparky from '../components/Sparky.astro';
-import { sitio } from '../data/sitio.js';
 
 const titulo = 'Firehouse Star — cheerleading desde cero para niñas y niños desde 4 años | Firehouse Cheer';
 const descripcion = 'Firehouse Star es la primera experiencia Firehouse: una clase semanal de cheerleading para empezar desde cero, sin necesidad de experiencia previa. Sábados en La Cisterna.';
@@ -25,78 +23,68 @@ const preguntas = [
     r: 'La mensualidad se ajusta a las clases que queden en el mes: se paga solo por las semanas de clase a las que efectivamente se llega, nunca el mes completo si se entra después de la primera semana.' },
 ];
 ---
-<Base titulo={titulo} descripcion={descripcion} ruta="/firehouse-star" preguntas={preguntas} miga="Firehouse Star">
+<Base titulo={titulo} descripcion={descripcion} ruta="/firehouse-star" preguntas={preguntas} miga="Firehouse Star"
+      navCtaHref="/registro?origen=star" navCtaTexto="Inscríbete en Star ⭐" navCtaTextoCorto="Star ⭐" navCtaExterno={false}>
 
   <!-- ============ HERO ============ -->
   <section class="star-hero">
-    <div class="star-hero__fondo" aria-hidden="true">
-      <picture>
-        <source srcset="/media/dia-cheer.webp" type="image/webp" />
-        <img class="star-hero__img" src="/media/dia-cheer.jpg" alt="" loading="eager" />
-      </picture>
-      <div class="star-hero__velo"></div>
-      <span class="star-chispa star-chispa--1">⭐</span>
-      <span class="star-chispa star-chispa--2">⭐</span>
-      <span class="star-chispa star-chispa--3">⭐</span>
-      <span class="star-chispa star-chispa--4">⭐</span>
-    </div>
+    <div class="star-hero__glow" aria-hidden="true"></div>
+    <svg class="star-hero__estrella" viewBox="0 0 120 120" aria-hidden="true">
+      <path d="M60 8 74.6 45.2 114 47.9 83.6 73.1 93.4 111.4 60 89.2 26.6 111.4 36.4 73.1 6 47.9 45.4 45.2 60 8Z" fill="currentColor"/>
+    </svg>
 
-    <div class="star-hero__sparky-wrap">
-      <Sparky pose="wave" size={104} class="sparky--flota" />
-    </div>
+    <div class="wrap star-hero__grid">
+      <div class="star-hero__texto">
+        <p class="star-hero__logo reveal star-reveal-1">FIREHOUSE <span>STAR</span></p>
+        <p class="star-count reveal star-reveal-1">⭐ DESDE LOS 4 AÑOS · SIN EXPERIENCIA PREVIA</p>
+        <h1 class="star-hero__titulo reveal star-reveal-2">No necesita saber cheer.</h1>
+        <p class="star-hero__bajada reveal star-reveal-3">Solo tener ganas de empezar.</p>
 
-    <div class="wrap star-hero__contenido">
-      <p class="star-count reveal star-reveal-1">SÁBADOS · 16:00 – 17:30</p>
-      <h1 class="star-hero__titulo reveal star-reveal-2">No necesita saber cheer.<br />Solo tener ganas de empezar. ⭐</h1>
-      <p class="star-hero__bajada reveal star-reveal-3">
-        Firehouse Star es la primera experiencia Firehouse para niñas y niños desde los 4 años
-        que quieren descubrir el cheer desde cero.
-      </p>
+        <ul class="star-datos reveal star-reveal-4">
+          <li>
+            <svg class="star-datos__icono" viewBox="0 0 48 48" aria-hidden="true"><path d="M24 4 29.4 18.1 45 19.2 33.4 29.2 37 44 24 35.8 11 44 14.6 29.2 3 19.2 18.6 18.1Z" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linejoin="round"/></svg>
+            <span>Edad</span><b>Desde 4 años</b>
+          </li>
+          <li>
+            <svg class="star-datos__icono" viewBox="0 0 48 48" aria-hidden="true"><rect x="6" y="10" width="36" height="32" rx="4" fill="none" stroke="currentColor" stroke-width="3.2"/><path d="M6 19h36" stroke="currentColor" stroke-width="3.2"/><path d="M15 6v9M33 6v9" stroke="currentColor" stroke-width="3.2" stroke-linecap="round"/></svg>
+            <span>Cuándo</span><b>Sábados</b>
+          </li>
+          <li>
+            <svg class="star-datos__icono" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="18" fill="none" stroke="currentColor" stroke-width="3.2"/><path d="M24 14v10l8 5" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span>Duración</span><b>90 minutos</b>
+          </li>
+          <li>
+            <svg class="star-datos__icono" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="18" fill="none" stroke="currentColor" stroke-width="3.2"/><text x="24" y="31" text-anchor="middle" font-weight="800" font-size="20" fill="currentColor">$</text></svg>
+            <span>Mensualidad</span><b>$30.000</b>
+          </li>
+        </ul>
 
-      <ul class="star-datos reveal star-reveal-4">
-        <li>
-          <svg class="star-datos__icono" viewBox="0 0 48 48" aria-hidden="true"><path d="M24 4 29.4 18.1 45 19.2 33.4 29.2 37 44 24 35.8 11 44 14.6 29.2 3 19.2 18.6 18.1Z" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linejoin="round"/></svg>
-          <span>Edad</span><b>Desde 4 años</b>
-        </li>
-        <li>
-          <svg class="star-datos__icono" viewBox="0 0 48 48" aria-hidden="true"><rect x="6" y="10" width="36" height="32" rx="4" fill="none" stroke="currentColor" stroke-width="3.2"/><path d="M6 19h36" stroke="currentColor" stroke-width="3.2"/><path d="M15 6v9M33 6v9" stroke="currentColor" stroke-width="3.2" stroke-linecap="round"/></svg>
-          <span>Cuándo</span><b>Sábados</b>
-        </li>
-        <li>
-          <svg class="star-datos__icono" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="18" fill="none" stroke="currentColor" stroke-width="3.2"/><path d="M24 14v10l8 5" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          <span>Duración</span><b>90 minutos</b>
-        </li>
-        <li>
-          <svg class="star-datos__icono" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="18" fill="none" stroke="currentColor" stroke-width="3.2"/><text x="24" y="31" text-anchor="middle" font-weight="800" font-size="20" fill="currentColor">$</text></svg>
-          <span>Mensualidad</span><b>$30.000</b>
-        </li>
-      </ul>
+        <p class="star-hero__cta reveal star-reveal-5">
+          <a class="star-btn star-btn--brilla" href="/registro?origen=star" id="wa-star-hero">QUIERO QUE EMPIECE EN STAR ⭐</a>
+          <a class="star-btn-quiet" href="#clase">Ver cómo es una clase ↓</a>
+        </p>
+      </div>
 
-      <p class="star-hero__cta reveal star-reveal-5">
-        <a class="star-btn star-btn--brilla" href="/registro" id="wa-star-hero">QUIERO EMPEZAR EN STAR ⭐</a>
-        <a class="star-btn-quiet" href="#clase">¿Qué va a hacer en la clase?</a>
-      </p>
+      <div class="star-hero__sparky-wrap">
+        <Sparky pose="wave" size={380} class="sparky--flota" alt="Sparky saludando, dando la bienvenida a Firehouse Star" />
+      </div>
     </div>
   </section>
 
   <!-- ============ SPARKY TAMPOCO SABÍA CHEER ============ -->
-  <section class="star-section star-section--objeto">
-    <svg class="star-objeto star-objeto--sol" viewBox="0 0 120 120" aria-hidden="true">
-      <path d="M60 8 74.6 45.2 114 47.9 83.6 73.1 93.4 111.4 60 89.2 26.6 111.4 36.4 73.1 6 47.9 45.4 45.2 60 8Z"
-            fill="none" stroke="currentColor" stroke-width="5" stroke-linejoin="round"/>
-    </svg>
-    <div class="wrap star-split">
-      <div class="star-panel-img reveal">
-        <Sparky pose="dizzy" size={220} class="sparky--flota" alt="Sparky mareado, intentando un movimiento sencillo" />
+  <section class="star-relato">
+    <div class="wrap star-relato__grid">
+      <div class="star-relato__sparky reveal">
+        <Sparky pose="dizzy" size={260} class="sparky--flota" alt="Sparky mareado, después de intentar un movimiento y que le saliera mal" />
       </div>
       <div class="reveal star-reveal-2">
-        <p class="star-eyebrow">La idea central</p>
-        <h2 class="star-title">Sparky tampoco sabía cheer.</h2>
-        <p class="star-parrafo">
-          Y eso está perfecto.<br />
-          Porque aquí no tienen que llegar sabiendo.<br />
-          Aquí vienen a aprender y a divertirse.
+        <h2 class="star-relato__titulo">Sparky tampoco sabía cheer. ⭐</h2>
+        <p class="star-relato__parrafo">
+          Se equivocó.<br />
+          Probó otra vez.<br />
+          Y siguió jugando.
         </p>
+        <p class="star-relato__remate">En Star nadie tiene que llegar sabiendo.<br />Ese es justamente el punto.</p>
       </div>
     </div>
   </section>
@@ -105,75 +93,75 @@ const preguntas = [
   <section class="star-section star-section--panel" id="clase">
     <div class="wrap">
       <p class="star-eyebrow">Así se vive una clase Star</p>
-      <h2 class="star-title">¿Qué va a hacer realmente durante 90 minutos?</h2>
+      <h2 class="star-title">¿Qué va a hacer durante 90 minutos?</h2>
 
-      <ol class="star-escenas">
-        <li class="star-escena reveal">
+      <div class="star-escenas">
+        <article class="star-escena reveal">
           <div class="star-escena__img">
+            <span class="star-escena__num">1</span>
             <picture>
               <source srcset="/media/star/escena-activamos.webp" type="image/webp" />
               <img src="/media/star/escena-activamos.jpg" alt="Sparky y los niños estirando antes de empezar la clase Star" loading="lazy" decoding="async" />
             </picture>
           </div>
           <div class="star-escena__texto">
-            <span class="star-escena__num">1</span>
-            <h3>Nos activamos 🔥</h3>
-            <p>Empezamos moviéndonos, entrando en calor y preparando el cuerpo.</p>
+            <h3>🔥 Nos activamos</h3>
+            <p>Movemos el cuerpo y entramos en calor.</p>
           </div>
-        </li>
-        <li class="star-escena reveal">
+        </article>
+        <article class="star-escena reveal">
           <div class="star-escena__img">
+            <span class="star-escena__num">2</span>
             <picture>
               <source srcset="/media/star/escena-jugamos.webp" type="image/webp" />
               <img src="/media/star/escena-jugamos.jpg" alt="Sparky y los niños en un circuito de conos, jugando y moviéndose" loading="lazy" decoding="async" />
             </picture>
           </div>
           <div class="star-escena__texto">
-            <span class="star-escena__num">2</span>
-            <h3>Jugamos y nos movemos 🎯</h3>
-            <p>Juegos, circuitos y pequeños desafíos para moverse, reaccionar y coordinar.</p>
+            <h3>🎯 Jugamos y nos movemos</h3>
+            <p>Circuitos y juegos para coordinar y reaccionar.</p>
           </div>
-        </li>
-        <li class="star-escena reveal">
+        </article>
+        <article class="star-escena reveal">
           <div class="star-escena__img">
+            <span class="star-escena__num">3</span>
             <picture>
               <source srcset="/media/star/escena-descubrimos.webp" type="image/webp" />
               <img src="/media/star/escena-descubrimos.jpg" alt="Niños de Star practicando una posición de cheer junto a Sparky" loading="lazy" decoding="async" />
             </picture>
           </div>
           <div class="star-escena__texto">
-            <span class="star-escena__num">3</span>
-            <h3>Descubrimos el cheer ⭐</h3>
-            <p>Aprendemos posiciones, movimientos, saltos y fundamentos adaptados a cada nivel.</p>
+            <h3>⭐ Descubrimos el cheer</h3>
+            <p>Primeras posiciones y movimientos del deporte.</p>
           </div>
-        </li>
-        <li class="star-escena reveal">
+        </article>
+        <article class="star-escena reveal">
           <div class="star-escena__img">
+            <span class="star-escena__num">4</span>
             <picture>
               <source srcset="/media/star/escena-juntos.webp" type="image/webp" />
               <img src="/media/star/escena-juntos.jpg" alt="Sparky y los niños de Star con las manos juntas al centro, en equipo" loading="lazy" decoding="async" />
             </picture>
           </div>
           <div class="star-escena__texto">
-            <span class="star-escena__num">4</span>
-            <h3>Lo hacemos juntos 🙌</h3>
-            <p>Aprendemos a escuchar, esperar, colaborar y trabajar con otros.</p>
+            <h3>🙌 Lo hacemos juntos</h3>
+            <p>Aprendemos a esperar y a colaborar.</p>
           </div>
-        </li>
-        <li class="star-escena reveal">
+        </article>
+        <article class="star-escena reveal">
           <div class="star-escena__img">
+            <span class="star-escena__num">5</span>
             <picture>
               <source srcset="/media/star/escena-celebramos.webp" type="image/webp" />
               <img src="/media/star/escena-celebramos.jpg" alt="Sparky y los niños de Star celebrando saltando, con estrellas alrededor" loading="lazy" decoding="async" />
             </picture>
           </div>
           <div class="star-escena__texto">
-            <span class="star-escena__num">5</span>
-            <h3>Celebramos lo aprendido 🎉</h3>
-            <p>Cada clase termina con algo nuevo que intentamos, aprendimos o conseguimos.</p>
+            <h3>🎉 Celebramos lo aprendido</h3>
+            <p>Algo nuevo logrado, en cada clase.</p>
           </div>
-        </li>
-      </ol>
+        </article>
+      </div>
     </div>
   </section>
 
@@ -208,10 +196,36 @@ const preguntas = [
     </div>
   </section>
 
-  <BandaFoto src="/media/gal-equipo.jpg"
-             alt="Deportistas de Firehouse de distintas edades junto al coach en el tapete, incluyendo niñas pequeñas"
-             frase="Todos tuvieron alguna vez una primera clase."
-             alto="medio" foco="center 38%" />
+  <!-- ============ FIREHOUSE REAL ============ -->
+  <section class="star-section star-confianza">
+    <div class="wrap star-confianza__grid">
+      <div class="star-confianza__foto reveal">
+        <picture>
+          <source srcset="/media/gal-equipo.webp" type="image/webp" />
+          <img src="/media/gal-equipo.jpg" alt="Deportistas de Firehouse de distintas edades junto al coach en el tapete, incluyendo niñas pequeñas" loading="lazy" decoding="async" />
+        </picture>
+      </div>
+      <div class="reveal star-reveal-2">
+        <p class="star-eyebrow">Star es nuevo. Firehouse no.</p>
+        <h2 class="star-title">Entrena dentro de Firehouse Cheer</h2>
+        <p class="star-parrafo">Santa Corina 197, La Cisterna — a pasos del Metro Lo Ovalle.</p>
+
+        <div class="star-confianza__coach">
+          <p class="star-confianza__coach-nombre">Coach Benjamín Beltrán</p>
+          <p class="star-confianza__coach-desc">Head coach, más de 25 años de experiencia.</p>
+        </div>
+
+        <!-- TODO (Jano): agregar acá la calificación real de Google y una
+             reseña real cuando estén confirmadas. No se inventa un número
+             ni una cita — se deja pendiente hasta tener el dato real. -->
+
+        <p class="star-confianza__links">
+          <a class="star-cta-texto" href="/coach-benjamin-beltran">Conocer al coach →</a>
+          <a class="star-cta-texto" href="/">Conocer Firehouse →</a>
+        </p>
+      </div>
+    </div>
+  </section>
 
   <!-- ============ ¿NUNCA HA HECHO CHEER? ============ -->
   <section class="star-section star-section--panel">
@@ -219,13 +233,7 @@ const preguntas = [
       <p class="star-eyebrow reveal">La objeción número uno</p>
       <h2 class="star-title reveal">¿Nunca ha hecho cheer?</h2>
       <p class="star-nunca__grande reveal">Perfecto.</p>
-      <p class="star-parrafo reveal">
-        Firehouse Star está pensado justamente para empezar desde cero.<br />
-        No necesita saber hacer piruetas.<br />
-        No necesita haber entrenado antes.<br />
-        No necesita llegar preparado.<br />
-        Y no tiene que decidir hoy si quiere competir.
-      </p>
+      <p class="star-parrafo reveal">Firehouse Star está pensado justamente para empezar desde cero. El resto de las dudas, aquí abajo.</p>
     </div>
   </section>
 
@@ -235,50 +243,47 @@ const preguntas = [
       <p class="star-eyebrow">Empezar es simple</p>
       <h2 class="star-title">Cuánto cuesta empezar</h2>
 
-      <div class="star-precio">
-        <div class="star-precio__bloque star-precio__bloque--primero reveal">
-          <span class="star-precio__etq">Primer pago — antes de la primera clase</span>
-          <span class="star-precio__num">$40.000<svg class="star-precio__chispa" viewBox="0 0 48 48" aria-hidden="true"><path d="M24 4 29.4 18.1 45 19.2 33.4 29.2 37 44 24 35.8 11 44 14.6 29.2 3 19.2 18.6 18.1Z" fill="currentColor"/></svg></span>
-          <ul class="star-precio__desglose">
-            <li><span>Inscripción Star</span><b>$10.000</b></li>
-            <li><span>Primera mensualidad</span><b>$30.000</b></li>
-          </ul>
+      <div class="star-precio-card reveal">
+        <span class="star-precio-card__etq">Para comenzar</span>
+        <span class="star-precio-card__num">$40.000</span>
+        <p class="star-precio-card__desglose">$10.000 inscripción + $30.000 primera mensualidad</p>
+
+        <div class="star-precio-card__despues">
+          <span>Después</span>
+          <b>$30.000<small>/mes</small></b>
+          <span class="star-precio-card__detalle">1 clase semanal · 90 minutos</span>
         </div>
-        <div class="star-precio__bloque reveal">
-          <span class="star-precio__etq">Desde el segundo mes</span>
-          <span class="star-precio__num">$30.000<small>/mes</small></span>
-          <p class="star-precio__inc">Incluye 1 clase semanal de 90 minutos, sábados 16:00–17:30.</p>
-        </div>
-      </div>
 
-      <p class="star-nota">Pago mes a mes, sin permanencia obligatoria. La inscripción incluye el kit de bienvenida.</p>
-
-      <div class="star-prorrateo reveal">
-        <p class="star-prorrateo__titulo">¿Te inscribes a mitad de mes? Pagas solo lo que queda:</p>
-        <table class="star-tabla">
-          <thead>
-            <tr><th>Ingresas en</th><th>Pagas ese mes</th></tr>
-          </thead>
-          <tbody>
-            <tr><td>Semana 1</td><td>$30.000 <span class="star-tabla__nota">(mes completo)</span></td></tr>
-            <tr><td>Semana 2</td><td>$22.500</td></tr>
-            <tr><td>Semana 3</td><td>$15.000</td></tr>
-            <tr><td>Semana 4</td><td>$7.500</td></tr>
-          </tbody>
-        </table>
-      </div>
-
-      <div class="star-politica reveal">
-        <p class="star-politica__titulo">Sin clase de prueba, con esta garantía:</p>
-        <ul class="star-politica__lista">
-          <li><b>Si el problema es nuestro</b> — ningún horario disponible resulta compatible con tu familia — reembolsamos completa la inscripción de $10.000.</li>
-          <li><b>Si cambias de opinión</b> antes de la primera clase, sin que exista ese problema, el pago no se devuelve en dinero, pero queda como <b>crédito Firehouse por 90 días</b>, usable para este hijo o un hermano.</li>
+        <ul class="star-precio-card__check">
+          <li>Sin permanencia obligatoria</li>
+          <li>Pagas mes a mes</li>
+          <li>Si entras a mitad de mes, pagas proporcional</li>
+          <li>Starter Pack incluido</li>
         </ul>
-      </div>
 
-      <p class="star-hero__cta">
-        <a class="star-btn" href="/registro" id="wa-star-precio">QUEREMOS INSCRIBIRNOS EN STAR ⭐</a>
-      </p>
+        <a class="star-btn star-btn--full" href="/registro?origen=star" id="wa-star-precio">QUEREMOS INSCRIBIRNOS EN STAR ⭐</a>
+
+        <details class="star-detalle">
+          <summary>Ver cálculo si ingreso a mitad de mes</summary>
+          <table class="star-tabla">
+            <thead><tr><th>Ingresas en</th><th>Pagas ese mes</th></tr></thead>
+            <tbody>
+              <tr><td>Semana 1</td><td>$30.000 <span class="star-tabla__nota">(mes completo)</span></td></tr>
+              <tr><td>Semana 2</td><td>$22.500</td></tr>
+              <tr><td>Semana 3</td><td>$15.000</td></tr>
+              <tr><td>Semana 4</td><td>$7.500</td></tr>
+            </tbody>
+          </table>
+        </details>
+
+        <details class="star-detalle">
+          <summary>¿Qué pasa si no funciona el horario, o me arrepiento?</summary>
+          <ul class="star-politica__lista">
+            <li><b>Si el problema es nuestro</b> — ningún horario disponible resulta compatible con tu familia — reembolsamos completa la inscripción de $10.000.</li>
+            <li><b>Si cambias de opinión</b> antes de la primera clase, sin que exista ese problema, el pago queda como <b>crédito Firehouse por 90 días</b>, usable para este hijo o un hermano.</li>
+          </ul>
+        </details>
+      </div>
     </div>
   </section>
 
@@ -287,14 +292,15 @@ const preguntas = [
     <div class="wrap">
       <p class="star-eyebrow">Incluido en la inscripción</p>
       <h2 class="star-title">Starter Pack Firehouse Star</h2>
-      <div class="star-grid5 star-grid5--pack">
-        <div class="star-card reveal">
-          <svg class="star-card__icono" viewBox="0 0 48 48" aria-hidden="true"><path d="M16 6 6 14l6 6 4-3v25h16V17l4 3 6-6-10-8c0 3-3 5-6 5s-6-2-6-5Z" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/></svg>
-          <h3>Polera de entrenamiento</h3><p>Polera oficial Firehouse Star, para todos.</p>
+
+      <div class="star-pack reveal">
+        <div class="star-pack__items">
+          <svg class="star-pack__icono" viewBox="0 0 48 48" aria-hidden="true"><path d="M16 6 6 14l6 6 4-3v25h16V17l4 3 6-6-10-8c0 3-3 5-6 5s-6-2-6-5Z" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/></svg>
+          <svg class="star-pack__icono" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="14" fill="none" stroke="currentColor" stroke-width="6"/><path d="M24 10c3 2 3 4 0 6M24 38c3-2 3-4 0-6" stroke="currentColor" stroke-width="3" stroke-linecap="round" fill="none"/></svg>
         </div>
-        <div class="star-card reveal">
-          <svg class="star-card__icono" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="14" fill="none" stroke="currentColor" stroke-width="6"/><path d="M24 10c3 2 3 4 0 6M24 38c3-2 3-4 0-6" stroke="currentColor" stroke-width="3" stroke-linecap="round" fill="none"/></svg>
-          <h3>Accesorio (niñas)</h3><p>Scrunchie Firehouse para el pelo, incluido para las niñas.</p>
+        <div class="star-pack__texto">
+          <h3>Polera de entrenamiento + Accesorio</h3>
+          <p>Polera oficial Firehouse Star para todos. Además, scrunchie Firehouse para el pelo, incluido para las niñas.</p>
         </div>
       </div>
     </div>
@@ -303,16 +309,12 @@ const preguntas = [
   <Faq preguntas={preguntas} titulo="Antes de decidir" />
 
   <!-- ============ CTA FINAL ============ -->
-  <section class="star-cierre star-section--objeto">
-    <svg class="star-objeto star-objeto--mono" viewBox="0 0 120 120" aria-hidden="true">
-      <path d="M60 8 74.6 45.2 114 47.9 83.6 73.1 93.4 111.4 60 89.2 26.6 111.4 36.4 73.1 6 47.9 45.4 45.2 60 8Z"
-            fill="none" stroke="currentColor" stroke-width="5" stroke-linejoin="round"/>
-    </svg>
+  <section class="star-cierre">
     <div class="wrap reveal">
-      <Sparky pose="excited" size={110} class="sparky--salta" />
+      <Sparky pose="excited" size={110} class="sparky--salta" alt="Sparky celebrando con los brazos arriba" />
       <h2 class="star-title">¿Empezamos? ⭐</h2>
       <p class="star-parrafo star-parrafo--centro">No tiene que llegar sabiendo.<br />Solo tiene que empezar.</p>
-      <a class="star-btn star-btn--brilla" href="/registro" id="wa-star-cierre">QUEREMOS INSCRIBIRNOS EN FIREHOUSE STAR</a>
+      <a class="star-btn star-btn--brilla" href="/registro?origen=star" id="wa-star-cierre">QUEREMOS INSCRIBIRNOS EN FIREHOUSE STAR</a>
       <p class="star-nota">Sábados 16:00–17:30 · Santa Corina 197, La Cisterna</p>
     </div>
   </section>
@@ -322,9 +324,9 @@ const preguntas = [
 <style>
 /*
   Paleta Firehouse Star: se apoya en los tokens de marca (sin inventar
-  colores nuevos). El amarillo pasa a ser el acento dominante —
-  coherente con la estrella y con "sal brillando"— y los botones usan
-  color sólido, sin degradados decorativos, según preferencia expresa.
+  colores nuevos). Amarillo = acento dominante de Star. Botones en color
+  sólido, sin degradados. Decoración reducida a lo que tiene función —
+  nada de estrellitas/fuego rellenando espacio porque sí.
 */
 
 .star-eyebrow{
@@ -335,18 +337,19 @@ const preguntas = [
 .star-eyebrow::before{ content:''; width:30px; height:3px; background: rgba(245,239,232,.38); transform: skewX(var(--tilt-sm)); }
 
 .star-count{
-  display: inline-flex; align-items: center; gap: 14px;
-  font-family: var(--font-count); font-weight: 700; font-size: 14px; letter-spacing: .28em;
-  color: var(--fire-yellow); margin-bottom: var(--e-2);
+  display: inline-flex; align-items: center; gap: 10px;
+  font-family: var(--font-count); font-weight: 700; font-size: 12.5px; letter-spacing: .16em;
+  color: var(--fire-yellow); margin-top: 6px;
 }
-.star-count::before, .star-count::after{ content:''; width:30px; height:3px; background: var(--fire-yellow); transform: skewX(var(--tilt-sm)); }
 
 .star-title{ font-family: var(--font-display); font-weight: 800; font-size: clamp(1.7rem, 3.6vw, 2.6rem); line-height: 1.05; margin-top: var(--e-3); }
 .star-parrafo{ color: var(--txt-soft); max-width: var(--wrap-texto); margin-top: var(--e-3); font-size: clamp(1rem,1.5vw,1.15rem); line-height: 1.6; }
 .star-parrafo--centro{ margin-inline: auto; text-align: center; }
 .star-nota{ color: var(--txt-faint); font-size: 14px; margin-top: var(--e-3); max-width: var(--wrap-texto); }
+.star-cta-texto{ color: var(--fire-yellow); text-decoration: none; border-bottom: 2px solid var(--fire-yellow); font-size: 15px; }
+.star-cta-texto:hover{ color: var(--chalk); border-bottom-color: var(--chalk); }
 
-/* Botón sólido — sin degradados, color con significado (amarillo = Star) */
+/* Botón sólido — sin degradados */
 .star-btn{
   display: inline-flex; align-items: center; justify-content: center; min-height: 48px;
   background: var(--fire-yellow); color: var(--ember); font-weight: 800; font-size: 16px;
@@ -356,30 +359,36 @@ const preguntas = [
 }
 .star-btn:hover{ background: #E6B000; transform: translateY(-2px); }
 .star-btn:focus-visible{ outline: 3px solid var(--chalk); outline-offset: 3px; }
+.star-btn--full{ display: flex; width: 100%; margin-top: var(--e-4); }
+.star-btn-quiet{ color: rgba(245,239,232,.78); font-size: 15px; text-decoration: underline; }
+.star-hero__cta{ display: flex; flex-direction: column; align-items: flex-start; gap: var(--e-2); margin-top: var(--e-5); }
 
-/* Brillo pulsante reservado a los dos CTA de mayor peso (hero y cierre) —
-   referencia literal a "sal brillando", no decoración genérica */
+/* Brillo pulsante reservado a los CTA de mayor peso — referencia literal
+   a "sal brillando", no decoración porque sí */
 .star-btn--brilla{ animation: star-brillo 2.6s ease-in-out infinite; }
 .star-btn--brilla:hover{ animation-play-state: paused; }
 @keyframes star-brillo{
   0%, 100% { box-shadow: 0 0 0 0 rgba(255,196,0,.55); }
   50%      { box-shadow: 0 0 0 10px rgba(255,196,0,0); }
 }
-.star-btn-quiet{ color: rgba(245,239,232,.78); font-size: 15px; text-decoration: underline; }
-.star-hero__cta{ display: flex; flex-direction: column; align-items: center; gap: var(--e-2); margin-top: var(--e-5); }
 
 /* ---- Hero ---- */
-.star-hero{ position: relative; overflow: hidden; isolation: isolate; border-bottom: 3px solid var(--fire-yellow); }
-.star-hero__fondo{ position: absolute; inset: 0; z-index: -1; }
-.star-hero__fondo img{ position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center 30%; }
-.star-hero__velo{
-  position: absolute; inset: 0;
-  background:
-    radial-gradient(ellipse 70% 55% at 18% 12%, rgba(255,196,0,.24) 0%, rgba(255,196,0,0) 60%),
-    linear-gradient(180deg, rgba(23,20,18,.72) 0%, rgba(23,20,18,.50) 45%, rgba(23,20,18,.92) 100%);
+.star-hero{ position: relative; overflow: hidden; background: var(--ember); border-bottom: 3px solid var(--fire-yellow); padding: var(--e-8) 0; }
+.star-hero__glow{
+  position: absolute; right: -8%; top: 50%; transform: translateY(-50%);
+  width: 56vw; max-width: 640px; aspect-ratio: 1; border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,196,0,.22) 0%, rgba(255,196,0,0) 70%);
+  pointer-events: none;
 }
-.star-hero__sparky-wrap{ position: absolute; right: 6%; bottom: 0; z-index: 1; animation: star-sparky-entra 900ms 300ms cubic-bezier(.22,.61,.36,1) both; }
-@media (max-width: 700px){ .star-hero__sparky-wrap{ right: 4%; width: 72px; } }
+.star-hero__estrella{ position: absolute; right: -4%; top: 50%; transform: translateY(-50%); width: 42vw; max-width: 520px; color: var(--fire-yellow); opacity: .07; pointer-events: none; }
+
+.star-hero__grid{ position: relative; display: grid; grid-template-columns: 1.15fr 1fr; gap: var(--e-6); align-items: center; }
+.star-hero__logo{ font-family: var(--font-display); font-weight: 800; font-size: 15px; letter-spacing: .1em; color: var(--chalk); text-transform: uppercase; }
+.star-hero__logo span{ color: var(--fire-yellow); }
+.star-hero__titulo{ font-family: var(--font-display); font-weight: 800; font-size: clamp(2.1rem, 4.4vw, 3.4rem); line-height: 1.05; margin-top: var(--e-3); }
+.star-hero__bajada{ font-family: var(--font-display); font-weight: 800; font-size: clamp(1.3rem, 2.4vw, 1.9rem); color: var(--fire-yellow); margin-top: 2px; }
+
+.star-hero__sparky-wrap{ position: relative; display: flex; justify-content: center; animation: star-sparky-entra 900ms 300ms cubic-bezier(.22,.61,.36,1) both; }
 @keyframes star-sparky-entra{
   0%   { transform: translateY(46px) scale(.7); opacity: 0; }
   60%  { transform: translateY(-8px) scale(1.04); opacity: 1; }
@@ -387,48 +396,16 @@ const preguntas = [
   100% { transform: translateY(0) scale(1); }
 }
 
-/* Zoom lento y continuo sobre la foto del hero (Ken Burns) */
-.star-hero__img{ animation: star-kenburns 22s ease-in-out infinite alternate; }
-@keyframes star-kenburns{
-  from{ transform: scale(1); }
-  to{ transform: scale(1.08); }
+@media (max-width: 900px){
+  .star-hero__grid{ grid-template-columns: 1fr; text-align: center; }
+  .star-hero__texto{ order: 2; }
+  .star-hero__cta{ align-items: center; }
+  .star-hero__sparky-wrap{ order: 1; max-width: 240px; margin-inline: auto; }
+  .star-hero__estrella, .star-hero__glow{ opacity: .5; }
+  .star-datos{ margin-inline: auto; }
 }
 
-/* Chispas/estrellas flotando en el hero — decorativas, ligadas al tema ⭐ */
-.star-chispa{
-  position: absolute; color: var(--fire-yellow); font-size: 18px; opacity: 0;
-  animation: star-titila 3.6s ease-in-out infinite;
-  text-shadow: 0 0 8px rgba(255,196,0,.7);
-}
-.star-chispa--1{ top: 18%; left: 12%; font-size: 14px; animation-delay: 0s; }
-.star-chispa--2{ top: 62%; left: 22%; font-size: 10px; animation-delay: .9s; }
-.star-chispa--3{ top: 28%; left: 82%; font-size: 16px; animation-delay: 1.8s; }
-.star-chispa--4{ top: 70%; left: 70%; font-size: 11px; animation-delay: 2.6s; }
-@keyframes star-titila{
-  0%, 100% { opacity: 0; transform: translateY(0) scale(.8); }
-  50%      { opacity: .85; transform: translateY(-10px) scale(1); }
-}
-
-/* Utilidades de retraso para escalonar textos que no son hijos repetidos */
-.star-reveal-1{ transition-delay: 0ms; }
-.star-reveal-2{ transition-delay: 90ms; }
-.star-reveal-3{ transition-delay: 170ms; }
-.star-reveal-4{ transition-delay: 250ms; }
-.star-reveal-5{ transition-delay: 330ms; }
-
-/* Objetos decorativos (estrellas de fondo, giro lento) */
-.star-section--objeto{ position: relative; overflow: hidden; }
-.star-objeto{ position: absolute; pointer-events: none; animation: star-objeto-gira 40s linear infinite; }
-.star-objeto--sol{ right: -24px; top: 12%; width: 170px; color: var(--fire-yellow); opacity: .10; }
-.star-objeto--mono{ left: -20px; bottom: -10px; width: 160px; color: var(--mat-blue); opacity: .12; animation-direction: reverse; }
-@keyframes star-objeto-gira{ from{ transform: rotate(0deg); } to{ transform: rotate(360deg); } }
-@media (max-width: 700px){ .star-objeto--sol, .star-objeto--mono{ width: 110px; } }
-
-.star-hero__contenido{ position: relative; padding: var(--e-8) 0 var(--e-7); text-align: center; max-width: 680px; margin-inline: auto; }
-.star-hero__titulo{ font-family: var(--font-display); font-weight: 800; font-size: clamp(2rem, 5vw, 3.2rem); line-height: 1.08; margin-top: var(--e-3); }
-.star-hero__bajada{ color: rgba(245,239,232,.92); font-size: clamp(1.05rem,1.6vw,1.2rem); margin-top: var(--e-3); max-width: 46ch; margin-inline: auto; text-shadow: 0 1px 12px rgba(23,20,18,.9); }
-
-.star-datos{ display: grid; grid-template-columns: repeat(auto-fit,minmax(130px,1fr)); gap: 10px; margin: var(--e-5) 0 0; padding: 0; list-style: none; max-width: 560px; margin-inline: auto; }
+.star-datos{ display: grid; grid-template-columns: repeat(auto-fit,minmax(130px,1fr)); gap: 10px; margin: var(--e-5) 0 0; padding: 0; list-style: none; max-width: 480px; }
 .star-datos li{ background: var(--fire-yellow); color: var(--ember); padding: var(--e-3) var(--e-2); border-radius: 10px; display: flex; flex-direction: column; align-items: center; gap: 2px; }
 .star-datos__icono{ width: 26px; height: 26px; color: var(--ember); margin-bottom: 4px; }
 .star-datos span{ display: block; font-family: var(--font-count); font-size: 10.5px; letter-spacing: .1em; color: rgba(23,20,18,.65); text-transform: uppercase; }
@@ -438,49 +415,44 @@ const preguntas = [
 .star-section{ padding: var(--e-7) 0; }
 .star-section--panel{ background: var(--ember-deep); }
 
-.star-split{ display: flex; gap: var(--e-6); align-items: center; }
-.star-split > *{ flex: 1; }
-@media (max-width: 900px){ .star-split{ flex-direction: column; } }
+/* ---- Relato Sparky (única sección clara del sitio: acento deliberado) ---- */
+.star-relato{ background: var(--chalk); padding: var(--e-7) 0; }
+.star-relato__grid{ display: flex; gap: var(--e-6); align-items: center; }
+.star-relato__grid > *{ flex: 1; }
+.star-relato__sparky{ display: flex; justify-content: center; }
+.star-relato__titulo{ font-family: var(--font-display); font-weight: 800; font-size: clamp(1.8rem, 3.6vw, 2.6rem); line-height: 1.08; color: var(--ember); }
+.star-relato__parrafo{ font-family: var(--font-display); font-weight: 700; font-size: clamp(1.2rem, 2vw, 1.5rem); color: var(--ember); margin-top: var(--e-3); line-height: 1.3; }
+.star-relato__remate{ color: rgba(23,20,18,.72); font-size: 15px; margin-top: var(--e-4); line-height: 1.6; max-width: 40ch; }
+@media (max-width: 900px){ .star-relato__grid{ flex-direction: column; text-align: center; } .star-relato__remate{ margin-inline: auto; } }
 
-/* ---- Panel de imagen (sección "Sparky tampoco sabía cheer") ---- */
-.star-panel-img{
-  display: flex; align-items: center; justify-content: center;
-  min-height: 240px; padding: var(--e-4);
-}
-
-/* ---- Escenas de clase (sí es una secuencia real → numerarla tiene sentido) ---- */
-.star-escenas{ list-style: none; margin: var(--e-6) 0 0; padding: 0; display: flex; flex-direction: column; gap: var(--e-5); }
-.star-escena{ display: flex; align-items: center; gap: var(--e-5); position: relative; }
-.star-escena:nth-child(even){ flex-direction: row-reverse; }
-
-.star-escena__img{
-  flex: none; width: 42%; max-width: 380px; aspect-ratio: 16 / 10;
-  overflow: hidden; border-radius: 4px; position: relative;
-  border-top: 3px solid var(--fire-yellow); transition: transform var(--t-interfaz) ease;
-}
-.star-escena:nth-child(2) .star-escena__img{ border-top-color: var(--mat-blue); }
-.star-escena:nth-child(3) .star-escena__img{ border-top-color: var(--fire-red); }
-.star-escena:nth-child(4) .star-escena__img{ border-top-color: var(--mat-blue); }
-.star-escena:hover .star-escena__img{ transform: scale(1.02); }
+/* ---- Escenas de clase: grilla 3+2 en desktop, carrusel horizontal en móvil ---- */
+.star-escenas{ display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: var(--e-3); margin: var(--e-6) calc(-1 * 24px) 0; padding: 4px 24px 8px; -webkit-overflow-scrolling: touch; }
+.star-escena{ flex: none; width: 78vw; max-width: 320px; scroll-snap-align: start; background: var(--ember); border-top: 3px solid var(--fire-yellow); }
+.star-escena:nth-child(2){ border-top-color: var(--mat-blue); }
+.star-escena:nth-child(3){ border-top-color: var(--fire-red); }
+.star-escena:nth-child(4){ border-top-color: var(--mat-blue); }
+.star-escena:nth-child(5){ border-top-color: var(--fire-red); }
+.star-escena__img{ position: relative; aspect-ratio: 4 / 3; overflow: hidden; }
 .star-escena__img picture, .star-escena__img img{ width: 100%; height: 100%; object-fit: cover; display: block; }
-
-.star-escena__texto{ flex: 1; position: relative; }
 .star-escena__num{
-  display: block; font-family: var(--font-display); font-weight: 800;
-  color: var(--fire-yellow); font-size: clamp(2.6rem, 5vw, 3.4rem); line-height: 1;
-  margin-bottom: 2px; opacity: .92;
+  position: absolute; top: 10px; left: 10px; z-index: 2;
+  width: 40px; height: 40px; border-radius: 50%;
+  background: var(--fire-yellow); color: var(--ember);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-display); font-weight: 800; font-size: 20px;
 }
-.star-escena h3{ font-family: var(--font-display); font-weight: 800; font-size: 19px; }
-.star-escena p{ color: var(--txt-soft); font-size: 15px; margin-top: 6px; max-width: 46ch; }
-@media (max-width: 760px){
-  .star-escena, .star-escena:nth-child(even){ flex-direction: column; gap: var(--e-3); }
-  .star-escena__img{ width: 100%; max-width: none; }
-}
+.star-escena__texto{ padding: var(--e-3); }
+.star-escena h3{ font-family: var(--font-display); font-weight: 800; font-size: 16px; }
+.star-escena p{ color: var(--txt-soft); font-size: 13.5px; margin-top: 4px; }
 
-.star-escenas .star-escena:nth-child(2){ transition-delay: 90ms; }
-.star-escenas .star-escena:nth-child(3){ transition-delay: 180ms; }
-.star-escenas .star-escena:nth-child(4){ transition-delay: 270ms; }
-.star-escenas .star-escena:nth-child(5){ transition-delay: 360ms; }
+@media (min-width: 901px){
+  .star-escenas{ display: grid; grid-template-columns: repeat(6, 1fr); overflow: visible; margin: var(--e-6) 0 0; padding: 0; }
+  .star-escena{ width: auto; max-width: none; grid-column: span 2; }
+  .star-escena:nth-child(4){ grid-column: 2 / span 2; }
+  .star-escena:nth-child(5){ grid-column: 4 / span 2; }
+  .star-escena{ transition: transform var(--t-interfaz) ease, box-shadow var(--t-interfaz) ease; }
+  .star-escena:hover{ transform: translateY(-4px); box-shadow: 0 10px 22px rgba(0,0,0,.28); }
+}
 
 /* ---- Tarjetas (aprendizaje / starter pack) ---- */
 .star-grid5{ display: grid; grid-template-columns: repeat(5,1fr); gap: var(--e-3); margin-top: var(--e-5); }
@@ -499,54 +471,67 @@ const preguntas = [
 @media (max-width: 900px){ .star-grid5{ grid-template-columns: repeat(2,1fr); } }
 @media (max-width: 480px){ .star-grid5{ grid-template-columns: 1fr; } }
 
-.star-grid5--pack{ grid-template-columns: repeat(2, minmax(220px, 340px)); justify-content: center; }
-@media (max-width: 560px){ .star-grid5--pack{ grid-template-columns: 1fr; max-width: 340px; margin-inline: auto; } }
-
 .star-grid5 .star-card:nth-child(2){ transition-delay: 70ms; }
 .star-grid5 .star-card:nth-child(3){ transition-delay: 140ms; }
 .star-grid5 .star-card:nth-child(4){ transition-delay: 210ms; }
 .star-grid5 .star-card:nth-child(5){ transition-delay: 280ms; }
 
-/* ---- ¿Nunca ha hecho cheer? ---- */
-.star-nunca{ text-align: center; max-width: 620px; margin-inline: auto; }
+/* ---- Firehouse Real ---- */
+.star-confianza__grid{ display: flex; gap: var(--e-6); align-items: center; }
+.star-confianza__grid > *{ flex: 1; }
+.star-confianza__foto{ aspect-ratio: 4/3; overflow: hidden; border-top: 3px solid var(--fire-yellow); }
+.star-confianza__foto picture, .star-confianza__foto img{ width: 100%; height: 100%; object-fit: cover; display: block; }
+.star-confianza__coach{ margin-top: var(--e-4); padding-top: var(--e-4); border-top: 1px solid var(--hairline); }
+.star-confianza__coach-nombre{ font-family: var(--font-display); font-weight: 800; font-size: 16px; }
+.star-confianza__coach-desc{ color: var(--txt-soft); font-size: 14px; margin-top: 2px; }
+.star-confianza__links{ display: flex; gap: var(--e-4); margin-top: var(--e-4); flex-wrap: wrap; }
+@media (max-width: 900px){ .star-confianza__grid{ flex-direction: column; } }
+
+/* ---- ¿Nunca ha hecho cheer? (franja corta) ---- */
+.star-nunca{ text-align: center; max-width: 560px; margin-inline: auto; }
 .star-nunca__grande{
   font-family: var(--font-display); font-weight: 800; color: var(--fire-yellow);
   font-size: clamp(2.4rem, 7vw, 4rem); line-height: 1; margin-top: var(--e-2);
 }
 .star-nunca .star-parrafo{ margin-inline: auto; }
 
-/* El remate "Perfecto." merece su propio gesto: no un fade, un rebote */
 html.js .star-nunca__grande.reveal{
   transform: scale(.4); opacity: 0; transition-delay: 120ms;
   transition: opacity 400ms ease, transform 550ms cubic-bezier(.34,1.56,.64,1) 120ms;
 }
 html.js .star-nunca__grande.reveal.visible{ transform: scale(1); opacity: 1; }
 
-/* ---- Precio ---- */
-.star-precio{ display: flex; gap: var(--e-4); margin-top: var(--e-5); flex-wrap: wrap; }
-.star-precio__bloque{ flex: 1; min-width: 240px; background: var(--ember-deep); padding: var(--e-4); border-top: 3px solid var(--fire-yellow); }
-.star-precio__bloque--primero{ border-top-color: var(--fire-red); }
-.star-precio__etq{ display: block; font-family: var(--font-count); font-size: 11px; letter-spacing: .1em; color: var(--txt-faint); text-transform: uppercase; }
-.star-precio__num{ display: block; font-family: var(--font-display); font-weight: 800; font-size: clamp(2rem,4.4vw,2.8rem); color: var(--fire-yellow); line-height: 1; margin-top: 8px; font-variant-numeric: tabular-nums; }
-.star-precio__num small{ font-size: 14px; font-weight: 500; color: var(--txt-soft); }
-.star-precio__chispa{ width: 20px; height: 20px; display: inline-block; vertical-align: top; margin-left: 4px; color: var(--fire-yellow); }
-.star-precio__desglose{ list-style: none; margin: var(--e-3) 0 0; padding: var(--e-3) 0 0; border-top: 1px solid var(--hairline); display: flex; flex-direction: column; gap: 6px; }
-.star-precio__desglose li{ display: flex; justify-content: space-between; font-size: 14px; color: var(--txt-soft); }
-.star-precio__desglose b{ color: var(--chalk); }
-.star-precio__inc{ color: var(--txt-soft); font-size: 13.5px; margin-top: var(--e-3); }
+/* ---- Precio: una sola card ---- */
+.star-precio-card{ max-width: 460px; margin: var(--e-5) auto 0; background: var(--ember-deep); border-top: 4px solid var(--fire-yellow); padding: var(--e-5); text-align: center; }
+.star-precio-card__etq{ display: block; font-family: var(--font-count); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--txt-faint); }
+.star-precio-card__num{ display: block; font-family: var(--font-display); font-weight: 800; font-size: clamp(2.6rem,7vw,3.6rem); color: var(--fire-yellow); line-height: 1; margin-top: 6px; }
+.star-precio-card__desglose{ color: var(--txt-soft); font-size: 14px; margin-top: 8px; }
+.star-precio-card__despues{ display: flex; flex-direction: column; align-items: center; gap: 2px; margin-top: var(--e-4); padding-top: var(--e-4); border-top: 1px solid var(--hairline); }
+.star-precio-card__despues > span:first-child{ font-family: var(--font-count); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--txt-faint); }
+.star-precio-card__despues b{ font-family: var(--font-display); font-weight: 800; font-size: 22px; }
+.star-precio-card__despues b small{ font-size: 13px; font-weight: 500; color: var(--txt-soft); }
+.star-precio-card__detalle{ color: var(--txt-faint); font-size: 12.5px; margin-top: 2px; }
+.star-precio-card__check{ list-style: none; margin: var(--e-4) 0 0; padding: 0; display: flex; flex-direction: column; gap: 8px; text-align: left; }
+.star-precio-card__check li{ color: var(--txt-soft); font-size: 14px; padding-left: 24px; position: relative; }
+.star-precio-card__check li::before{ content: '✓'; position: absolute; left: 0; color: var(--fire-yellow); font-weight: 800; }
 
-.star-prorrateo{ margin-top: var(--e-5); }
-.star-prorrateo__titulo{ font-family: var(--font-display); font-weight: 700; font-size: 15px; margin-bottom: var(--e-2); }
-.star-tabla{ width: 100%; max-width: 480px; border-collapse: collapse; }
-.star-tabla th, .star-tabla td{ text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--hairline); font-size: 14.5px; }
-.star-tabla th{ font-family: var(--font-count); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--fire-yellow); }
+.star-detalle{ text-align: left; margin-top: var(--e-3); border-top: 1px solid var(--hairline); padding-top: var(--e-3); }
+.star-detalle summary{ cursor: pointer; font-family: var(--font-display); font-weight: 700; font-size: 14px; color: var(--fire-yellow); }
+.star-detalle .star-tabla{ margin-top: var(--e-3); width: 100%; border-collapse: collapse; }
+.star-tabla th, .star-tabla td{ text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--hairline); font-size: 14px; }
+.star-tabla th{ font-family: var(--font-count); font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--fire-yellow); }
 .star-tabla td:first-child{ font-weight: 600; }
-.star-tabla__nota{ color: var(--txt-faint); font-size: 12px; }
+.star-tabla__nota{ color: var(--txt-faint); font-size: 11.5px; }
+.star-detalle .star-politica__lista{ margin: var(--e-3) 0 0; padding-left: 20px; color: var(--txt-soft); font-size: 14px; line-height: 1.6; display: flex; flex-direction: column; gap: 10px; }
+.star-detalle .star-politica__lista b{ color: var(--chalk); }
 
-.star-politica{ margin-top: var(--e-5); background: var(--ember-deep); border-left: 4px solid var(--mat-blue); padding: var(--e-4); max-width: var(--wrap-texto); }
-.star-politica__titulo{ font-family: var(--font-display); font-weight: 700; font-size: 15px; }
-.star-politica__lista{ margin: var(--e-3) 0 0; padding-left: 20px; color: var(--txt-soft); font-size: 14.5px; line-height: 1.6; display: flex; flex-direction: column; gap: 10px; }
-.star-politica__lista b{ color: var(--chalk); }
+/* ---- Starter Pack: composición tipo "boxed set" ---- */
+.star-pack{ display: flex; align-items: center; gap: var(--e-5); margin-top: var(--e-5); max-width: 620px; background: var(--ember); border: 2px solid var(--fire-yellow); border-radius: 12px; padding: var(--e-5); }
+.star-pack__items{ display: flex; gap: var(--e-4); flex: none; }
+.star-pack__icono{ width: 60px; height: 60px; color: var(--fire-yellow); }
+.star-pack__texto h3{ font-family: var(--font-display); font-weight: 800; font-size: 18px; }
+.star-pack__texto p{ color: var(--txt-soft); font-size: 14px; margin-top: 6px; }
+@media (max-width: 640px){ .star-pack{ flex-direction: column; text-align: center; } }
 
 /* ---- Cierre ---- */
 .star-cierre{ text-align: center; padding: var(--e-8) 0; background: var(--ember-deep); }
@@ -557,13 +542,10 @@ html.js .star-nunca__grande.reveal.visible{ transform: scale(1); opacity: 1; }
   .star-btn{ transition: none; }
   .star-btn:hover{ transform: none; }
   .star-btn--brilla{ animation: none; }
-  .star-hero__img{ animation: none; }
   .star-hero__sparky-wrap{ animation: none; }
-  .star-chispa{ animation: none; opacity: .5; }
-  .star-objeto{ animation: none; }
   .star-card{ transition: none; }
   .star-card:hover{ transform: none; }
-  .star-escena__img{ transition: none; }
+  .star-escena{ transition: none; }
   html.js .star-nunca__grande.reveal{ transform: none; transition: opacity 200ms ease; }
 }
 </style>

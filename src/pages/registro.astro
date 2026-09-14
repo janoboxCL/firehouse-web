@@ -29,7 +29,7 @@ const descripcion = 'Registra tus datos para conocer las opciones de Firehouse C
       <div id="form-cabecera" class="registro__cabecera reveal">
         <p class="count">Registro</p>
         <h1 class="registro__titulo">Registro Firehouse</h1>
-        <p class="registro__bajada">🔥 ¿Quieren agendar una clase de prueba o conocer nuestras alternativas para 2027? Cuéntanos sobre tu familia y te orientamos.</p>
+        <p class="registro__bajada" id="registro-bajada">🔥 ¿Quieren agendar una clase de prueba o conocer nuestras alternativas para 2027? Cuéntanos sobre tu familia y te orientamos.</p>
         <p class="registro__tiempo">⏱ No te tomará más de 3 minutos</p>
         <p class="registro__ayuda">
           ¿Tienes dudas antes de partir?
@@ -222,6 +222,17 @@ const descripcion = 'Registra tus datos para conocer las opciones de Firehouse C
 <script>
   import { iniciarFormularioRegistro } from '../scripts/registro-form.ts';
   iniciarFormularioRegistro();
+</script>
+
+<script is:inline>
+  (() => {
+    const origen = new URLSearchParams(location.search).get('origen');
+    if (origen !== 'star') return;
+    const bajada = document.getElementById('registro-bajada');
+    if (bajada) {
+      bajada.textContent = '⭐ Ya diste el primer paso para sumarte a Firehouse Star. Cuéntanos sobre tu familia para confirmar la inscripción.';
+    }
+  })();
 </script>
 
 <style is:global>
