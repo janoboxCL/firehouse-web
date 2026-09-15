@@ -34,25 +34,26 @@ const navEnlacesStar = [
 
   <!-- ============ HERO ============ -->
   <section class="star-hero">
-    <div class="star-hero__fondo" aria-hidden="true">
-      <picture>
-        <source srcset="/media/star/hero-3d.webp" type="image/webp" />
-        <img class="star-hero__img" src="/media/star/hero-3d.jpg" alt="" loading="eager" />
-      </picture>
-      <div class="star-hero__velo"></div>
-    </div>
+    <div class="star-hero__inner">
+      <div class="star-hero__fondo" aria-hidden="true">
+        <picture>
+          <source srcset="/media/star/hero-3d.webp" type="image/webp" />
+          <img class="star-hero__img" src="/media/star/hero-3d.jpg" alt="" loading="eager" />
+        </picture>
+      </div>
+      <div class="star-hero__velo" aria-hidden="true"></div>
 
-    <div class="star-hero__contenido">
-      <picture class="star-hero__logo reveal star-reveal-1">
-        <source srcset="/media/star/logo-firehouse-star.webp" type="image/webp" />
-        <img src="/media/star/logo-firehouse-star.png" alt="Firehouse Star" width="220" />
-      </picture>
+      <div class="star-hero__contenido">
+        <picture class="star-hero__logo reveal star-reveal-1">
+          <source srcset="/media/star/logo-firehouse-star.webp" type="image/webp" />
+          <img src="/media/star/logo-firehouse-star.png" alt="Firehouse Star" width="220" />
+        </picture>
 
-      <h1 class="star-hero__titulo reveal star-reveal-2">¿Buscas una actividad que de verdad le entusiasme?</h1>
-      <p class="star-hero__bajada reveal star-reveal-3">Una forma diferente de moverse, aprender, compartir y descubrir el cheer.</p>
-      <p class="star-hero__submensaje reveal star-reveal-3">Desde los 4 años · No necesita experiencia para comenzar</p>
+        <h1 class="star-hero__titulo reveal star-reveal-2">¿Buscas una actividad que de verdad le entusiasme?</h1>
+        <p class="star-hero__bajada reveal star-reveal-3">Una forma diferente de moverse, aprender, compartir y descubrir el cheer.</p>
+        <p class="star-hero__submensaje reveal star-reveal-3">Desde los 4 años · No necesita experiencia para comenzar</p>
 
-      <ul class="star-datos reveal star-reveal-4">
+        <ul class="star-datos reveal star-reveal-4">
         <li>
           <svg class="star-datos__icono" viewBox="0 0 48 48" aria-hidden="true"><path d="M24 4 29.4 18.1 45 19.2 33.4 29.2 37 44 24 35.8 11 44 14.6 29.2 3 19.2 18.6 18.1Z" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linejoin="round"/></svg>
           <span>Edad</span><b>Desde 4 años</b>
@@ -69,12 +70,13 @@ const navEnlacesStar = [
           <svg class="star-datos__icono" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="18" fill="none" stroke="currentColor" stroke-width="3.2"/><text x="24" y="31" text-anchor="middle" font-weight="800" font-size="20" fill="currentColor">$</text></svg>
           <span>Mensualidad</span><b>$30.000</b>
         </li>
-      </ul>
+        </ul>
 
-      <p class="star-hero__cta reveal star-reveal-5">
-        <a class="star-btn star-btn--brilla" href="/registro-star" id="wa-star-hero">QUIERO QUE EMPIECE EN STAR ⭐</a>
-        <a class="star-btn-quiet" href="#clase">Ver cómo es una clase ↓</a>
-      </p>
+        <p class="star-hero__cta reveal star-reveal-5">
+          <a class="star-btn star-btn--brilla" href="/registro-star" id="wa-star-hero">QUIERO QUE EMPIECE EN STAR ⭐</a>
+          <a class="star-btn-quiet" href="#clase">Ver cómo es una clase ↓</a>
+        </p>
+      </div>
     </div>
   </section>
 
@@ -411,7 +413,8 @@ const navEnlacesStar = [
 .star-btn--full{ display: flex; width: 100%; margin-top: var(--e-4); }
 .star-btn--chica{ padding: 10px 18px; font-size: 13px; min-height: 40px; }
 .star-btn-quiet{ color: rgba(245,239,232,.78); font-size: 15px; text-decoration: underline; }
-.star-hero__cta{ display: flex; flex-direction: column; align-items: center; gap: var(--e-2); margin-top: var(--e-4); }
+.star-hero__cta{ width: 100%; min-height: 50px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--e-2); margin-top: 4px; }
+.star-hero__cta .star-btn{ width: min(100%, 380px); margin-inline: auto; }
 
 /* Brillo pulsante dorado alrededor del botón rojo — referencia literal
    a "sal brillando"; se conserva aunque el botón cambió de color */
@@ -424,64 +427,67 @@ const navEnlacesStar = [
 
 /* ---- Hero ---- */
 .star-hero{
+  width: 100%;
+  padding: 0 24px 48px;
+}
+.star-hero__inner{
   position: relative;
-  width: calc(100% - 48px);
-  max-width: 1280px;
+  width: min(1240px, 100%);
+  min-height: 680px;
   margin-inline: auto;
   overflow: hidden;
-  border-bottom: 3px solid var(--fire-yellow);
+  isolation: isolate;
+  background: #141110;
+  border-bottom: 2px solid rgba(244,196,0,.9);
 }
-.star-hero__fondo{ position: relative; z-index: 0; min-width: 0; }
+.star-hero__fondo{ position: absolute; inset: 0; z-index: 0; }
 .star-hero__fondo picture{ display: block; width: 100%; height: 100%; }
-.star-hero__img{ width: 100%; height: 100%; object-fit: cover; object-position: 62% center; display: block; }
+.star-hero__img{ width: 100%; height: 100%; object-fit: cover; object-position: 57% center; display: block; }
 .star-hero__velo{
-  position: absolute; inset: 0;
-  background: linear-gradient(90deg, var(--ember) 0%, rgba(23,20,18,.82) 8%, transparent 24%);
+  position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background:
+    linear-gradient(90deg, #141110 0%, rgba(20,17,16,.99) 22%, rgba(20,17,16,.94) 35%, rgba(20,17,16,.70) 47%, rgba(20,17,16,.28) 58%, rgba(20,17,16,0) 72%),
+    linear-gradient(0deg, rgba(20,17,16,.14) 0%, transparent 24%);
 }
-.star-hero__contenido{ position: relative; z-index: 1; min-width: 0; text-align: center; padding: var(--e-4) 24px; }
-
-@media (min-width: 901px){
-  .star-hero{
-    display: grid;
-    grid-template-columns: minmax(0, 40fr) minmax(0, 60fr);
-    align-items: stretch;
-    height: clamp(560px, 46vw, 590px);
-    background: var(--ember);
-  }
-  .star-hero__fondo{
-    grid-column: 2;
-    grid-row: 1;
-    margin-left: -40px;
-  }
-  .star-hero__contenido{
-    grid-column: 1;
-    grid-row: 1;
-    align-self: center;
-  }
+.star-hero__contenido{
+  position: relative; z-index: 2;
+  width: min(500px, 44%); min-height: 680px;
+  display: flex; flex-direction: column; justify-content: center;
+  box-sizing: border-box; text-align: center;
+  padding: 38px 0 34px 34px;
 }
 
-.star-hero__logo{ display: block; margin: 0 auto var(--e-2); }
-.star-hero__logo img{ width: min(300px, 75%); height: auto; display: block; margin-inline: auto; }
-.star-hero__titulo{ font-family: var(--font-display); font-weight: 800; font-size: clamp(1.8rem, 3.6vw, 2.7rem); line-height: 1.12; }
-.star-hero__bajada{ color: rgba(245,239,232,.92); font-size: clamp(1rem,1.4vw,1.1rem); margin: var(--e-2) auto 0; max-width: 46ch; line-height: 1.5; }
-.star-hero__submensaje{ font-family: var(--font-display); font-weight: 700; font-size: clamp(.95rem, 1.4vw, 1.05rem); color: var(--fire-yellow); margin-top: var(--e-2); }
+.star-hero__logo{ width: clamp(230px, 22vw, 300px); max-width: 100%; height: auto; display: block; margin: 0 auto 22px; }
+.star-hero__logo img{ width: 100%; height: auto; display: block; }
+.star-hero__titulo{ max-width: 500px; margin: 0 auto 18px; font-family: var(--font-display); font-weight: 800; font-size: clamp(36px, 3vw, 46px); line-height: 1.06; letter-spacing: -.025em; text-align: center; }
+.star-hero__bajada{ max-width: 470px; margin: 0 auto 18px; color: rgba(245,239,232,.92); font-size: 17px; line-height: 1.45; text-align: center; }
+.star-hero__submensaje{ margin: 0 auto 24px; font-family: var(--font-display); font-weight: 700; font-size: 16px; line-height: 1.35; color: var(--fire-yellow); text-align: center; }
 
-@media (max-width: 900px){
-  .star-hero{ width: calc(100% - 32px); }
-  .star-hero__fondo{ aspect-ratio: 16 / 10; }
-  .star-hero__velo{ background: linear-gradient(180deg, transparent 72%, var(--ember) 100%); }
+@media (max-width: 1050px){
+  .star-hero__inner{ min-height: 660px; }
+  .star-hero__contenido{ width: 50%; min-height: 660px; padding-left: 28px; }
   .star-hero__img{ object-position: 62% center; }
-  .star-hero__contenido{ max-width: none; text-align: center; padding: var(--e-6) 24px var(--e-7); }
-  .star-hero__logo img{ margin-inline: auto; }
-  .star-hero__cta{ align-items: center; }
-  .star-datos{ margin-inline: auto; }
+  .star-hero__velo{ background: linear-gradient(90deg, #141110 0%, rgba(20,17,16,.99) 30%, rgba(20,17,16,.88) 44%, rgba(20,17,16,.38) 62%, transparent 78%); }
+  .star-datos{ grid-template-columns: repeat(2, minmax(0,1fr)); }
+  .star-datos li{ min-height: 78px; }
 }
 
-.star-datos{ display: grid; grid-template-columns: repeat(auto-fit,minmax(130px,1fr)); gap: 10px; margin: var(--e-4) auto 0; padding: 0; list-style: none; max-width: 480px; }
-@media (min-width: 901px){
-  .star-datos{ grid-template-columns: repeat(4, minmax(0,1fr)); max-width: 560px; }
+.star-datos{ width: 100%; display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 8px; margin: 0 0 18px; padding: 0; list-style: none; }
+.star-datos li{ min-width: 0; min-height: 105px; background: var(--ember-deep); border-top: 2px solid var(--fire-yellow); padding: 14px 7px; border-radius: 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; box-sizing: border-box; text-align: center; }
+
+@media (max-width: 760px){
+  .star-hero{ padding-inline: 0; padding-bottom: 32px; }
+  .star-hero__inner{ width: 100%; min-height: 0; display: flex; flex-direction: column; overflow: visible; }
+  .star-hero__fondo{ position: relative; inset: auto; width: 100%; height: auto; aspect-ratio: 16 / 10; overflow: hidden; }
+  .star-hero__img{ width: 100%; height: 100%; object-fit: cover; object-position: 67% center; }
+  .star-hero__velo{ top: 0; left: 0; right: 0; bottom: auto; height: auto; aspect-ratio: 16 / 10; background: linear-gradient(180deg, rgba(20,17,16,0) 55%, rgba(20,17,16,.35) 78%, #141110 100%); }
+  .star-hero__contenido{ width: 100%; min-height: 0; padding: 24px 18px 30px; background: #141110; }
+  .star-hero__logo{ width: min(260px, 72vw); }
+  .star-hero__titulo{ font-size: clamp(32px, 9vw, 40px); }
+  .star-datos{ grid-template-columns: repeat(2, minmax(0,1fr)); gap: 8px; }
+  .star-datos li{ min-height: 90px; }
+  .star-hero__cta .star-btn{ width: 100%; }
 }
-.star-datos li{ background: var(--ember-deep); border-top: 3px solid var(--fire-yellow); padding: var(--e-3) var(--e-2); border-radius: 6px; display: flex; flex-direction: column; align-items: center; gap: 2px; }
 .star-datos__icono{ width: 24px; height: 24px; color: var(--fire-yellow); margin-bottom: 4px; }
 .star-datos span{ display: block; font-family: var(--font-count); font-size: 10.5px; letter-spacing: .1em; color: var(--txt-faint); text-transform: uppercase; }
 .star-datos b{ display: block; margin-top: 2px; font-family: var(--font-display); font-weight: 800; font-size: 15px; color: var(--chalk); }
