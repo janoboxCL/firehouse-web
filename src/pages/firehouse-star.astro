@@ -13,9 +13,9 @@ const preguntas = [
   { p: '¿Tiene que saber hacer piruetas?',
     r: 'No. La clase parte con movimientos y ejercicios adaptados a su nivel, sin ninguna base previa.' },
   { p: '¿Es muy exigente?',
-    r: 'Es una clase semanal de 90 minutos donde se mezclan movimiento, juegos y fundamentos del cheer. No es un entrenamiento de competencia.' },
+    r: 'Es una clase semanal de 90 minutos pensada para iniciarse progresivamente. Se combinan movimiento, juegos y fundamentos del cheer en una clase guiada y estructurada.\n\nNo es un entrenamiento de competencia, pero sí existe aprendizaje, práctica y progresión en cada etapa.' },
   { p: '¿Va a competir?',
-    r: 'No tiene que decidirlo ahora. Firehouse Star es un espacio para aprender y disfrutar sin presión por competir, y puede quedarse en Star todo el tiempo que quiera. Si en algún momento quiere dar el paso hacia un equipo de competencia (Firehouse All Star), ese camino también va a estar disponible.' },
+    r: 'No. Firehouse Star no exige competir.\n\nPuede seguir aprendiendo, entrenando y disfrutando en Star todo el tiempo que quiera.\n\nSi más adelante le interesa conocer nuestros equipos Firehouse All Star, ese camino también estará disponible.' },
   { p: '¿Existe clase de prueba?',
     r: 'Durante esta etapa, Firehouse Star funciona por inscripción directa, sin clase de prueba gratuita. Para bajar el riesgo de esa decisión, si ningún horario disponible resulta compatible con tu familia, la inscripción se reembolsa completa; y si te arrepientes antes de la primera clase sin que exista ese problema, el pago queda como crédito Firehouse por 90 días, para este hijo o hija, o para un hermano o hermana.' },
   { p: '¿Existe permanencia mínima?',
@@ -49,6 +49,7 @@ const navEnlacesStar = [
           <img src="/media/star/logo-firehouse-star.png" alt="Firehouse Star" width="220" />
         </picture>
 
+        <p class="star-hero__eyebrow reveal star-reveal-2">Programa de iniciación al cheer</p>
         <h1 class="star-hero__titulo reveal star-reveal-2">¿Buscas una actividad que de verdad le entusiasme?</h1>
         <p class="star-hero__bajada reveal star-reveal-3">Una forma diferente de moverse, aprender, compartir y descubrir el cheer.</p>
         <p class="star-hero__submensaje reveal star-reveal-3">Desde los 4 años · No necesita experiencia para comenzar</p>
@@ -104,6 +105,7 @@ const navEnlacesStar = [
       <p class="star-eyebrow">Así se vive una clase Star</p>
       <h2 class="star-title">¿Qué pasa en una clase de Firehouse Star?</h2>
       <p class="star-parrafo">90 minutos para moverse, jugar, aprender y descubrir el cheer.</p>
+      <p class="star-clase__estructura">Una clase guiada, con actividades y aprendizajes progresivos adaptados a su etapa.</p>
       <p class="star-escenas__hint">Desliza para ver →</p>
 
       <div class="star-escenas">
@@ -215,7 +217,7 @@ const navEnlacesStar = [
       <p class="star-eyebrow reveal">La objeción número uno</p>
       <h2 class="star-title reveal">¿Nunca ha hecho cheer?</h2>
       <p class="star-nunca__grande reveal">Perfecto.</p>
-      <p class="star-parrafo reveal">Firehouse Star está diseñado justamente para descubrirlo desde cero. Aquí puede aprender movimientos, coordinación, trabajo en equipo y fundamentos del cheer, de forma progresiva y entretenida.</p>
+      <p class="star-parrafo reveal">Firehouse Star es el programa de iniciación al cheer de Firehouse, diseñado justamente para comenzar desde cero. Aquí aprende movimientos, coordinación, trabajo en equipo y fundamentos del cheer de forma progresiva y entretenida.</p>
     </div>
   </section>
 
@@ -279,12 +281,12 @@ const navEnlacesStar = [
   <section class="star-section star-section--panel">
     <div class="wrap star-filosofia">
       <p class="star-eyebrow reveal">Filosofía Star</p>
-      <h2 class="star-filosofia__grande reveal">A su ritmo. Sin presión. Sin apuro.</h2>
+      <h2 class="star-filosofia__grande reveal">A su ritmo. Con acompañamiento. Sin presión por competir.</h2>
       <p class="star-parrafo reveal">
-        Firehouse Star es un espacio para aprender, disfrutar y avanzar sin presión por competir.
-        Puede continuar en Star todo el tiempo que quiera.
+        Firehouse Star es una clase guiada para aprender, disfrutar y avanzar progresivamente.
+        Cada niño o niña puede desarrollar sus habilidades a su ritmo, con acompañamiento de sus coaches y sin presión por competir.
       </p>
-      <p class="star-nota reveal">Si algún día quiere dar el paso hacia un equipo competitivo, también tendrá ese camino disponible.</p>
+      <p class="star-nota reveal">Puede continuar en Star todo el tiempo que quiera. Y si más adelante le interesa conocer Firehouse All Star, ese camino también estará disponible.</p>
     </div>
   </section>
 
@@ -420,7 +422,7 @@ const navEnlacesStar = [
       <p class="star-cierre__previo">Toda estrella de Firehouse tuvo un primer día.</p>
       <Sparky pose="excited" size={110} class="sparky--salta" alt="Sparky celebrando con los brazos arriba" />
       <h2 class="star-title">Su primera experiencia en cheer puede empezar aquí. ⭐</h2>
-      <p class="star-parrafo star-parrafo--centro">No necesita experiencia.<br />Puede avanzar a su ritmo.</p>
+      <p class="star-parrafo star-parrafo--centro">No necesita experiencia.<br />Aprende paso a paso, con acompañamiento.</p>
       <a class="star-btn star-btn--brilla" href="/registro-star" id="wa-star-cierre">QUIERO QUE EMPIECE EN STAR ⭐</a>
       <p class="star-nota">Sábados 16:00–17:30 · Santa Corina 197, La Cisterna</p>
       <p class="star-nota"><a class="star-cta-texto" href={whatsapp('ayudaRegistroStar')} target="_blank" rel="noopener">¿Tienes una duda? WhatsApp</a></p>
@@ -555,8 +557,9 @@ const navEnlacesStar = [
   padding: 38px 0 22px 34px;
 }
 
-.star-hero__logo{ width: clamp(230px, 22vw, 300px); max-width: 100%; height: auto; display: block; margin: 0 auto 22px; }
+.star-hero__logo{ width: clamp(230px, 22vw, 300px); max-width: 100%; height: auto; display: block; margin: 0 auto 12px; }
 .star-hero__logo img{ width: 100%; height: auto; display: block; }
+.star-hero__eyebrow{ margin: 0 auto 12px; font-size: 13px; line-height: 1.2; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: var(--fire-yellow); text-align: center; }
 .star-hero__titulo{ max-width: 500px; margin: 0 auto 18px; font-family: var(--font-display); font-weight: 800; font-size: clamp(36px, 3vw, 46px); line-height: 1.06; letter-spacing: -.025em; text-align: center; }
 .star-hero__bajada{ max-width: 470px; margin: 0 auto 18px; color: rgba(245,239,232,.92); font-size: 17px; line-height: 1.45; text-align: center; }
 .star-hero__submensaje{ margin: 0 auto 24px; font-family: var(--font-display); font-weight: 700; font-size: 16px; line-height: 1.35; color: var(--fire-yellow); text-align: center; }
@@ -610,6 +613,7 @@ const navEnlacesStar = [
   display: none; font-family: var(--font-count); font-size: 12px; letter-spacing: .08em;
   color: var(--fire-yellow); text-transform: uppercase; margin-top: var(--e-3);
 }
+.star-clase__estructura{ max-width: var(--wrap-texto); margin-top: var(--e-2); color: var(--txt-faint); font-size: 14px; line-height: 1.5; }
 @media (max-width: 900px){ .star-escenas__hint{ display: block; } }
 
 .star-escenas{ display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: var(--e-3); margin: var(--e-4) calc(-1 * 24px) 0; padding: 4px 24px 8px; -webkit-overflow-scrolling: touch; }
