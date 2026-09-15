@@ -423,28 +423,40 @@ const navEnlacesStar = [
 }
 
 /* ---- Hero ---- */
-.star-hero{ position: relative; overflow: hidden; border-bottom: 3px solid var(--fire-yellow); }
-.star-hero__fondo{ position: absolute; inset: 0; z-index: 0; }
-.star-hero__img{ width: 100%; height: 100%; object-fit: cover; object-position: 72% center; display: block; }
+.star-hero{
+  position: relative;
+  width: calc(100% - 48px);
+  max-width: 1280px;
+  margin-inline: auto;
+  overflow: hidden;
+  border-bottom: 3px solid var(--fire-yellow);
+}
+.star-hero__fondo{ position: relative; z-index: 0; min-width: 0; }
+.star-hero__fondo picture{ display: block; width: 100%; height: 100%; }
+.star-hero__img{ width: 100%; height: 100%; object-fit: cover; object-position: 62% center; display: block; }
 .star-hero__velo{
   position: absolute; inset: 0;
-  background: linear-gradient(90deg, rgba(23,20,18,.95) 0%, rgba(23,20,18,.84) 34%, rgba(23,20,18,.4) 58%, rgba(23,20,18,.08) 78%);
+  background: linear-gradient(90deg, var(--ember) 0%, rgba(23,20,18,.82) 8%, transparent 24%);
 }
-.star-hero__contenido{ position: relative; z-index: 1; max-width: 640px; text-align: center; padding: var(--e-4) 24px var(--e-4) clamp(32px, 6vw, 96px); }
+.star-hero__contenido{ position: relative; z-index: 1; min-width: 0; text-align: center; padding: var(--e-4) 24px; }
 
 @media (min-width: 901px){
-  .star-hero{ display: flex; align-items: center; min-height: 620px; }
-  /* La ilustración conserva su proporción en vez de ampliarse hasta cubrir
-     todo el ancho. Así los personajes no dominan el hero en pantallas grandes
-     y el fondo oscuro completa naturalmente el espacio detrás del mensaje. */
-  .star-hero__fondo{ background: var(--ember); }
-  .star-hero__fondo picture{ display: block; width: 100%; height: 100%; }
-  .star-hero__img{
-    width: 68%;
-    height: 100%;
-    margin-left: auto;
-    object-fit: contain;
-    object-position: right center;
+  .star-hero{
+    display: grid;
+    grid-template-columns: minmax(0, 40fr) minmax(0, 60fr);
+    align-items: stretch;
+    height: clamp(560px, 46vw, 590px);
+    background: var(--ember);
+  }
+  .star-hero__fondo{
+    grid-column: 2;
+    grid-row: 1;
+    margin-left: -40px;
+  }
+  .star-hero__contenido{
+    grid-column: 1;
+    grid-row: 1;
+    align-self: center;
   }
 }
 
@@ -455,8 +467,9 @@ const navEnlacesStar = [
 .star-hero__submensaje{ font-family: var(--font-display); font-weight: 700; font-size: clamp(.95rem, 1.4vw, 1.05rem); color: var(--fire-yellow); margin-top: var(--e-2); }
 
 @media (max-width: 900px){
-  .star-hero__fondo{ position: relative; inset: auto; aspect-ratio: 16 / 10; }
-  .star-hero__velo{ background: linear-gradient(180deg, rgba(23,20,18,.1) 45%, rgba(23,20,18,.97) 94%); }
+  .star-hero{ width: calc(100% - 32px); }
+  .star-hero__fondo{ aspect-ratio: 16 / 10; }
+  .star-hero__velo{ background: linear-gradient(180deg, transparent 72%, var(--ember) 100%); }
   .star-hero__img{ object-position: 62% center; }
   .star-hero__contenido{ max-width: none; text-align: center; padding: var(--e-6) 24px var(--e-7); }
   .star-hero__logo img{ margin-inline: auto; }
