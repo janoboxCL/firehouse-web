@@ -23,7 +23,7 @@ function plantillaAtleta(numero: number): string {
   return `
     <fieldset class="rstar-atleta-card" data-atleta-card>
       <div class="rstar-atleta-card__cabecera">
-        <p class="rstar-atleta-card__titulo">Niña o niño ${numero}</p>
+        <p class="rstar-atleta-card__titulo">Deportista ${numero}</p>
         <button type="button" class="rstar-atleta-card__eliminar" data-accion="eliminar-atleta" hidden>Eliminar</button>
       </div>
       <div class="rstar-fila">
@@ -61,7 +61,7 @@ function renumerarAtletas(): void {
   cards.forEach((card, i) => {
     const numero = i + 1;
     const titulo = $('.rstar-atleta-card__titulo', card);
-    if (titulo) titulo.textContent = `Niña o niño ${numero}`;
+    if (titulo) titulo.textContent = `Deportista ${numero}`;
     const btnEliminar = $<HTMLButtonElement>('[data-accion="eliminar-atleta"]', card);
     if (btnEliminar) btnEliminar.hidden = cards.length <= 1;
   });
