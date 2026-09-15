@@ -7,7 +7,7 @@ const titulo = 'Firehouse Star — cheerleading desde cero para niñas y niños 
 const descripcion = 'Firehouse Star es el programa de iniciación de Firehouse Cheer: una clase semanal para descubrir el cheer desde cero, sin experiencia previa. Sábados en La Cisterna.';
 
 const preguntas = [
-  { p: 'Mi hijo nunca ha hecho cheer.',
+  { p: 'Mi hijo o hija nunca ha hecho cheer.',
     r: 'Perfecto. Firehouse Star está pensado justamente para empezar desde cero.' },
   { p: '¿Tiene que saber hacer piruetas?',
     r: 'No. La clase parte con movimientos y ejercicios adaptados a su nivel, sin ninguna base previa.' },
@@ -16,7 +16,7 @@ const preguntas = [
   { p: '¿Va a competir?',
     r: 'No. Firehouse Star no compite: es la puerta de entrada al cheer. Si en marzo de 2027 quiere sumarse a un equipo de competencia (Firehouse All Star), puede iniciar el proceso de incorporación a la temporada en ese momento.' },
   { p: '¿Existe clase de prueba?',
-    r: 'Durante esta etapa, Firehouse Star funciona por inscripción directa, sin clase de prueba gratuita. Para bajar el riesgo de esa decisión, si ningún horario disponible resulta compatible con tu familia, la inscripción se reembolsa completa; y si te arrepientes antes de la primera clase sin que exista ese problema, el pago queda como crédito Firehouse por 90 días, para este hijo o para un hermano.' },
+    r: 'Durante esta etapa, Firehouse Star funciona por inscripción directa, sin clase de prueba gratuita. Para bajar el riesgo de esa decisión, si ningún horario disponible resulta compatible con tu familia, la inscripción se reembolsa completa; y si te arrepientes antes de la primera clase sin que exista ese problema, el pago queda como crédito Firehouse por 90 días, para este hijo o hija, o para un hermano o hermana.' },
   { p: '¿Existe permanencia mínima?',
     r: 'No. La mensualidad funciona mes a mes, igual que en el resto de Firehouse.' },
   { p: '¿Qué pasa si me inscribo a mitad de mes?',
@@ -109,6 +109,7 @@ const navEnlacesStar = [
     <div class="wrap">
       <p class="star-eyebrow">Así se vive una clase Star</p>
       <h2 class="star-title">¿Qué va a hacer durante 90 minutos?</h2>
+      <p class="star-escenas__hint">Desliza para ver →</p>
 
       <div class="star-escenas">
         <article class="star-escena reveal">
@@ -480,10 +481,9 @@ const navEnlacesStar = [
 
 @media (max-width: 900px){
   .star-hero__grid{ grid-template-columns: 1fr; text-align: center; }
-  .star-hero__texto{ order: 2; }
   .star-hero__logo img{ margin-inline: auto; }
   .star-hero__cta{ align-items: center; }
-  .star-hero__sparky-wrap{ order: 1; max-width: 220px; margin-inline: auto; }
+  .star-hero__sparky-wrap{ max-width: 220px; margin-inline: auto; }
   .star-hero__glow{ opacity: .6; }
   .star-datos{ margin-inline: auto; }
 }
@@ -509,7 +509,13 @@ const navEnlacesStar = [
 @media (max-width: 900px){ .star-relato__grid{ flex-direction: column; text-align: center; } .star-relato__remate{ margin-inline: auto; } }
 
 /* ---- Escenas de clase: grilla 3+2 en desktop, carrusel horizontal en móvil ---- */
-.star-escenas{ display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: var(--e-3); margin: var(--e-6) calc(-1 * 24px) 0; padding: 4px 24px 8px; -webkit-overflow-scrolling: touch; }
+.star-escenas__hint{
+  display: none; font-family: var(--font-count); font-size: 12px; letter-spacing: .08em;
+  color: var(--fire-yellow); text-transform: uppercase; margin-top: var(--e-3);
+}
+@media (max-width: 900px){ .star-escenas__hint{ display: block; } }
+
+.star-escenas{ display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: var(--e-3); margin: var(--e-4) calc(-1 * 24px) 0; padding: 4px 24px 8px; -webkit-overflow-scrolling: touch; }
 .star-escena{ flex: none; width: 78vw; max-width: 320px; scroll-snap-align: start; background: var(--ember); border-top: 3px solid var(--fire-yellow); }
 .star-escena:nth-child(2){ border-top-color: var(--mat-blue); }
 .star-escena:nth-child(3){ border-top-color: var(--fire-red); }
