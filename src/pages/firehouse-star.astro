@@ -436,18 +436,15 @@ const navEnlacesStar = [
 
 .star-hero__kicker{ font-family: var(--font-count); font-weight: 700; font-size: 11.5px; letter-spacing: .18em; color: var(--txt-faint); text-transform: uppercase; }
 .star-hero__logo{ display: block; margin: var(--e-2) 0; }
-.star-hero__logo img{ width: min(360px, 100%); height: auto; display: block; }
-.star-hero__titulo{ font-family: var(--font-display); font-weight: 800; font-size: clamp(1.9rem, 4vw, 3rem); line-height: 1.08; margin-top: var(--e-2); }
+.star-hero__logo img{ width: min(300px, 100%); height: auto; display: block; }
+.star-hero__titulo{ font-family: var(--font-display); font-weight: 800; font-size: clamp(2.2rem, 4vw, 3.4rem); line-height: 1.06; margin-top: var(--e-2); max-width:18ch; }
 .star-hero__bajada{ color: rgba(245,239,232,.9); font-size: clamp(.95rem,1.3vw,1.05rem); margin-top: var(--e-3); max-width: 46ch; line-height: 1.55; }
-.star-hero__submensaje{ font-family: var(--font-display); font-weight: 800; font-size: clamp(1.05rem, 1.6vw, 1.25rem); color: var(--fire-yellow); margin-top: var(--e-3); max-width: 30ch; line-height: 1.3; }
+.star-hero__submensaje{ font-family: var(--font-display); font-weight: 800; font-size: clamp(1.05rem, 1.6vw, 1.25rem); color: var(--fire-yellow); margin-top: var(--e-3); max-width: 44ch; line-height: 1.3; }
 
 .star-hero__sparky-wrap{ position:relative; z-index:1; display:flex; justify-content:center; animation:star-sparky-entra 900ms 300ms cubic-bezier(.22,.61,.36,1) both; }
 
-/* Corrección de composición solo en desktop: sube el bloque de texto y,
-   más todavía, a Sparky — para que el casco quede a la altura de la
-   mitad inferior del logo y no sobre vacío en el cuadrante superior
-   derecho. Se usa margin (no transform) para no pisar la animación de
-   entrada de Sparky, que ya anima su propio transform. */
+/* En pantallas amplias, Sparky cierra la composición sin quitarle
+   ancho útil al mensaje principal. */
 @media (min-width: 1024px){
   .star-hero__texto{ margin-top: -10px; }
   .star-hero__sparky-wrap{ margin-top:-40px; }
@@ -470,11 +467,12 @@ const navEnlacesStar = [
   .star-datos{ margin-inline: auto; }
 }
 
-.star-datos{ display: grid; grid-template-columns: repeat(auto-fit,minmax(130px,1fr)); gap: 10px; margin: var(--e-5) 0 0; padding: 0; list-style: none; max-width: 480px; }
+.star-datos{ display: grid; grid-template-columns: repeat(4,minmax(120px,1fr)); gap: 10px; margin: var(--e-5) 0 0; padding: 0; list-style: none; max-width: 650px; }
 .star-datos li{ background: var(--ember-deep); border-top: 3px solid var(--fire-yellow); padding: var(--e-3) var(--e-2); border-radius: 6px; display: flex; flex-direction: column; align-items: center; gap: 2px; }
 .star-datos__icono{ width: 24px; height: 24px; color: var(--fire-yellow); margin-bottom: 4px; }
 .star-datos span{ display: block; font-family: var(--font-count); font-size: 10.5px; letter-spacing: .1em; color: var(--txt-faint); text-transform: uppercase; }
 .star-datos b{ display: block; margin-top: 2px; font-family: var(--font-display); font-weight: 800; font-size: 15px; color: var(--chalk); }
+@media (max-width: 640px){ .star-datos{ grid-template-columns:repeat(2,1fr); } }
 
 /* ---- Secciones genéricas ---- */
 .star-section{ padding: var(--e-7) 0; }
