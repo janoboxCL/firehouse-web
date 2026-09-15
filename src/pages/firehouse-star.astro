@@ -428,19 +428,40 @@ const navEnlacesStar = [
 /* ---- Hero ---- */
 .star-hero{
   width: 100%;
-  padding: 0 24px 48px;
+  margin-bottom: 0;
+  padding: 0 24px 16px;
+  overflow: clip;
 }
 .star-hero__inner{
   position: relative;
   width: min(1240px, 100%);
   min-height: 680px;
   margin-inline: auto;
-  overflow: hidden;
+  overflow: visible;
   isolation: isolate;
   background: #141110;
   border-bottom: 2px solid rgba(244,196,0,.9);
 }
-.star-hero__fondo{ position: absolute; inset: 0; z-index: 0; }
+.star-hero__fondo{
+  position: absolute;
+  top: 0;
+  right: -72px;
+  bottom: 0;
+  left: 0;
+  z-index: 0;
+  overflow: hidden;
+}
+.star-hero__fondo::after{
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 110px;
+  z-index: 2;
+  pointer-events: none;
+  background: linear-gradient(90deg, rgba(20,17,16,0) 0%, rgba(20,17,16,.12) 28%, rgba(20,17,16,.38) 62%, rgba(20,17,16,.72) 82%, #141110 100%);
+}
 .star-hero__fondo picture{ display: block; width: 100%; height: 100%; }
 .star-hero__img{ width: 100%; height: 100%; object-fit: cover; object-position: 57% center; display: block; }
 .star-hero__velo{
@@ -454,7 +475,7 @@ const navEnlacesStar = [
   width: min(500px, 44%); min-height: 680px;
   display: flex; flex-direction: column; justify-content: center;
   box-sizing: border-box; text-align: center;
-  padding: 38px 0 34px 34px;
+  padding: 38px 0 22px 34px;
 }
 
 .star-hero__logo{ width: clamp(230px, 22vw, 300px); max-width: 100%; height: auto; display: block; margin: 0 auto 22px; }
@@ -476,12 +497,13 @@ const navEnlacesStar = [
 .star-datos li{ min-width: 0; min-height: 105px; background: var(--ember-deep); border-top: 2px solid var(--fire-yellow); padding: 14px 7px; border-radius: 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; box-sizing: border-box; text-align: center; }
 
 @media (max-width: 760px){
-  .star-hero{ padding-inline: 0; padding-bottom: 32px; }
+  .star-hero{ padding-inline: 0; padding-bottom: 16px; }
   .star-hero__inner{ width: 100%; min-height: 0; display: flex; flex-direction: column; overflow: visible; }
   .star-hero__fondo{ position: relative; inset: auto; width: 100%; height: auto; aspect-ratio: 16 / 10; overflow: hidden; }
+  .star-hero__fondo::after{ display: none; }
   .star-hero__img{ width: 100%; height: 100%; object-fit: cover; object-position: 67% center; }
   .star-hero__velo{ top: 0; left: 0; right: 0; bottom: auto; height: auto; aspect-ratio: 16 / 10; background: linear-gradient(180deg, rgba(20,17,16,0) 55%, rgba(20,17,16,.35) 78%, #141110 100%); }
-  .star-hero__contenido{ width: 100%; min-height: 0; padding: 24px 18px 30px; background: #141110; }
+  .star-hero__contenido{ width: 100%; min-height: 0; padding: 24px 18px 22px; background: #141110; }
   .star-hero__logo{ width: min(260px, 72vw); }
   .star-hero__titulo{ font-size: clamp(32px, 9vw, 40px); }
   .star-datos{ grid-template-columns: repeat(2, minmax(0,1fr)); gap: 8px; }
@@ -497,7 +519,7 @@ const navEnlacesStar = [
 .star-section--panel{ background: var(--ember-deep); }
 
 /* ---- Relato Sparky (única sección clara del sitio: acento deliberado) ---- */
-.star-relato{ background: var(--chalk); padding: var(--e-7) 0; }
+.star-relato{ margin-top: 0; background: var(--chalk); padding: 56px 0 var(--e-7); }
 .star-relato__grid{ display: flex; gap: var(--e-6); align-items: center; }
 .star-relato__grid > *{ flex: 1; }
 .star-relato__sparky{ display: flex; justify-content: center; }
