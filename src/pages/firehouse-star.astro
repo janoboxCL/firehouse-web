@@ -424,15 +424,15 @@ const navEnlacesStar = [
 }
 
 /* ---- Hero ---- */
-.star-hero{ position: relative; overflow: hidden; background: var(--ember); border-bottom: 3px solid var(--fire-yellow); padding: var(--e-6) 0; min-height: 650px; display:flex; align-items:center; }
+.star-hero{ position: relative; overflow: hidden; background: var(--ember); border-bottom: 3px solid var(--fire-yellow); padding: var(--e-7) 0; min-height: 720px; display:flex; align-items:center; }
 .star-hero__glow{
   position: absolute; right: -8%; top: 50%; transform: translateY(-50%);
   width: 56vw; max-width: 640px; aspect-ratio: 1; border-radius: 50%;
   background: radial-gradient(circle, rgba(255,196,0,.20) 0%, rgba(255,196,0,0) 70%);
   pointer-events: none;
 }
-.star-hero__grid{ position: relative; display: grid; grid-template-columns: minmax(0,1.35fr) minmax(280px,.65fr); gap: var(--e-6); align-items: center; }
-.star-hero__texto{ position:relative; z-index:2; width:100%; padding:var(--e-3) 0; }
+.star-hero__grid{ position: relative; display: grid; grid-template-columns: minmax(440px,.82fr) 1.18fr; gap: var(--e-5); align-items: center; }
+.star-hero__texto{ position:relative; z-index:2; padding:var(--e-5); background:linear-gradient(90deg,rgba(23,20,18,.98) 0%,rgba(23,20,18,.9) 76%,rgba(23,20,18,0) 100%); }
 
 .star-hero__kicker{ font-family: var(--font-count); font-weight: 700; font-size: 11.5px; letter-spacing: .18em; color: var(--txt-faint); text-transform: uppercase; }
 .star-hero__logo{ display: block; margin: var(--e-2) 0; }
@@ -446,7 +446,8 @@ const navEnlacesStar = [
 /* En pantallas amplias, Sparky cierra la composición sin quitarle
    ancho útil al mensaje principal. */
 @media (min-width: 1024px){
-  .star-hero__sparky-wrap{ justify-content:flex-end; }
+  .star-hero__texto{ margin-top: -10px; }
+  .star-hero__sparky-wrap{ margin-top:-40px; }
 }
 @keyframes star-sparky-entra{
   0%   { transform: translateY(46px) scale(.7); opacity: 0; }
@@ -458,7 +459,7 @@ const navEnlacesStar = [
 @media (max-width: 900px){
   .star-hero{ padding:0 0 var(--e-6); min-height:0; }
   .star-hero__grid{ grid-template-columns: 1fr; text-align: center; display:flex; flex-direction:column; padding:0; }
-  .star-hero__texto{ padding:var(--e-5) 24px 0; }
+  .star-hero__texto{ padding:var(--e-5) 24px 0; background:linear-gradient(180deg,var(--ember),var(--ember)); }
   .star-hero__logo img{ margin-inline: auto; }
   .star-hero__cta{ align-items: center; }
   .star-hero__sparky-wrap{ max-width:220px; margin:var(--e-4) auto 0; }
