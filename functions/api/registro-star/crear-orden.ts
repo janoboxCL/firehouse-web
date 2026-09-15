@@ -19,6 +19,7 @@
 
 import { createClient } from '@supabase/supabase-js';
 import { elegirPasarelaHabilitada, construirPaymentProvider, type PaymentProvidersEnv } from '../../lib/payment-providers/index.ts';
+import { validarRegistroStar } from '../../../src/lib/crm/registro-star.ts';
 
 interface Env extends PaymentProvidersEnv {
   SUPABASE_URL: string;
@@ -26,9 +27,6 @@ interface Env extends PaymentProvidersEnv {
   SITE_URL?: string;
 }
 
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const MONTO_KIT_STAR = 10000;
-const MAX_ATLETAS = 5;
 const NOMBRE_PRODUCTO_KIT = 'Kit de Iniciación Firehouse Star';
 
 // Prefijo del commerce_order: así el webhook compartido de Mercado Pago
@@ -62,58 +60,11 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       return jsonResponse(400, { error: 'json_invalido' });
     }
 
-    const apoderado = (body.apoderado ?? {}) as Record<string, unknown>;
-    const atletasCrudos = Array.isArray(body.atletas) ? body.atletas : [];
-
-    const apNombre = String(apoderado.nombre ?? '').trim().slice(0, 80);
-    const apApellidos = String(apoderado.apellidos ?? '').trim().slice(0, 120);
-    const apTelefono = String(apoderado.telefono ?? '').trim().slice(0, 20);
-    const apEmail = String(apoderado.email ?? '').trim().slice(0, 254);
-    const apComuna = String(apoderado.comuna ?? '').trim().slice(0, 100);
-
-    const aceptaCondiciones = body.aceptaCondiciones === true;
-
-    if (!apNombre || apNombre.length < 2) {
-      return jsonResponse(400, { error: 'nombre_apoderado_invalido' });
+    const validacion = validarRegistroStar(body);
+    if (!validacion.ok) {
+      return jsonResponse(400, { error: validacion.error });
     }
-    if (!apApellidos || apApellidos.length < 2) {
-      return jsonResponse(400, { error: 'apellidos_apoderado_invalidos' });
-    }
-    if (!EMAIL_RE.test(apEmail)) {
-      return jsonResponse(400, { error: 'email_invalido' });
-    }
-    if (apTelefono.replace(/\D/g, '').length < 8) {
-      return jsonResponse(400, { error: 'telefono_invalido' });
-    }
-    if (!apComuna) {
-      return jsonResponse(400, { error: 'comuna_invalida' });
-    }
-    if (atletasCrudos.length === 0 || atletasCrudos.length > MAX_ATLETAS) {
-      return jsonResponse(400, { error: 'cantidad_atletas_invalida' });
-    }
-
-    const atletas: { nombre: string; apellidos: string; fechaNacimiento: string }[] = [];
-    for (const raw of atletasCrudos) {
-      const a = (raw ?? {}) as Record<string, unknown>;
-      const atNombre = String(a.nombre ?? '').trim().slice(0, 80);
-      const atApellidos = String(a.apellidos ?? '').trim().slice(0, 120);
-      const atFechaNacimiento = String(a.fechaNacimiento ?? '').trim();
-
-      if (!atNombre || atNombre.length < 2) {
-        return jsonResponse(400, { error: 'nombre_atleta_invalido' });
-      }
-      if (!atFechaNacimiento || isNaN(Date.parse(atFechaNacimiento))) {
-        return jsonResponse(400, { error: 'fecha_nacimiento_invalida' });
-      }
-      if (new Date(atFechaNacimiento) > new Date()) {
-        return jsonResponse(400, { error: 'fecha_nacimiento_futura' });
-      }
-      atletas.push({ nombre: atNombre, apellidos: atApellidos, fechaNacimiento: atFechaNacimiento });
-    }
-
-    if (!aceptaCondiciones) {
-      return jsonResponse(400, { error: 'debe_aceptar_condiciones' });
-    }
+    const { apoderado, atletas, montoTotal } = validacion.datos;
 
     const supabase = createClient(context.env.SUPABASE_URL, context.env.SUPABASE_SERVICE_ROLE_KEY);
 
@@ -130,18 +81,17 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     }
 
     const commerceOrder = `${PREFIJO_COMMERCE_ORDER}${Date.now()}-${crypto.randomUUID().slice(0, 6)}`;
-    const montoTotal = MONTO_KIT_STAR * atletas.length;
 
     const { data: resultado, error: errRpc } = await supabase.rpc('fn_crear_registro_star', {
       payload: {
         commerceOrder,
         monto: montoTotal,
         apoderado: {
-          nombre: apNombre,
-          apellidos: apApellidos,
-          telefono: apTelefono,
-          email: apEmail,
-          comuna: apComuna,
+          nombre: apoderado.nombre,
+          apellidos: apoderado.apellidos,
+          telefono: apoderado.telefono,
+          email: apoderado.email,
+          comuna: apoderado.comuna,
           privacyPolicyVersion: '2026-09',
         },
         atletas,
@@ -167,7 +117,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       const preferencia = await provider.crearPreferencia({
         commerceOrder,
         items: [{ producto: 'KIT_STAR', nombre: `${NOMBRE_PRODUCTO_KIT} (x${atletas.length})`, precio: montoTotal }],
-        email: apEmail,
+        email: apoderado.email,
         urlWebhook: `${siteUrl}${WEBHOOK_POR_PASARELA[pasarelaId]}`,
         // Igual que en la campaña 2026: las tres apuntan al mismo lugar a
         // propósito — esa página nunca confía en la URL de retorno, siempre
@@ -183,7 +133,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
         .eq('orden_id', ordenId)
         .eq('pasarela', pasarelaId);
 
-      return jsonResponse(200, { url: preferencia.urlPago });
+      return jsonResponse(200, { url: preferencia.urlPago, ordenId });
     } catch (e) {
       await supabase.rpc('fn_marcar_pago_no_aprobado_star', {
         p_commerce_order: commerceOrder,
