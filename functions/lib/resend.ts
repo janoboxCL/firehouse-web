@@ -102,6 +102,69 @@ function construirHtml(datos: DatosCorreoConfirmacion): string {
  * con la variable de entorno EMAIL_BCC (lista separada por comas) sin tocar código. */
 const BCC_POR_DEFECTO = ['ben.beltran.m@gmail.com', 'alejandro.cespedesd@gmail.com'];
 
+/**
+ * Correo de confirmación de pago del Kit de Iniciación Firehouse Star.
+ * A propósito dice desde ya que falta un segundo cobro (la primera
+ * mensualidad, más cerca de la fecha de la primera clase) — no debe sonar
+ * a que "ya está todo pagado" cuando no es así.
+ *
+ * Mismo criterio "best effort" que el resto: si falla, no debe romper la
+ * confirmación del pago, que ya quedó guardada en la base antes de llegar acá.
+ */
+export interface DatosCorreoStar {
+  apoderadoNombre: string;
+  apoderadoEmail: string;
+  atletaNombre: string;
+  monto: number;
+  commerceOrder: string;
+  ordenId: string;
+}
+
+// Mismo número que usa el resto del sitio (src/data/sitio.js) — hardcodeado
+// acá también porque este archivo corre en el runtime de las Cloudflare
+// Functions, que no comparte módulos con el front-end de Astro.
+const WHATSAPP_HREF_STAR = 'https://wa.me/56986114663?text=' + encodeURIComponent('Hola, tengo dudas sobre mi inscripción a Firehouse Star. ¿Me pueden ayudar?');
+
+function construirHtmlStar(datos: DatosCorreoStar): string {
+  const apoderado = escaparHtml(datos.apoderadoNombre.split(' ')[0]);
+  const atleta = escaparHtml(datos.atletaNombre.split(' ')[0]);
+  const montoFormateado = new Intl.NumberFormat('es-CL').format(datos.monto);
+  const cuerpo = `
+    <p style="font-size:15px;line-height:1.65;color:rgba(245,239,232,.86);margin:0 0 16px;">
+      Hola ${apoderado}, ¡recibimos tu pago y <strong>${atleta}</strong> ya tiene su lugar reservado
+      en Firehouse Star! ⭐
+    </p>
+    <p style="font-size:15px;line-height:1.65;color:rgba(245,239,232,.86);margin:0 0 8px;">
+      💳 <strong>Kit de Iniciación Firehouse Star</strong> — $${montoFormateado} pagado
+    </p>
+    <p style="font-size:14px;line-height:1.6;color:rgba(245,239,232,.65);margin:0 0 28px;">
+      Antes de la primera clase te vamos a escribir con el link para pagar la primera
+      mensualidad — todavía falta ese paso, este correo solo confirma el kit.
+    </p>
+    <p style="font-size:13px;line-height:1.6;color:rgba(245,239,232,.6);margin:0 0 28px;">
+      ¿Dudas? Escríbenos por WhatsApp y te ayudamos:
+      <a href="${WHATSAPP_HREF_STAR}" style="color:#FFC400;">wa.me</a>
+    </p>`;
+  return plantillaBase('Firehouse Star', '¡Ya tienes tu lugar en Firehouse Star! ⭐', cuerpo);
+}
+
+/** Best effort — si Resend falla, no debe romper la confirmación del pago, que ya quedó guardada. */
+export async function enviarCorreoConfirmacionStar(
+  apiKey: string,
+  remitente: string,
+  datos: DatosCorreoStar,
+  bcc?: string[],
+): Promise<void> {
+  await enviarCorreoGenerico(
+    apiKey,
+    remitente,
+    datos.apoderadoEmail,
+    '¡Ya tienes tu lugar en Firehouse Star! ⭐',
+    construirHtmlStar(datos),
+    bcc,
+  );
+}
+
 export function resolverBcc(valorEnv: string | undefined): string[] {
   if (!valorEnv) return BCC_POR_DEFECTO;
   const lista = valorEnv

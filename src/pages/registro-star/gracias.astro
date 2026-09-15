@@ -1,0 +1,80 @@
+---
+import Base from '../../layouts/Base.astro';
+import { whatsapp } from '../../data/sitio.js';
+
+const titulo = 'Gracias | Firehouse Star';
+const descripcion = 'Confirmación de inscripción a Firehouse Star.';
+---
+<Base titulo={titulo} descripcion={descripcion} ruta="/registro-star/gracias" noindex={true}
+      navCtaHref="/firehouse-star" navCtaTexto="Ver Firehouse Star ⭐" navCtaTextoCorto="Star ⭐" navCtaExterno={false}>
+
+  <section class="rsg-section">
+    <div class="wrap rsg-wrap">
+
+      <div id="rsgEstado-cargando" class="rsg-bloque">
+        <p class="rsg-eyebrow">Firehouse Star</p>
+        <h1 class="rsg-titulo">Confirmando tu pago…</h1>
+        <p class="rsg-texto">Esto toma solo unos segundos.</p>
+      </div>
+
+      <div id="rsgEstado-pagada" class="rsg-bloque" hidden>
+        <p class="rsg-eyebrow">Firehouse Star</p>
+        <h1 class="rsg-titulo">¡<span id="rsgAtleta">Listo</span> ya tiene su lugar! ⭐</h1>
+        <p class="rsg-texto">
+          El Kit de Iniciación quedó pagado y el cupo reservado. Antes de la primera clase te
+          vamos a escribir por WhatsApp y correo con el link para pagar la primera mensualidad —
+          ese paso todavía falta, este pago era solo el kit.
+        </p>
+        <p class="rsg-texto">Te mandamos la confirmación también a tu correo.</p>
+        <a class="rsg-btn-quiet" href={whatsapp('ayudaRegistroStar')} target="_blank" rel="noopener">¿Dudas? Escríbenos por WhatsApp →</a>
+      </div>
+
+      <div id="rsgEstado-pendiente" class="rsg-bloque" hidden>
+        <p class="rsg-eyebrow">Firehouse Star</p>
+        <h1 class="rsg-titulo">Todavía estamos confirmando tu pago</h1>
+        <p class="rsg-texto">
+          Puede tomar un momento más. Si esto no cambia en un par de minutos, escríbenos por
+          WhatsApp con tu nombre y te confirmamos manualmente.
+        </p>
+        <button type="button" id="rsgReintentarBtn" class="rsg-btn" hidden>Volver a intentar</button>
+        <a class="rsg-btn-quiet" href={whatsapp('ayudaRegistroStar')} target="_blank" rel="noopener">Escribir por WhatsApp →</a>
+      </div>
+
+      <div id="rsgEstado-rechazada" class="rsg-bloque" hidden>
+        <p class="rsg-eyebrow">Firehouse Star</p>
+        <h1 class="rsg-titulo">El pago no se pudo completar</h1>
+        <p class="rsg-texto">No alcanzamos a confirmar el pago del kit. Puedes volver a intentarlo o escribirnos por WhatsApp.</p>
+        <a class="rsg-btn" href="/registro-star">Volver a intentar</a>
+        <a class="rsg-btn-quiet" href={whatsapp('ayudaRegistroStar')} target="_blank" rel="noopener">Escribir por WhatsApp →</a>
+      </div>
+
+      <div id="rsgEstado-error" class="rsg-bloque" hidden>
+        <p class="rsg-eyebrow">Firehouse Star</p>
+        <h1 class="rsg-titulo">Algo no salió bien</h1>
+        <p class="rsg-texto">No pudimos consultar tu orden. Escríbenos por WhatsApp con tu nombre y lo revisamos.</p>
+        <a class="rsg-btn-quiet" href={whatsapp('ayudaRegistroStar')} target="_blank" rel="noopener">Escribir por WhatsApp →</a>
+      </div>
+
+    </div>
+  </section>
+
+</Base>
+
+<script>
+  import { iniciarGraciasStar } from '../../scripts/registro-star-gracias.ts';
+  iniciarGraciasStar();
+</script>
+
+<style>
+.rsg-section{ padding: var(--e-8) 0; min-height: 50vh; display: flex; align-items: center; }
+.rsg-wrap{ max-width: 560px; text-align: center; margin-inline: auto; }
+.rsg-eyebrow{ font-family: var(--font-count); font-size: 11px; letter-spacing: .3em; color: var(--fire-yellow); text-transform: uppercase; }
+.rsg-titulo{ font-family: var(--font-display); font-weight: 800; font-size: clamp(1.6rem, 4vw, 2.2rem); margin-top: var(--e-2); }
+.rsg-texto{ color: var(--txt-soft); font-size: 15px; line-height: 1.6; margin-top: var(--e-3); }
+.rsg-btn{
+  display: inline-flex; margin-top: var(--e-4); background: var(--fire-red); color: #fff;
+  font-weight: 800; font-family: var(--font-display); padding: 13px 28px; border-radius: var(--radio);
+  text-decoration: none; border: none; cursor: pointer; font-size: 15px;
+}
+.rsg-btn-quiet{ display: block; margin-top: var(--e-4); color: var(--fire-yellow); text-decoration: underline; font-size: 14px; }
+</style>

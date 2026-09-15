@@ -14,7 +14,7 @@
 
 import { createClient } from '@supabase/supabase-js';
 import { construirPaymentProvider, type PaymentProvidersEnv } from '../../lib/payment-providers/index.ts';
-import { enviarCorreoConfirmacionCampana } from '../../lib/resend.ts';
+import { enviarCorreoConfirmacionCampana, enviarCorreoConfirmacionStar, resolverBcc } from '../../lib/resend.ts';
 
 interface Env extends PaymentProvidersEnv {
   SUPABASE_URL: string;
@@ -22,7 +22,17 @@ interface Env extends PaymentProvidersEnv {
   RESEND_API_KEY?: string;
   EMAIL_FROM?: string;
   EMAIL_FROM_CAMPANA?: string;
+  EMAIL_FROM_STAR?: string;
+  EMAIL_BCC?: string;
   SITE_URL?: string;
+}
+
+// Un solo webhook de Mercado Pago para todo Firehouse — el commerce_order
+// dice a qué feature pertenece cada orden ("CAMPANA2026-..." vs "STAR-..."),
+// igual que ya hace crear-orden.ts de cada feature al generarlo. Así no
+// hace falta una tabla ni una columna nueva sólo para diferenciar esto.
+function esOrdenStar(commerceOrder: string): boolean {
+  return commerceOrder.startsWith('STAR-');
 }
 
 export const onRequestPost: PagesFunction<Env> = async (context) => {
@@ -64,8 +74,51 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     }
 
     const supabase = createClient(context.env.SUPABASE_URL, context.env.SUPABASE_SERVICE_ROLE_KEY);
+    const esStar = esOrdenStar(estado.commerceOrder);
 
-    if (estado.estado === 'APROBADO') {
+    if (estado.estado === 'APROBADO' && esStar) {
+      const { error: errConfirmar } = await supabase.rpc('fn_confirmar_pago_star', {
+        p_commerce_order: estado.commerceOrder,
+        p_pasarela: 'MERCADOPAGO',
+        p_pasarela_payment_id: estado.pasarelaPaymentId,
+        p_monto: estado.monto,
+        p_moneda: estado.moneda,
+        p_metodo_pago: estado.metodoPago,
+        p_datos_json: estado.datosCrudos,
+      });
+      if (errConfirmar) {
+        console.error('fn_confirmar_pago_star_error', errConfirmar.message);
+        return new Response('no se pudo confirmar el pago', { status: 500 });
+      }
+
+      if (context.env.RESEND_API_KEY && (context.env.EMAIL_FROM_STAR || context.env.EMAIL_FROM)) {
+        try {
+          const { data: orden } = await supabase
+            .from('star_ordenes')
+            .select('id, apoderado_nombre, apoderado_email, atleta_nombre, monto, commerce_order')
+            .eq('commerce_order', estado.commerceOrder)
+            .single();
+
+          if (orden) {
+            await enviarCorreoConfirmacionStar(
+              context.env.RESEND_API_KEY,
+              context.env.EMAIL_FROM_STAR ?? context.env.EMAIL_FROM!,
+              {
+                apoderadoNombre: orden.apoderado_nombre,
+                apoderadoEmail: orden.apoderado_email,
+                atletaNombre: orden.atleta_nombre,
+                monto: orden.monto,
+                commerceOrder: orden.commerce_order,
+                ordenId: orden.id,
+              },
+              resolverBcc(context.env.EMAIL_BCC),
+            );
+          }
+        } catch (err) {
+          console.error('email_confirmacion_star_error', err instanceof Error ? err.message.slice(0, 200) : 'desconocido');
+        }
+      }
+    } else if (estado.estado === 'APROBADO') {
       const { data: entradas, error: errConfirmar } = await supabase.rpc('fn_confirmar_pago_campana', {
         p_commerce_order: estado.commerceOrder,
         p_pasarela: 'MERCADOPAGO',
@@ -115,8 +168,16 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
           console.error('email_confirmacion_campana_error', err instanceof Error ? err.message.slice(0, 200) : 'desconocido');
         }
       }
+    } else if (estado.estado === 'REEMBOLSADO' && esStar) {
+      await supabase.rpc('fn_marcar_pago_reembolsado_star', { p_commerce_order: estado.commerceOrder, p_pasarela: 'MERCADOPAGO' });
     } else if (estado.estado === 'REEMBOLSADO') {
       await supabase.rpc('fn_marcar_pago_reembolsado_campana', { p_commerce_order: estado.commerceOrder, p_pasarela: 'MERCADOPAGO' });
+    } else if (esStar) {
+      await supabase.rpc('fn_marcar_pago_no_aprobado_star', {
+        p_commerce_order: estado.commerceOrder,
+        p_pasarela: 'MERCADOPAGO',
+        p_estado_pago: estado.estado === 'PENDIENTE' ? 'PENDIENTE' : 'RECHAZADO',
+      });
     } else {
       await supabase.rpc('fn_marcar_pago_no_aprobado_campana', {
         p_commerce_order: estado.commerceOrder,

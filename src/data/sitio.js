@@ -34,6 +34,7 @@ const mensajes = {
   pretemporada: 'Hola, quiero reservar un cupo para la Pretemporada Firehouse 2027.',
   registro:  'Hola, acabo de completar el formulario de registro y quería contarles un poco más.',
   ayudaRegistro: 'Hola, tengo algunas dudas antes de registrarme en Firehouse. ¿Me pueden ayudar a elegir la mejor opción?',
+  ayudaRegistroStar: 'Hola, tengo dudas sobre mi inscripción a Firehouse Star. ¿Me pueden ayudar?',
   sorteo: 'Hola, tengo una duda sobre el Gran Concurso Firehouse.',
   campana2026: 'Hola, tengo una duda sobre la Campaña Firehouse 2026.',
   campana2026Pago: 'Hola, quiero comprar mi sobre de la Campaña Firehouse 2026. ¿Me avisan apenas esté disponible el pago en línea?',
