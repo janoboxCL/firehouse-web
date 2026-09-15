@@ -38,7 +38,7 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
 
     const { data: orden, error } = await supabase
       .from('star_ordenes')
-      .select('id, estado, apoderado_nombre, atleta_nombre, monto')
+      .select('id, estado, apoderado_nombre, monto, star_orden_atletas ( atleta_nombre )')
       .eq('id', ordenId)
       .maybeSingle();
 
@@ -52,10 +52,14 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
       return jsonResponse(202, { estado: orden.estado });
     }
 
+    const atletaNombres = ((orden as unknown as { star_orden_atletas: { atleta_nombre: string }[] }).star_orden_atletas ?? []).map(
+      (a) => a.atleta_nombre,
+    );
+
     return jsonResponse(200, {
       estado: 'PAGADA',
       apoderadoNombre: orden.apoderado_nombre,
-      atletaNombre: orden.atleta_nombre,
+      atletaNombres,
       monto: orden.monto,
     });
   } catch (e) {

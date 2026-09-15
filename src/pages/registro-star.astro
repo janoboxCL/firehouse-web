@@ -1,6 +1,9 @@
 ---
 import Base from '../layouts/Base.astro';
 import { whatsapp } from '../data/sitio.js';
+import { COMUNAS_CHILE, REGIONES_COMUNAS } from '../lib/crm/comunas.ts';
+
+const comunasRM = REGIONES_COMUNAS.find((r) => r.region === 'Metropolitana de Santiago')!.comunas;
 
 const titulo = 'Inscripción Firehouse Star | Firehouse Cheer';
 const descripcion = 'Inscribe a tu hija o hijo en Firehouse Star: el programa de iniciación de Firehouse Cheer.';
@@ -10,12 +13,17 @@ const descripcion = 'Inscribe a tu hija o hijo en Firehouse Star: el programa de
 
   <section class="rstar-section">
     <div class="wrap rstar-wrap">
-      <p class="rstar-eyebrow">Firehouse Star</p>
-      <h1 class="rstar-titulo">Inscripción</h1>
+      <picture class="rstar-logo">
+        <source srcset="/media/star/logo-firehouse-star.webp" type="image/webp" />
+        <img src="/media/star/logo-firehouse-star.png" alt="Firehouse Star" width="220" />
+      </picture>
+
+      <p class="rstar-eyebrow">Inscripción</p>
+      <h1 class="rstar-titulo">Firehouse Star</h1>
       <p class="rstar-bajada">
-        Hoy se paga el <strong>Kit de Iniciación Firehouse Star ($10.000)</strong>, que reserva el
-        cupo. La primera mensualidad se cobra aparte, más cerca de la fecha de la primera clase —
-        te avisamos por WhatsApp y correo antes de que llegue ese paso.
+        Hoy se paga el <strong>Kit de Iniciación Firehouse Star ($10.000 por niña o niño)</strong>,
+        que reserva el cupo. La primera mensualidad se cobra aparte, más cerca de la fecha de la
+        primera clase — te avisamos por WhatsApp y correo antes de que llegue ese paso.
       </p>
 
       <form id="rstar-form" class="rstar-form" novalidate>
@@ -45,35 +53,31 @@ const descripcion = 'Inscribe a tu hija o hijo en Firehouse Star: el programa de
           </div>
           <div class="rstar-campo">
             <label for="rstar-ap-comuna">Comuna</label>
-            <input type="text" id="rstar-ap-comuna" required maxlength="100" autocomplete="address-level2" />
+            <select id="rstar-ap-comuna" required autocomplete="address-level2">
+              <option value="">Selecciona tu comuna</option>
+              {comunasRM.map((c) => <option value={c}>{c}</option>)}
+              <option value="OTRA">Otra (fuera de la Región Metropolitana)</option>
+            </select>
+            <div class="rstar-campo rstar-campo--anidado" id="rstar-comuna-otra-wrap" hidden>
+              <label for="rstar-ap-comuna-otra">¿Cuál es tu comuna?</label>
+              <input id="rstar-ap-comuna-otra" type="text" list="rstar-lista-comunas" maxlength="100" autocomplete="address-level2" />
+              <datalist id="rstar-lista-comunas">
+                {COMUNAS_CHILE.map((c) => <option value={c} />)}
+              </datalist>
+            </div>
           </div>
         </fieldset>
 
-        <fieldset class="rstar-grupo">
-          <legend>Datos de la niña o el niño</legend>
-          <div class="rstar-fila">
-            <div class="rstar-campo">
-              <label for="rstar-at-nombre">Nombre</label>
-              <input type="text" id="rstar-at-nombre" required maxlength="80" />
-            </div>
-            <div class="rstar-campo">
-              <label for="rstar-at-apellidos">Apellidos <span class="rstar-opcional">(opcional)</span></label>
-              <input type="text" id="rstar-at-apellidos" maxlength="120" />
-            </div>
-          </div>
-          <div class="rstar-campo">
-            <label for="rstar-at-fecha">Fecha de nacimiento</label>
-            <input type="date" id="rstar-at-fecha" required max="" />
-          </div>
-        </fieldset>
+        <div id="rstar-atletas-lista" class="rstar-atletas-lista"></div>
+        <button type="button" id="rstar-agregar-atleta" class="rstar-btn-agregar">+ Agregar otra niña o niño</button>
 
         <label class="rstar-check">
           <input type="checkbox" id="rstar-acepta" required />
           <span>
-            Entiendo que el pago de hoy corresponde al Kit de Iniciación ($10.000) y que la
-            primera mensualidad se paga aparte antes de la primera clase. Si ningún horario
-            disponible es compatible con mi familia, el kit se reembolsa completo; si cambio de
-            opinión sin ese problema, el pago queda como crédito Firehouse por 90 días.
+            Entiendo que el pago de hoy corresponde al Kit de Iniciación ($10.000 por niña o niño)
+            y que la primera mensualidad se paga aparte antes de la primera clase. Si ningún
+            horario disponible es compatible con mi familia, el kit se reembolsa completo; si
+            cambio de opinión sin ese problema, el pago queda como crédito Firehouse por 90 días.
           </span>
         </label>
 
@@ -84,7 +88,7 @@ const descripcion = 'Inscribe a tu hija o hijo en Firehouse Star: el programa de
           <a class="rstar-btn-quiet" href={whatsapp('ayudaRegistroStar')} target="_blank" rel="noopener">Escribir por WhatsApp →</a>
         </div>
 
-        <button type="submit" class="rstar-btn" id="rstar-enviar">Pagar el Kit de Iniciación — $10.000 ⭐</button>
+        <button type="submit" class="rstar-btn" id="rstar-enviar">Pagar el Kit de Iniciación — <span id="rstar-total">$10.000</span> ⭐</button>
 
         <p class="rstar-ayuda">
           ¿Dudas antes de pagar?
@@ -101,21 +105,13 @@ const descripcion = 'Inscribe a tu hija o hijo en Firehouse Star: el programa de
   iniciarFormularioStar();
 </script>
 
-<script is:inline>
-  // Tope de fecha de nacimiento = hoy, calculado en el navegador (evita
-  // desfases de zona horaria del build estático).
-  (() => {
-    const input = document.getElementById('rstar-at-fecha');
-    if (input) input.max = new Date().toISOString().slice(0, 10);
-  })();
-</script>
-
 <style>
 .rstar-section{ padding: var(--e-7) 0 var(--e-8); }
 .rstar-wrap{ max-width: 640px; }
+.rstar-logo img{ width: min(220px, 60%); height: auto; display: block; }
 .rstar-eyebrow{
   font-family: var(--font-count); font-size: 11px; letter-spacing: .3em;
-  color: var(--fire-yellow); text-transform: uppercase;
+  color: var(--fire-yellow); text-transform: uppercase; margin-top: var(--e-4);
 }
 .rstar-titulo{ font-family: var(--font-display); font-weight: 800; font-size: clamp(1.8rem, 4vw, 2.6rem); margin-top: var(--e-2); }
 .rstar-bajada{ color: var(--txt-soft); font-size: 15px; line-height: 1.6; margin-top: var(--e-3); max-width: 56ch; }
@@ -131,13 +127,27 @@ const descripcion = 'Inscribe a tu hija o hijo en Firehouse Star: el programa de
 @media (max-width: 560px){ .rstar-fila{ grid-template-columns: 1fr; } }
 
 .rstar-campo{ display: flex; flex-direction: column; gap: 6px; }
+.rstar-campo--anidado{ margin-top: 4px; padding-left: var(--e-3); border-left: 2px solid var(--hairline); }
 .rstar-campo label{ font-size: 13px; color: var(--txt-soft); font-family: var(--font-count); letter-spacing: .02em; }
 .rstar-opcional{ color: var(--txt-faint); font-weight: 400; }
-.rstar-campo input{
+.rstar-campo input, .rstar-campo select{
   background: var(--ember-deep); border: 1px solid var(--hairline); border-radius: 8px;
   padding: 12px 14px; color: var(--chalk); font-size: 15px; font-family: inherit;
 }
-.rstar-campo input:focus{ outline: none; border-color: var(--fire-yellow); }
+.rstar-campo input:focus, .rstar-campo select:focus{ outline: none; border-color: var(--fire-yellow); }
+
+.rstar-atletas-lista{ display: flex; flex-direction: column; gap: var(--e-4); }
+.rstar-atleta-card{ background: var(--ember-deep); border-top: 3px solid var(--fire-yellow); padding: var(--e-4); display: flex; flex-direction: column; gap: var(--e-3); }
+.rstar-atleta-card__cabecera{ display: flex; align-items: center; justify-content: space-between; }
+.rstar-atleta-card__titulo{ font-family: var(--font-display); font-weight: 800; font-size: 15px; }
+.rstar-atleta-card__eliminar{ background: none; border: none; color: var(--fire-red); font-size: 13px; cursor: pointer; text-decoration: underline; padding: 0; }
+
+.rstar-btn-agregar{
+  align-self: flex-start; background: none; border: 1px dashed var(--hairline); color: var(--fire-yellow);
+  padding: 10px 18px; border-radius: var(--radio); font-size: 14px; font-family: var(--font-display);
+  font-weight: 700; cursor: pointer;
+}
+.rstar-btn-agregar:hover{ border-color: var(--fire-yellow); }
 
 .rstar-check{ display: flex; gap: 12px; align-items: flex-start; font-size: 13.5px; color: var(--txt-soft); line-height: 1.55; }
 .rstar-check input{ flex: none; width: 18px; height: 18px; margin-top: 2px; accent-color: var(--fire-yellow); }

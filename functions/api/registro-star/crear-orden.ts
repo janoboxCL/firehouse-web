@@ -28,6 +28,7 @@ interface Env extends PaymentProvidersEnv {
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const MONTO_KIT_STAR = 10000;
+const MAX_ATLETAS = 5;
 const NOMBRE_PRODUCTO_KIT = 'Kit de Iniciación Firehouse Star';
 
 // Prefijo del commerce_order: así el webhook compartido de Mercado Pago
@@ -62,17 +63,13 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     }
 
     const apoderado = (body.apoderado ?? {}) as Record<string, unknown>;
-    const atleta = (body.atleta ?? {}) as Record<string, unknown>;
+    const atletasCrudos = Array.isArray(body.atletas) ? body.atletas : [];
 
     const apNombre = String(apoderado.nombre ?? '').trim().slice(0, 80);
     const apApellidos = String(apoderado.apellidos ?? '').trim().slice(0, 120);
     const apTelefono = String(apoderado.telefono ?? '').trim().slice(0, 20);
     const apEmail = String(apoderado.email ?? '').trim().slice(0, 254);
     const apComuna = String(apoderado.comuna ?? '').trim().slice(0, 100);
-
-    const atNombre = String(atleta.nombre ?? '').trim().slice(0, 80);
-    const atApellidos = String(atleta.apellidos ?? '').trim().slice(0, 120);
-    const atFechaNacimiento = String(atleta.fechaNacimiento ?? '').trim();
 
     const aceptaCondiciones = body.aceptaCondiciones === true;
 
@@ -88,15 +85,32 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     if (apTelefono.replace(/\D/g, '').length < 8) {
       return jsonResponse(400, { error: 'telefono_invalido' });
     }
-    if (!atNombre || atNombre.length < 2) {
-      return jsonResponse(400, { error: 'nombre_atleta_invalido' });
+    if (!apComuna) {
+      return jsonResponse(400, { error: 'comuna_invalida' });
     }
-    if (!atFechaNacimiento || isNaN(Date.parse(atFechaNacimiento))) {
-      return jsonResponse(400, { error: 'fecha_nacimiento_invalida' });
+    if (atletasCrudos.length === 0 || atletasCrudos.length > MAX_ATLETAS) {
+      return jsonResponse(400, { error: 'cantidad_atletas_invalida' });
     }
-    if (new Date(atFechaNacimiento) > new Date()) {
-      return jsonResponse(400, { error: 'fecha_nacimiento_futura' });
+
+    const atletas: { nombre: string; apellidos: string; fechaNacimiento: string }[] = [];
+    for (const raw of atletasCrudos) {
+      const a = (raw ?? {}) as Record<string, unknown>;
+      const atNombre = String(a.nombre ?? '').trim().slice(0, 80);
+      const atApellidos = String(a.apellidos ?? '').trim().slice(0, 120);
+      const atFechaNacimiento = String(a.fechaNacimiento ?? '').trim();
+
+      if (!atNombre || atNombre.length < 2) {
+        return jsonResponse(400, { error: 'nombre_atleta_invalido' });
+      }
+      if (!atFechaNacimiento || isNaN(Date.parse(atFechaNacimiento))) {
+        return jsonResponse(400, { error: 'fecha_nacimiento_invalida' });
+      }
+      if (new Date(atFechaNacimiento) > new Date()) {
+        return jsonResponse(400, { error: 'fecha_nacimiento_futura' });
+      }
+      atletas.push({ nombre: atNombre, apellidos: atApellidos, fechaNacimiento: atFechaNacimiento });
     }
+
     if (!aceptaCondiciones) {
       return jsonResponse(400, { error: 'debe_aceptar_condiciones' });
     }
@@ -116,11 +130,12 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     }
 
     const commerceOrder = `${PREFIJO_COMMERCE_ORDER}${Date.now()}-${crypto.randomUUID().slice(0, 6)}`;
+    const montoTotal = MONTO_KIT_STAR * atletas.length;
 
     const { data: resultado, error: errRpc } = await supabase.rpc('fn_crear_registro_star', {
       payload: {
         commerceOrder,
-        monto: MONTO_KIT_STAR,
+        monto: montoTotal,
         apoderado: {
           nombre: apNombre,
           apellidos: apApellidos,
@@ -129,11 +144,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
           comuna: apComuna,
           privacyPolicyVersion: '2026-09',
         },
-        atleta: {
-          nombre: atNombre,
-          apellidos: atApellidos,
-          fechaNacimiento: atFechaNacimiento,
-        },
+        atletas,
       },
     });
     if (errRpc || !resultado) {
@@ -144,7 +155,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 
     const { error: errPago } = await supabase
       .from('star_pagos')
-      .insert({ orden_id: ordenId, pasarela: pasarelaId, monto: MONTO_KIT_STAR, moneda: 'CLP', estado: 'PENDIENTE' });
+      .insert({ orden_id: ordenId, pasarela: pasarelaId, monto: montoTotal, moneda: 'CLP', estado: 'PENDIENTE' });
     if (errPago) {
       return jsonResponse(500, { error: 'no_se_pudo_crear_el_pago', detalle: errPago.message });
     }
@@ -155,7 +166,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     try {
       const preferencia = await provider.crearPreferencia({
         commerceOrder,
-        items: [{ producto: 'KIT_STAR', nombre: NOMBRE_PRODUCTO_KIT, precio: MONTO_KIT_STAR }],
+        items: [{ producto: 'KIT_STAR', nombre: `${NOMBRE_PRODUCTO_KIT} (x${atletas.length})`, precio: montoTotal }],
         email: apEmail,
         urlWebhook: `${siteUrl}${WEBHOOK_POR_PASARELA[pasarelaId]}`,
         // Igual que en la campaña 2026: las tres apuntan al mismo lugar a

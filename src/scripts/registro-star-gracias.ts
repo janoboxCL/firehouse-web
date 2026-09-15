@@ -11,8 +11,15 @@ function $<T extends Element>(selector: string): T | null {
 interface RespuestaOrden {
   estado: string;
   apoderadoNombre?: string;
-  atletaNombre?: string;
+  atletaNombres?: string[];
   monto?: number;
+}
+
+function textoNombres(nombres: string[]): string {
+  const primeros = nombres.map((n) => n.split(' ')[0]);
+  if (primeros.length === 1) return primeros[0];
+  if (primeros.length === 2) return `${primeros[0]} y ${primeros[1]}`;
+  return `${primeros.slice(0, -1).join(', ')} y ${primeros[primeros.length - 1]}`;
 }
 
 const REINTENTOS = [2000, 3000, 5000, 8000];
@@ -25,8 +32,12 @@ function mostrarBloque(id: string): void {
 }
 
 function renderPagada(data: RespuestaOrden): void {
-  const nombreAtleta = $<HTMLElement>('#rsgAtleta');
-  if (nombreAtleta && data.atletaNombre) nombreAtleta.textContent = data.atletaNombre.split(' ')[0];
+  const nombreAtletas = $<HTMLElement>('#rsgAtleta');
+  if (nombreAtletas && data.atletaNombres && data.atletaNombres.length > 0) {
+    nombreAtletas.textContent = textoNombres(data.atletaNombres);
+  }
+  const verbo = $<HTMLElement>('#rsgVerbo');
+  if (verbo) verbo.textContent = (data.atletaNombres?.length ?? 1) > 1 ? 'ya tienen' : 'ya tiene';
   mostrarBloque('rsgEstado-pagada');
 }
 

@@ -95,18 +95,21 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
         try {
           const { data: orden } = await supabase
             .from('star_ordenes')
-            .select('id, apoderado_nombre, apoderado_email, atleta_nombre, monto, commerce_order')
+            .select('id, apoderado_nombre, apoderado_email, monto, commerce_order, star_orden_atletas ( atleta_nombre )')
             .eq('commerce_order', estado.commerceOrder)
             .single();
 
           if (orden) {
+            const atletaNombres = ((orden as unknown as { star_orden_atletas: { atleta_nombre: string }[] }).star_orden_atletas ?? []).map(
+              (a) => a.atleta_nombre,
+            );
             await enviarCorreoConfirmacionStar(
               context.env.RESEND_API_KEY,
               context.env.EMAIL_FROM_STAR ?? context.env.EMAIL_FROM!,
               {
                 apoderadoNombre: orden.apoderado_nombre,
                 apoderadoEmail: orden.apoderado_email,
-                atletaNombre: orden.atleta_nombre,
+                atletaNombres,
                 monto: orden.monto,
                 commerceOrder: orden.commerce_order,
                 ordenId: orden.id,

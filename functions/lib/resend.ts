@@ -114,7 +114,7 @@ const BCC_POR_DEFECTO = ['ben.beltran.m@gmail.com', 'alejandro.cespedesd@gmail.c
 export interface DatosCorreoStar {
   apoderadoNombre: string;
   apoderadoEmail: string;
-  atletaNombre: string;
+  atletaNombres: string[];
   monto: number;
   commerceOrder: string;
   ordenId: string;
@@ -127,12 +127,13 @@ const WHATSAPP_HREF_STAR = 'https://wa.me/56986114663?text=' + encodeURIComponen
 
 function construirHtmlStar(datos: DatosCorreoStar): string {
   const apoderado = escaparHtml(datos.apoderadoNombre.split(' ')[0]);
-  const atleta = escaparHtml(datos.atletaNombre.split(' ')[0]);
+  const nombresAtletas = escaparHtml(textoAtletas(datos.atletaNombres.map((n) => n.split(' ')[0])));
+  const verbo = datos.atletaNombres.length > 1 ? 'ya tienen' : 'ya tiene';
   const montoFormateado = new Intl.NumberFormat('es-CL').format(datos.monto);
   const cuerpo = `
     <p style="font-size:15px;line-height:1.65;color:rgba(245,239,232,.86);margin:0 0 16px;">
-      Hola ${apoderado}, ¡recibimos tu pago y <strong>${atleta}</strong> ya tiene su lugar reservado
-      en Firehouse Star! ⭐
+      Hola ${apoderado}, ¡recibimos tu pago y <strong>${nombresAtletas}</strong> ${verbo} su lugar
+      reservado en Firehouse Star! ⭐
     </p>
     <p style="font-size:15px;line-height:1.65;color:rgba(245,239,232,.86);margin:0 0 8px;">
       💳 <strong>Kit de Iniciación Firehouse Star</strong> — $${montoFormateado} pagado
