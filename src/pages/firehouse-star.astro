@@ -42,7 +42,7 @@ const navEnlacesStar = [
       <div class="star-hero__velo"></div>
     </div>
 
-    <div class="wrap star-hero__contenido">
+    <div class="star-hero__contenido">
       <picture class="star-hero__logo reveal star-reveal-1">
         <source srcset="/media/star/logo-firehouse-star.webp" type="image/webp" />
         <img src="/media/star/logo-firehouse-star.png" alt="Firehouse Star" width="220" />
@@ -411,7 +411,7 @@ const navEnlacesStar = [
 .star-btn--full{ display: flex; width: 100%; margin-top: var(--e-4); }
 .star-btn--chica{ padding: 10px 18px; font-size: 13px; min-height: 40px; }
 .star-btn-quiet{ color: rgba(245,239,232,.78); font-size: 15px; text-decoration: underline; }
-.star-hero__cta{ display: flex; flex-direction: column; align-items: flex-start; gap: var(--e-2); margin-top: var(--e-5); }
+.star-hero__cta{ display: flex; flex-direction: column; align-items: flex-start; gap: var(--e-2); margin-top: var(--e-4); }
 
 /* Brillo pulsante dorado alrededor del botón rojo — referencia literal
    a "sal brillando"; se conserva aunque el botón cambió de color */
@@ -430,7 +430,7 @@ const navEnlacesStar = [
   position: absolute; inset: 0;
   background: linear-gradient(90deg, rgba(23,20,18,.95) 0%, rgba(23,20,18,.84) 34%, rgba(23,20,18,.4) 58%, rgba(23,20,18,.08) 78%);
 }
-.star-hero__contenido{ position: relative; z-index: 1; padding: var(--e-8) 0; max-width: 560px; }
+.star-hero__contenido{ position: relative; z-index: 1; max-width: 560px; padding: var(--e-6) 24px var(--e-6) clamp(24px, 6vw, 88px); }
 
 .star-hero__logo{ display: block; margin-bottom: var(--e-3); }
 .star-hero__logo img{ width: min(200px, 60%); height: auto; display: block; }
@@ -442,13 +442,13 @@ const navEnlacesStar = [
   .star-hero__fondo{ position: relative; inset: auto; aspect-ratio: 16 / 10; }
   .star-hero__velo{ background: linear-gradient(180deg, rgba(23,20,18,.1) 45%, rgba(23,20,18,.97) 94%); }
   .star-hero__img{ object-position: 62% center; }
-  .star-hero__contenido{ max-width: none; text-align: center; padding: var(--e-6) 0 var(--e-7); }
+  .star-hero__contenido{ max-width: none; text-align: center; padding: var(--e-6) 24px var(--e-7); }
   .star-hero__logo img{ margin-inline: auto; }
   .star-hero__cta{ align-items: center; }
   .star-datos{ margin-inline: auto; }
 }
 
-.star-datos{ display: grid; grid-template-columns: repeat(auto-fit,minmax(130px,1fr)); gap: 10px; margin: var(--e-5) 0 0; padding: 0; list-style: none; max-width: 480px; }
+.star-datos{ display: grid; grid-template-columns: repeat(auto-fit,minmax(130px,1fr)); gap: 10px; margin: var(--e-4) 0 0; padding: 0; list-style: none; max-width: 480px; }
 .star-datos li{ background: var(--ember-deep); border-top: 3px solid var(--fire-yellow); padding: var(--e-3) var(--e-2); border-radius: 6px; display: flex; flex-direction: column; align-items: center; gap: 2px; }
 .star-datos__icono{ width: 24px; height: 24px; color: var(--fire-yellow); margin-bottom: 4px; }
 .star-datos span{ display: block; font-family: var(--font-count); font-size: 10.5px; letter-spacing: .1em; color: var(--txt-faint); text-transform: uppercase; }
