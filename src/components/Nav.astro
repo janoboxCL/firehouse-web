@@ -25,7 +25,7 @@ const {
     </a>
 
     <nav aria-label="Principal" class="nav__links">
-      {enlaces.map(e => <a href={e.href}>{e.texto}</a>)}
+      {enlaces.map(e => <a href={e.href} target={e.externo ? '_blank' : undefined} rel={e.externo ? 'noopener' : undefined}>{e.texto}</a>)}
     </nav>
 
     <a class="nav__cta" id="wa-menu" href={ctaHref} target={ctaExterno ? '_blank' : undefined} rel={ctaExterno ? 'noopener' : undefined}>
@@ -40,7 +40,7 @@ const {
   </div>
 
   <nav class="nav__panel" id="nav-panel" aria-label="Menú" hidden>
-    {enlaces.map(e => <a href={e.href}>{e.texto}</a>)}
+    {enlaces.map(e => <a href={e.href} target={e.externo ? '_blank' : undefined} rel={e.externo ? 'noopener' : undefined}>{e.texto}</a>)}
   </nav>
 </header>
 

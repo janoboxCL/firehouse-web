@@ -1,5 +1,14 @@
 ---
 import { sitio, whatsapp } from '../data/sitio.js';
+const { ocultar = [] as string[] } = Astro.props;
+
+const enlacesPaginas = [
+  { href: '/', texto: 'Inicio' },
+  { href: '/clases-cheerleading-santiago', texto: 'Entrenamientos' },
+  { href: '/clase-de-prueba', texto: 'Clase de prueba' },
+  { href: '/precios', texto: 'Precios' },
+  { href: '/coach-benjamin-beltran', texto: 'El coach' },
+].filter((e) => !ocultar.includes(e.href));
 ---
 <footer class="pie">
   <div class="wrap pie__grid">
@@ -14,11 +23,7 @@ import { sitio, whatsapp } from '../data/sitio.js';
 
     <nav class="pie__col" aria-label="Páginas">
       <p class="pie__rotulo">Páginas</p>
-      <a href="/">Inicio</a>
-      <a href="/clases-cheerleading-santiago">Entrenamientos</a>
-      <a href="/clase-de-prueba">Clase de prueba</a>
-      <a href="/precios">Precios</a>
-      <a href="/coach-benjamin-beltran">El coach</a>
+      {enlacesPaginas.map((e) => <a href={e.href}>{e.texto}</a>)}
     </nav>
 
     <nav class="pie__col" aria-label="Secciones del inicio">
