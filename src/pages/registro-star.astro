@@ -105,7 +105,7 @@ const descripcion = 'Inscribe a tu hija o hijo en Firehouse Star: el programa de
   iniciarFormularioStar();
 </script>
 
-<style>
+<style is:global>
 .rstar-section{ padding: var(--e-7) 0 var(--e-8); }
 .rstar-wrap{ max-width: 640px; }
 .rstar-logo img{ width: min(220px, 60%); height: auto; display: block; }
@@ -127,6 +127,7 @@ const descripcion = 'Inscribe a tu hija o hijo en Firehouse Star: el programa de
 @media (max-width: 560px){ .rstar-fila{ grid-template-columns: 1fr; } }
 
 .rstar-campo{ display: flex; flex-direction: column; gap: 6px; }
+.rstar-campo[hidden]{ display: none; }
 .rstar-campo--anidado{ margin-top: 4px; padding-left: var(--e-3); border-left: 2px solid var(--hairline); }
 .rstar-campo label{ font-size: 13px; color: var(--txt-soft); font-family: var(--font-count); letter-spacing: .02em; }
 .rstar-opcional{ color: var(--txt-faint); font-weight: 400; }
