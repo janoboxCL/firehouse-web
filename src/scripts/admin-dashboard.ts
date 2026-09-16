@@ -172,4 +172,23 @@ export async function iniciarDashboard(): Promise<void> {
     $(sel)?.addEventListener('change', renderizar);
   });
   $('#f-busqueda')?.addEventListener('input', debounce(renderizar, 250));
+
+  $('#f-star-inscritos')?.addEventListener('click', () => {
+    $<HTMLSelectElement>('#f-journey')!.value = 'FIREHOUSE_STAR';
+    $<HTMLSelectElement>('#f-estado')!.value = 'INSCRITO';
+    $<HTMLSelectElement>('#f-responsable')!.value = '';
+    $<HTMLSelectElement>('#f-fecha')!.value = 'TODOS';
+    $<HTMLInputElement>('#f-busqueda')!.value = '';
+    $<HTMLButtonElement>('#f-limpiar')!.hidden = false;
+    renderizar();
+  });
+  $('#f-limpiar')?.addEventListener('click', () => {
+    $<HTMLSelectElement>('#f-journey')!.value = '';
+    $<HTMLSelectElement>('#f-estado')!.value = '';
+    $<HTMLSelectElement>('#f-responsable')!.value = '';
+    $<HTMLSelectElement>('#f-fecha')!.value = 'TODOS';
+    $<HTMLInputElement>('#f-busqueda')!.value = '';
+    $<HTMLButtonElement>('#f-limpiar')!.hidden = true;
+    renderizar();
+  });
 }

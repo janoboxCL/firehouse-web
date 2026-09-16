@@ -14,7 +14,8 @@
 
 import { createClient } from '@supabase/supabase-js';
 import { construirPaymentProvider, type PaymentProvidersEnv } from '../../lib/payment-providers/index.ts';
-import { enviarCorreoConfirmacionCampana, enviarCorreoConfirmacionStar, resolverBcc } from '../../lib/resend.ts';
+import { enviarCorreoConfirmacionCampana } from '../../lib/resend.ts';
+import { enviarConfirmacionStarSiCorresponde } from '../../lib/star-confirmation.ts';
 
 interface Env extends PaymentProvidersEnv {
   SUPABASE_URL: string;
@@ -91,35 +92,10 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
         return new Response('no se pudo confirmar el pago', { status: 500 });
       }
 
-      if (context.env.RESEND_API_KEY && (context.env.EMAIL_FROM_STAR || context.env.EMAIL_FROM)) {
-        try {
-          const { data: orden } = await supabase
-            .from('star_ordenes')
-            .select('id, apoderado_nombre, apoderado_email, monto, commerce_order, star_orden_atletas ( atleta_nombre )')
-            .eq('commerce_order', estado.commerceOrder)
-            .single();
-
-          if (orden) {
-            const atletaNombres = ((orden as unknown as { star_orden_atletas: { atleta_nombre: string }[] }).star_orden_atletas ?? []).map(
-              (a) => a.atleta_nombre,
-            );
-            await enviarCorreoConfirmacionStar(
-              context.env.RESEND_API_KEY,
-              context.env.EMAIL_FROM_STAR ?? context.env.EMAIL_FROM!,
-              {
-                apoderadoNombre: orden.apoderado_nombre,
-                apoderadoEmail: orden.apoderado_email,
-                atletaNombres,
-                monto: orden.monto,
-                commerceOrder: orden.commerce_order,
-                ordenId: orden.id,
-              },
-              resolverBcc(context.env.EMAIL_BCC),
-            );
-          }
-        } catch (err) {
-          console.error('email_confirmacion_star_error', err instanceof Error ? err.message.slice(0, 200) : 'desconocido');
-        }
+      try {
+        await enviarConfirmacionStarSiCorresponde(supabase, context.env, estado.commerceOrder);
+      } catch (err) {
+        console.error('email_confirmacion_star_error', err instanceof Error ? err.message.slice(0, 200) : 'desconocido');
       }
     } else if (estado.estado === 'APROBADO') {
       const { data: entradas, error: errConfirmar } = await supabase.rpc('fn_confirmar_pago_campana', {

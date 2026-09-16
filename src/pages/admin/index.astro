@@ -12,6 +12,11 @@ import {
 
   <h1 class="db-titulo">Firehouse CRM</h1>
 
+  <div class="db-accesos" aria-label="Accesos rápidos">
+    <button type="button" id="f-star-inscritos" class="admin-btn">⭐ Ver inscritos de Firehouse Star</button>
+    <button type="button" id="f-limpiar" class="admin-btn admin-btn--secundario" hidden>Ver todos los casos</button>
+  </div>
+
   <section class="db-kpis" id="db-kpis" aria-label="Resumen">
     <div class="admin-card db-kpi">
       <p class="db-kpi__valor" id="kpi-nuevos">—</p>
@@ -87,6 +92,7 @@ import {
 
 <style is:global>
 .db-titulo{ font-size: 1.7rem; margin: 0 0 20px; }
+.db-accesos{ display:flex; flex-wrap:wrap; gap:10px; margin:-6px 0 20px; }
 
 .db-kpis{ display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; margin-bottom: 20px; }
 .db-kpi{ text-align: center; padding: 18px 12px; }
