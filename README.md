@@ -144,6 +144,12 @@ correo de confirmación. Usa [Resend](https://resend.com), que tiene un plan gra
      usar el dominio que verificaste en el paso 2-3)
 6. Guarda y espera el redeploy automático.
 
+Para las confirmaciones de pago de **Firehouse Star**, configura además
+`EMAIL_FROM_STAR` (por ejemplo, `Firehouse Star <star@firehousecheer.cl>`). Si no se
+define, el sistema usa `EMAIL_FROM`. Cada confirmación se envía al apoderado con copia
+oculta a `ben.beltran.m@gmail.com` y `alejandro.cespedesd@gmail.com`; la lista se puede
+reemplazar con `EMAIL_BCC` usando correos separados por comas.
+
 Si no configuras esto, el formulario sigue funcionando exactamente igual — el correo de
 confirmación simplemente no se envía (es un "best effort": si Resend falla o no está
 configurado, el registro igual se guarda normalmente, nunca se pierde nada por esto).

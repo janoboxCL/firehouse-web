@@ -9,8 +9,9 @@
 
 import { createClient } from '@supabase/supabase-js';
 import { construirPaymentProvider, type PaymentProvidersEnv } from '../../lib/payment-providers/index.ts';
+import { enviarConfirmacionStarSiCorresponde, type StarEmailEnv } from '../../lib/star-confirmation.ts';
 
-interface Env extends PaymentProvidersEnv {
+interface Env extends PaymentProvidersEnv, StarEmailEnv {
   SUPABASE_URL: string;
   SUPABASE_SERVICE_ROLE_KEY: string;
 }
@@ -72,7 +73,14 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
     if (!orden) return jsonResponse(404, { error: 'orden_no_encontrada' });
 
     const ordenStar = orden as unknown as OrdenStar;
-    if (ordenStar.estado === 'PAGADA') return respuestaPagada(ordenStar);
+    if (ordenStar.estado === 'PAGADA') {
+      try {
+        await enviarConfirmacionStarSiCorresponde(supabase, context.env, ordenStar.commerce_order);
+      } catch (errorEmail) {
+        console.error('email_confirmacion_star_error', errorEmail instanceof Error ? errorEmail.message.slice(0, 200) : 'desconocido');
+      }
+      return respuestaPagada(ordenStar);
+    }
 
     // El retorno del checkout puede ganarle al webhook. En ese caso no nos
     // limitamos a esperar: consultamos la pasarela directamente y aplicamos
@@ -108,7 +116,14 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
                 p_metodo_pago: estadoPago.metodoPago,
                 p_datos_json: estadoPago.datosCrudos,
               });
-              if (!errorConfirmar) return respuestaPagada(ordenStar);
+              if (!errorConfirmar) {
+                try {
+                  await enviarConfirmacionStarSiCorresponde(supabase, context.env, estadoPago.commerceOrder);
+                } catch (errorEmail) {
+                  console.error('email_confirmacion_star_error', errorEmail instanceof Error ? errorEmail.message.slice(0, 200) : 'desconocido');
+                }
+                return respuestaPagada(ordenStar);
+              }
               console.error('reconciliar_pago_star_error', errorConfirmar.message);
             } else if (estadoPago.estado !== 'PENDIENTE') {
               await supabase.rpc('fn_marcar_pago_no_aprobado_star', {
