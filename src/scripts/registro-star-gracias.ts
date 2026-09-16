@@ -41,9 +41,11 @@ function renderPagada(data: RespuestaOrden): void {
   mostrarBloque('rsgEstado-pagada');
 }
 
-async function consultar(ordenId: string, intento: number): Promise<void> {
+async function consultar(ordenId: string, pagoId: string, intento: number): Promise<void> {
   try {
-    const res = await fetch(`/api/registro-star/orden?orden=${encodeURIComponent(ordenId)}`);
+    const params = new URLSearchParams({ orden: ordenId });
+    if (pagoId) params.set('pago', pagoId);
+    const res = await fetch(`/api/registro-star/orden?${params.toString()}`);
     const data = (await res.json()) as RespuestaOrden;
 
     if (res.status === 200 && data.estado === 'PAGADA') {
@@ -54,7 +56,7 @@ async function consultar(ordenId: string, intento: number): Promise<void> {
     if (res.status === 202) {
       if (intento < REINTENTOS.length) {
         mostrarBloque('rsgEstado-pendiente');
-        setTimeout(() => consultar(ordenId, intento + 1), REINTENTOS[intento]);
+        setTimeout(() => consultar(ordenId, pagoId, intento + 1), REINTENTOS[intento]);
       } else {
         mostrarBloque('rsgEstado-pendiente');
         $<HTMLElement>('#rsgReintentarBtn')?.removeAttribute('hidden');
@@ -69,7 +71,12 @@ async function consultar(ordenId: string, intento: number): Promise<void> {
 }
 
 export function iniciarGraciasStar(): void {
-  const ordenId = new URLSearchParams(window.location.search).get('orden');
+  const query = new URLSearchParams(window.location.search);
+  const ordenId = query.get('orden');
+  // Mercado Pago agrega payment_id (o collection_id en algunos retornos)
+  // a la back_url. El backend lo usa sólo para consultar la pasarela y
+  // exige que pertenezca exactamente a esta orden STAR.
+  const pagoId = query.get('payment_id') ?? query.get('collection_id') ?? '';
   if (!ordenId) {
     mostrarBloque('rsgEstado-error');
     return;
@@ -77,8 +84,8 @@ export function iniciarGraciasStar(): void {
 
   $('#rsgReintentarBtn')?.addEventListener('click', () => {
     mostrarBloque('rsgEstado-cargando');
-    consultar(ordenId, REINTENTOS.length);
+    consultar(ordenId, pagoId, REINTENTOS.length);
   });
 
-  consultar(ordenId, 0);
+  consultar(ordenId, pagoId, 0);
 }
