@@ -150,6 +150,10 @@ define, el sistema usa `EMAIL_FROM`. Cada confirmación se envía al apoderado c
 oculta a `ben.beltran.m@gmail.com` y `alejandro.cespedesd@gmail.com`; la lista se puede
 reemplazar con `EMAIL_BCC` usando correos separados por comas.
 
+Este correo es automático, se construye en el backend y se envía mediante Resend.
+No utiliza las plantillas de `CRM > Plantillas`: la plantilla **Invitación a conocer
+Firehouse Star** es exclusivamente un texto manual para WhatsApp.
+
 Si no configuras esto, el formulario sigue funcionando exactamente igual — el correo de
 confirmación simplemente no se envía (es un "best effort": si Resend falla o no está
 configurado, el registro igual se guarda normalmente, nunca se pierde nada por esto).
