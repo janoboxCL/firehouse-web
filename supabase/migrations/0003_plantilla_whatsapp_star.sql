@@ -1,10 +1,6 @@
--- Evita duplicar el correo cuando el pago es confirmado primero por el retorno
--- del checkout y luego por el webhook (o viceversa).
-alter table public.star_ordenes
-  add column if not exists correo_confirmacion_enviado_at timestamptz;
-
--- Plantilla manual e independiente de cualquier journey/automatización. Una vez
--- aplicada la migración aparece en CRM > Plantillas y en las fichas de familias.
+-- Plantilla manual de WhatsApp para invitar familias desde el CRM.
+-- No se usa para el correo automático de confirmación de pago: ese correo se
+-- construye y envía por Resend desde functions/lib/star-confirmation.ts.
 insert into public.plantillas_mensaje (nombre, canal, asunto, cuerpo, activo)
 select
   'Invitación a conocer Firehouse Star',
