@@ -4,11 +4,11 @@ import Faq from '../components/Faq.astro';
 import Sparky from '../components/Sparky.astro';
 import { whatsapp } from '../data/sitio.js';
 
-const titulo = 'Firehouse Star — cheerleading desde cero para niñas y niños desde 4 años | Firehouse Cheer';
-const descripcion = 'Firehouse Star es el programa de iniciación de Firehouse Cheer: una clase semanal para descubrir el cheer desde cero, sin experiencia previa. Sábados en La Cisterna.';
+const titulo = 'Firehouse Star — cheerleading desde cero y sin límite de edad | Firehouse Cheer';
+const descripcion = 'Firehouse Star es el programa de iniciación de Firehouse Cheer desde los 4 años y sin edad máxima: una clase semanal para descubrir el cheer desde cero. Sábados en La Cisterna.';
 
 const preguntas = [
-  { p: 'Mi hijo o hija nunca ha hecho cheer.',
+  { p: 'Nunca he hecho cheer, ¿puedo empezar?',
     r: 'Perfecto. Firehouse Star está pensado justamente para empezar desde cero.' },
   { p: '¿Tiene que saber hacer piruetas?',
     r: 'No. La clase parte con movimientos y ejercicios adaptados a su nivel, sin ninguna base previa.' },
@@ -16,8 +16,10 @@ const preguntas = [
     r: 'Es una clase semanal de 90 minutos pensada para iniciarse progresivamente. Se combinan movimiento, juegos y fundamentos del cheer en una clase guiada y estructurada.\n\nNo es un entrenamiento de competencia, pero sí existe aprendizaje, práctica y progresión en cada etapa.' },
   { p: '¿Va a competir?',
     r: 'No. Firehouse Star no exige competir.\n\nPuede seguir aprendiendo, entrenando y disfrutando en Star todo el tiempo que quiera.\n\nSi más adelante le interesa conocer nuestros equipos Firehouse All Star, ese camino también estará disponible.' },
+  { p: '¿Hay una edad máxima para inscribirse?',
+    r: 'No hay límite de edad. Se puede comenzar desde los 4 años y las personas adultas también pueden inscribirse por sí mismas. Las actividades se adaptan a la etapa y al nivel de cada deportista.' },
   { p: '¿Existe clase de prueba?',
-    r: 'Durante esta etapa, Firehouse Star funciona por inscripción directa, sin clase de prueba gratuita. Para bajar el riesgo de esa decisión, si ningún horario disponible resulta compatible con tu familia, la inscripción se reembolsa completa; y si te arrepientes antes de la primera clase sin que exista ese problema, el pago queda como crédito Firehouse por 90 días, para este hijo o hija, o para un hermano o hermana.' },
+    r: 'Durante esta etapa, Firehouse Star funciona por inscripción directa, sin clase de prueba gratuita. Si tienes dudas antes de inscribirte, escríbenos por WhatsApp y te ayudamos.' },
   { p: '¿Existe permanencia mínima?',
     r: 'No. La mensualidad funciona mes a mes, igual que en el resto de Firehouse.' },
   { p: '¿Qué pasa si me inscribo a mitad de mes?',
@@ -50,14 +52,14 @@ const navEnlacesStar = [
         </picture>
 
         <p class="star-hero__eyebrow reveal star-reveal-2">Programa de iniciación al cheer</p>
-        <h1 class="star-hero__titulo reveal star-reveal-2">¿Buscas una actividad que de verdad le entusiasme?</h1>
+        <h1 class="star-hero__titulo reveal star-reveal-2">¿Buscas una actividad que de verdad te entusiasme?</h1>
         <p class="star-hero__bajada reveal star-reveal-3">Una forma diferente de moverse, aprender, compartir y descubrir el cheer.</p>
-        <p class="star-hero__submensaje reveal star-reveal-3">Desde los 4 años · No necesita experiencia para comenzar</p>
+        <p class="star-hero__submensaje reveal star-reveal-3">Desde los 4 años · Sin límite de edad · No necesitas experiencia</p>
 
         <ul class="star-datos reveal star-reveal-4">
         <li>
           <svg class="star-datos__icono" viewBox="0 0 48 48" aria-hidden="true"><path d="M24 4 29.4 18.1 45 19.2 33.4 29.2 37 44 24 35.8 11 44 14.6 29.2 3 19.2 18.6 18.1Z" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linejoin="round"/></svg>
-          <span>Edad</span><b>Desde 4 años</b>
+          <span>Edad</span><b>Desde 4 años · Sin límite</b>
         </li>
         <li>
           <svg class="star-datos__icono" viewBox="0 0 48 48" aria-hidden="true"><rect x="6" y="10" width="36" height="32" rx="4" fill="none" stroke="currentColor" stroke-width="3.2"/><path d="M6 19h36" stroke="currentColor" stroke-width="3.2"/><path d="M15 6v9M33 6v9" stroke="currentColor" stroke-width="3.2" stroke-linecap="round"/></svg>
@@ -74,7 +76,7 @@ const navEnlacesStar = [
         </ul>
 
         <p class="star-hero__cta reveal star-reveal-5">
-          <a class="star-btn star-btn--brilla" href="/registro-star" id="wa-star-hero">QUIERO QUE EMPIECE EN STAR ⭐</a>
+          <a class="star-btn star-btn--brilla" href="/registro-star" id="wa-star-hero">QUIERO EMPEZAR EN STAR ⭐</a>
           <a class="star-btn-quiet" href="#clase">Ver cómo es una clase ↓</a>
         </p>
       </div>
@@ -284,7 +286,7 @@ const navEnlacesStar = [
       <h2 class="star-filosofia__grande reveal">A su ritmo. Con acompañamiento. Sin presión por competir.</h2>
       <p class="star-parrafo reveal">
         Firehouse Star es una clase guiada para aprender, disfrutar y avanzar progresivamente.
-        Cada niño o niña puede desarrollar sus habilidades a su ritmo, con acompañamiento de sus coaches y sin presión por competir.
+        Cada deportista puede desarrollar sus habilidades a su ritmo, con acompañamiento de sus coaches y sin presión por competir.
       </p>
       <p class="star-nota reveal">Puede continuar en Star todo el tiempo que quiera. Y si más adelante le interesa conocer Firehouse All Star, ese camino también estará disponible.</p>
     </div>
@@ -345,7 +347,7 @@ const navEnlacesStar = [
           <li>Starter Pack incluido</li>
         </ul>
 
-        <a class="star-btn star-btn--full" href="/registro-star" id="wa-star-precio">QUIERO QUE EMPIECE EN STAR ⭐</a>
+        <a class="star-btn star-btn--full" href="/registro-star" id="wa-star-precio">QUIERO EMPEZAR EN STAR ⭐</a>
 
         <details class="star-detalle">
           <summary>Ver cálculo si ingreso a mitad de mes</summary>
@@ -359,7 +361,6 @@ const navEnlacesStar = [
             </tbody>
           </table>
         </details>
-        <p class="star-nota">¿Qué pasa si no funciona el horario o me arrepiento? Está respondido en las preguntas frecuentes, más abajo.</p>
         <p class="star-nota"><a class="star-cta-texto" href={whatsapp('ayudaRegistroStar')} target="_blank" rel="noopener">Tengo una duda 💬</a></p>
       </div>
     </div>
@@ -369,7 +370,7 @@ const navEnlacesStar = [
   <section class="star-section star-after-payment">
     <div class="wrap">
       <div class="star-after-payment__intro reveal">
-        <h2 class="star-title">¿Qué pasa después de inscribirlo? ⭐</h2>
+        <h2 class="star-title">¿Qué pasa después de la inscripción? ⭐</h2>
         <p class="star-parrafo">Empezar en Firehouse Star es así de simple.</p>
       </div>
       <ol class="star-after-payment__steps">
@@ -421,9 +422,9 @@ const navEnlacesStar = [
     <div class="wrap reveal">
       <p class="star-cierre__previo">Toda estrella de Firehouse tuvo un primer día.</p>
       <Sparky pose="excited" size={110} class="sparky--salta" alt="Sparky celebrando con los brazos arriba" />
-      <h2 class="star-title">Su primera experiencia en cheer puede empezar aquí. ⭐</h2>
-      <p class="star-parrafo star-parrafo--centro">No necesita experiencia.<br />Aprende paso a paso, con acompañamiento.</p>
-      <a class="star-btn star-btn--brilla" href="/registro-star" id="wa-star-cierre">QUIERO QUE EMPIECE EN STAR ⭐</a>
+      <h2 class="star-title">La primera experiencia en cheer puede empezar aquí. ⭐</h2>
+      <p class="star-parrafo star-parrafo--centro">No se necesita experiencia.<br />Se aprende paso a paso, con acompañamiento.</p>
+      <a class="star-btn star-btn--brilla" href="/registro-star" id="wa-star-cierre">QUIERO EMPEZAR EN STAR ⭐</a>
       <p class="star-nota">Sábados 16:00–17:30 · Santa Corina 197, La Cisterna</p>
       <p class="star-nota"><a class="star-cta-texto" href={whatsapp('ayudaRegistroStar')} target="_blank" rel="noopener">¿Tienes una duda? WhatsApp</a></p>
     </div>
@@ -432,7 +433,7 @@ const navEnlacesStar = [
   <!-- ============ BARRA FIJA MÓVIL ============ -->
   <div class="star-barra-fija" id="star-barra-fija">
     <div class="star-barra-fija__info"><b>STAR</b><span>$30.000/mes</span></div>
-    <a class="star-btn star-btn--chica" href="/registro-star" id="wa-star-barra">QUIERO QUE EMPIECE ⭐</a>
+    <a class="star-btn star-btn--chica" href="/registro-star" id="wa-star-barra">QUIERO EMPEZAR ⭐</a>
   </div>
 
 </Base>
