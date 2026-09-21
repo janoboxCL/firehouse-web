@@ -30,7 +30,7 @@ function envio(atletas: Record<string, unknown>[], overrides: Record<string, unk
   };
 }
 
-test('Caso 1 — Martina: sin experiencia, interés Pretemporada → PRETEMPORADA', () => {
+test('Caso 1 — Pretemporada deja de aceptarse en registros públicos nuevos', () => {
   const r = validarRegistroPublico(
     envio([
       {
@@ -43,11 +43,7 @@ test('Caso 1 — Martina: sin experiencia, interés Pretemporada → PRETEMPORAD
       },
     ]),
   );
-  assert.equal(r.ok, true);
-  if (r.ok) {
-    assert.equal(r.value.atletas.length, 1);
-    assert.equal(r.value.atletas[0].journey, CRM_JOURNEYS.PRETEMPORADA);
-  }
+  assert.equal(r.ok, false);
 });
 
 test('Caso 2 — Sofía: 3 años de experiencia, interés Temporada 2027 → EXPERIMENTADA_2027', () => {
@@ -95,7 +91,7 @@ test('Caso 4 — Paula registra dos atletas: 1 apoderado, 2 atletas, journeys in
         apellidos: 'Soto',
         fechaNacimiento: '2017-06-01',
         firehouseActual: false,
-        interes: 'PRETEMPORADA',
+        interes: 'CLASE_PRUEBA_STAR',
         tieneExperiencia: false,
       },
       {
@@ -111,7 +107,7 @@ test('Caso 4 — Paula registra dos atletas: 1 apoderado, 2 atletas, journeys in
   assert.equal(r.ok, true);
   if (r.ok) {
     assert.equal(r.value.atletas.length, 2);
-    assert.equal(r.value.atletas[0].journey, CRM_JOURNEYS.PRETEMPORADA);
+    assert.equal(r.value.atletas[0].journey, CRM_JOURNEYS.CLASE_PRUEBA_STAR);
     assert.equal(r.value.atletas[1].journey, CRM_JOURNEYS.PRINCIPIANTE_2027);
   }
 });
@@ -171,7 +167,7 @@ test('marca fuera_rango_habitual sin bloquear el registro', () => {
   }
 });
 
-test('clase de prueba: es un journey propio, elegido como cualquiera de las 4 tarjetas', () => {
+test('clase de prueba antigua ya no se admite desde el formulario público', () => {
   const r = validarRegistroPublico(
     envio([
       {
@@ -186,14 +182,10 @@ test('clase de prueba: es un journey propio, elegido como cualquiera de las 4 ta
     ]),
     { viernes: false, sabado: true },
   );
-  assert.equal(r.ok, true);
-  if (r.ok) {
-    assert.equal(r.value.atletas[0].journey, CRM_JOURNEYS.CLASE_PRUEBA);
-    assert.equal(r.value.atletas[0].diaClasePrueba, 'SABADO');
-  }
+  assert.equal(r.ok, false);
 });
 
-test('clase de prueba Firehouse Star: origenStar en el envío distingue el journey, sin afectar el día', () => {
+test('clase de prueba Firehouse Star: el origen fuerza el journey aunque manipulen el interés', () => {
   const r = validarRegistroPublico(
     envio(
       [
@@ -202,9 +194,8 @@ test('clase de prueba Firehouse Star: origenStar en el envío distingue el journ
           apellidos: 'Soto',
           fechaNacimiento: '2017-06-01',
           firehouseActual: false,
-          interes: 'CLASE_PRUEBA',
+          interes: 'PRETEMPORADA',
           tieneExperiencia: false,
-          diaClasePrueba: 'SABADO',
         },
       ],
       { origenStar: true },
@@ -214,7 +205,7 @@ test('clase de prueba Firehouse Star: origenStar en el envío distingue el journ
   assert.equal(r.ok, true);
   if (r.ok) {
     assert.equal(r.value.atletas[0].journey, CRM_JOURNEYS.CLASE_PRUEBA_STAR);
-    assert.equal(r.value.atletas[0].diaClasePrueba, 'SABADO');
+    assert.equal(r.value.atletas[0].diaClasePrueba, null);
   }
 });
 

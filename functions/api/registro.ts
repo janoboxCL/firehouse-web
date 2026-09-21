@@ -11,6 +11,8 @@ import { validarRegistroPublico } from '../../src/lib/crm/registro.ts';
 import type { DiasHabilitados } from '../../src/lib/crm/clase-prueba.ts';
 import { proximaFechaParaDia, type DiaClasePrueba } from '../../src/lib/crm/clase-prueba.ts';
 import { enviarCorreoConfirmacion, resolverBcc } from '../lib/resend.ts';
+import { getNextStarClassDate, STAR_CLASS_START, STAR_CLASS_END } from '../../src/lib/crm/star-class.ts';
+import { CRM_JOURNEYS } from '../../src/lib/crm/constants.ts';
 
 interface Env {
   SUPABASE_URL: string;
@@ -88,6 +90,12 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     return jsonResponse(400, { error: 'VALIDATION_ERROR', message: 'JSON inválido.' });
   }
 
+  // El modo Star lo determina la URL recibida por el servidor, no un booleano
+  // editable dentro del JSON. La validación luego fuerza el journey Star.
+  if (body && typeof body === 'object') {
+    body.origenStar = new URL(request.url).searchParams.get('origen') === 'star';
+  }
+
   const ip = request.headers.get('cf-connecting-ip') ?? 'desconocida';
 
   // Honeypot: si un bot llenó el campo trampa, respondemos "éxito" sin escribir nada.
@@ -150,6 +158,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
   if (env.RESEND_API_KEY && env.EMAIL_FROM) {
     try {
       const atletaConClase = validacion.value.atletas.find((a) => a.diaClasePrueba);
+      const tieneClaseStar = validacion.value.atletas.some((a) => a.journey === CRM_JOURNEYS.CLASE_PRUEBA_STAR);
       const claseDePrueba = atletaConClase?.diaClasePrueba
         ? {
             dia: atletaConClase.diaClasePrueba,
@@ -165,6 +174,9 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
           apoderadoEmail: validacion.value.apoderado.email,
           nombresAtletas,
           claseDePrueba,
+          claseDePruebaStar: tieneClaseStar
+            ? { fecha: getNextStarClassDate(), inicio: STAR_CLASS_START, fin: STAR_CLASS_END }
+            : null,
         },
         resolverBcc(env.EMAIL_BCC),
       );

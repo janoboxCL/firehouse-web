@@ -31,6 +31,11 @@ export interface DatosClasificacion {
  * SI interes = NO_SEGURO                  → POR_CLASIFICAR
  */
 export function clasificarJourney(datos: DatosClasificacion): ClasificacionJourney {
+  // El origen Star es una decisión de negocio ya tomada en la landing. Tiene
+  // precedencia incluso si un request manipulado intenta enviar otro interés.
+  if (datos.origenStar) {
+    return { journey: CRM_JOURNEYS.CLASE_PRUEBA_STAR, intencionInicial: null };
+  }
   if (datos.firehouseActual) {
     const intencion = datos.intencionInicial ?? INTENCION_INICIAL.INDECISO;
     return { journey: CRM_JOURNEYS.RENOVACION_2027, intencionInicial: intencion };
@@ -46,11 +51,10 @@ export function clasificarJourney(datos: DatosClasificacion): ClasificacionJourn
           : CRM_JOURNEYS.PRINCIPIANTE_2027,
         intencionInicial: null,
       };
+    case INTERES_OPCIONES.CLASE_PRUEBA_STAR:
+      return { journey: CRM_JOURNEYS.CLASE_PRUEBA_STAR, intencionInicial: null };
     case INTERES_OPCIONES.CLASE_PRUEBA:
-      return {
-        journey: datos.origenStar ? CRM_JOURNEYS.CLASE_PRUEBA_STAR : CRM_JOURNEYS.CLASE_PRUEBA,
-        intencionInicial: null,
-      };
+      return { journey: CRM_JOURNEYS.CLASE_PRUEBA, intencionInicial: null };
     case INTERES_OPCIONES.NO_SEGURO:
     default:
       return { journey: CRM_JOURNEYS.POR_CLASIFICAR, intencionInicial: null };
