@@ -19,7 +19,7 @@ const preguntas = [
   { p: '¿Hay una edad máxima para inscribirse?',
     r: 'No hay límite de edad. Se puede comenzar desde los 4 años y las personas adultas también pueden inscribirse por sí mismas. Las actividades se adaptan a la etapa y al nivel de cada deportista.' },
   { p: '¿Existe clase de prueba?',
-    r: 'Sí. Puedes agendar una clase de prueba gratuita, los sábados, antes de decidir tu inscripción — más abajo encontrarás el botón para agendarla.' },
+    r: 'Sí. Si prefieres conocer Firehouse Star antes de inscribirte, puedes agendar una clase de prueba gratuita directamente desde nuestra página.\n\nSi ya estás listo/a para comenzar, también puedes realizar la inscripción y el pago online.' },
   { p: '¿Existe permanencia mínima?',
     r: 'No. La mensualidad funciona mes a mes, igual que en el resto de Firehouse.' },
   { p: '¿Qué pasa si me inscribo a mitad de mes?',
@@ -32,7 +32,8 @@ const navEnlacesStar = [
 ---
 <Base titulo={titulo} descripcion={descripcion} ruta="/firehouse-star" preguntas={preguntas} miga="Firehouse Star"
       navCtaHref="/registro-star" navCtaTexto="Inscríbete en Star ⭐" navCtaTextoCorto="Star ⭐"
-      navCtaExterno={false} navEnlaces={navEnlacesStar} pieOcultar={['/clase-de-prueba']}>
+      navCtaExterno={false} navEnlaces={navEnlacesStar} pieOcultar={['/clase-de-prueba']}
+      topBarAviso="FIREHOUSE STAR · INSCRIPCIONES Y CLASES DE PRUEBA ABIERTAS ⭐">
 
   <!-- ============ HERO ============ -->
   <section class="star-hero">
@@ -63,7 +64,7 @@ const navEnlacesStar = [
         </li>
         <li>
           <svg class="star-datos__icono" viewBox="0 0 48 48" aria-hidden="true"><rect x="6" y="10" width="36" height="32" rx="4" fill="none" stroke="currentColor" stroke-width="3.2"/><path d="M6 19h36" stroke="currentColor" stroke-width="3.2"/><path d="M15 6v9M33 6v9" stroke="currentColor" stroke-width="3.2" stroke-linecap="round"/></svg>
-          <span>Cuándo</span><b>Sábados</b>
+          <span>Cuándo</span><b>Sábados<br />18:30–20:00</b>
         </li>
         <li>
           <svg class="star-datos__icono" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="18" fill="none" stroke="currentColor" stroke-width="3.2"/><path d="M24 14v10l8 5" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -75,10 +76,17 @@ const navEnlacesStar = [
         </li>
         </ul>
 
-        <p class="star-hero__cta reveal star-reveal-5">
-          <a class="star-btn star-btn--brilla" href="/registro-star" id="wa-star-hero">QUIERO EMPEZAR EN STAR ⭐</a>
-          <a class="star-btn-quiet" href="#clase">Ver cómo es una clase ↓</a>
-        </p>
+        <p class="star-hero__choice-copy reveal star-reveal-5">Puedes inscribirte ahora o venir a probar primero.</p>
+        <div class="star-hero__actions reveal star-reveal-5">
+          <a class="star-choice star-choice--primary star-btn--brilla" href="/registro-star" id="wa-star-hero">
+            <span class="star-choice__title">⭐ QUIERO EMPEZAR EN STAR</span>
+            <span class="star-choice__meta">Inscripción + pago online</span>
+          </a>
+          <a class="star-choice star-choice--trial" href="/registro?origen=star" id="cta-clase-prueba-star-hero">
+            <span class="star-choice__title">👀 AGENDAR CLASE DE PRUEBA</span>
+            <span class="star-choice__meta">Clase de prueba gratuita · sin pago</span>
+          </a>
+        </div>
       </div>
     </div>
   </section>
@@ -347,7 +355,16 @@ const navEnlacesStar = [
           <li>Starter Pack incluido</li>
         </ul>
 
-        <a class="star-btn star-btn--full" href="/registro-star" id="wa-star-precio">QUIERO EMPEZAR EN STAR ⭐</a>
+        <div class="star-choice-group star-choice-group--price">
+          <a class="star-choice star-choice--primary" href="/registro-star" id="wa-star-precio">
+            <span class="star-choice__title">⭐ INSCRIBIRME EN FIREHOUSE STAR</span>
+            <span class="star-choice__meta">Inscripción + pago online</span>
+          </a>
+          <a class="star-choice star-choice--trial" href="/registro?origen=star" id="cta-clase-prueba-star-precio">
+            <span class="star-choice__title">👀 PREFIERO PROBAR PRIMERO</span>
+            <span class="star-choice__meta">Clase de prueba gratuita · sin pago</span>
+          </a>
+        </div>
 
         <details class="star-detalle">
           <summary>Ver cálculo si ingreso a mitad de mes</summary>
@@ -424,9 +441,17 @@ const navEnlacesStar = [
       <Sparky pose="excited" size={110} class="sparky--salta" alt="Sparky celebrando con los brazos arriba" />
       <h2 class="star-title">La primera experiencia en cheer puede empezar aquí. ⭐</h2>
       <p class="star-parrafo star-parrafo--centro">No se necesita experiencia.<br />Se aprende paso a paso, con acompañamiento.</p>
-      <a class="star-btn star-btn--brilla" href="/registro-star" id="wa-star-cierre">QUIERO EMPEZAR EN STAR ⭐</a>
-      <p class="star-cierre__alt"><a class="btn-quiet" href="/registro?origen=star" id="cta-clase-prueba-star">Prefiero agendar una clase de prueba primero →</a></p>
-      <p class="star-nota">Sábados 16:00–17:30 · Santa Corina 197, La Cisterna</p>
+      <div class="star-choice-group star-choice-group--closing">
+        <a class="star-choice star-choice--primary star-btn--brilla" href="/registro-star" id="wa-star-cierre">
+          <span class="star-choice__title">⭐ QUIERO EMPEZAR EN STAR</span>
+          <span class="star-choice__meta">Inscripción + pago online</span>
+        </a>
+        <a class="star-choice star-choice--trial" href="/registro?origen=star" id="cta-clase-prueba-star">
+          <span class="star-choice__title">👀 AGENDAR CLASE DE PRUEBA</span>
+          <span class="star-choice__meta">Clase de prueba gratuita · sin pago</span>
+        </a>
+      </div>
+      <p class="star-nota">Sábados 18:30–20:00 · Santa Corina 197, La Cisterna</p>
       <p class="star-nota"><a class="star-cta-texto" href={whatsapp('ayudaRegistroStar')} target="_blank" rel="noopener">¿Tienes una duda? WhatsApp</a></p>
     </div>
   </section>
@@ -494,11 +519,42 @@ const navEnlacesStar = [
 .star-btn--full{ display: flex; width: 100%; margin-top: var(--e-4); }
 .star-btn--chica{ padding: 10px 18px; font-size: 13px; min-height: 40px; }
 .star-btn-quiet{ color: rgba(245,239,232,.78); font-size: 15px; text-decoration: underline; }
-.star-hero__cta{ width: 100%; min-height: 50px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--e-2); margin-top: 4px; }
-.star-hero__cta .star-btn{ width: min(100%, 380px); margin-inline: auto; }
 
-/* Brillo pulsante dorado alrededor del botón rojo — referencia literal
-   a "sal brillando"; se conserva aunque el botón cambió de color */
+.star-hero__choice-copy{
+  max-width: 420px; margin: 0 auto 10px; text-align: center;
+  color: rgba(255,255,255,.78); font-size: 14px; line-height: 1.4;
+}
+.star-hero__actions,
+.star-choice-group{
+  width: min(100%, 380px); margin-inline: auto;
+  display: flex; flex-direction: column; gap: 8px;
+}
+.star-choice{
+  width: 100%; box-sizing: border-box; border-radius: var(--radio);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  text-align: center; text-decoration: none; font-family: var(--font-display);
+  transition: transform var(--t-interfaz) ease, background var(--t-interfaz) ease;
+}
+.star-choice:hover{ transform: translateY(-2px); }
+.star-choice:focus-visible{ outline: 3px solid var(--fire-yellow); outline-offset: 3px; }
+.star-choice--primary{
+  min-height: 58px; padding: 11px 18px;
+  color: var(--ember); background: var(--fire-yellow);
+}
+.star-choice--primary:hover{ background: #ffd536; }
+.star-choice--trial{
+  min-height: 50px; padding: 9px 18px;
+  color: #fff; background: rgba(255,255,255,.04);
+  border: 1.5px solid rgba(244,196,0,.85);
+}
+.star-choice--trial:hover{ background: rgba(244,196,0,.10); }
+.star-choice__title{ display: block; font-size: 15px; font-weight: 900; line-height: 1.2; }
+.star-choice__meta{ display: block; margin-top: 2px; font-size: 11px; font-weight: 600; line-height: 1.25; opacity: .72; }
+.star-choice-group--price{ width: 100%; margin-top: var(--e-4); }
+.star-choice-group--closing{ margin-top: var(--e-4); }
+
+/* Brillo pulsante alrededor del CTA principal — referencia literal a
+   "sal brillando". */
 .star-btn--brilla{ animation: star-brillo 2.6s ease-in-out infinite; }
 .star-btn--brilla:hover{ animation-play-state: paused; }
 @keyframes star-brillo{
@@ -590,7 +646,7 @@ const navEnlacesStar = [
   .star-hero__titulo{ font-size: clamp(32px, 9vw, 40px); }
   .star-datos{ grid-template-columns: repeat(2, minmax(0,1fr)); gap: 8px; }
   .star-datos li{ min-height: 90px; }
-  .star-hero__cta .star-btn{ width: 100%; }
+  .star-hero__actions{ width: 100%; }
 }
 .star-datos__icono{ width: 24px; height: 24px; color: var(--fire-yellow); margin-bottom: 4px; }
 .star-datos span{ display: block; font-family: var(--font-count); font-size: 10.5px; letter-spacing: .1em; color: var(--txt-faint); text-transform: uppercase; }
@@ -824,8 +880,7 @@ html.js .star-nunca__grande.reveal.visible{ transform: scale(1); opacity: 1; }
 .star-cierre{ text-align: center; padding: var(--e-8) 0; background: var(--ember-deep); }
 .star-cierre__previo{ font-family: var(--font-count); font-size: 12.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--fire-yellow); }
 .star-cierre .star-title{ max-width: 20ch; margin-inline: auto; margin-top: var(--e-4); }
-.star-cierre .star-btn{ margin-top: var(--e-4); }
-.star-cierre__alt{ margin-top: var(--e-3); }
+.star-cierre .star-nota{ margin-inline: auto; }
 
 /* ---- Barra fija móvil ---- */
 .star-barra-fija{
@@ -843,6 +898,8 @@ html.js .star-nunca__grande.reveal.visible{ transform: scale(1); opacity: 1; }
 @media (prefers-reduced-motion: reduce){
   .star-btn{ transition: none; }
   .star-btn:hover{ transform: none; }
+  .star-choice{ transition: none; }
+  .star-choice:hover{ transform: none; }
   .star-btn--brilla{ animation: none; }
   .star-hero__sparky-wrap{ animation: none; }
   .star-card{ transition: none; }
