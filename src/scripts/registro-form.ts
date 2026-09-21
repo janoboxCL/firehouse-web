@@ -159,27 +159,28 @@ function plantillaAtleta(numero: number): string {
       <div class="campo">
         <p class="campo__label">¿Qué alternativa les interesa principalmente?</p>
         <div class="tarjetas-interes" data-grupo="interes">
-          <label class="tarjeta-interes">
-            <input type="radio" name="${idBase}-interes" value="PRETEMPORADA" />
-            <span class="tarjeta-interes__titulo">🔥 Pretemporada Firehouse</span>
-            <span class="tarjeta-interes__texto">Diciembre y enero. Una forma entretenida de conocer el cheer y Firehouse durante las vacaciones.</span>
-          </label>
+          ${esOrigenStar() ? `
+          <label class="tarjeta-interes tarjeta-interes--star">
+            <input type="radio" name="${idBase}-interes" value="CLASE_PRUEBA_STAR" checked />
+            <span class="tarjeta-interes__titulo">⭐ Clase de prueba Firehouse Star</span>
+            <span class="tarjeta-interes__texto">Ven a conocer nuestro programa de iniciación al cheer.</span>
+            <span class="tarjeta-interes__beneficio">✓ Sin pago<br />✓ No necesitas experiencia previa</span>
+          </label>` : `
           <label class="tarjeta-interes">
             <input type="radio" name="${idBase}-interes" value="TEMPORADA_2027" />
             <span class="tarjeta-interes__titulo">⭐ Temporada Firehouse 2027</span>
             <span class="tarjeta-interes__texto">Desde marzo. Queremos conocer las opciones para incorporarse a los equipos Firehouse 2027.</span>
           </label>
-          ${hayAlgunDiaHabilitado() ? `
           <label class="tarjeta-interes">
-            <input type="radio" name="${idBase}-interes" value="CLASE_PRUEBA" />
-            <span class="tarjeta-interes__titulo">📅 ${esOrigenStar() ? 'Clase de prueba Firehouse Star' : 'Asistir a clase de prueba'}</span>
-            <span class="tarjeta-interes__texto">Antes de decidir, quieren venir a probar una clase.</span>
-          </label>` : ''}
+            <input type="radio" name="${idBase}-interes" value="CLASE_PRUEBA_STAR" />
+            <span class="tarjeta-interes__titulo">⭐ Clase de prueba Firehouse Star</span>
+            <span class="tarjeta-interes__texto">Ven a conocer nuestro programa de iniciación al cheer. Sin pago y sin experiencia previa.</span>
+          </label>
           <label class="tarjeta-interes">
             <input type="radio" name="${idBase}-interes" value="NO_SEGURO" />
-            <span class="tarjeta-interes__titulo">❓ Todavía no estamos seguros</span>
+            <span class="tarjeta-interes__titulo">❓ No estamos seguros / necesito orientación</span>
             <span class="tarjeta-interes__texto">Preferimos que Firehouse nos oriente.</span>
-          </label>
+          </label>`}
         </div>
       </div>
 
@@ -436,8 +437,6 @@ async function enviarRegistro(evt: SubmitEvent): Promise<void> {
   btnEnviar.textContent = 'Enviando…';
   if (bannerError) bannerError.hidden = true;
 
-  evento('registration_submitted');
-
   const submissionId = ($('#f-submission-id') as HTMLInputElement).value;
   const formStartedAtMs = Number(($('#f-started-at') as HTMLInputElement).value);
   const honeypot = ($('#f-honeypot') as HTMLInputElement).value;
@@ -463,8 +462,12 @@ async function enviarRegistro(evt: SubmitEvent): Promise<void> {
     atletas: $all<HTMLElement>('[data-atleta-card]').map(leerAtleta),
   };
 
+  const journeys = payload.atletas.map((a) => a.interes).filter(Boolean);
+  evento('registration_submitted', { journeys: journeys.join(',') });
+
   try {
-    const res = await fetch('/api/registro', {
+    const endpoint = esOrigenStar() ? '/api/registro?origen=star' : '/api/registro';
+    const res = await fetch(endpoint, {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify(payload),
@@ -485,7 +488,7 @@ async function enviarRegistro(evt: SubmitEvent): Promise<void> {
 
     const data = await res.json();
     mostrarExito(data.atletas ?? []);
-    evento('registration_success');
+    evento('registration_success', { journeys: journeys.join(',') });
   } catch {
     mostrarError('No pudimos guardar el registro. Revisa tu conexión e inténtalo nuevamente.');
     evento('registration_error', { status: 0 });

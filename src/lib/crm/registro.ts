@@ -69,8 +69,8 @@ export function validarRegistroPublico(
     return { ok: false, errors: [{ field: 'root', message: 'Solicitud inválida.' }] };
   }
 
-  // true cuando el envío viene desde /firehouse-star (?origen=star en /registro).
-  // Sólo cambia cómo se clasifica una clase de prueba (ver journey.ts) — nada más.
+  // Este valor ya fue derivado de ?origen=star por el endpoint (no se confía en
+  // el JSON del navegador). En ese modo fuerza el interés y journey Star.
   const origenStar = payload.origenStar === true;
 
   // Honeypot: si viene con contenido, es un bot. No damos pistas, sólo rechazamos "silenciosamente"
@@ -170,10 +170,15 @@ export function validarRegistroPublico(
         intencionInicial = INTENCION_INICIAL.INDECISO;
       }
     } else {
-      if (!valorEnConjunto(a?.interes, INTERES_OPCIONES)) {
+      const interesesPublicos = [
+        INTERES_OPCIONES.TEMPORADA_2027,
+        INTERES_OPCIONES.CLASE_PRUEBA_STAR,
+        INTERES_OPCIONES.NO_SEGURO,
+      ];
+      if (!origenStar && !interesesPublicos.includes(a?.interes)) {
         errors.push({ field: `${prefijo}.interes`, message: 'Selecciona qué alternativa les interesa.' });
       } else {
-        interes = a.interes;
+        interes = origenStar ? INTERES_OPCIONES.CLASE_PRUEBA_STAR : a.interes;
         if (interes === INTERES_OPCIONES.CLASE_PRUEBA) {
           if (esDiaClasePruebaValido(a?.diaClasePrueba) && diaEstaHabilitado(a.diaClasePrueba, diasHabilitados)) {
             diaClasePrueba = a.diaClasePrueba;

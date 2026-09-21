@@ -9,6 +9,7 @@ export interface DatosCorreoConfirmacion {
   /** Si alguien de la familia pidió clase de prueba, el correo cambia de tono
    * y contenido — deja de ser un "recibimos tu registro" genérico. */
   claseDePrueba?: { dia: string; fecha: string } | null;
+  claseDePruebaStar?: { fecha: string; inicio: string; fin: string } | null;
 }
 
 const HORARIO_POR_DIA: Record<string, string> = {
@@ -59,7 +60,7 @@ function plantillaBase(preTitulo: string, titulo: string, cuerpo: string): strin
 function formatearFechaEmail(fechaISO: string): string {
   try {
     const fecha = new Date(`${fechaISO}T00:00:00`);
-    return new Intl.DateTimeFormat('es-CL', { day: 'numeric', month: 'long' }).format(fecha);
+    return new Intl.DateTimeFormat('es-CL', { day: '2-digit', month: 'long', year: 'numeric' }).format(fecha);
   } catch {
     return fechaISO;
   }
@@ -68,6 +69,27 @@ function formatearFechaEmail(fechaISO: string): string {
 function construirHtml(datos: DatosCorreoConfirmacion): string {
   const nombres = escaparHtml(textoAtletas(datos.nombresAtletas));
   const nombreApoderado = escaparHtml(datos.apoderadoNombre.split(' ')[0]);
+
+  if (datos.claseDePruebaStar) {
+    const fechaLegible = formatearFechaEmail(datos.claseDePruebaStar.fecha);
+    const cuerpo = `
+    <p style="font-size:15px;line-height:1.65;color:rgba(245,239,232,.86);margin:0 0 16px;">
+      Hola ${nombreApoderado}, ¡tu clase de prueba en Firehouse Star para <strong>${nombres}</strong> ya está agendada! ⭐🔥
+    </p>
+    <p style="font-size:15px;line-height:1.65;color:rgba(245,239,232,.86);margin:0 0 16px;">
+      Te esperamos para que conozcas nuestro programa de iniciación al cheer.
+    </p>
+    <p style="font-size:15px;line-height:1.8;color:rgba(245,239,232,.86);margin:0 0 16px;">
+      📅 <strong>Sábado ${fechaLegible}</strong><br />
+      🕡 <strong>${datos.claseDePruebaStar.inicio} a ${datos.claseDePruebaStar.fin} hrs.</strong><br />
+      📍 <strong>Firehouse Cheer · La Cisterna</strong>
+    </p>
+    <p style="font-size:15px;line-height:1.65;color:rgba(245,239,232,.86);margin:0 0 28px;">
+      No necesitas experiencia previa. Ven con ropa deportiva cómoda, zapatillas y muchas ganas de conocer Firehouse Star.<br /><br />
+      <strong>Esta clase de prueba no requiere pago.</strong>
+    </p>`;
+    return plantillaBase('Firehouse Star', '¡Tu clase de prueba Firehouse Star está agendada!', cuerpo);
+  }
 
   if (datos.claseDePrueba) {
     const diaNombre = NOMBRE_DIA[datos.claseDePrueba.dia] ?? datos.claseDePrueba.dia.toLowerCase();
@@ -216,7 +238,9 @@ export async function enviarCorreoConfirmacion(
   datos: DatosCorreoConfirmacion,
   bcc?: string[],
 ): Promise<void> {
-  const asunto = datos.claseDePrueba
+  const asunto = datos.claseDePruebaStar
+    ? '⭐ Tu clase de prueba Firehouse Star está agendada'
+    : datos.claseDePrueba
     ? '¡Recibimos tu solicitud de clase de prueba! 📅'
     : '¡Recibimos tu registro en Firehouse! 🔥';
   await enviarCorreoGenerico(apiKey, remitente, datos.apoderadoEmail, asunto, construirHtml(datos), bcc);

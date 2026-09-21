@@ -16,7 +16,7 @@ import {
 const comunasRM = REGIONES_COMUNAS.find((r) => r.region === 'Metropolitana de Santiago')!.comunas;
 
 const titulo = 'Registro Firehouse | Cuéntanos sobre tu familia';
-const descripcion = 'Registra tus datos para conocer las opciones de Firehouse Cheer: Pretemporada, temporada 2027 o renovación.';
+const descripcion = 'Registra tus datos para conocer la temporada 2027 o agendar una clase de prueba Firehouse Star.';
 ---
 <Base titulo={titulo} descripcion={descripcion} ruta="/registro">
   <BandaFoto src="/media/banda-llegada.jpg"
@@ -395,6 +395,7 @@ textarea.con-contenido:valid:not(:focus-visible){
 .tarjeta-interes input{ position: absolute; opacity: 0; pointer-events: none; }
 .tarjeta-interes__titulo{ display: block; font-family: var(--font-display); font-weight: 800; font-size: 1.05rem; }
 .tarjeta-interes__texto{ display: block; margin-top: 6px; color: var(--txt-soft); font-size: 14px; }
+.tarjeta-interes__beneficio{ display: block; margin-top: 12px; color: var(--chalk); font-size: 14px; line-height: 1.7; }
 
 .atleta-card{
   border: 1px solid var(--hairline); border-radius: 16px; padding: var(--e-4);

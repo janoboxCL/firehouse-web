@@ -143,7 +143,8 @@ create table casos_crm (
 
   journey               varchar(40) not null check (journey in (
                            'RENOVACION_2027','PRETEMPORADA','EXPERIMENTADA_2027',
-                           'PRINCIPIANTE_2027','POR_CLASIFICAR'
+                           'PRINCIPIANTE_2027','CLASE_PRUEBA','CLASE_PRUEBA_STAR',
+                           'FIREHOUSE_STAR','POR_CLASIFICAR'
                          )),
   estado                varchar(40) not null default 'NUEVO' check (estado in (
                            'NUEVO','CONTACTADO','SEGUIMIENTO','AGENDADO','ASISTIO',

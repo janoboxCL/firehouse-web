@@ -64,7 +64,7 @@ test('clase de prueba Star: interés CLASE_PRUEBA + origenStar → CLASE_PRUEBA_
   assert.equal(r.journey, CRM_JOURNEYS.CLASE_PRUEBA_STAR);
 });
 
-test('clase de prueba: origenStar en true no afecta otros intereses (no se "pega" a Pretemporada)', () => {
+test('origenStar fuerza CLASE_PRUEBA_STAR aunque el interés haya sido manipulado', () => {
   const r = clasificarJourney({ firehouseActual: false, interes: INTERES_OPCIONES.PRETEMPORADA, origenStar: true });
-  assert.equal(r.journey, CRM_JOURNEYS.PRETEMPORADA);
+  assert.equal(r.journey, CRM_JOURNEYS.CLASE_PRUEBA_STAR);
 });
