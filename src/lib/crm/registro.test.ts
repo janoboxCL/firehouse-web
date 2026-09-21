@@ -193,6 +193,31 @@ test('clase de prueba: es un journey propio, elegido como cualquiera de las 4 ta
   }
 });
 
+test('clase de prueba Firehouse Star: origenStar en el envío distingue el journey, sin afectar el día', () => {
+  const r = validarRegistroPublico(
+    envio(
+      [
+        {
+          nombre: 'Martina',
+          apellidos: 'Soto',
+          fechaNacimiento: '2017-06-01',
+          firehouseActual: false,
+          interes: 'CLASE_PRUEBA',
+          tieneExperiencia: false,
+          diaClasePrueba: 'SABADO',
+        },
+      ],
+      { origenStar: true },
+    ),
+    { viernes: false, sabado: true },
+  );
+  assert.equal(r.ok, true);
+  if (r.ok) {
+    assert.equal(r.value.atletas[0].journey, CRM_JOURNEYS.CLASE_PRUEBA_STAR);
+    assert.equal(r.value.atletas[0].diaClasePrueba, 'SABADO');
+  }
+});
+
 test('clase de prueba: rechaza un día que el mantenedor no tiene habilitado', () => {
   const r = validarRegistroPublico(
     envio([

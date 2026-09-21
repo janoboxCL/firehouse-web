@@ -56,6 +56,11 @@ function opcionesExperiencia(): string {
 
 let DIAS_HABILITADOS: DiasHabilitados = { viernes: false, sabado: false };
 
+/** true cuando se llega desde /firehouse-star vía /registro?origen=star. */
+function esOrigenStar(): boolean {
+  return new URLSearchParams(location.search).get('origen') === 'star';
+}
+
 async function cargarDiasHabilitados(): Promise<void> {
   try {
     const res = await fetch('/api/config/dias-clase-prueba');
@@ -74,9 +79,13 @@ function hayAlgunDiaHabilitado(): boolean {
 
 function pillsDiaClasePrueba(idBase: string): string {
   const dias = (['VIERNES', 'SABADO'] as DiaClasePrueba[]).filter((d) => diaEstaHabilitado(d, DIAS_HABILITADOS));
+  // Si sólo hay un día habilitado no hay nada que elegir de verdad — lo dejamos
+  // premarcado en vez de obligar a un clic redundante sobre la única opción.
+  const unicoDia = dias.length === 1;
   return dias
     .map(
-      (d) => `<label class="pill"><input type="radio" name="${idBase}-dia-clase" value="${d}" /> ${DIA_CLASE_PRUEBA_LABEL[d]}</label>`,
+      (d) =>
+        `<label class="pill"><input type="radio" name="${idBase}-dia-clase" value="${d}" ${unicoDia ? 'checked' : ''} /> ${DIA_CLASE_PRUEBA_LABEL[d]}</label>`,
     )
     .join('');
 }
@@ -163,7 +172,7 @@ function plantillaAtleta(numero: number): string {
           ${hayAlgunDiaHabilitado() ? `
           <label class="tarjeta-interes">
             <input type="radio" name="${idBase}-interes" value="CLASE_PRUEBA" />
-            <span class="tarjeta-interes__titulo">📅 Asistir a clase de prueba</span>
+            <span class="tarjeta-interes__titulo">📅 ${esOrigenStar() ? 'Clase de prueba Firehouse Star' : 'Asistir a clase de prueba'}</span>
             <span class="tarjeta-interes__texto">Antes de decidir, quieren venir a probar una clase.</span>
           </label>` : ''}
           <label class="tarjeta-interes">
@@ -437,6 +446,7 @@ async function enviarRegistro(evt: SubmitEvent): Promise<void> {
     submissionId,
     honeypot,
     formStartedAtMs,
+    origenStar: esOrigenStar(),
     apoderado: {
       nombre: $<HTMLInputElement>('#f-nombre')!.value,
       apellidos: $<HTMLInputElement>('#f-apellidos')!.value,

@@ -53,3 +53,18 @@ test('por clasificar: interés ausente/no reconocido también cae a POR_CLASIFIC
   const r = clasificarJourney({ firehouseActual: false });
   assert.equal(r.journey, CRM_JOURNEYS.POR_CLASIFICAR);
 });
+
+test('clase de prueba: interés CLASE_PRUEBA sin origen Star → CLASE_PRUEBA', () => {
+  const r = clasificarJourney({ firehouseActual: false, interes: INTERES_OPCIONES.CLASE_PRUEBA });
+  assert.equal(r.journey, CRM_JOURNEYS.CLASE_PRUEBA);
+});
+
+test('clase de prueba Star: interés CLASE_PRUEBA + origenStar → CLASE_PRUEBA_STAR', () => {
+  const r = clasificarJourney({ firehouseActual: false, interes: INTERES_OPCIONES.CLASE_PRUEBA, origenStar: true });
+  assert.equal(r.journey, CRM_JOURNEYS.CLASE_PRUEBA_STAR);
+});
+
+test('clase de prueba: origenStar en true no afecta otros intereses (no se "pega" a Pretemporada)', () => {
+  const r = clasificarJourney({ firehouseActual: false, interes: INTERES_OPCIONES.PRETEMPORADA, origenStar: true });
+  assert.equal(r.journey, CRM_JOURNEYS.PRETEMPORADA);
+});

@@ -69,6 +69,10 @@ export function validarRegistroPublico(
     return { ok: false, errors: [{ field: 'root', message: 'Solicitud inválida.' }] };
   }
 
+  // true cuando el envío viene desde /firehouse-star (?origen=star en /registro).
+  // Sólo cambia cómo se clasifica una clase de prueba (ver journey.ts) — nada más.
+  const origenStar = payload.origenStar === true;
+
   // Honeypot: si viene con contenido, es un bot. No damos pistas, sólo rechazamos "silenciosamente"
   // desde el caller (no se trata como error de validación normal).
   if (limpiarTexto(payload.honeypot) !== '') {
@@ -205,6 +209,7 @@ export function validarRegistroPublico(
       intencionInicial,
       interes: interes as any,
       tieneExperiencia,
+      origenStar,
     });
 
     atletas.push({

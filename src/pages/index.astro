@@ -13,6 +13,7 @@ import Testimonios from '../components/Testimonios.astro';
 import Coach from '../components/Coach.astro';
 import QueEs from '../components/QueEs.astro';
 import Galeria from '../components/Galeria.astro';
+import Sparky from '../components/Sparky.astro';
 
 const titulo = 'Clases de cheerleading en Santiago | Clase de prueba gratis';
 const descripcion = 'Clases de cheerleading en Santiago (La Cisterna) para niños y niñas desde 4 años, sin experiencia. Todos los equipos compiten. Primera clase gratis.';
@@ -46,6 +47,21 @@ const anio = [
   <Hero />
 
   <QueEs />
+
+  <section class="section star-home">
+    <div class="wrap star-home__fila reveal">
+      <div class="star-home__texto">
+        <Etiqueta texto="Para empezar" />
+        <h2 class="section__title">Firehouse Star ⭐</h2>
+        <p class="section__intro">
+          El programa de iniciación al cheer: para niñas y niños desde los 4 años, sin experiencia
+          previa. Entra jugando, sal brillando.
+        </p>
+        <a class="btn" href="/firehouse-star">Conocer Firehouse Star →</a>
+      </div>
+      <Sparky pose="wave" size={150} class="star-home__sparky" alt="Sparky, la mascota de Firehouse Star, saludando" />
+    </div>
+  </section>
 
   <ClasePrueba />
 
@@ -281,5 +297,19 @@ const anio = [
   .etapa:nth-child(even){ clip-path:none; }
   .etapa__copa{ width:130px; right:-14px; opacity:.7; }
   .anio__calendario{ width:120px; right:-18px; }
+}
+
+.star-home__fila{
+  display:flex; align-items:center; justify-content:space-between; gap:var(--e-6);
+  flex-direction:column-reverse; text-align:center;
+}
+.star-home__texto{ max-width:52ch; }
+.star-home__texto .section__intro{ margin-inline:auto; }
+.star-home__texto .btn{ margin-top:var(--e-4); }
+.star-home__sparky{ flex:none; }
+
+@media (min-width:820px){
+  .star-home__fila{ flex-direction:row; text-align:left; }
+  .star-home__texto .section__intro{ margin-inline:0; }
 }
 </style>

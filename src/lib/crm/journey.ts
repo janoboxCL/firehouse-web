@@ -13,6 +13,12 @@ export interface DatosClasificacion {
   /** Sólo aplica cuando firehouseActual = false. */
   interes?: Interest | null;
   tieneExperiencia?: boolean | null;
+  /**
+   * true cuando el registro llegó con ?origen=star (desde /firehouse-star).
+   * Sólo afecta el caso CLASE_PRUEBA: la distingue como CLASE_PRUEBA_STAR
+   * para que el CRM la muestre aparte de cualquier otra clase de prueba.
+   */
+  origenStar?: boolean;
 }
 
 /**
@@ -20,6 +26,7 @@ export interface DatosClasificacion {
  * SI interes = PRETEMPORADA               → PRETEMPORADA
  * SI interes = TEMPORADA_2027 + experiencia    → EXPERIMENTADA_2027
  * SI interes = TEMPORADA_2027 + sin experiencia → PRINCIPIANTE_2027
+ * SI interes = CLASE_PRUEBA + origenStar   → CLASE_PRUEBA_STAR
  * SI interes = CLASE_PRUEBA               → CLASE_PRUEBA
  * SI interes = NO_SEGURO                  → POR_CLASIFICAR
  */
@@ -40,7 +47,10 @@ export function clasificarJourney(datos: DatosClasificacion): ClasificacionJourn
         intencionInicial: null,
       };
     case INTERES_OPCIONES.CLASE_PRUEBA:
-      return { journey: CRM_JOURNEYS.CLASE_PRUEBA, intencionInicial: null };
+      return {
+        journey: datos.origenStar ? CRM_JOURNEYS.CLASE_PRUEBA_STAR : CRM_JOURNEYS.CLASE_PRUEBA,
+        intencionInicial: null,
+      };
     case INTERES_OPCIONES.NO_SEGURO:
     default:
       return { journey: CRM_JOURNEYS.POR_CLASIFICAR, intencionInicial: null };

@@ -8,6 +8,7 @@ export const CRM_JOURNEYS = {
   EXPERIMENTADA_2027: 'EXPERIMENTADA_2027',
   PRINCIPIANTE_2027: 'PRINCIPIANTE_2027',
   CLASE_PRUEBA: 'CLASE_PRUEBA',
+  CLASE_PRUEBA_STAR: 'CLASE_PRUEBA_STAR',
   FIREHOUSE_STAR: 'FIREHOUSE_STAR',
   POR_CLASIFICAR: 'POR_CLASIFICAR',
 } as const;
@@ -18,6 +19,7 @@ export const CRM_JOURNEYS_LABEL: Record<string, string> = {
   EXPERIMENTADA_2027: 'Experimentada 2027',
   PRINCIPIANTE_2027: 'Principiante 2027',
   CLASE_PRUEBA: 'Clase de prueba',
+  CLASE_PRUEBA_STAR: 'Clase de prueba Firehouse Star',
   FIREHOUSE_STAR: 'Firehouse Star',
   POR_CLASIFICAR: 'Por clasificar',
 };

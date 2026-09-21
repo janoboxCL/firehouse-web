@@ -19,7 +19,7 @@ const preguntas = [
   { p: '¿Hay una edad máxima para inscribirse?',
     r: 'No hay límite de edad. Se puede comenzar desde los 4 años y las personas adultas también pueden inscribirse por sí mismas. Las actividades se adaptan a la etapa y al nivel de cada deportista.' },
   { p: '¿Existe clase de prueba?',
-    r: 'Durante esta etapa, Firehouse Star funciona por inscripción directa, sin clase de prueba gratuita. Si tienes dudas antes de inscribirte, escríbenos por WhatsApp y te ayudamos.' },
+    r: 'Sí. Puedes agendar una clase de prueba gratuita, los sábados, antes de decidir tu inscripción — más abajo encontrarás el botón para agendarla.' },
   { p: '¿Existe permanencia mínima?',
     r: 'No. La mensualidad funciona mes a mes, igual que en el resto de Firehouse.' },
   { p: '¿Qué pasa si me inscribo a mitad de mes?',
@@ -425,6 +425,7 @@ const navEnlacesStar = [
       <h2 class="star-title">La primera experiencia en cheer puede empezar aquí. ⭐</h2>
       <p class="star-parrafo star-parrafo--centro">No se necesita experiencia.<br />Se aprende paso a paso, con acompañamiento.</p>
       <a class="star-btn star-btn--brilla" href="/registro-star" id="wa-star-cierre">QUIERO EMPEZAR EN STAR ⭐</a>
+      <p class="star-cierre__alt"><a class="btn-quiet" href="/registro?origen=star" id="cta-clase-prueba-star">Prefiero agendar una clase de prueba primero →</a></p>
       <p class="star-nota">Sábados 16:00–17:30 · Santa Corina 197, La Cisterna</p>
       <p class="star-nota"><a class="star-cta-texto" href={whatsapp('ayudaRegistroStar')} target="_blank" rel="noopener">¿Tienes una duda? WhatsApp</a></p>
     </div>
@@ -824,6 +825,7 @@ html.js .star-nunca__grande.reveal.visible{ transform: scale(1); opacity: 1; }
 .star-cierre__previo{ font-family: var(--font-count); font-size: 12.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--fire-yellow); }
 .star-cierre .star-title{ max-width: 20ch; margin-inline: auto; margin-top: var(--e-4); }
 .star-cierre .star-btn{ margin-top: var(--e-4); }
+.star-cierre__alt{ margin-top: var(--e-3); }
 
 /* ---- Barra fija móvil ---- */
 .star-barra-fija{
