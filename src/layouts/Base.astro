@@ -10,6 +10,7 @@ const {
   titulo, descripcion, ruta = '', preguntas = null, miga = null, noindex = false, minimal = false, ogImagen = null,
   etiquetaMinima = 'Gran Concurso', mensajeWhatsappMinima = 'sorteo',
   navCtaHref = null, navCtaTexto = null, navCtaTextoCorto = null, navCtaExterno = true, navEnlaces = null, pieOcultar = null,
+  topBarAviso = null,
 } = Astro.props;
 const canonical = `${sitio.url}${ruta}`;
 const imagenOg = ogImagen ? `${sitio.url}${ogImagen}` : `${sitio.url}/og.jpg`;
@@ -113,7 +114,7 @@ const schema = {
     </header>
   ) : (
     <>
-      <TopBar />
+      <TopBar {...(topBarAviso ? { aviso: topBarAviso } : {})} />
       <Nav interior={ruta !== ''}
            {...(navCtaHref ? { ctaHref: navCtaHref } : {})}
            {...(navCtaTexto ? { ctaTexto: navCtaTexto } : {})}
