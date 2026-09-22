@@ -17,6 +17,7 @@ import AdminBase from '../../layouts/AdminBase.astro';
         <p class="cc-metrica__valor" id="ca-ordenes-pagadas">—</p>
         <p class="cc-metrica__label">órdenes pagadas</p>
       </div>
+      <div class="admin-card cc-metrica"><p class="cc-metrica__valor" id="ca-personas">—</p><p class="cc-metrica__label">personas únicas</p></div>
       <div class="admin-card cc-metrica">
         <p class="cc-metrica__valor" id="ca-recaudado">—</p>
         <p class="cc-metrica__label">recaudado total</p>
@@ -34,6 +35,9 @@ import AdminBase from '../../layouts/AdminBase.astro';
 
     <p id="ca-invalidadas" class="admin-aviso-cerrado" hidden></p>
     <p id="ca-ordenes-pendientes-linea" class="cc-sub">Órdenes pendientes de pago: <strong id="ca-ordenes-pendientes">—</strong></p>
+    <p id="ca-distribucion" class="cc-sub"></p>
+
+    <section class="admin-card"><h2 class="cc-bloque__titulo">Participantes (vista unificada)</h2><div class="cc-tabla-wrap"><table class="cc-tabla" id="ca-tabla-participantes"><thead><tr><th>Participante</th><th>RUT</th><th>Compra</th><th>Gratis</th><th>Total</th><th>Códigos</th><th>Órdenes</th><th>Correo</th></tr></thead><tbody></tbody></table></div></section>
 
     <section class="admin-card">
       <h2 class="cc-bloque__titulo">Pasarelas</h2>

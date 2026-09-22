@@ -40,6 +40,13 @@ const formatoCLP = new Intl.NumberFormat('es-CL', {
 });
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const BASES_VERSION = '2026-1.0';
+function limpiarRut(rut: string): string { return rut.replace(/[^0-9kK]/g, '').toUpperCase(); }
+function rutValido(rut: string): boolean {
+  const r = limpiarRut(rut); if (r.length < 2 || !/^\d+$/.test(r.slice(0, -1))) return false;
+  let suma = 0, m = 2; for (let i = r.length - 2; i >= 0; i--) { suma += Number(r[i]) * m; m = m === 7 ? 2 : m + 1; }
+  const x = 11 - suma % 11; return r.at(-1) === (x === 11 ? '0' : x === 10 ? 'K' : String(x));
+}
 
 function formatearTelefonoInput(input: HTMLInputElement | null): void {
   if (!input) return;
@@ -253,6 +260,8 @@ export function iniciarCampana2026(): void {
   const emailInput = $<HTMLInputElement>('#campEmail');
   const emailFeedback = $<HTMLElement>('#campEmailFeedback');
   const telefonoInput = $<HTMLInputElement>('#campTelefono');
+  const rutInput = $<HTMLInputElement>('#campRut');
+  const aceptaBasesInput = $<HTMLInputElement>('#campAceptaBases');
   const formError = $<HTMLElement>('#campFormError');
   const enviarBtn = $<HTMLButtonElement>('#campModalEnviar');
 
@@ -290,8 +299,9 @@ export function iniciarCampana2026(): void {
     const email = emailInput?.value.trim() ?? '';
     const telefono = telefonoInput?.value.trim() ?? '';
     const telefonoDigitos = telefono.replace(/\D/g, '');
+    const rut = rutInput?.value.trim() ?? '';
 
-    if (nombre.length < 3 || !EMAIL_RE.test(email) || telefonoDigitos.length < 8) {
+    if (nombre.length < 3 || !EMAIL_RE.test(email) || telefonoDigitos.length < 8 || !rutValido(rut) || !aceptaBasesInput?.checked) {
       formError?.removeAttribute('hidden');
       return;
     }
@@ -306,7 +316,9 @@ export function iniciarCampana2026(): void {
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify({
           productos,
-          comprador: { nombre, email, telefono: `+56${telefonoDigitos}` },
+          comprador: { nombre, email, telefono: `+56${telefonoDigitos}`, rut },
+          aceptaBases: true,
+          basesVersion: BASES_VERSION,
           ref: ref ?? null,
         }),
       });

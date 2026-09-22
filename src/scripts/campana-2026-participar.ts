@@ -9,6 +9,7 @@ function $<T extends Element>(selector: string): T | null {
 }
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const BASES_VERSION = '2026-1.0';
 
 function limpiarRut(rut: string): string {
   return rut.replace(/[^0-9kK]/g, '').toUpperCase();
@@ -58,7 +59,7 @@ function formatearTelefonoInput(input: HTMLInputElement | null): void {
 }
 
 function mostrarBloque(id: string): void {
-  ['pgForm', 'pgExito', 'pgYaParticipa'].forEach((otro) => $<HTMLElement>(`#${otro}`)?.setAttribute('hidden', ''));
+  ['pgForm', 'pgExito'].forEach((otro) => $<HTMLElement>(`#${otro}`)?.setAttribute('hidden', ''));
   $<HTMLElement>(`#${id}`)?.removeAttribute('hidden');
 }
 
@@ -72,6 +73,8 @@ export function iniciarParticiparGratis(): void {
   const formError = $<HTMLElement>('#pgFormError');
   const enviarBtn = $<HTMLButtonElement>('#pgEnviar');
   const codigoEl = $<HTMLElement>('#pgCodigo');
+  const resultadoTexto = $<HTMLElement>('#pgResultadoTexto');
+  const websiteInput = $<HTMLInputElement>('#pgWebsite');
 
   formatearRutInput(rutInput);
   formatearTelefonoInput(telefonoInput);
@@ -108,18 +111,16 @@ export function iniciarParticiparGratis(): void {
       const res = await fetch('/api/campana-2026/participar-gratis', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ nombre, rut, email, telefono: `+56${telefonoDigitos}`, aceptaBases: true }),
+        body: JSON.stringify({ nombre, rut, email, telefono: `+56${telefonoDigitos}`, aceptaBases: true, basesVersion: BASES_VERSION, website: websiteInput?.value ?? '' }),
       });
-      const data = (await res.json().catch(() => ({}))) as { codigo?: string; error?: string };
+      const data = (await res.json().catch(() => ({}))) as { asignadas?: number; total?: number; codigos?: string[]; error?: string };
 
       if (res.ok) {
-        if (codigoEl && data.codigo) codigoEl.textContent = data.codigo;
+        if (codigoEl) { codigoEl.textContent = (data.codigos ?? []).join(' · '); codigoEl.toggleAttribute('hidden', !(data.codigos?.length)); }
+        if (resultadoTexto) resultadoTexto.textContent = data.asignadas
+          ? `Se asignaron ${data.asignadas} participaciones promocionales. Total activo: ${data.total} de 3.`
+          : 'Tu RUT ya alcanzó el máximo de tres participaciones y no se generaron códigos adicionales.';
         mostrarBloque('pgExito');
-        return;
-      }
-
-      if (res.status === 409 && data.error === 'rut_ya_participa') {
-        mostrarBloque('pgYaParticipa');
         return;
       }
 

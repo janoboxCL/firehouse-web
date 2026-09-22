@@ -4,10 +4,6 @@ import Base from '../../layouts/Base.astro';
 const titulo = 'Bases de la Promoción | Campaña Firehouse 2026';
 const descripcion = 'Bases de la promoción comercial y sorteo promocional Campaña Firehouse 2026.';
 
-// ⚠️ Borrador de trabajo (ver aviso dentro del documento). Quedan pendientes:
-// fechas exactas (vigencia y sorteo), premios 2/3/4, medio de pago definitivo,
-// y revisión de un abogado antes de publicar en serio. Mismo criterio usado
-// en /sorteo/bases y en la política de privacidad. Mientras tanto, noindex.
 const noindex = true;
 ---
 <Base
@@ -21,14 +17,8 @@ const noindex = true;
 >
   <section class="bases">
     <div class="wrap bases__caja">
-      <p class="bases__version">Versión preliminar — documento de trabajo. Fecha de versión: 8 de septiembre de 2026 (en revisión).</p>
+      <p class="bases__version">Versión definitiva 2026-1.0 — publicada el 22 de septiembre de 2026.</p>
       <h1>Bases de la Promoción Comercial y Sorteo Promocional "Campaña Firehouse 2026"</h1>
-      <p class="bases__aviso">
-        Este documento corresponde a un borrador de trabajo. Antes del lanzamiento oficial deberán
-        completarse los campos pendientes, publicarse la versión definitiva y, de ser posible, contar
-        con revisión jurídica profesional. Estas bases no constituyen por sí solas una autorización
-        administrativa ni sustituyen las condiciones que pueda exigir el proveedor de pagos.
-      </p>
 
       <h2>Primero — Organizador</h2>
       <p>La Promoción es organizada por Benjamín Orlando Beltrán Maureira, RUT N.º 15.353.195-1, en adelante el "Organizador".</p>
@@ -76,14 +66,14 @@ const noindex = true;
       <p>Las características definitivas de los productos estarán visibles antes de efectuar la compra en: <a href="https://firehousecheer.cl/campana-2026">firehousecheer.cl/campana-2026</a>.</p>
 
       <h2>Cuarto — Participación promocional asociada a productos</h2>
-      <p>Cada unidad de producto participante adquirida mediante una transacción válidamente pagada y confirmada otorgará al comprador una (1) participación promocional, sin costo adicional.</p>
+      <p>Cada persona podrá mantener un máximo de tres (3) participaciones promocionales válidas durante toda la vigencia de la Promoción, independientemente de la modalidad mediante la cual sean obtenidas. Para estos efectos, la identidad del participante será determinada mediante su RUT.</p>
       <p>Inicialmente:</p>
       <ul>
         <li>Sobre Digital Blaze → 1 participación promocional.</li>
         <li>Sobre Digital Nova → 1 participación promocional.</li>
-        <li>Pack Digital Blaze + Nova → 1 participación promocional.</li>
+        <li>Pack Digital Blaze + Nova → 2 participaciones promocionales.</li>
       </ul>
-      <p>El precio o contenido de un producto no altera por sí solo la cantidad de participaciones promocionales otorgadas, salvo que las presentes bases sean modificadas antes del inicio oficial de la campaña para establecer expresamente una mecánica diferente.</p>
+      <p>Las participaciones provenientes de compras y de la modalidad sin compra son acumulables únicamente hasta alcanzar el máximo global de tres (3) participaciones por persona/RUT.</p><p>Alcanzado dicho máximo, posteriores adquisiciones de productos digitales continuarán siendo válidas y los productos serán entregados normalmente, pero no generarán nuevas participaciones promocionales.</p>
       <p>Una vez confirmado el pago, el sistema asignará automáticamente al participante un código único de participación, por ejemplo: FH-0001.</p>
       <p>Dicho código constituye únicamente un identificador de participación promocional y no corresponde al producto digital comprado.</p>
       <p>El participante no podrá seleccionar ni modificar su código.</p>
@@ -102,7 +92,7 @@ const noindex = true;
 
       <h2>Séptimo — Participación sin compra</h2>
       <p>La Promoción contemplará una modalidad de participación sin obligación de adquirir productos.</p>
-      <p>Toda persona que cumpla los requisitos establecidos en estas bases podrá solicitar una (1) participación gratuita durante toda la vigencia de la Promoción.</p>
+      <p>La modalidad sin compra permitirá al participante obtener, en una única solicitud, las participaciones que le resten para completar el máximo global de tres (3).</p>
       <p>Para ello deberá completar el formulario habilitado en: <a href="https://firehousecheer.cl/campana-2026/participar">firehousecheer.cl/campana-2026/participar</a>.</p>
       <p>El formulario deberá solicitar, al menos:</p>
       <ul>
@@ -112,13 +102,13 @@ const noindex = true;
         <li>teléfono de contacto;</li>
         <li>aceptación expresa de las presentes bases.</li>
       </ul>
-      <p>Se permitirá un máximo de una participación gratuita por persona y RUT durante toda la campaña.</p>
+      <p>Las participaciones gratuitas tienen exactamente la misma validez, probabilidad individual y forman parte del mismo universo que las provenientes de compras; no existe un universo separado.</p>
       <p>El sistema podrá efectuar validaciones destinadas exclusivamente a evitar registros duplicados, automatizados o fraudulentos.</p>
       <p>Una vez validada la solicitud, se asignará al participante un código único de participación que ingresará al mismo universo de selección que las participaciones promocionales provenientes de adquisiciones de productos.</p>
       <p>No se exigirá pago alguno para utilizar esta modalidad.</p>
 
       <h2>Octavo — Vigencia</h2>
-      <p>La Campaña Firehouse 2026 tendrá vigencia desde: [FECHA Y HORA DE INICIO] hasta: [FECHA Y HORA DE CIERRE], ambas correspondientes a la hora oficial de Chile continental.</p>
+      <p>La Campaña Firehouse 2026 tendrá vigencia desde el 1 de octubre de 2026 a las 00:00 horas hasta el 11 de diciembre de 2026 a las 23:59 horas, ambas correspondientes a la hora oficial de Chile continental.</p>
       <p>Las compras o solicitudes gratuitas recibidas posteriormente al cierre no participarán en el sorteo.</p>
       <p>El sorteo se realizará independientemente de la cantidad de productos vendidos o de la recaudación obtenida durante la campaña.</p>
       <p>La meta comunicacional de 800 sobres o packs adquiridos corresponde exclusivamente a un objetivo de campaña y no constituye una condición para efectuar el sorteo ni para entregar los premios.</p>
@@ -134,17 +124,15 @@ const noindex = true;
       <p>No se incorporarán al sorteo operaciones pendientes, rechazadas, anuladas, reembolsadas ni registros gratuitos que hayan sido invalidados por duplicidad o incumplimiento de los requisitos establecidos.</p>
 
       <h2>Décimo — Mecanismo del sorteo</h2>
-      <p>El sorteo se efectuará el 12 de diciembre de 2026, a las [HORA], y será transmitido públicamente a través de la cuenta oficial de Instagram: @firehouse.cheer.</p>
+      <p>El sorteo se efectuará el 12 de diciembre de 2026, a las 20:00 horas, y será transmitido públicamente a través de la cuenta oficial de Instagram: @firehouse.cheer.</p>
       <p>
-        El Organizador utilizará como método de selección un generador de números aleatorios externo y
-        verificable (por ejemplo, random.org) aplicado sobre la lista numerada de códigos de
-        participación válidos, desde el número 1 hasta el total de participaciones registradas. El
+        El Organizador utilizará como método de selección el generador de enteros de RANDOM.ORG sobre un snapshot definitivo de N participaciones ACTIVE. El sistema ordenará las participaciones por su número interno ascendente, asignará índices consecutivos 1..N y publicará N y el SHA-256 del CSV sin datos personales. El número sorteado corresponderá al draw_index, no al sufijo del código. El
         proceso de generación se mostrará en pantalla durante la transmisión en vivo, junto con el
         código resultante ganador.
       </p>
       <p>El procedimiento será realizado en presencia de al menos un testigo mayor de edad que no participe en la Promoción, y la transmisión o registro audiovisual será conservado como respaldo.</p>
       <p>Antes de efectuar la selección se informará públicamente la cantidad total de participaciones válidas que integran el sorteo.</p>
-      <p>El Organizador podrá adicionalmente conservar un respaldo digital de la base cerrada de participantes y de los códigos incluidos en el proceso.</p>
+      <p>El snapshot cerrado será inmutable. Si el ganador no es elegible se repetirá la selección. Una persona/RUT podrá ganar como máximo un premio; si vuelve a ser seleccionada, se repetirá la selección.</p>
 
       <h2>Décimo primero — Selección de ganadores</h2>
       <p>Se seleccionará un ganador distinto para cada premio informado.</p>
@@ -171,10 +159,7 @@ const noindex = true;
         estas bases para reclamar su premio, se aplicará el procedimiento de reemplazo de ganador
         establecido en el Décimo cuarto.
       </p>
-      <p><strong>Segundo Premio:</strong> [COMPLETAR]</p>
-      <p><strong>Tercer Premio:</strong> [COMPLETAR]</p>
-      <p><strong>Cuarto Premio:</strong> [COMPLETAR]</p>
-      <p>La descripción definitiva, cantidad y características de los premios deberá encontrarse publicada antes del comienzo oficial de la campaña tanto en estas bases como en el sitio web.</p>
+      <p>La Promoción contempla exactamente un (1) premio: el Primer Premio descrito precedentemente.</p>
       <p>Los premios serán entregados independientemente de la cantidad de productos vendidos.</p>
       <p>Ningún premio podrá sustituirse unilateralmente por otro de inferior valor.</p>
       <p>Cuando un premio consista en dinero, ello será expresamente señalado en estas bases.</p>
@@ -223,7 +208,7 @@ const noindex = true;
         <li>cumplir obligaciones legales o administrativas aplicables.</li>
       </ul>
       <p>El Organizador no venderá los datos personales ni los utilizará para fines ajenos a la campaña sin la autorización correspondiente.</p>
-      <p>Los datos podrán ser tratados por proveedores tecnológicos estrictamente necesarios para operar la campaña, tales como proveedores de pago, alojamiento web, correo electrónico u otros servicios técnicos.</p>
+      <p>Los datos podrán ser tratados por proveedores tecnológicos estrictamente necesarios para operar la campaña, tales como Mercado Pago, alojamiento web, correo electrónico u otros servicios técnicos.</p>
       <p>Los datos de tarjetas bancarias no serán almacenados directamente por Firehouse y serán procesados por el proveedor de pagos correspondiente.</p>
       <p>Los participantes podrán efectuar consultas relativas a sus datos personales mediante: allstarfirehouse@gmail.com.</p>
       <p>El tratamiento se realizará conforme a la normativa chilena vigente sobre protección de datos personales.</p>
@@ -280,10 +265,6 @@ const noindex = true;
       <p>Correo electrónico: allstarfirehouse@gmail.com.</p>
       <p>Sitio web: <a href="https://firehousecheer.cl">firehousecheer.cl</a>.</p>
 
-      <p class="bases__pendiente">
-        * Documento en revisión. Pendiente antes del lanzamiento: fecha y hora exactas de inicio, cierre
-        y sorteo; descripción de los premios 2, 3 y 4; y confirmación del medio de pago definitivo.
-      </p>
     </div>
   </section>
 </Base>
@@ -299,5 +280,4 @@ const noindex = true;
 .bases__caja a{ color:var(--fire-yellow); }
 .bases__version{ color:var(--txt-faint); font-size:12px; margin-bottom:var(--e-2); }
 .bases__aviso{ color:var(--fire-yellow); font-size:13px; }
-.bases__pendiente{ margin-top:var(--e-4); font-size:12px; color:var(--txt-faint); border-top:1px solid var(--hairline); padding-top:var(--e-3); }
 </style>

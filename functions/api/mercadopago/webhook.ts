@@ -121,10 +121,14 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
             .single();
 
           if (orden) {
+            const { data: claimed } = await supabase.from('campana_email_outbox').update({ status: 'SENDING' })
+              .eq('tipo', 'CONFIRMACION_COMPRA').eq('order_id', orden.id).eq('status', 'PENDING').select('id').maybeSingle();
+            if (!claimed) return new Response('ok', { status: 200 });
             const productos = ((orden as unknown as { campana_orden_items: { producto: string }[] }).campana_orden_items ?? []).map(
               (i) => i.producto,
             );
-            const codigos = ((entradas ?? []) as { codigo: string }[]).map((e) => e.codigo);
+            const resultado = (entradas ?? {}) as { codigos?: string[]; total?: number };
+            const codigos = resultado.codigos ?? [];
             const siteUrl = context.env.SITE_URL ?? 'https://firehousecheer.cl';
 
             await enviarCorreoConfirmacionCampana(
@@ -138,13 +142,16 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
                 ordenId: orden.id,
                 productos,
                 codigos,
+                totalParticipaciones: resultado.total ?? codigos.length,
                 siteUrl,
               },
               [],
             );
+            await supabase.from('campana_email_outbox').update({ status: 'SENT', sent_at: new Date().toISOString(), attempts: 1 }).eq('id', claimed.id);
           }
         } catch (err) {
           console.error('email_confirmacion_campana_error', err instanceof Error ? err.message.slice(0, 200) : 'desconocido');
+          await supabase.from('campana_email_outbox').update({ status: 'FAILED', last_error: err instanceof Error ? err.message.slice(0, 500) : 'desconocido' }).eq('order_id', (await supabase.from('campana_ordenes').select('id').eq('commerce_order', estado.commerceOrder).single()).data?.id ?? '');
         }
       }
     } else if (estado.estado === 'REEMBOLSADO' && esStar) {

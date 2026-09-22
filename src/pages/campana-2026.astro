@@ -204,6 +204,11 @@ const detalle = [
             </div>
           ))}
         </div>
+        <div class="camp-confianza" style="max-width:760px;margin:24px auto 0">
+          <p><strong>Qué compras:</strong> contenido coleccionable digital Firehouse, que se entrega después de aprobarse el pago.</p>
+          <p><strong>Promoción incluida:</strong> Blaze y Nova asignan 1 participación; el Pack asigna 2, siempre hasta el máximo global de 3 por persona/RUT, sumando compra y modalidad gratuita.</p>
+          <p><a href="/campana-2026/participar">Participación sin compra disponible.</a></p>
+        </div>
       </div>
     </section>
 
@@ -285,7 +290,7 @@ const detalle = [
           <p class="camp-premio__desc">Para gastar en lo que quieras</p>
           <p class="camp-premio__nota">Pago mediante transferencia bancaria al ganador.</p>
         </div>
-        <p class="camp-premios__teaser">🎁 Más premios por anunciarse antes del lanzamiento oficial de la campaña.</p>
+        <p class="camp-premios__teaser">La promoción contempla un premio único de $100.000.</p>
       </div>
     </section>
 
@@ -393,6 +398,17 @@ const detalle = [
             <input type="tel" inputmode="tel" id="campTelefono" required autocomplete="tel"
                    placeholder="9 1234 5678" maxlength="12" pattern="9 \d{4} \d{4}" title="Formato: 9 1234 5678" />
           </div>
+          <div class="camp-campo">
+            <label for="campRut">RUT</label>
+            <input type="text" id="campRut" required inputmode="text" autocomplete="off" placeholder="12.345.678-5" maxlength="12" />
+          </div>
+
+          <label class="camp-modal__legal" style="display:flex;gap:10px;align-items:flex-start;text-align:left">
+            <input type="checkbox" id="campAceptaBases" required />
+            <span>Declaro haber leído y acepto las <a href="/campana-2026/bases" target="_blank" rel="noopener">Bases de la Promoción Firehouse 2026</a>.</span>
+          </label>
+          <p class="camp-modal__legal">Máximo 3 participaciones promocionales por persona/RUT durante toda la campaña, sumando compras y modalidad gratuita. Alcanzado ese máximo, puedes seguir comprando productos digitales, pero no recibirás participaciones adicionales.</p>
+          <p class="camp-modal__legal"><a href="/campana-2026/participar">También puedes participar sin compra.</a></p>
 
           <p id="campFormError" class="camp-modal__error" hidden>Completa nombre, correo y celular con un formato válido para continuar.</p>
 
@@ -402,9 +418,6 @@ const detalle = [
           </div>
 
           <button type="submit" class="btn camp-modal__enviar" id="campModalEnviar">Continuar al pago</button>
-          <p class="camp-modal__legal">
-            Al continuar aceptas las <a href="/campana-2026/bases" target="_blank" rel="noopener">Bases de la promoción</a>.
-          </p>
         </form>
       </div>
     </div>

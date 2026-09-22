@@ -16,11 +16,14 @@
 import { createClient } from '@supabase/supabase-js';
 import { elegirPasarelaHabilitada, construirPaymentProvider, type PaymentProvidersEnv } from '../../lib/payment-providers/index.ts';
 import { NOMBRE_PRODUCTO_CAMPANA } from '../../lib/resend.ts';
+import { CAMPAIGN_BASES_VERSION, CAMPAIGN_ID, CAMPAIGN_PRIVACY_VERSION, enmascararRut, identityHash } from '../../lib/campaign-2026.ts';
+import { rutValido } from '../../lib/rut.ts';
 
 interface Env extends PaymentProvidersEnv {
   SUPABASE_URL: string;
   SUPABASE_SERVICE_ROLE_KEY: string;
   SITE_URL?: string;
+  CAMPAIGN_IDENTITY_SECRET: string;
 }
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -61,26 +64,34 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     const nombre = String(comprador.nombre ?? '').trim().slice(0, 150);
     const email = String(comprador.email ?? '').trim().slice(0, 254);
     const telefono = String(comprador.telefono ?? '').trim().slice(0, 20);
+    const rut = String(comprador.rut ?? '').trim();
+    const aceptaBases = body.aceptaBases === true;
+    const basesVersion = String(body.basesVersion ?? '');
     const refTexto = body.ref ? String(body.ref).trim().slice(0, 12) : null;
 
     if (productos.length === 0 || productos.length > 3) {
       return jsonResponse(400, { error: 'productos_invalidos' });
     }
-    if (!nombre || !EMAIL_RE.test(email) || telefono.replace(/\D/g, '').length < 8) {
+    if (nombre.length < 3 || !EMAIL_RE.test(email) || telefono.replace(/\D/g, '').length < 8 || !rutValido(rut)) {
       return jsonResponse(400, { error: 'datos_comprador_invalidos' });
     }
+    if (!aceptaBases || basesVersion !== CAMPAIGN_BASES_VERSION) return jsonResponse(400, { error: 'bases_no_aceptadas_o_desactualizadas' });
+    if (!context.env.CAMPAIGN_IDENTITY_SECRET) return jsonResponse(503, { error: 'campana_no_configurada' });
 
     const supabase = createClient(context.env.SUPABASE_URL, context.env.SUPABASE_SERVICE_ROLE_KEY);
 
     const { data: config, error: errConfig } = await supabase
       .from('campana_config')
-      .select('checkout_habilitado')
+      .select('checkout_habilitado, bases_version, privacy_version, inicio_at, cierre_at, sorteo_at, premios, proveedor_pago, email_configurado, schema_version')
       .eq('id', 1)
       .single();
     if (errConfig || !config) {
       return jsonResponse(500, { error: 'config_no_disponible', detalle: errConfig?.message ?? 'sin fila en campana_config' });
     }
-    if (!config.checkout_habilitado) {
+    const configuracionCompleta = config.bases_version === CAMPAIGN_BASES_VERSION && config.privacy_version === CAMPAIGN_PRIVACY_VERSION
+      && config.inicio_at && config.cierre_at && config.sorteo_at && Array.isArray(config.premios) && config.premios.length > 0
+      && config.proveedor_pago && config.email_configurado && Number(config.schema_version) >= 5;
+    if (!config.checkout_habilitado || !configuracionCompleta) {
       return jsonResponse(403, { error: 'checkout_deshabilitado' });
     }
 
@@ -104,6 +115,14 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 
     const monto = productos.reduce((acc, p) => acc + PRECIOS[p], 0);
     const commerceOrder = `CAMPANA2026-${Date.now()}-${crypto.randomUUID().slice(0, 6)}`;
+    const now = new Date().toISOString();
+    const hash = await identityHash(rut, context.env.CAMPAIGN_IDENTITY_SECRET);
+    const { data: participante, error: errParticipante } = await supabase
+      .from('campana_participantes')
+      .upsert({ campaign_id: CAMPAIGN_ID, identity_hash: hash, rut_masked: enmascararRut(rut), nombre, email, telefono,
+        bases_version: basesVersion, bases_accepted_at: now, updated_at: now }, { onConflict: 'campaign_id,identity_hash' })
+      .select('id').single();
+    if (errParticipante || !participante) return jsonResponse(500, { error: 'no_se_pudo_identificar_participante' });
 
     const { data: orden, error: errOrden } = await supabase
       .from('campana_ordenes')
@@ -112,6 +131,9 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
         comprador_nombre: nombre,
         comprador_email: email,
         comprador_telefono: telefono,
+        participant_id: participante.id,
+        bases_version: basesVersion,
+        bases_accepted_at: now,
         rifa_codigo_id: rifaCodigoId,
         monto,
       })
