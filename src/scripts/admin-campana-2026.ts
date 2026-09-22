@@ -3,6 +3,7 @@ import {
   obtenerResumenCampana,
   obtenerOrdenesCampana,
   obtenerParticipacionesGratisCampana,
+  obtenerParticipantesCampana,
 } from '../lib/crm/admin-campana-api.ts';
 
 function $<T extends Element>(selector: string): T | null {
@@ -51,10 +52,11 @@ export async function iniciarAdminCampana2026(): Promise<void> {
   montarCabeceraAdmin(perfil);
 
   try {
-    const [resumen, ordenes, gratis] = await Promise.all([
+    const [resumen, ordenes, gratis, participantes] = await Promise.all([
       obtenerResumenCampana(supabase),
       obtenerOrdenesCampana(supabase),
       obtenerParticipacionesGratisCampana(supabase),
+      obtenerParticipantesCampana(supabase),
     ]);
 
     // ---- resumen ----
@@ -62,6 +64,8 @@ export async function iniciarAdminCampana2026(): Promise<void> {
     $('#ca-ordenes-pendientes')!.textContent = String(resumen.ordenesPendientes);
     $('#ca-entradas-compra')!.textContent = String(resumen.entradasCompra);
     $('#ca-entradas-gratis')!.textContent = String(resumen.entradasGratis);
+    $('#ca-personas')!.textContent = String(resumen.personasUnicas);
+    $('#ca-distribucion')!.textContent = `1: ${resumen.personasPorTotal[1]} · 2: ${resumen.personasPorTotal[2]} · 3: ${resumen.personasPorTotal[3]} · emails fallidos: ${resumen.emailsFallidos}`;
     if (resumen.entradasInvalidadas > 0) {
       $('#ca-invalidadas')!.textContent = `${resumen.entradasInvalidadas} entrada(s) invalidada(s) por reembolso`;
       $('#ca-invalidadas')?.removeAttribute('hidden');
@@ -113,6 +117,9 @@ export async function iniciarAdminCampana2026(): Promise<void> {
     }
 
     // ---- participación gratuita ----
+    const tbodyParticipantes = $('#ca-tabla-participantes tbody')!;
+    tbodyParticipantes.innerHTML = participantes.map(p => `<tr><td><strong>${p.nombre}</strong><br><span class="cc-sub">${p.email}</span></td><td class="cc-mono">${p.rutMasked}</td><td>${p.compra}</td><td>${p.gratis}</td><td><strong>${p.total} / 3</strong></td><td class="cc-mono">${p.codigos.join(', ')||'—'}</td><td class="cc-sub">${p.ordenes.join('<br>')||'—'}</td><td>${p.emailStatus}</td></tr>`).join('') || '<tr><td colspan="8" class="cc-vacio">Sin participantes.</td></tr>';
+
     const tbodyGratis = $('#ca-tabla-gratis tbody')!;
     if (gratis.length === 0) {
       tbodyGratis.innerHTML = '<tr><td colspan="5" class="cc-vacio">Todavía no hay participaciones sin compra.</td></tr>';

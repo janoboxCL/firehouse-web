@@ -6,6 +6,9 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 
 export interface ResumenCampana {
+  personasUnicas: number;
+  personasPorTotal: Record<number, number>;
+  emailsFallidos: number;
   ordenesPagadas: number;
   ordenesPendientes: number;
   recaudadoPorPasarela: Record<string, number>;
@@ -62,11 +65,13 @@ export async function obtenerPasarelasCampana(supabase: SupabaseClient): Promise
 }
 
 export async function obtenerResumenCampana(supabase: SupabaseClient): Promise<ResumenCampana> {
-  const [{ data: ordenes, error: errOrdenes }, { data: pagos, error: errPagos }, { data: entradas, error: errEntradas }, pasarelas] =
+  const [{ data: ordenes, error: errOrdenes }, { data: pagos, error: errPagos }, { data: entradas, error: errEntradas }, { data: participantes }, { data: emails }, pasarelas] =
     await Promise.all([
       supabase.from('campana_ordenes').select('estado'),
       supabase.from('campana_pagos').select('pasarela, monto, estado').eq('estado', 'APROBADO'),
       supabase.from('campana_entradas').select('origen, status'),
+      supabase.from('campana_participantes').select('id, campana_entradas(status)'),
+      supabase.from('campana_email_outbox').select('status').eq('status', 'FAILED'),
       obtenerPasarelasCampana(supabase),
     ]);
   if (errOrdenes) throw errOrdenes;
@@ -78,7 +83,15 @@ export async function obtenerResumenCampana(supabase: SupabaseClient): Promise<R
     recaudadoPorPasarela[p.pasarela] = (recaudadoPorPasarela[p.pasarela] ?? 0) + p.monto;
   }
 
+  const personasPorTotal: Record<number, number> = { 1: 0, 2: 0, 3: 0 };
+  for (const p of participantes ?? []) {
+    const total = ((p as any).campana_entradas ?? []).filter((e: any) => e.status === 'ACTIVE').length;
+    if (total >= 1 && total <= 3) personasPorTotal[total]++;
+  }
   return {
+    personasUnicas: participantes?.length ?? 0,
+    personasPorTotal,
+    emailsFallidos: emails?.length ?? 0,
     ordenesPagadas: (ordenes ?? []).filter((o) => o.estado === 'PAGADA').length,
     ordenesPendientes: (ordenes ?? []).filter((o) => o.estado === 'PENDIENTE').length,
     recaudadoPorPasarela,
@@ -87,6 +100,24 @@ export async function obtenerResumenCampana(supabase: SupabaseClient): Promise<R
     entradasInvalidadas: (entradas ?? []).filter((e) => e.status === 'INVALIDATED').length,
     pasarelas,
   };
+}
+
+export interface ParticipanteCampana {
+  id: string; nombre: string; rutMasked: string; email: string; compra: number; gratis: number;
+  total: number; codigos: string[]; ordenes: string[]; emailStatus: string;
+}
+
+export async function obtenerParticipantesCampana(supabase: SupabaseClient): Promise<ParticipanteCampana[]> {
+  const { data, error } = await supabase.from('campana_participantes').select(`id,nombre,rut_masked,email,
+    campana_entradas(source,status,codigo),campana_ordenes(commerce_order,estado),campana_email_outbox(status)`).order('created_at', { ascending: false });
+  if (error) throw error;
+  return (data ?? []).map((p: any) => {
+    const active = (p.campana_entradas ?? []).filter((e: any) => e.status === 'ACTIVE');
+    return { id:p.id,nombre:p.nombre,rutMasked:p.rut_masked,email:p.email,
+      compra:active.filter((e:any)=>e.source==='COMPRA').length,gratis:active.filter((e:any)=>e.source==='GRATIS').length,
+      total:active.length,codigos:active.map((e:any)=>e.codigo),ordenes:(p.campana_ordenes??[]).map((o:any)=>`${o.commerce_order} (${o.estado})`),
+      emailStatus:(p.campana_email_outbox??[]).map((e:any)=>e.status).join(', ')||'—' };
+  });
 }
 
 export async function obtenerOrdenesCampana(supabase: SupabaseClient, limite = 200): Promise<OrdenCampana[]> {

@@ -340,11 +340,12 @@ export interface DatosCorreoCampana {
   productos: string[];
   /** Uno por producto comprado (fn_confirmar_orden_campana genera un código por ítem). */
   codigos: string[];
+  totalParticipaciones: number;
   /** URL base del sitio, para armar el link a la página de descarga. */
   siteUrl: string;
 }
 
-function construirHtmlCampana(datos: DatosCorreoCampana): string {
+export function construirHtmlCampana(datos: DatosCorreoCampana): string {
   const nombre = escaparHtml(datos.compradorNombre.split(' ')[0]);
   const montoTexto = `$${datos.monto.toLocaleString('es-CL')}`;
   const urlDescarga = `${datos.siteUrl}/campana-2026/descarga?orden=${datos.ordenId}`;
@@ -377,10 +378,15 @@ function construirHtmlCampana(datos: DatosCorreoCampana): string {
         Descargar tu colección
       </a>
     </p>
-    <p style="font-size:13px;line-height:1.6;color:rgba(245,239,232,.6);margin:0 0 8px;">
-      Además, tu compra incluye una participación en la promoción Firehouse 2026 — este es tu código:
+    <hr style="border:0;border-top:1px solid #39332e;margin:24px 0;">
+    <p style="font-size:15px;color:#F5EFE8;margin:0 0 8px;"><strong>Promoción incluida</strong></p>
+    <p style="font-size:13px;line-height:1.6;color:rgba(245,239,232,.7);margin:0 0 8px;">
+      Participaciones promocionales asignadas en esta compra: ${datos.codigos.length}.
     </p>
-    <p style="margin:0 0 24px;">${listaCodigos}</p>
+    ${datos.codigos.length ? `<p style="margin:0 0 12px;">${listaCodigos}</p>` : `<p style="font-size:13px;line-height:1.6;color:rgba(245,239,232,.7);">Tu compra fue confirmada y tu producto digital está disponible. No se asignaron participaciones promocionales adicionales porque ya alcanzaste el máximo de 3 participaciones por persona establecido en las Bases.</p>`}
+    <p style="font-size:13px;color:rgba(245,239,232,.7);">Total de participaciones activas asociadas a tu RUT: ${datos.totalParticipaciones} de 3.</p>
+    <hr style="border:0;border-top:1px solid #39332e;margin:24px 0;">
+    <p style="font-size:13px;line-height:1.6;color:rgba(245,239,232,.6);">Máximo 3 participaciones por persona/RUT. Sorteo: 12 de diciembre de 2026, 20:00 h, por Instagram @firehouse.cheer. Plazo para reclamar: 10 días corridos. <a style="color:#FFC400" href="${datos.siteUrl}/campana-2026/bases">Guardar Bases versión 2026-1.0</a>. Contacto: allstarfirehouse@gmail.com.</p>
     <p style="font-size:15px;line-height:1.65;color:rgba(245,239,232,.86);margin:0 0 8px;">
       Monto pagado: <strong>${montoTexto}</strong>
     </p>
@@ -421,21 +427,23 @@ export async function enviarCorreoConfirmacionCampana(
 export interface DatosCorreoParticipacionGratis {
   nombre: string;
   email: string;
-  codigo: string;
+  codigos: string[];
+  total: number;
 }
 
-function construirHtmlParticipacionGratis(datos: DatosCorreoParticipacionGratis): string {
+export function construirHtmlParticipacionGratis(datos: DatosCorreoParticipacionGratis): string {
   const nombre = escaparHtml(datos.nombre.split(' ')[0]);
   const cuerpo = `
     <p style="font-size:15px;line-height:1.65;color:rgba(245,239,232,.86);margin:0 0 16px;">
       Hola ${nombre}, ¡ya estás participando en la promoción Firehouse 2026! 🔥
     </p>
     <p style="font-size:13px;line-height:1.6;color:rgba(245,239,232,.6);margin:0 0 8px;">
-      Tu código de participación:
+      Se asignaron ${datos.codigos.length} participaciones promocionales.
     </p>
     <p style="margin:0 0 24px;">
-      <span style="display:inline-block;background:#171412;color:#FFC400;font-family:monospace;font-size:15px;padding:6px 12px;border-radius:6px;">${escaparHtml(datos.codigo)}</span>
+      ${datos.codigos.map(c => `<span style="display:inline-block;background:#171412;color:#FFC400;font-family:monospace;font-size:15px;padding:6px 12px;border-radius:6px;margin:3px;">${escaparHtml(c)}</span>`).join('')}
     </p>
+    ${datos.codigos.length === 0 ? '<p style="font-size:13px;color:rgba(245,239,232,.7);">Tu RUT ya alcanzó el máximo de tres participaciones y no se generaron códigos adicionales.</p>' : ''}
     <p style="font-size:13px;line-height:1.6;color:rgba(245,239,232,.6);margin:0;">
       Guarda este correo — este código entra al mismo sorteo que las participaciones de quienes
       compraron un sobre. El sorteo se transmite en vivo por Instagram <strong>@firehouse.cheer</strong>.

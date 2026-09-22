@@ -3,7 +3,7 @@ import Base from '../../layouts/Base.astro';
 import { whatsapp } from '../../data/sitio.js';
 
 const titulo = 'Participa sin compra | Campaña Firehouse 2026';
-const descripcion = 'Participa sin costo en la promoción Firehouse 2026: una participación gratuita por persona durante toda la campaña.';
+const descripcion = 'Participa sin costo y completa hasta tres participaciones por persona/RUT en la promoción Firehouse 2026.';
 const noindex = true;
 ---
 <Base
@@ -22,8 +22,8 @@ const noindex = true;
         <p class="pg__titulo">Participa sin compra</p>
         <p class="pg__texto">
           La promoción Firehouse 2026 contempla una modalidad gratuita de participación, sin
-          necesidad de adquirir productos: una (1) participación por persona y RUT durante toda
-          la vigencia de la campaña, conforme a las
+          necesidad de adquirir productos. Esta modalidad permite completar las participaciones
+          que te resten hasta el máximo global de tres por persona/RUT, conforme a las
           <a href="/campana-2026/bases" target="_blank" rel="noopener">Bases de la Promoción</a>.
         </p>
 
@@ -31,6 +31,9 @@ const noindex = true;
           <div class="pg-campo">
             <label for="pgNombre">Nombre completo</label>
             <input type="text" id="pgNombre" required autocomplete="name" maxlength="150" minlength="3" />
+          </div>
+          <div class="pg-campo" aria-hidden="true" style="position:absolute;left:-9999px">
+            <label for="pgWebsite">Sitio web</label><input type="text" id="pgWebsite" tabindex="-1" autocomplete="off" />
           </div>
           <div class="pg-campo">
             <label for="pgRut">RUT</label>
@@ -58,22 +61,13 @@ const noindex = true;
 
       <div id="pgExito" class="pg__estado" hidden>
         <p class="pg__titulo">¡Ya estás participando! 🔥</p>
-        <p class="pg__texto">Tu código de participación:</p>
+        <p class="pg__texto" id="pgResultadoTexto"></p>
         <p class="pg-codigo" id="pgCodigo"></p>
         <p class="pg__texto">
           Te enviamos este código también por correo. Entra al mismo sorteo que las
           participaciones de quienes compraron un sobre — se transmite en vivo por Instagram
           <strong>@firehouse.cheer</strong>.
         </p>
-      </div>
-
-      <div id="pgYaParticipa" class="pg__estado" hidden>
-        <p class="pg__titulo">Este RUT ya está participando</p>
-        <p class="pg__texto">
-          Sólo se permite una participación gratuita por persona durante toda la campaña. Si
-          crees que esto es un error, escríbenos.
-        </p>
-        <a class="btn" href={whatsapp('campana2026')} target="_blank" rel="noopener">Escríbenos por WhatsApp</a>
       </div>
 
     </div>
