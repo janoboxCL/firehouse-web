@@ -1,5 +1,4 @@
 import { requireAdminSession, montarCabeceraAdmin } from '../lib/crm/auth.ts';
-import { iniciarEstadoCampana } from './admin-campana-estado.ts';
 import {
   obtenerResumenCampana,
   obtenerOrdenesCampana,
@@ -97,7 +96,6 @@ function mostrarError(mensaje: string): void {
 export async function iniciarAdminCampana2026(): Promise<void> {
   const { supabase, perfil } = await requireAdminSession();
   montarCabeceraAdmin(perfil);
-  void iniciarEstadoCampana(supabase);
 
   try {
     const [resumen, ordenes, gratis, participantes] = await Promise.all([
