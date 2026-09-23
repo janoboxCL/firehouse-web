@@ -12,9 +12,10 @@ import {
 
   <h1 class="db-titulo">Firehouse CRM</h1>
 
+  <div id="db-programa" class="fh-programa" aria-label="Programa"></div>
   <div class="db-accesos" aria-label="Accesos rápidos">
-    <button type="button" id="f-star-inscritos" class="admin-btn">⭐ Ver inscritos de Firehouse Star</button>
-    <button type="button" id="f-limpiar" class="admin-btn admin-btn--secundario" hidden>Ver todos los casos</button>
+    <div id="db-atajos" class="db-atajos"></div>
+    <button type="button" id="f-limpiar" class="admin-btn admin-btn--secundario" hidden>Quitar filtros</button>
   </div>
 
   <section class="db-kpis" id="db-kpis" aria-label="Resumen">
@@ -92,7 +93,12 @@ import {
 
 <style is:global>
 .db-titulo{ font-size: 1.7rem; margin: 0 0 20px; }
-.db-accesos{ display:flex; flex-wrap:wrap; gap:10px; margin:-6px 0 20px; }
+.db-accesos{ display:flex; flex-wrap:wrap; align-items:center; gap:10px; margin:0 0 20px; }
+.db-atajos{ display:flex; flex-wrap:wrap; gap:8px; }
+.db-atajo{ border:1px solid #E4DFD6; background:#fff; border-radius:999px; padding:7px 14px; font:inherit; font-size:13px; cursor:pointer; }
+.db-atajo[aria-pressed="true"]{ background: var(--ember, #171412); border-color: var(--ember, #171412); color:#fff; }
+.db-programa-badge{ font-size: 11px; }
+.db-asignar{ font: inherit; font-size: 12px; padding: 4px 6px; border: 1px dashed #B8AEA3; border-radius: 6px; background: #fff; }
 
 .db-kpis{ display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; margin-bottom: 20px; }
 .db-kpi{ text-align: center; padding: 18px 12px; }

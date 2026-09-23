@@ -7,6 +7,7 @@ import {
   casoEsParaHoy,
   edadDeAtleta,
   nombreAdminDe,
+  actualizarProgramaCaso,
   agruparPorApoderado,
   ordenarGruposPorUrgencia,
   type CasoResumen,
@@ -15,7 +16,16 @@ import {
   type AdminMini,
 } from '../lib/crm/admin-api.ts';
 import { CRM_JOURNEYS_LABEL, CRM_ESTADOS_LABEL, CRM_ESTADOS } from '../lib/crm/constants.ts';
-import { formatearFecha, claseBadgeEstado } from '../lib/crm/format.ts';
+import { formatearFecha, claseBadgeEstado, escaparHtml, mensajeErrorSupabase } from '../lib/crm/format.ts';
+import {
+  contarPorPrograma,
+  leerSeleccion,
+  montarSelectorPrograma,
+  coincidePrograma,
+  type SeleccionPrograma,
+} from '../lib/crm/programa-filtro.ts';
+import { PROGRAMAS_LABEL, esPrograma } from '../lib/crm/programas.ts';
+import type { SupabaseClient } from '@supabase/supabase-js';
 
 function $<T extends Element>(selector: string): T | null {
   return document.querySelector<T>(selector);
@@ -23,6 +33,20 @@ function $<T extends Element>(selector: string): T | null {
 
 let TODOS_LOS_CASOS: CasoResumen[] = [];
 let ADMINS: AdminMini[] = [];
+let PROGRAMA: SeleccionPrograma = 'TODOS';
+let SUPABASE: SupabaseClient;
+
+/** Atajos por programa: fijan los filtros de journey y estado. */
+const ATAJOS: Record<SeleccionPrograma, Array<{ etiqueta: string; journey?: string; estado?: string }>> = {
+  TODOS: [],
+  ALL_STAR: [{ etiqueta: 'Inscritos', estado: 'INSCRITO' }],
+  STAR: [
+    { etiqueta: 'Clase de prueba', journey: 'CLASE_PRUEBA_STAR' },
+    { etiqueta: 'Kit pendiente de pago', journey: 'FIREHOUSE_STAR', estado: 'NUEVO' },
+    { etiqueta: 'Inscritos', estado: 'INSCRITO' },
+  ],
+  SIN_PROGRAMA: [],
+};
 
 function debounce<T extends (...args: any[]) => void>(fn: T, ms: number): T {
   let t: ReturnType<typeof setTimeout>;
@@ -39,7 +63,24 @@ function leerFiltros(): FiltrosCasos {
     responsableId: $<HTMLSelectElement>('#f-responsable')?.value || undefined,
     fecha: ($<HTMLSelectElement>('#f-fecha')?.value as FiltrosCasos['fecha']) || 'TODOS',
     busqueda: $<HTMLInputElement>('#f-busqueda')?.value || undefined,
+    programa: PROGRAMA,
   };
+}
+
+function hayFiltrosActivos(): boolean {
+  const f = leerFiltros();
+  return !!(f.journey || f.estado || f.responsableId || (f.fecha && f.fecha !== 'TODOS') || f.busqueda);
+}
+
+function renderAtajos(): void {
+  const f = leerFiltros();
+  $<HTMLElement>('#db-atajos')!.innerHTML = ATAJOS[PROGRAMA]
+    .map((a, i) => {
+      const activo = (a.journey ?? '') === (f.journey ?? '') && (a.estado ?? '') === (f.estado ?? '');
+      return `<button type="button" class="db-atajo" data-atajo="${i}" aria-pressed="${activo}">${escaparHtml(a.etiqueta)}</button>`;
+    })
+    .join('');
+  $<HTMLButtonElement>('#f-limpiar')!.hidden = !hayFiltrosActivos();
 }
 
 function renderKPIs(casos: CasoResumen[]): void {
@@ -56,6 +97,41 @@ function renderKPIs(casos: CasoResumen[]): void {
   $('#kpi-agendados')!.textContent = String(agendados.length);
   $('#kpi-inscritos')!.textContent = String(inscritos.length);
   $('#kpi-sin-contactar')!.textContent = String(sinContactar24h.length);
+}
+
+function celdaPrograma(caso: CasoResumen): HTMLTableCellElement {
+  const td = document.createElement('td');
+  td.className = 'db-celda-programa';
+  if (esPrograma(caso.programa)) {
+    td.innerHTML = `<span class="fh-badge-programa fh-badge-programa--${caso.programa.toLowerCase()}">${
+      caso.programa === 'STAR' ? 'Star' : 'All Star'
+    }</span>`;
+    return td;
+  }
+  // Sin programa: se asigna aquí mismo, sin abrir el caso.
+  const select = document.createElement('select');
+  select.className = 'db-asignar';
+  select.setAttribute('aria-label', `Asignar programa a ${caso.atleta.nombre}`);
+  select.innerHTML = `<option value="">Asignar programa</option>
+    <option value="STAR">${PROGRAMAS_LABEL.STAR}</option>
+    <option value="ALL_STAR">${PROGRAMAS_LABEL.ALL_STAR}</option>`;
+  select.addEventListener('click', (e) => e.stopPropagation());
+  select.addEventListener('change', async (e) => {
+    e.stopPropagation();
+    if (!select.value) return;
+    select.disabled = true;
+    try {
+      await actualizarProgramaCaso(SUPABASE, caso.id, select.value);
+      caso.programa = select.value;
+      actualizarSelectorPrograma();
+      renderizar();
+    } catch (err) {
+      mostrarError(mensajeErrorSupabase(err, 'No pudimos asignar el programa.'));
+      select.disabled = false;
+    }
+  });
+  td.appendChild(select);
+  return td;
 }
 
 function filaAtleta(caso: CasoResumen): HTMLTableRowElement {
@@ -76,14 +152,16 @@ function filaAtleta(caso: CasoResumen): HTMLTableRowElement {
   celdaFecha.textContent = caso.fecha_proxima_accion ? textoFecha : '—';
 
   tr.innerHTML = `
-    <td>${caso.atleta.nombre} ${caso.atleta.apellidos} ${edad !== null ? `(${edad})` : ''}</td>
-    <td><span class="admin-badge admin-badge--journey">${CRM_JOURNEYS_LABEL[caso.journey] ?? caso.journey}</span></td>
-    <td><span class="admin-badge ${claseBadgeEstado(caso.estado)}">${CRM_ESTADOS_LABEL[caso.estado] ?? caso.estado}</span></td>
-    <td>${caso.proxima_accion ?? '—'}</td>
+    <td>${escaparHtml(`${caso.atleta.nombre} ${caso.atleta.apellidos}`)} ${edad !== null ? `(${edad})` : ''}</td>
+    <td class="db-celda-programa"></td>
+    <td><span class="admin-badge admin-badge--journey">${escaparHtml(CRM_JOURNEYS_LABEL[caso.journey] ?? caso.journey)}</span></td>
+    <td><span class="admin-badge ${claseBadgeEstado(caso.estado)}">${escaparHtml(CRM_ESTADOS_LABEL[caso.estado] ?? caso.estado)}</span></td>
+    <td>${escaparHtml(caso.proxima_accion ?? '—')}</td>
     <td></td>
-    <td>${nombreAdminDe(ADMINS, caso.responsable_id)}</td>
+    <td>${escaparHtml(nombreAdminDe(ADMINS, caso.responsable_id))}</td>
   `;
-  tr.children[4].replaceWith(celdaFecha);
+  tr.children[5].replaceWith(celdaFecha);
+  tr.children[1].replaceWith(celdaPrograma(caso));
   return tr;
 }
 
@@ -95,8 +173,8 @@ function tarjetaFamilia(grupo: GrupoApoderado): HTMLElement {
   header.className = 'familia-card__header';
   header.innerHTML = `
     <div>
-      <p class="familia-card__nombre">${grupo.apoderado.nombre} ${grupo.apoderado.apellidos}</p>
-      <p class="familia-card__contacto">${grupo.apoderado.telefono} · ${grupo.apoderado.email}</p>
+      <p class="familia-card__nombre">${escaparHtml(`${grupo.apoderado.nombre} ${grupo.apoderado.apellidos}`)}</p>
+      <p class="familia-card__contacto">${escaparHtml(grupo.apoderado.telefono)} · ${escaparHtml(grupo.apoderado.email)}</p>
     </div>
   `;
   header.addEventListener('click', () => {
@@ -113,8 +191,20 @@ function tarjetaFamilia(grupo: GrupoApoderado): HTMLElement {
   return card;
 }
 
+function actualizarSelectorPrograma(): void {
+  montarSelectorPrograma($<HTMLElement>('#db-programa')!, contarPorPrograma(TODOS_LOS_CASOS), PROGRAMA, (v) => {
+    PROGRAMA = v;
+    // Los atajos dependen del programa: al cambiarlo se limpian journey y estado.
+    $<HTMLSelectElement>('#f-journey')!.value = '';
+    $<HTMLSelectElement>('#f-estado')!.value = '';
+    renderizar();
+  });
+}
+
 function renderizar(): void {
   const filtros = leerFiltros();
+  renderKPIs(TODOS_LOS_CASOS.filter((c) => coincidePrograma(c.programa, PROGRAMA)));
+  renderAtajos();
   const filtrados = filtrarCasos(TODOS_LOS_CASOS, filtros);
   const grupos = ordenarGruposPorUrgencia(agruparPorApoderado(filtrados));
 
@@ -164,31 +254,34 @@ export async function iniciarDashboard(): Promise<void> {
   }
 
   $('#db-cargando')!.setAttribute('hidden', '');
+  SUPABASE = supabase;
+  PROGRAMA = leerSeleccion();
+  if (PROGRAMA === 'SIN_PROGRAMA' && contarPorPrograma(TODOS_LOS_CASOS).SIN_PROGRAMA === 0) PROGRAMA = 'TODOS';
   poblarSelectResponsables();
-  renderKPIs(TODOS_LOS_CASOS);
+  actualizarSelectorPrograma();
   renderizar();
+
+  $('#db-atajos')?.addEventListener('click', (evt) => {
+    const b = (evt.target as HTMLElement).closest<HTMLButtonElement>('button[data-atajo]');
+    if (!b) return;
+    const atajo = ATAJOS[PROGRAMA][Number(b.dataset.atajo)];
+    const yaActivo = b.getAttribute('aria-pressed') === 'true';
+    $<HTMLSelectElement>('#f-journey')!.value = yaActivo ? '' : atajo.journey ?? '';
+    $<HTMLSelectElement>('#f-estado')!.value = yaActivo ? '' : atajo.estado ?? '';
+    renderizar();
+  });
 
   ['#f-journey', '#f-estado', '#f-responsable', '#f-fecha'].forEach((sel) => {
     $(sel)?.addEventListener('change', renderizar);
   });
   $('#f-busqueda')?.addEventListener('input', debounce(renderizar, 250));
 
-  $('#f-star-inscritos')?.addEventListener('click', () => {
-    $<HTMLSelectElement>('#f-journey')!.value = 'FIREHOUSE_STAR';
-    $<HTMLSelectElement>('#f-estado')!.value = 'INSCRITO';
-    $<HTMLSelectElement>('#f-responsable')!.value = '';
-    $<HTMLSelectElement>('#f-fecha')!.value = 'TODOS';
-    $<HTMLInputElement>('#f-busqueda')!.value = '';
-    $<HTMLButtonElement>('#f-limpiar')!.hidden = false;
-    renderizar();
-  });
   $('#f-limpiar')?.addEventListener('click', () => {
     $<HTMLSelectElement>('#f-journey')!.value = '';
     $<HTMLSelectElement>('#f-estado')!.value = '';
     $<HTMLSelectElement>('#f-responsable')!.value = '';
     $<HTMLSelectElement>('#f-fecha')!.value = 'TODOS';
     $<HTMLInputElement>('#f-busqueda')!.value = '';
-    $<HTMLButtonElement>('#f-limpiar')!.hidden = true;
     renderizar();
   });
 }

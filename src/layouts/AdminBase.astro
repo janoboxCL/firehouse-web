@@ -265,6 +265,23 @@ body.admin-tema a{ color: var(--fire-red); }
 .fm-cargo{ margin: 6px 0 0; font-weight: 600; }
 .fm-vista{ font-size: 13px; color: #6B6259; margin: 14px 0 0; }
 .fm-vista span{ color: var(--ember, #171412); font-style: italic; }
+/* ---------------------------------------------------------------------------
+   Selector de programa (dashboard y clase de prueba)
+--------------------------------------------------------------------------- */
+.fh-programa{ display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 16px; padding: 4px; background: #fff; border: 1px solid #E4DFD6; border-radius: 12px; width: fit-content; max-width: 100%; }
+.fh-programa__tab{ display: inline-flex; align-items: center; gap: 8px; border: 0; background: transparent; border-radius: 9px; padding: 9px 14px; font: inherit; font-size: 14px; font-weight: 500; color: #6B6259; cursor: pointer; }
+.fh-programa__tab:hover{ background: #F5EFE8; }
+.fh-programa__tab:focus-visible{ outline: 2px solid var(--fire-red); outline-offset: 2px; }
+.fh-programa__tab[aria-selected="true"]{ color: #fff; background: var(--ember, #171412); }
+.fh-programa__tab--all_star[aria-selected="true"]{ background: var(--mat-blue, #1B4FA8); }
+.fh-programa__tab--star[aria-selected="true"]{ background: var(--fire-yellow, #FFC400); color: var(--ember, #171412); }
+.fh-programa__tab--sin_programa[aria-selected="true"]{ background: #6B6259; }
+.fh-programa__conteo{ font-size: 12px; font-weight: 700; min-width: 22px; padding: 1px 7px; border-radius: 999px; background: rgba(0,0,0,.08); text-align: center; }
+.fh-programa__tab[aria-selected="true"] .fh-programa__conteo{ background: rgba(255,255,255,.25); }
+.fh-programa__tab--star[aria-selected="true"] .fh-programa__conteo{ background: rgba(0,0,0,.12); }
+.fh-badge-programa{ display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 700; white-space: nowrap; }
+.fh-badge-programa--star{ background: var(--fire-yellow, #FFC400); color: var(--ember, #171412); }
+.fh-badge-programa--all_star{ background: var(--mat-blue, #1B4FA8); color: #fff; }
 @media (max-width: 700px){
   .familia-card__atletas thead{ display: none; }
   .familia-card__atletas, .familia-card__atletas tbody, .familia-card__atletas tr, .familia-card__atletas td{

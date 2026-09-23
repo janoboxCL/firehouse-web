@@ -2,6 +2,8 @@
 // están separadas de las funciones que hablan con Supabase para poder testearlas sin red.
 
 import type { SupabaseClient } from '@supabase/supabase-js';
+import { coincidePrograma, type SeleccionPrograma } from './programa-filtro.ts';
+import { getNextStarClassDate } from './star-class.ts';
 import { ESTADOS_CERRADOS, CRM_ESTADOS, CRM_JOURNEYS } from './constants.ts';
 import { calcularEdad, normalizarTelefonoCL, validarEmail } from './validation.ts';
 
@@ -48,6 +50,8 @@ export interface CasoResumen {
   fecha_clase_prueba: string | null;
   created_at: string;
   updated_at: string;
+  /** ALL_STAR, STAR o null (sin asignar). Migración 0007. */
+  programa?: string | null;
   atleta: AtletaResumen;
 }
 
@@ -69,7 +73,7 @@ export interface AdminMini {
 const SELECT_CASO = `
   id, journey, estado, intencion_inicial, como_conocio, comentario_inicial,
   responsable_id, proxima_accion, fecha_proxima_accion, prioridad,
-  quiere_clase_prueba, dia_clase_prueba, fecha_clase_prueba, created_at, updated_at,
+  quiere_clase_prueba, dia_clase_prueba, fecha_clase_prueba, created_at, updated_at, programa,
   atleta:atletas (
     id, nombre, apellidos, fecha_nacimiento, firehouse_actual, tiene_experiencia,
     anos_experiencia, academia_anterior, fuera_rango_habitual,
@@ -188,6 +192,7 @@ export interface FiltrosCasos {
   responsableId?: string;
   fecha?: 'HOY' | 'ATRASADOS' | 'SEMANA' | 'TODOS';
   busqueda?: string;
+  programa?: SeleccionPrograma;
 }
 
 export function coincideBusqueda(caso: CasoResumen, textoCrudo: string): boolean {
@@ -211,6 +216,7 @@ export function filtrarCasos(casos: CasoResumen[], filtros: FiltrosCasos, ahora:
   finSemana.setHours(23, 59, 59, 999);
 
   return casos.filter((caso) => {
+    if (filtros.programa && !coincidePrograma(caso.programa, filtros.programa)) return false;
     if (filtros.journey && caso.journey !== filtros.journey) return false;
     if (filtros.estado && caso.estado !== filtros.estado) return false;
     if (filtros.responsableId && caso.responsable_id !== filtros.responsableId) return false;
@@ -330,6 +336,55 @@ export function agruparClasePruebaPorFecha(casos: CasoResumen[]): GrupoClasePrue
     .map(([fecha, casos]) => ({
       fecha,
       casos: [...casos].sort((a, b) => a.atleta.apoderado.nombre.localeCompare(b.atleta.apoderado.nombre, 'es')),
+    }))
+    .sort((a, b) => a.fecha.localeCompare(b.fecha));
+}
+
+export async function actualizarProgramaCaso(supabase: SupabaseClient, casoId: string, programa: string | null): Promise<void> {
+  const { error } = await supabase.from('casos_crm').update({ programa }).eq('id', casoId);
+  if (error) throw error;
+}
+
+export interface ItemPrimeraClase {
+  caso: CasoResumen;
+  /** PRUEBA: clase de prueba · INSCRIPCION: inscripción Star que viene a su primera clase. */
+  tipo: 'PRUEBA' | 'INSCRIPCION';
+  fecha: string;
+}
+
+export interface GrupoPrimeraClase {
+  fecha: string;
+  items: ItemPrimeraClase[];
+}
+
+const ESTADOS_CERRADOS_NO_ASISTE = ['NO_INTERESADO', 'NO_CONTINUA'];
+
+/**
+ * Quiénes vienen a una primera clase, agrupados por fecha: las clases de prueba
+ * (general y Star) y las inscripciones Star cuya primera clase aún no pasa o fue
+ * hace menos de una semana.
+ */
+export function agruparPrimerasClases(casos: CasoResumen[], ahora: Date = new Date()): GrupoPrimeraClase[] {
+  const hace7 = new Date(ahora.getTime() - 7 * 86_400_000).toISOString().slice(0, 10);
+  const items: ItemPrimeraClase[] = [];
+  for (const caso of casos) {
+    const esPrueba = caso.journey === CRM_JOURNEYS.CLASE_PRUEBA || caso.journey === CRM_JOURNEYS.CLASE_PRUEBA_STAR;
+    if (esPrueba && caso.fecha_clase_prueba) {
+      items.push({ caso, tipo: 'PRUEBA', fecha: caso.fecha_clase_prueba });
+    } else if (caso.journey === CRM_JOURNEYS.FIREHOUSE_STAR && !ESTADOS_CERRADOS_NO_ASISTE.includes(caso.estado)) {
+      const fecha = getNextStarClassDate(new Date(caso.created_at));
+      if (fecha >= hace7) items.push({ caso, tipo: 'INSCRIPCION', fecha });
+    }
+  }
+  const mapa = new Map<string, ItemPrimeraClase[]>();
+  items.forEach((i) => {
+    if (!mapa.has(i.fecha)) mapa.set(i.fecha, []);
+    mapa.get(i.fecha)!.push(i);
+  });
+  return [...mapa.entries()]
+    .map(([fecha, lista]) => ({
+      fecha,
+      items: lista.sort((a, b) => a.caso.atleta.apoderado.nombre.localeCompare(b.caso.atleta.apoderado.nombre, 'es')),
     }))
     .sort((a, b) => a.fecha.localeCompare(b.fecha));
 }

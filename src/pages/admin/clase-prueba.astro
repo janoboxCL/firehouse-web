@@ -4,12 +4,13 @@ import AdminBase from '../../layouts/AdminBase.astro';
 <AdminBase titulo="Clase de prueba">
   <a href="/admin" class="ficha-volver">← Volver al listado de casos</a>
   <div class="cp-header">
-    <h1 class="db-titulo">Clase de prueba — confirmados</h1>
+    <h1 class="db-titulo">Clases de prueba y primeras clases</h1>
     <button type="button" id="cp-btn-visita-rapida" class="admin-btn admin-btn--secundario">+ Agregar visita rápida</button>
   </div>
   <p class="admin-intro">
-    Todas las familias que pidieron clase de prueba, agrupadas por fecha. Registra la talla,
-    envía los mensajes de la secuencia por WhatsApp y marca la asistencia apenas lleguen.
+    Quiénes vienen a una clase de prueba o a su primera clase de Firehouse Star, agrupados por
+    fecha. Registra la talla, envía los mensajes de la secuencia por WhatsApp y marca la asistencia
+    apenas lleguen.
   </p>
 
   <div id="cp-error" class="admin-error" hidden></div>
@@ -56,7 +57,8 @@ import AdminBase from '../../layouts/AdminBase.astro';
     </form>
   </section>
 
- <div id="cp-aviso-mensajes" class="admin-aviso-cerrado" hidden></div>
+ <div id="cp-programa" class="fh-programa" aria-label="Programa"></div>
+  <div id="cp-aviso-mensajes" class="admin-aviso-cerrado" hidden></div>
 
   <section class="admin-card cp-lista-wrap">
     <p id="cp-cargando" class="admin-spinner">Cargando…</p>
@@ -104,6 +106,13 @@ import AdminBase from '../../layouts/AdminBase.astro';
   display: inline-block; margin-left: 6px; padding: 2px 8px; border-radius: 999px;
   background: var(--fire-yellow, #FFC400); color: var(--ember, #171412); font-size: 11px; font-weight: 700; vertical-align: middle;
 }
+.cp-etiqueta-general{
+  display: inline-block; margin-left: 6px; padding: 2px 8px; border-radius: 999px;
+  background: #E4DFD6; color: var(--ember, #171412); font-size: 11px; font-weight: 700; vertical-align: middle;
+}
+.cp-pago{ display: inline-block; margin-left: 4px; padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 700; vertical-align: middle; color: #fff; }
+.cp-pago--ok{ background: #1E7A3C; }
+.cp-pago--pendiente{ background: #B07800; }
 .cp-mensajes{ flex-basis: 100%; border-top: 1px solid #EFEBE4; padding-top: 12px; }
 .cp-fila--asistio .cp-mensajes{ border-top-color: #BFE2C4; }
 .cp-mensajes__campos{ display: flex; flex-wrap: wrap; align-items: flex-end; gap: 12px; }

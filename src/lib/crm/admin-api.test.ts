@@ -10,6 +10,7 @@ import {
   agruparPorApoderado,
   ordenarGruposPorUrgencia,
   agruparClasePruebaPorFecha,
+  agruparPrimerasClases,
   rellenarPlantilla,
   type CasoResumen,
 } from './admin-api.ts';
@@ -179,4 +180,31 @@ test('agruparClasePruebaPorFecha: agrupa varias familias en la misma fecha', () 
   const grupos = agruparClasePruebaPorFecha([a, b]);
   assert.equal(grupos.length, 1);
   assert.equal(grupos[0].casos.length, 2);
+});
+
+test('agruparPrimerasClases: junta clases de prueba e inscripciones Star del mismo sábado', () => {
+  const ahora = new Date('2026-09-24T12:00:00-03:00');
+  const prueba = caso({ id: 'p', journey: 'CLASE_PRUEBA_STAR', fecha_clase_prueba: '2026-10-03' });
+  const inscrita = caso({ id: 'i', journey: 'FIREHOUSE_STAR', estado: 'INSCRITO', created_at: '2026-09-20T12:00:00Z' });
+  const pendiente = caso({ id: 'n', journey: 'FIREHOUSE_STAR', estado: 'NUEVO', created_at: '2026-09-22T12:00:00Z' });
+  const retirada = caso({ id: 'r', journey: 'FIREHOUSE_STAR', estado: 'NO_CONTINUA', created_at: '2026-09-22T12:00:00Z' });
+  const otro = caso({ id: 'o', journey: 'POR_CLASIFICAR' });
+  const grupos = agruparPrimerasClases([prueba, inscrita, pendiente, retirada, otro], ahora);
+  assert.equal(grupos.length, 1);
+  assert.equal(grupos[0].fecha, '2026-10-03');
+  assert.deepEqual(grupos[0].items.map((i) => `${i.caso.id}:${i.tipo}`).sort(), ['i:INSCRIPCION', 'n:INSCRIPCION', 'p:PRUEBA']);
+});
+
+test('agruparPrimerasClases: no muestra inscripciones cuya primera clase fue hace más de una semana', () => {
+  const antigua = caso({ id: 'a', journey: 'FIREHOUSE_STAR', estado: 'INSCRITO', created_at: '2026-09-20T12:00:00Z' });
+  assert.equal(agruparPrimerasClases([antigua], new Date('2026-10-20T12:00:00-03:00')).length, 0);
+});
+
+test('filtrarCasos: filtra por programa', () => {
+  const star = caso({ id: 's', programa: 'STAR' });
+  const allStar = caso({ id: 'a', programa: 'ALL_STAR' });
+  const sin = caso({ id: 'x', programa: null });
+  assert.deepEqual(filtrarCasos([star, allStar, sin], { programa: 'STAR' }).map((c) => c.id), ['s']);
+  assert.deepEqual(filtrarCasos([star, allStar, sin], { programa: 'SIN_PROGRAMA' }).map((c) => c.id), ['x']);
+  assert.equal(filtrarCasos([star, allStar, sin], { programa: 'TODOS' }).length, 3);
 });

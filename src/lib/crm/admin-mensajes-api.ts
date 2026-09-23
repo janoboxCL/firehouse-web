@@ -122,3 +122,31 @@ export async function obtenerValorInscripcionStar(supabase: SupabaseClient): Pro
     .maybeSingle();
   return data ? formatoPesos(data.matricula as number) : null;
 }
+
+/** Nota con la que se registra la asistencia a la primera clase de una inscripción Star. */
+export const NOTA_ASISTENCIA_PRIMERA_CLASE = 'Asistió a su primera clase de Firehouse Star';
+
+export async function obtenerAsistenciasPrimeraClase(supabase: SupabaseClient, casoIds: string[]): Promise<Set<string>> {
+  if (casoIds.length === 0) return new Set();
+  const { data, error } = await supabase
+    .from('interacciones')
+    .select('caso_id')
+    .in('caso_id', casoIds)
+    .eq('nota', NOTA_ASISTENCIA_PRIMERA_CLASE);
+  if (error) throw error;
+  return new Set((data ?? []).map((d) => d.caso_id as string));
+}
+
+/**
+ * Registra la asistencia de una inscripción Star sin cambiar el estado del caso
+ * (que refleja el pago: INSCRITO o pendiente).
+ */
+export async function registrarAsistenciaPrimeraClase(supabase: SupabaseClient, casoId: string): Promise<void> {
+  const { error } = await supabase.from('interacciones').insert({
+    caso_id: casoId,
+    tipo: 'NOTA',
+    nota: NOTA_ASISTENCIA_PRIMERA_CLASE,
+    responsable_id: await usuarioActual(supabase),
+  });
+  if (error) throw error;
+}
