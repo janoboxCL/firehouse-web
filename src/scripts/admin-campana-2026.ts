@@ -4,10 +4,55 @@ import {
   obtenerOrdenesCampana,
   obtenerParticipacionesGratisCampana,
   obtenerParticipantesCampana,
+  reenviarCorreoCampana,
+  type ParticipanteCampana,
 } from '../lib/crm/admin-campana-api.ts';
 
 function $<T extends Element>(selector: string): T | null {
   return document.querySelector<T>(selector);
+}
+
+/** Escapa texto ingresado por el público antes de insertarlo en el panel. */
+function esc(v: unknown): string {
+  return String(v ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
+}
+
+const ETIQUETA_CORREO: Record<string, string> = {
+  PENDING: 'Pendiente',
+  SENDING: 'Enviando',
+  SENT: 'Enviado',
+  FAILED: 'Fallido',
+};
+
+function renderParticipantes(participantes: ParticipanteCampana[]): string {
+  if (participantes.length === 0) return '<tr><td colspan="8" class="cc-vacio">Sin participantes.</td></tr>';
+  return participantes
+    .map((p) => {
+      const correos = p.correos.length
+        ? p.correos
+            .map(
+              (c) => `<div class="cc-correo">
+                <span>${c.tipo === 'CONFIRMACION_COMPRA' ? 'Compra' : 'Sin compra'}: ${ETIQUETA_CORREO[c.status] ?? esc(c.status)}${
+                  c.attempts > 1 ? ` (${c.attempts} intentos)` : ''
+                }</span>
+                ${c.lastError && c.status === 'FAILED' ? `<br><span class="cc-sub">${esc(c.lastError)}</span>` : ''}
+                ${c.status === 'SENDING' ? '' : `<br><button type="button" class="cc-btn-link" data-reenviar="${esc(c.id)}">Reenviar correo</button>`}
+              </div>`,
+            )
+            .join('')
+        : '—';
+      return `<tr>
+        <td><strong>${esc(p.nombre)}</strong><br><span class="cc-sub">${esc(p.email)}</span></td>
+        <td class="cc-mono">${esc(p.rutMasked)}</td>
+        <td>${p.compra}</td>
+        <td>${p.gratis}</td>
+        <td><strong>${p.total} / 3</strong>${p.invalidadas ? `<br><span class="cc-sub">${p.invalidadas} invalidada${p.invalidadas === 1 ? '' : 's'}</span>` : ''}</td>
+        <td class="cc-mono">${p.codigos.map(esc).join(', ') || '—'}</td>
+        <td class="cc-sub">${p.ordenes.map(esc).join('<br>') || '—'}</td>
+        <td>${correos}</td>
+      </tr>`;
+    })
+    .join('');
 }
 
 function formatearMonto(n: number): string {
@@ -27,6 +72,7 @@ const ETIQUETA_ESTADO: Record<string, string> = {
   RECHAZADA: 'Rechazada',
   ANULADA: 'Anulada',
   EXPIRADA: 'Expirada',
+  REEMBOLSADA: 'Reembolsada',
 };
 
 const NOMBRE_PRODUCTO: Record<string, string> = {
@@ -101,13 +147,13 @@ export async function iniciarAdminCampana2026(): Promise<void> {
           return `
             <tr>
               <td>
-                <strong>${o.compradorNombre}</strong><br/>
-                <span class="cc-sub">${o.compradorEmail} · ${o.compradorTelefono}</span>
-                ${o.atletaReferido ? `<br/><span class="cc-sub">Referido: ${o.atletaReferido}</span>` : ''}
+                <strong>${esc(o.compradorNombre)}</strong><br/>
+                <span class="cc-sub">${esc(o.compradorEmail)} · ${esc(o.compradorTelefono)}</span>
+                ${o.atletaReferido ? `<br/><span class="cc-sub">Referido: ${esc(o.atletaReferido)}</span>` : ''}
               </td>
               <td>${productos}</td>
               <td class="cc-num">${formatearMonto(o.monto)}</td>
-              <td>${o.pago ? `${o.pago.pasarela}<br/><span class="cc-sub">${o.pago.metodoPago ?? ''}</span>` : '—'}</td>
+              <td>${o.pago ? `${o.pago.pasarela}<br/><span class="cc-sub">${esc(o.pago.metodoPago ?? '')}</span>` : '—'}</td>
               <td>${badgeEstado(o.estado)}</td>
               <td class="cc-mono">${codigos}</td>
               <td class="cc-sub">${formatearFecha(o.paidAt ?? o.createdAt)}</td>
@@ -118,7 +164,22 @@ export async function iniciarAdminCampana2026(): Promise<void> {
 
     // ---- participación gratuita ----
     const tbodyParticipantes = $('#ca-tabla-participantes tbody')!;
-    tbodyParticipantes.innerHTML = participantes.map(p => `<tr><td><strong>${p.nombre}</strong><br><span class="cc-sub">${p.email}</span></td><td class="cc-mono">${p.rutMasked}</td><td>${p.compra}</td><td>${p.gratis}</td><td><strong>${p.total} / 3</strong></td><td class="cc-mono">${p.codigos.join(', ')||'—'}</td><td class="cc-sub">${p.ordenes.join('<br>')||'—'}</td><td>${p.emailStatus}</td></tr>`).join('') || '<tr><td colspan="8" class="cc-vacio">Sin participantes.</td></tr>';
+    tbodyParticipantes.innerHTML = renderParticipantes(participantes);
+    tbodyParticipantes.onclick = async (evt) => {
+      const boton = (evt.target as HTMLElement).closest<HTMLButtonElement>('button[data-reenviar]');
+      if (!boton) return;
+      if (!confirm('¿Reenviar este correo? No se generan participaciones nuevas.')) return;
+      boton.disabled = true;
+      boton.textContent = 'Enviando…';
+      try {
+        await reenviarCorreoCampana(supabase, boton.dataset.reenviar!);
+        boton.textContent = 'Correo reenviado';
+      } catch (e) {
+        boton.disabled = false;
+        boton.textContent = 'Reintentar';
+        alert(`No se pudo reenviar: ${e instanceof Error ? e.message : 'error desconocido'}`);
+      }
+    };
 
     const tbodyGratis = $('#ca-tabla-gratis tbody')!;
     if (gratis.length === 0) {
@@ -128,10 +189,10 @@ export async function iniciarAdminCampana2026(): Promise<void> {
         .map(
           (g) => `
             <tr>
-              <td>${g.nombreCompleto}</td>
-              <td class="cc-mono">${g.rut}</td>
-              <td><span class="cc-sub">${g.email} · ${g.telefono}</span></td>
-              <td class="cc-mono">${g.codigo ?? '—'}</td>
+              <td>${esc(g.nombreCompleto)}</td>
+              <td class="cc-mono">${esc(g.rut)}</td>
+              <td><span class="cc-sub">${esc(g.email)} · ${esc(g.telefono)}</span></td>
+              <td class="cc-mono">${esc(g.codigo ?? '—')}</td>
               <td class="cc-sub">${formatearFecha(g.createdAt)}</td>
             </tr>`,
         )

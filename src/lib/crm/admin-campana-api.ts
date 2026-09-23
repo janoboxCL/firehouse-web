@@ -102,22 +102,63 @@ export async function obtenerResumenCampana(supabase: SupabaseClient): Promise<R
   };
 }
 
+export interface CorreoCampana {
+  id: string;
+  tipo: 'CONFIRMACION_COMPRA' | 'PARTICIPACION_GRATIS';
+  status: 'PENDING' | 'SENDING' | 'SENT' | 'FAILED';
+  attempts: number;
+  lastError: string | null;
+}
+
 export interface ParticipanteCampana {
   id: string; nombre: string; rutMasked: string; email: string; compra: number; gratis: number;
-  total: number; codigos: string[]; ordenes: string[]; emailStatus: string;
+  total: number; invalidadas: number; codigos: string[]; ordenes: string[]; correos: CorreoCampana[];
 }
 
 export async function obtenerParticipantesCampana(supabase: SupabaseClient): Promise<ParticipanteCampana[]> {
-  const { data, error } = await supabase.from('campana_participantes').select(`id,nombre,rut_masked,email,
-    campana_entradas(source,status,codigo),campana_ordenes(commerce_order,estado),campana_email_outbox(status)`).order('created_at', { ascending: false });
+  const { data, error } = await supabase
+    .from('campana_participantes')
+    .select(
+      `id, nombre, rut_masked, email,
+       campana_entradas ( source, status, codigo, entry_no ),
+       campana_ordenes ( commerce_order, estado ),
+       campana_email_outbox ( id, tipo, status, attempts, last_error )`,
+    )
+    .order('created_at', { ascending: false });
   if (error) throw error;
   return (data ?? []).map((p: any) => {
-    const active = (p.campana_entradas ?? []).filter((e: any) => e.status === 'ACTIVE');
-    return { id:p.id,nombre:p.nombre,rutMasked:p.rut_masked,email:p.email,
-      compra:active.filter((e:any)=>e.source==='COMPRA').length,gratis:active.filter((e:any)=>e.source==='GRATIS').length,
-      total:active.length,codigos:active.map((e:any)=>e.codigo),ordenes:(p.campana_ordenes??[]).map((o:any)=>`${o.commerce_order} (${o.estado})`),
-      emailStatus:(p.campana_email_outbox??[]).map((e:any)=>e.status).join(', ')||'—' };
+    const entradas = [...(p.campana_entradas ?? [])].sort((a: any, b: any) => (a.entry_no ?? 0) - (b.entry_no ?? 0));
+    const activas = entradas.filter((e: any) => e.status === 'ACTIVE');
+    return {
+      id: p.id,
+      nombre: p.nombre,
+      rutMasked: p.rut_masked,
+      email: p.email,
+      compra: activas.filter((e: any) => e.source === 'COMPRA').length,
+      gratis: activas.filter((e: any) => e.source === 'GRATIS').length,
+      total: activas.length,
+      invalidadas: entradas.length - activas.length,
+      codigos: activas.map((e: any) => e.codigo),
+      ordenes: (p.campana_ordenes ?? []).map((o: any) => `${o.commerce_order} (${o.estado})`),
+      correos: (p.campana_email_outbox ?? []).map((c: any) => ({
+        id: c.id, tipo: c.tipo, status: c.status, attempts: c.attempts ?? 0, lastError: c.last_error ?? null,
+      })),
+    };
   });
+}
+
+/** Reenvía un correo del outbox sin generar participaciones nuevas. */
+export async function reenviarCorreoCampana(supabase: SupabaseClient, outboxId: string): Promise<void> {
+  const token = (await supabase.auth.getSession()).data.session?.access_token ?? '';
+  const r = await fetch('/api/admin/campana-reenviar-correo', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', authorization: `Bearer ${token}` },
+    body: JSON.stringify({ outboxId }),
+  });
+  if (!r.ok) {
+    const cuerpo = (await r.json().catch(() => ({}))) as { detalle?: string; error?: string };
+    throw new Error(cuerpo.detalle ?? cuerpo.error ?? `Error ${r.status}`);
+  }
 }
 
 export async function obtenerOrdenesCampana(supabase: SupabaseClient, limite = 200): Promise<OrdenCampana[]> {

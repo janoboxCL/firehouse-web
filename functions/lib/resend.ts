@@ -338,7 +338,7 @@ export interface DatosCorreoCampana {
   ordenId: string;
   /** Uno por producto comprado, en el mismo orden que los ítems de la orden. */
   productos: string[];
-  /** Uno por producto comprado (fn_confirmar_orden_campana genera un código por ítem). */
+  /** Códigos efectivamente asignados en esta compra (0 a 3, según el máximo por RUT). */
   codigos: string[];
   totalParticipaciones: number;
   /** URL base del sitio, para armar el link a la página de descarga. */
@@ -438,15 +438,16 @@ export function construirHtmlParticipacionGratis(datos: DatosCorreoParticipacion
       Hola ${nombre}, ¡ya estás participando en la promoción Firehouse 2026! 🔥
     </p>
     <p style="font-size:13px;line-height:1.6;color:rgba(245,239,232,.6);margin:0 0 8px;">
-      Se asignaron ${datos.codigos.length} participaciones promocionales.
+      ${datos.codigos.length === 1 ? 'Se asignó 1 participación promocional.' : `Se asignaron ${datos.codigos.length} participaciones promocionales.`}
+      Total de participaciones activas asociadas a tu RUT: ${datos.total} de 3.
     </p>
     <p style="margin:0 0 24px;">
       ${datos.codigos.map(c => `<span style="display:inline-block;background:#171412;color:#FFC400;font-family:monospace;font-size:15px;padding:6px 12px;border-radius:6px;margin:3px;">${escaparHtml(c)}</span>`).join('')}
     </p>
     ${datos.codigos.length === 0 ? '<p style="font-size:13px;color:rgba(245,239,232,.7);">Tu RUT ya alcanzó el máximo de tres participaciones y no se generaron códigos adicionales.</p>' : ''}
     <p style="font-size:13px;line-height:1.6;color:rgba(245,239,232,.6);margin:0;">
-      Guarda este correo — este código entra al mismo sorteo que las participaciones de quienes
-      compraron un sobre. El sorteo se transmite en vivo por Instagram <strong>@firehouse.cheer</strong>.
+      Guarda este correo — ${datos.codigos.length === 1 ? 'este código entra' : 'tus códigos entran'} al mismo sorteo que las participaciones de quienes
+      compraron un sobre, con la misma validez. El sorteo se transmite en vivo por Instagram <strong>@firehouse.cheer</strong>.
     </p>
   `;
   return plantillaBase('Firehouse Cheerleading All Stars', '¡Ya estás participando! 🎉', cuerpo);

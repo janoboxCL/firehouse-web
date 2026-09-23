@@ -16,7 +16,7 @@
 import { createClient } from '@supabase/supabase-js';
 import { elegirPasarelaHabilitada, construirPaymentProvider, type PaymentProvidersEnv } from '../../lib/payment-providers/index.ts';
 import { NOMBRE_PRODUCTO_CAMPANA } from '../../lib/resend.ts';
-import { CAMPAIGN_BASES_VERSION, CAMPAIGN_ID, CAMPAIGN_PRIVACY_VERSION, enmascararRut, identityHash } from '../../lib/campaign-2026.ts';
+import { CAMPAIGN_BASES_VERSION, CAMPAIGN_PRIVACY_VERSION, dentroDelPeriodo, obtenerOCrearParticipante } from '../../lib/campaign-2026.ts';
 import { rutValido } from '../../lib/rut.ts';
 
 interface Env extends PaymentProvidersEnv {
@@ -91,7 +91,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     const configuracionCompleta = config.bases_version === CAMPAIGN_BASES_VERSION && config.privacy_version === CAMPAIGN_PRIVACY_VERSION
       && config.inicio_at && config.cierre_at && config.sorteo_at && Array.isArray(config.premios) && config.premios.length > 0
       && config.proveedor_pago && config.email_configurado && Number(config.schema_version) >= 5;
-    if (!config.checkout_habilitado || !configuracionCompleta) {
+    if (!config.checkout_habilitado || !configuracionCompleta || !dentroDelPeriodo(config.inicio_at, config.cierre_at)) {
       return jsonResponse(403, { error: 'checkout_deshabilitado' });
     }
 
@@ -116,13 +116,10 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     const monto = productos.reduce((acc, p) => acc + PRECIOS[p], 0);
     const commerceOrder = `CAMPANA2026-${Date.now()}-${crypto.randomUUID().slice(0, 6)}`;
     const now = new Date().toISOString();
-    const hash = await identityHash(rut, context.env.CAMPAIGN_IDENTITY_SECRET);
-    const { data: participante, error: errParticipante } = await supabase
-      .from('campana_participantes')
-      .upsert({ campaign_id: CAMPAIGN_ID, identity_hash: hash, rut_masked: enmascararRut(rut), nombre, email, telefono,
-        bases_version: basesVersion, bases_accepted_at: now, updated_at: now }, { onConflict: 'campaign_id,identity_hash' })
-      .select('id').single();
-    if (errParticipante || !participante) return jsonResponse(500, { error: 'no_se_pudo_identificar_participante' });
+    const participante = await obtenerOCrearParticipante(supabase, context.env.CAMPAIGN_IDENTITY_SECRET, {
+      rut, nombre, email, telefono, basesVersion,
+    });
+    if (!participante) return jsonResponse(500, { error: 'no_se_pudo_identificar_participante' });
 
     const { data: orden, error: errOrden } = await supabase
       .from('campana_ordenes')

@@ -1,13 +1,13 @@
 /// <reference types="@cloudflare/workers-types" />
 // POST /api/campana-2026/participar-gratis
-// Registra una (1) participación gratuita por RUT, conforme a las Bases,
-// Séptimo. Nunca confía en la validación del navegador — el RUT y el resto
-// de los campos se revalidan acá antes de tocar la base de datos.
+// Modalidad sin compra: asigna las participaciones que le falten a la persona
+// para completar el máximo global de 3 por RUT (Bases). Nunca confía en la
+// validación del navegador: el RUT y el resto de los campos se revalidan acá.
 
 import { createClient } from '@supabase/supabase-js';
 import { rutValido } from '../../lib/rut.ts';
 import { enviarCorreoParticipacionGratisCampana } from '../../lib/resend.ts';
-import { CAMPAIGN_BASES_VERSION, CAMPAIGN_ID, enmascararRut, identityHash } from '../../lib/campaign-2026.ts';
+import { CAMPAIGN_BASES_VERSION, dentroDelPeriodo, hmacHex, obtenerOCrearParticipante } from '../../lib/campaign-2026.ts';
 
 interface Env {
   SUPABASE_URL: string;
@@ -61,23 +61,21 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     const supabase = createClient(context.env.SUPABASE_URL, context.env.SUPABASE_SERVICE_ROLE_KEY);
     const { data: config } = await supabase.from('campana_config').select('participacion_habilitada,bases_version,inicio_at,cierre_at').eq('id', 1).single();
     const ahora = Date.now();
-    if (!config?.participacion_habilitada || config.bases_version !== basesVersion || !config.inicio_at || !config.cierre_at
-      || ahora < Date.parse(config.inicio_at) || ahora > Date.parse(config.cierre_at)) return jsonResponse(403, { error: 'participacion_deshabilitada' });
+    if (!config?.participacion_habilitada || config.bases_version !== basesVersion
+      || !dentroDelPeriodo(config.inicio_at, config.cierre_at, ahora)) return jsonResponse(403, { error: 'participacion_deshabilitada' });
 
+    // Límite por IP (no por IP + RUT): cambiar de RUT no permite saltarse la espera.
     const forwarded = context.request.headers.get('CF-Connecting-IP') ?? 'unknown';
-    const rateKey = await identityHash(`${forwarded}:${rutCrudo}`, context.env.CAMPAIGN_IDENTITY_SECRET);
+    const rateKey = await hmacHex(`rate:${forwarded}`, context.env.CAMPAIGN_IDENTITY_SECRET);
     const cache = caches.default;
     const rateRequest = new Request(`https://rate-limit.invalid/${rateKey}`);
     if (await cache.match(rateRequest)) return jsonResponse(429, { error: 'demasiadas_solicitudes' });
     await cache.put(rateRequest, new Response('1', { headers: { 'cache-control': 'max-age=30' } }));
 
-    const now = new Date().toISOString();
-    const hash = await identityHash(rutCrudo, context.env.CAMPAIGN_IDENTITY_SECRET);
-    const { data: participante, error: participantError } = await supabase.from('campana_participantes').upsert({
-      campaign_id: CAMPAIGN_ID, identity_hash: hash, rut_masked: enmascararRut(rutCrudo), nombre, email, telefono,
-      bases_version: basesVersion, bases_accepted_at: now, updated_at: now,
-    }, { onConflict: 'campaign_id,identity_hash' }).select('id').single();
-    if (participantError || !participante) return jsonResponse(500, { error: 'no_se_pudo_identificar_participante' });
+    const participante = await obtenerOCrearParticipante(supabase, context.env.CAMPAIGN_IDENTITY_SECRET, {
+      rut: rutCrudo, nombre, email, telefono, basesVersion,
+    });
+    if (!participante) return jsonResponse(500, { error: 'no_se_pudo_identificar_participante' });
 
     const { data, error } = await supabase.rpc('fn_registrar_entrada_gratis_campana', {
       p_participant_id: participante.id,
@@ -96,10 +94,13 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
         const { data: claimed } = await supabase.from('campana_email_outbox').update({ status: 'SENDING' })
           .eq('tipo', 'PARTICIPACION_GRATIS').eq('participant_id', participante.id).eq('status', 'PENDING').select('id').maybeSingle();
         if (!claimed) return jsonResponse(200, { asignadas: resultado.asignadas ?? 0, total: resultado.total ?? 0, codigos });
+        // El correo va a los datos registrados de la persona (outbox), no a los
+        // escritos en este formulario.
+        const { data: registrado } = await supabase.from('campana_participantes').select('nombre, email').eq('id', participante.id).single();
         await enviarCorreoParticipacionGratisCampana(
           context.env.RESEND_API_KEY,
           context.env.EMAIL_FROM_CAMPANA ?? context.env.EMAIL_FROM!,
-          { nombre, email, codigos, total: resultado.total ?? 0 },
+          { nombre: registrado?.nombre ?? nombre, email: registrado?.email ?? email, codigos, total: resultado.total ?? 0 },
           [],
         );
         await supabase.from('campana_email_outbox').update({ status: 'SENT', sent_at: new Date().toISOString(), attempts: 1 }).eq('id', claimed.id);
