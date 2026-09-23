@@ -6,8 +6,12 @@ import { LIMITES } from '../../lib/crm/constants.ts';
   <a href="/admin" class="ficha-volver">← Volver al listado de casos</a>
   <h1 class="db-titulo">Plantillas de mensajes</h1>
   <p class="admin-intro">
-    Mensajes reutilizables para WhatsApp y correo. Usa <code>{'{nombre_apoderado}'}</code> y
-    <code>{'{nombre_atleta}'}</code> donde quieras que se reemplacen automáticamente.
+    Mensajes reutilizables para WhatsApp y correo. Estas variables se reemplazan automáticamente:
+    <code>{'{nombre_apoderado}'}</code>, <code>{'{nombre_atleta}'}</code>, <code>{'{remitente}'}</code> y
+    <code>{'{cargo}'}</code> (según quién envía). En las plantillas de clase de prueba además:
+    <code>{'{fecha_clase}'}</code>, <code>{'{hora_clase}'}</code>, <code>{'{talla}'}</code>,
+    <code>{'{valor_inscripcion}'}</code> y <code>{'{link_pago}'}</code>. Si falta un dato, el panel avisa
+    y no deja enviar el mensaje incompleto.
   </p>
 
   <div id="pl-error" class="admin-error" hidden></div>
@@ -26,6 +30,13 @@ import { LIMITES } from '../../lib/crm/constants.ts';
           <option value="WHATSAPP">Sólo WhatsApp</option>
           <option value="EMAIL">Sólo correo</option>
           <option value="AMBOS">WhatsApp y correo</option>
+        </select>
+      </div>
+      <div class="admin-campo">
+        <label class="admin-label" for="pl-categoria">Dónde se usa</label>
+        <select id="pl-categoria" class="admin-select">
+          <option value="GENERAL">General (ficha del contacto)</option>
+          <option value="CLASE_PRUEBA">Clase de prueba (secuencia de mensajes)</option>
         </select>
       </div>
       <div class="admin-campo" id="pl-asunto-wrap" hidden>

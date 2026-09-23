@@ -160,6 +160,14 @@ test('agruparClasePruebaPorFecha: sólo incluye journey CLASE_PRUEBA con fecha, 
   assert.equal(grupos[1].fecha, '2026-09-11');
 });
 
+test('agruparClasePruebaPorFecha: incluye la clase de prueba de Firehouse Star', () => {
+  const star = caso({ id: 's', journey: 'CLASE_PRUEBA_STAR', fecha_clase_prueba: '2026-10-03' });
+  const inscrita = caso({ id: 'i', journey: 'FIREHOUSE_STAR', fecha_clase_prueba: '2026-10-03' });
+  const grupos = agruparClasePruebaPorFecha([star, inscrita]);
+  assert.equal(grupos.length, 1);
+  assert.deepEqual(grupos[0].casos.map((c) => c.id), ['s']);
+});
+
 test('agruparClasePruebaPorFecha: agrupa varias familias en la misma fecha', () => {
   const a = caso({ id: 'a', journey: 'CLASE_PRUEBA', fecha_clase_prueba: '2026-09-05' });
   const b = caso({

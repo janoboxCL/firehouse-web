@@ -1,3 +1,4 @@
+import { escaparHtml } from '../lib/crm/format.ts';
 import { requireAdminSession, montarCabeceraAdmin } from '../lib/crm/auth.ts';
 import {
   obtenerPlantillas,
@@ -6,6 +7,7 @@ import {
   eliminarPlantilla,
   type PlantillaMensaje,
   type CanalPlantilla,
+  type CategoriaPlantilla,
 } from '../lib/crm/admin-api.ts';
 import type { SupabaseClient } from '@supabase/supabase-js';
 
@@ -39,6 +41,7 @@ function cargarEnFormulario(p: PlantillaMensaje): void {
   $<HTMLInputElement>('#pl-id')!.value = p.id;
   $<HTMLInputElement>('#pl-nombre')!.value = p.nombre;
   $<HTMLSelectElement>('#pl-canal')!.value = p.canal;
+  $<HTMLSelectElement>('#pl-categoria')!.value = p.categoria ?? 'GENERAL';
   $<HTMLInputElement>('#pl-asunto')!.value = p.asunto ?? '';
   $<HTMLTextAreaElement>('#pl-cuerpo')!.value = p.cuerpo;
   $<HTMLInputElement>('#pl-activo')!.checked = p.activo;
@@ -64,8 +67,8 @@ function renderLista(plantillas: PlantillaMensaje[], supabase: SupabaseClient, o
     item.className = `pl-item${p.activo ? '' : ' pl-item--inactiva'}`;
     item.innerHTML = `
       <div>
-        <p class="pl-item__nombre">${p.nombre} · <span class="admin-badge admin-badge--journey">${CANAL_LABEL[p.canal] ?? p.canal}</span>${p.activo ? '' : ' <span class="admin-badge admin-badge--estado-cerrado-no">Inactiva</span>'}</p>
-        <p class="pl-item__cuerpo">${p.cuerpo}</p>
+        <p class="pl-item__nombre">${escaparHtml(p.nombre)} · <span class="admin-badge admin-badge--journey">${CANAL_LABEL[p.canal] ?? p.canal}</span>${p.categoria === 'CLASE_PRUEBA' ? ' <span class="admin-badge admin-badge--journey">Clase de prueba</span>' : ''}${p.activo ? '' : ' <span class="admin-badge admin-badge--estado-cerrado-no">Inactiva</span>'}</p>
+        <p class="pl-item__cuerpo">${escaparHtml(p.cuerpo)}</p>
       </div>
       <div class="pl-item__acciones">
         <button type="button" class="pl-item__accion pl-item__accion--editar">Editar</button>
@@ -115,6 +118,7 @@ export async function iniciarPlantillas(): Promise<void> {
       asunto: $<HTMLInputElement>('#pl-asunto')!.value.trim() || null,
       cuerpo: $<HTMLTextAreaElement>('#pl-cuerpo')!.value.trim(),
       activo: $<HTMLInputElement>('#pl-activo')!.checked,
+      categoria: $<HTMLSelectElement>('#pl-categoria')!.value as CategoriaPlantilla,
     };
     try {
       if (id) await actualizarPlantilla(supabase, id, datos);

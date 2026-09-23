@@ -48,3 +48,9 @@ const LABEL_DIA: Record<DiaClasePrueba, string> = { VIERNES: 'Viernes', SABADO: 
 export function etiquetaDia(dia: DiaClasePrueba): string {
   return LABEL_DIA[dia] ?? dia;
 }
+
+/** Hora de inicio de la clase de prueba según el día (para los mensajes). */
+export const HORA_CLASE_PRUEBA: Record<DiaClasePrueba, string> = {
+  VIERNES: '18:00',
+  SABADO: '16:00',
+};

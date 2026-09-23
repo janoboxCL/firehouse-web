@@ -8,8 +8,8 @@ import AdminBase from '../../layouts/AdminBase.astro';
     <button type="button" id="cp-btn-visita-rapida" class="admin-btn admin-btn--secundario">+ Agregar visita rápida</button>
   </div>
   <p class="admin-intro">
-    Todas las familias que pidieron clase de prueba, agrupadas por fecha. Toca
-    "Marcar asistencia" apenas lleguen — no hace falta código ni QR.
+    Todas las familias que pidieron clase de prueba, agrupadas por fecha. Registra la talla,
+    envía los mensajes de la secuencia por WhatsApp y marca la asistencia apenas lleguen.
   </p>
 
   <div id="cp-error" class="admin-error" hidden></div>
@@ -56,6 +56,8 @@ import AdminBase from '../../layouts/AdminBase.astro';
     </form>
   </section>
 
+ <div id="cp-aviso-mensajes" class="admin-aviso-cerrado" hidden></div>
+
   <section class="admin-card cp-lista-wrap">
     <p id="cp-cargando" class="admin-spinner">Cargando…</p>
     <p id="cp-vacio" class="admin-vacio" hidden>No hay clases de prueba agendadas todavía.</p>
@@ -88,7 +90,7 @@ import AdminBase from '../../layouts/AdminBase.astro';
 }
 
 .cp-fila{
-  display: flex; align-items: center; justify-content: space-between; gap: 14px;
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px;
   padding: 14px 16px; border: 1px solid #E4DFD6; border-radius: 12px; margin-bottom: 10px;
 }
 .cp-fila--asistio{ background: #E3F3E5; border-color: #BFE2C4; }
@@ -98,5 +100,20 @@ import AdminBase from '../../layouts/AdminBase.astro';
 .cp-fila__nota{ font-size: 13px; color: var(--ember); margin: 6px 0 0; font-style: italic; }
 .cp-fila__accion{ flex-shrink: 0; }
 .cp-fila__confirmado{ color: #1E7A34; font-weight: 600; font-size: 14px; white-space: nowrap; }
+.cp-etiqueta-star{
+  display: inline-block; margin-left: 6px; padding: 2px 8px; border-radius: 999px;
+  background: var(--fire-yellow, #FFC400); color: var(--ember, #171412); font-size: 11px; font-weight: 700; vertical-align: middle;
+}
+.cp-mensajes{ flex-basis: 100%; border-top: 1px solid #EFEBE4; padding-top: 12px; }
+.cp-fila--asistio .cp-mensajes{ border-top-color: #BFE2C4; }
+.cp-mensajes__campos{ display: flex; flex-wrap: wrap; align-items: flex-end; gap: 12px; }
+.cp-mensajes__campos .admin-label{ font-size: 12px; margin-bottom: 4px; }
+.cp-select-talla{ min-width: 130px; }
+.cp-mensajes__plantilla{ flex: 1 1 220px; }
+.cp-mensajes__plantilla .admin-select{ width: 100%; }
+.cp-mensajes__aviso{ margin: 10px 0 0; font-size: 13px; color: var(--fire-red, #C51515); }
+.cp-enviados{ display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.cp-enviados:empty{ display: none; }
+.cp-enviado{ font-size: 12px; padding: 3px 10px; border-radius: 999px; background: #1E7A3C; color: #fff; }
 </style>
 

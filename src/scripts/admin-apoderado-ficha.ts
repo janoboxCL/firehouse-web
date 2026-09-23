@@ -5,7 +5,6 @@ import {
   obtenerNotasApoderado,
   agregarNotaApoderado,
   obtenerPlantillas,
-  rellenarPlantilla,
   enviarCorreoAdmin,
   eliminarApoderado,
   edadDeAtleta,
@@ -17,8 +16,10 @@ import {
   type PlantillaMensaje,
 } from '../lib/crm/admin-api.ts';
 import { CRM_JOURNEYS_LABEL, CRM_ESTADOS_LABEL, RELACION_APODERADO_LABEL, CANAL_PREFERIDO_LABEL } from '../lib/crm/constants.ts';
-import { formatearFecha, formatearFechaHora, claseBadgeEstado, mensajeWhatsappSugerido, mensajeErrorSupabase } from '../lib/crm/format.ts';
+import { formatearFecha, formatearFechaHora, claseBadgeEstado, mensajeWhatsappSugerido, mensajeErrorSupabase, escaparHtml } from '../lib/crm/format.ts';
 import type { SupabaseClient } from '@supabase/supabase-js';
+import { obtenerFirma, type Firma } from '../lib/crm/admin-mensajes-api.ts';
+import { completarPlantilla, enlaceWhatsApp, mensajeFaltantes, primerNombre } from '../lib/crm/plantillas.ts';
 
 function $<T extends Element>(selector: string): T | null {
   return document.querySelector<T>(selector);
@@ -123,7 +124,19 @@ function poblarPlantillas(plantillas: PlantillaMensaje[]): void {
   });
 }
 
+function textoPlantilla(plantilla: PlantillaMensaje, nombreCompleto: string, atletas: string, firma: Firma): { texto: string; faltantes: string } {
+  const { texto, faltantes } = completarPlantilla(plantilla.cuerpo, {
+    nombre_apoderado: primerNombre(nombreCompleto),
+    nombre_atleta: atletas,
+    remitente: firma.nombre,
+    cargo: firma.cargo,
+  });
+  return { texto, faltantes: mensajeFaltantes(faltantes) };
+}
+
 function conectarPlantillas(supabase: SupabaseClient, casos: CasoResumen[], plantillas: PlantillaMensaje[]): void {
+  let firma: Firma = { nombre: null, cargo: null, nombreFirma: null, disponible: false };
+  void obtenerFirma(supabase).then((f) => (firma = f));
   const select = $<HTMLSelectElement>('#ap-select-plantilla')!;
   const btnWa = $<HTMLButtonElement>('#ap-btn-plantilla-whatsapp')!;
   const btnEmail = $<HTMLButtonElement>('#ap-btn-plantilla-email')!;
@@ -142,8 +155,12 @@ function conectarPlantillas(supabase: SupabaseClient, casos: CasoResumen[], plan
   btnWa.addEventListener('click', () => {
     const plantilla = plantillas.find((p) => p.id === select.value);
     if (!plantilla) return;
-    const texto = rellenarPlantilla(plantilla.cuerpo, nombreCompleto, atletas);
-    window.open(`https://wa.me/${ap.telefono.replace('+', '')}?text=${encodeURIComponent(texto)}`, '_blank');
+    const { texto, faltantes } = textoPlantilla(plantilla, nombreCompleto, atletas, firma);
+    if (faltantes) {
+      mostrarError(faltantes);
+      return;
+    }
+    window.open(enlaceWhatsApp(ap.telefono, texto), '_blank', 'noopener');
   });
 
   btnEmail.addEventListener('click', async () => {
@@ -153,8 +170,9 @@ function conectarPlantillas(supabase: SupabaseClient, casos: CasoResumen[], plan
     estado.hidden = true;
     try {
       const asunto = plantilla.asunto || plantilla.nombre;
-      const cuerpo = rellenarPlantilla(plantilla.cuerpo, nombreCompleto, atletas);
-      const html = `<div style="font-family:Arial,sans-serif;font-size:15px;line-height:1.6;color:#171412;white-space:pre-wrap;">${cuerpo}</div>`;
+      const { texto: cuerpo, faltantes } = textoPlantilla(plantilla, nombreCompleto, atletas, firma);
+      if (faltantes) throw new Error(faltantes);
+      const html = `<div style="font-family:Arial,sans-serif;font-size:15px;line-height:1.6;color:#171412;white-space:pre-wrap;">${escaparHtml(cuerpo)}</div>`;
       await enviarCorreoAdmin(supabase, ap.email, asunto, html);
       estado.textContent = 'Correo enviado ✓';
       estado.hidden = false;
@@ -222,6 +240,8 @@ export async function iniciarFichaApoderado(): Promise<void> {
       obtenerNotasApoderado(supabase, apoderadoId),
       obtenerPlantillas(supabase, true),
     ]);
+    // En la ficha solo se usan las plantillas generales.
+    plantillas = plantillas.filter((p) => (p.categoria ?? 'GENERAL') === 'GENERAL');
   } catch {
     mostrarError('No pudimos cargar este contacto. Recarga la página o inténtalo más tarde.');
     return;

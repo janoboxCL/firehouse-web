@@ -39,6 +39,25 @@ import AdminBase from '../../layouts/AdminBase.astro';
     </form>
   </section>
 
+  <section id="fm-seccion" class="admin-card cfg-seccion" hidden>
+    <h2 class="ficha-bloque__titulo">Tu firma en los mensajes</h2>
+    <p class="cfg-ayuda">Así te presentas en las plantillas de WhatsApp. El cargo lo define el administrador.</p>
+    <form id="fm-form" class="fm-form" novalidate>
+      <div>
+        <label class="admin-label" for="fm-nombre">Tu nombre para mensajes</label>
+        <input id="fm-nombre" class="admin-input" maxlength="60" placeholder="Ej.: Alejandro" />
+      </div>
+      <div>
+        <p class="admin-label">Cargo</p>
+        <p id="fm-cargo" class="fm-cargo"></p>
+      </div>
+      <button type="submit" class="admin-btn">Guardar</button>
+    </form>
+    <p class="fm-vista">Vista previa: <span id="fm-vista"></span></p>
+    <p id="fm-guardado" class="ficha-guardado" hidden>Firma guardada.</p>
+    <div id="fm-error" class="admin-error" hidden></div>
+  </section>
+
   <div id="prg-aviso" class="admin-aviso-cerrado" hidden></div>
 
   <section id="prg-estado" class="admin-card cfg-seccion" hidden>

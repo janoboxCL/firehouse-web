@@ -316,7 +316,10 @@ export interface GrupoClasePrueba {
 /** Agrupa los casos de journey CLASE_PRUEBA por fecha concreta, ordenados del
  * más próximo al más lejano — así el staff ve de un vistazo quién viene cada día. */
 export function agruparClasePruebaPorFecha(casos: CasoResumen[]): GrupoClasePrueba[] {
-  const relevantes = casos.filter((c) => c.journey === CRM_JOURNEYS.CLASE_PRUEBA && c.fecha_clase_prueba);
+  // Incluye la clase de prueba general y la de Firehouse Star.
+  const relevantes = casos.filter(
+    (c) => (c.journey === CRM_JOURNEYS.CLASE_PRUEBA || c.journey === CRM_JOURNEYS.CLASE_PRUEBA_STAR) && c.fecha_clase_prueba,
+  );
   const mapa = new Map<string, CasoResumen[]>();
   relevantes.forEach((c) => {
     const key = c.fecha_clase_prueba!;
@@ -382,13 +385,19 @@ export interface PlantillaMensaje {
   asunto: string | null;
   cuerpo: string;
   activo: boolean;
+  categoria: CategoriaPlantilla;
+  orden: number;
   created_at: string;
 }
+
+export type CategoriaPlantilla = 'GENERAL' | 'CLASE_PRUEBA';
 
 export async function obtenerPlantillas(supabase: SupabaseClient, soloActivas = false): Promise<PlantillaMensaje[]> {
   let query = supabase
     .from('plantillas_mensaje')
-    .select('id, nombre, canal, asunto, cuerpo, activo, created_at')
+    .select('id, nombre, canal, asunto, cuerpo, activo, categoria, orden, created_at')
+    .order('categoria')
+    .order('orden')
     .order('created_at', { ascending: false });
   if (soloActivas) query = query.eq('activo', true);
   const { data, error } = await query;
@@ -402,6 +411,7 @@ export interface DatosPlantilla {
   asunto: string | null;
   cuerpo: string;
   activo: boolean;
+  categoria: CategoriaPlantilla;
 }
 
 export async function crearPlantilla(supabase: SupabaseClient, datos: DatosPlantilla): Promise<void> {
