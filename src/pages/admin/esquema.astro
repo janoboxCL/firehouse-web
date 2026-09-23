@@ -1,0 +1,50 @@
+---
+import AdminBase from '../../layouts/AdminBase.astro';
+---
+<AdminBase titulo="Esquema de la base de datos">
+  <a href="/admin" class="ficha-volver">← Volver al listado de casos</a>
+  <h1 class="db-titulo">Esquema de la base de datos</h1>
+  <p class="admin-intro">
+    Estructura real de Supabase: tablas, columnas, funciones y migraciones aplicadas.
+    No muestra datos personales, solo conteos. Descarga el JSON para compartirlo al
+    planificar cambios.
+  </p>
+
+  <div class="esq-acciones">
+    <button type="button" id="esq-actualizar" class="admin-btn admin-btn--secundario">Actualizar</button>
+    <button type="button" id="esq-descargar" class="admin-btn" disabled>Descargar JSON</button>
+  </div>
+
+  <div id="esq-error" class="admin-error" hidden></div>
+  <p id="esq-cargando" class="admin-spinner">Leyendo la estructura…</p>
+
+  <div id="esq-contenido" hidden>
+    <div id="esq-advertencias"></div>
+    <dl id="esq-resumen" class="esq-resumen"></dl>
+
+    <section class="admin-card esq-bloque">
+      <h2 class="ficha-bloque__titulo">Migraciones registradas</h2>
+      <div id="esq-migraciones"></div>
+    </section>
+
+    <section class="admin-card esq-bloque">
+      <h2 class="ficha-bloque__titulo">Distribución de registros</h2>
+      <div id="esq-resumenes"></div>
+    </section>
+
+    <section class="admin-card esq-bloque">
+      <h2 class="ficha-bloque__titulo">Tablas</h2>
+      <div id="esq-tablas"></div>
+    </section>
+
+    <section class="admin-card esq-bloque">
+      <h2 class="ficha-bloque__titulo">Funciones</h2>
+      <div id="esq-funciones"></div>
+    </section>
+  </div>
+</AdminBase>
+
+<script>
+  import { iniciarEsquema } from '../../scripts/admin-esquema.ts';
+  iniciarEsquema();
+</script>

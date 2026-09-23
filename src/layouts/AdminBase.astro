@@ -27,6 +27,7 @@ const { titulo, ocultarCabecera = false } = Astro.props;
           <a href="/admin/configuracion" class="admin-header__link">Configuración</a>
           <a href="/admin/plantillas" class="admin-header__link">Plantillas</a>
           <a href="/admin/apoderados" class="admin-header__link">Contactos</a>
+          <a href="/admin/esquema" class="admin-header__link">Esquema</a>
           <span id="admin-usuario" class="admin-header__usuario"></span>
           <button type="button" id="admin-logout" class="admin-header__logout">Cerrar sesión</button>
         </nav>
@@ -91,6 +92,7 @@ body.admin-tema a{ color: var(--fire-red); }
 }
 .admin-btn:hover{ background: #a91111; }
 .admin-btn:disabled{ opacity: .6; cursor: not-allowed; }
+.admin-btn[hidden]{ display: none; }
 .admin-btn--secundario{
   background: #fff; color: var(--ember); border: 1px solid #D8D2C8;
 }
@@ -192,6 +194,70 @@ body.admin-tema a{ color: var(--fire-red); }
 .familia-card__atletas td:first-child{ font-weight: 500; }
 .db-fila__vencido{ color: var(--fire-red); font-weight: 500; }
 
+/* ---------------------------------------------------------------------------
+   /admin/esquema — diagnóstico de la base de datos
+--------------------------------------------------------------------------- */
+.esq-acciones{ display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; }
+.esq-resumen{
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px;
+  margin: 0 0 20px;
+}
+.esq-resumen > div{ background: #fff; border: 1px solid #E4DFD6; border-radius: 10px; padding: 12px 14px; }
+.esq-resumen dt{ font-size: 12px; color: #6B6259; }
+.esq-resumen dd{ margin: 4px 0 0; font-family: var(--font-display); font-weight: 800; font-size: 1.25rem; }
+.esq-resumen dd.esq-resumen__texto{ font-family: var(--font-body); font-weight: 500; font-size: 14px; }
+.esq-bloque{ margin-bottom: 20px; }
+.esq-scroll{ overflow-x: auto; }
+.esq-tabla{ width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 16px; }
+.esq-tabla th{
+  text-align: left; padding: 8px 6px; font-size: 12px; font-weight: 500; color: #6B6259;
+  border-bottom: 1px solid #E4DFD6; white-space: nowrap;
+}
+.esq-tabla td{ padding: 8px 6px; border-top: 1px solid #EFEBE4; vertical-align: top; }
+.esq-num{ text-align: right; font-variant-numeric: tabular-nums; }
+.esq-detalle{ border-top: 1px solid #EFEBE4; }
+.esq-detalle:first-child{ border-top: none; }
+.esq-detalle summary{
+  display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px;
+  padding: 12px 0; cursor: pointer; font-size: 14px;
+}
+.esq-detalle summary:focus-visible{ outline: 2px solid var(--fire-red); outline-offset: 2px; }
+.esq-detalle__nombre{ font-weight: 500; }
+.esq-detalle__meta{ color: #6B6259; font-size: 13px; }
+
+/* ---------------------------------------------------------------------------
+   /admin/configuracion — programas, precios y periodos de inscripción
+--------------------------------------------------------------------------- */
+.cfg-seccion{ margin-top: 20px; }
+.cfg-ayuda{ font-size: 13px; color: #6B6259; margin: -8px 0 16px; max-width: 70ch; }
+.prg-cabecera{ display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 12px; margin-bottom: 8px; }
+.prg-temporada{ min-width: 160px; }
+.prg-tabla .admin-input{ max-width: 150px; }
+.prg-tabla td{ vertical-align: middle; }
+.prg-estado{ display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+.prg-estado__item{ border: 1px solid #EFEBE4; border-radius: 10px; padding: 14px; }
+.prg-estado__programa{ font-weight: 600; margin: 0 0 8px; }
+.prg-estado__detalle{ font-size: 13px; color: #6B6259; margin: 8px 0 0; }
+.prg-periodos{ list-style: none; margin: 0 0 20px; padding: 0; }
+.prg-periodo{ border-top: 1px solid #EFEBE4; padding: 14px 0; }
+.prg-periodo:first-child{ border-top: none; }
+.prg-periodo__cabecera{ display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.prg-periodo__nombre{ font-weight: 500; margin: 0; }
+.prg-periodo__fechas{
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 8px 16px;
+  margin: 10px 0; font-size: 13px;
+}
+.prg-periodo__fechas dt{ color: #6B6259; }
+.prg-periodo__fechas dd{ margin: 2px 0 0; font-weight: 500; }
+.prg-periodo__acciones{ display: flex; flex-wrap: wrap; gap: 8px; }
+.prg-periodo__acciones .admin-btn{ min-height: 36px; padding: 8px 14px; font-size: 13px; }
+.prg-form-periodo{ border-top: 1px solid #E4DFD6; padding-top: 20px; }
+.prg-campos{ display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 14px; margin-bottom: 14px; }
+
+@media (max-width: 700px){
+  .admin-header__wrap{ flex-wrap: wrap; gap: 10px; }
+  .admin-header__nav{ flex-wrap: wrap; gap: 8px 14px; }
+}
 @media (max-width: 900px){
   .ficha-grid{ grid-template-columns: 1fr; }
 }
