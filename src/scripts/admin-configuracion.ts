@@ -1,5 +1,6 @@
 import { requireAdminSession, montarCabeceraAdmin } from '../lib/crm/auth.ts';
 import { obtenerDiasClasePrueba, guardarDiasClasePrueba } from '../lib/crm/admin-api.ts';
+import { iniciarConfiguracionProgramas } from './admin-configuracion-programas.ts';
 
 function $<T extends Element>(selector: string): T | null {
   return document.querySelector<T>(selector);
@@ -15,6 +16,10 @@ function mostrarError(mensaje: string): void {
 export async function iniciarConfiguracion(): Promise<void> {
   const { supabase, perfil } = await requireAdminSession();
   montarCabeceraAdmin(perfil);
+
+  // Programas, precios y periodos (migración 0007). Independiente de los días de
+  // clase de prueba: si falla, no afecta a esta sección.
+  void iniciarConfiguracionProgramas(supabase);
 
   try {
     const dias = await obtenerDiasClasePrueba(supabase);

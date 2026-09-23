@@ -154,6 +154,8 @@ export const TABLAS_ESPERADAS = [
   'notas_apoderado', 'plantillas_mensaje', 'configuracion_clase_prueba',
   'star_ordenes', 'star_orden_atletas', 'star_pagos',
   'campana_config', 'campana_ordenes', 'campana_pagos', 'campana_pasarelas',
+  // Requeridas por el código de Campaña 2026 desde el 22/9/2026 (migración 0005).
+  'campana_participantes', 'campana_email_outbox',
 ];
 
 export function tablasFaltantes(tablas: TablaEsquema[]): string[] {

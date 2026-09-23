@@ -5,9 +5,8 @@ import AdminBase from '../../layouts/AdminBase.astro';
   <a href="/admin" class="ficha-volver">← Volver al listado de casos</a>
   <h1 class="db-titulo">Configuración</h1>
   <p class="admin-intro">
-    Controla qué días de la semana se ofrecen para "Asistir a clase de prueba"
-    en el formulario público. Si desmarcas un día, esa opción deja de aparecer
-    para los apoderados de inmediato.
+    Días de clase de prueba, precios de cada programa y periodos de inscripción.
+    Los cambios se aplican de inmediato.
   </p>
 
   <div id="cfg-error" class="admin-error" hidden></div>
@@ -18,6 +17,7 @@ import AdminBase from '../../layouts/AdminBase.astro';
 
     <form id="cfg-form" hidden>
       <h2 class="ficha-bloque__titulo">Clase de prueba — días disponibles</h2>
+      <p class="cfg-ayuda">Si desmarcas un día, deja de ofrecerse en el formulario público.</p>
 
       <label class="cfg-dia">
         <input type="checkbox" id="cfg-viernes" />
@@ -36,6 +36,89 @@ import AdminBase from '../../layouts/AdminBase.astro';
       </label>
 
       <button type="submit" class="admin-btn">Guardar</button>
+    </form>
+  </section>
+
+  <div id="prg-aviso" class="admin-aviso-cerrado" hidden></div>
+
+  <section id="prg-estado" class="admin-card cfg-seccion" hidden>
+    <h2 class="ficha-bloque__titulo">Inscripciones hoy</h2>
+    <div id="prg-estado-lista" class="prg-estado"></div>
+  </section>
+
+  <section id="prg-precios" class="admin-card cfg-seccion" hidden>
+    <div class="prg-cabecera">
+      <h2 class="ficha-bloque__titulo">Precios</h2>
+      <div class="prg-temporada">
+        <label class="admin-label" for="prg-temporada">Temporada</label>
+        <select id="prg-temporada" class="admin-select"></select>
+      </div>
+    </div>
+
+    <form id="prg-form-precios" novalidate>
+      <h3 class="ficha-bloque__subtitulo">Por programa</h3>
+      <div class="esq-scroll">
+        <table class="esq-tabla prg-tabla">
+          <thead><tr><th>Programa</th><th>Matrícula</th><th>Mensualidad</th></tr></thead>
+          <tbody id="prg-filas-precios"></tbody>
+        </table>
+      </div>
+
+      <h3 class="ficha-bloque__subtitulo">Precio hermanos (total mensual por dos)</h3>
+      <div class="esq-scroll">
+        <table class="esq-tabla prg-tabla">
+          <thead><tr><th>Combinación</th><th>Total mensual</th><th>Por deportista</th></tr></thead>
+          <tbody id="prg-filas-hermanos"></tbody>
+        </table>
+      </div>
+
+      <div id="prg-precios-error" class="admin-error" hidden></div>
+      <div class="ficha-acciones">
+        <button type="submit" class="admin-btn">Guardar precios</button>
+        <button type="button" id="prg-nueva-temporada" class="admin-btn admin-btn--secundario">Agregar temporada</button>
+      </div>
+      <p id="prg-precios-guardado" class="ficha-guardado" hidden>Precios guardados.</p>
+    </form>
+  </section>
+
+  <section id="prg-periodos" class="admin-card cfg-seccion" hidden>
+    <h2 class="ficha-bloque__titulo">Periodos de inscripción</h2>
+    <p class="cfg-ayuda">
+      Definen cuándo se puede inscribir alguien en cada programa. La fecha de inicio de
+      clases es independiente: la inscripción puede abrir antes.
+    </p>
+    <div id="prg-solapes"></div>
+    <div id="prg-lista-periodos"></div>
+
+    <form id="prg-form-periodo" class="prg-form-periodo" novalidate>
+      <h3 id="prg-form-titulo" class="ficha-bloque__subtitulo">Agregar periodo</h3>
+      <div class="prg-campos">
+        <div>
+          <label class="admin-label" for="prg-p-programa">Programa</label>
+          <select id="prg-p-programa" class="admin-select"></select>
+        </div>
+        <div>
+          <label class="admin-label" for="prg-p-nombre">Nombre</label>
+          <input id="prg-p-nombre" class="admin-input" maxlength="80" placeholder="Ej.: Pretemporada 2028" />
+        </div>
+        <div>
+          <label class="admin-label" for="prg-p-abre">Abre</label>
+          <input id="prg-p-abre" type="date" class="admin-input" />
+        </div>
+        <div>
+          <label class="admin-label" for="prg-p-cierra">Cierra (opcional)</label>
+          <input id="prg-p-cierra" type="date" class="admin-input" />
+        </div>
+        <div>
+          <label class="admin-label" for="prg-p-clases">Inicio de clases (opcional)</label>
+          <input id="prg-p-clases" type="date" class="admin-input" />
+        </div>
+      </div>
+      <div id="prg-periodo-error" class="admin-error" hidden></div>
+      <div class="ficha-acciones">
+        <button type="submit" id="prg-p-guardar" class="admin-btn">Agregar periodo</button>
+        <button type="button" id="prg-p-cancelar" class="admin-btn admin-btn--secundario" hidden>Cancelar edición</button>
+      </div>
     </form>
   </section>
 </AdminBase>
