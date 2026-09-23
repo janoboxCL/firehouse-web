@@ -8,6 +8,35 @@ import AdminBase from '../../layouts/AdminBase.astro';
     de pago vienen directo de la pasarela correspondiente (Flow o Mercado Pago).
   </p>
 
+  <section id="ce-panel" class="admin-card ce-panel" hidden>
+    <div class="ce-cabecera">
+      <h2 class="cc-bloque__titulo">Estado de la campaña</h2>
+      <span id="ce-estado" class="ce-estado"></span>
+    </div>
+    <p id="ce-descripcion" class="ce-descripcion"></p>
+    <div id="ce-aviso" class="admin-aviso-cerrado" hidden></div>
+    <div id="ce-error" class="admin-error" hidden></div>
+
+    <div class="ce-controles">
+      <div class="ce-control">
+        <div><p class="ce-control__titulo">Compras</p><p id="ce-compras-texto" class="cc-sub"></p></div>
+        <button type="button" id="ce-compras" class="admin-btn"></button>
+      </div>
+      <div class="ce-control">
+        <div><p class="ce-control__titulo">Participación sin compra</p><p id="ce-gratis-texto" class="cc-sub"></p></div>
+        <button type="button" id="ce-gratis" class="admin-btn"></button>
+      </div>
+    </div>
+
+    <dl id="ce-fechas" class="ce-fechas"></dl>
+    <div id="ce-acciones" class="ce-acciones"></div>
+
+    <details id="ce-chequeos" class="ce-chequeos">
+      <summary id="ce-chequeos-resumen">Requisitos</summary>
+      <ul id="ce-chequeos-lista"></ul>
+    </details>
+  </section>
+
   <div id="ca-error" class="admin-error" hidden></div>
   <p id="ca-cargando" class="admin-spinner">Cargando…</p>
 
@@ -116,4 +145,29 @@ import AdminBase from '../../layouts/AdminBase.astro';
 .cc-correo{ margin-bottom: 6px; font-size: 13px; }
   .cc-btn-link{ background: none; border: 0; padding: 0; color: var(--fire-red, #C8102E); font: inherit; font-size: 13px; text-decoration: underline; cursor: pointer; }
   .cc-btn-link:disabled{ color: #6B6259; cursor: default; text-decoration: none; }
+.ce-panel{ margin-bottom: 20px; }
+.ce-cabecera{ display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; }
+.ce-cabecera .cc-bloque__titulo{ margin: 0; }
+.ce-estado{ display: inline-block; padding: 6px 14px; border-radius: 999px; font-size: 13px; font-weight: 600; color: #fff; background: #6B6259; }
+.ce-estado--abierta{ background: #1E7A3C; }
+.ce-estado--fuera_de_periodo{ background: #B07800; }
+.ce-estado--cerrada{ background: #6B6259; }
+.ce-estado--sorteo_cerrado{ background: #1B4FA8; }
+.ce-descripcion{ margin: 10px 0 14px; font-size: 14px; }
+.ce-controles{ display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; margin: 14px 0; }
+.ce-control{ display: flex; align-items: center; justify-content: space-between; gap: 12px; border: 1px solid #EFEBE4; border-radius: 10px; padding: 12px 14px; }
+.ce-control__titulo{ margin: 0; font-weight: 600; }
+.ce-control .cc-sub{ margin: 2px 0 0; }
+.ce-fechas{ display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 8px 16px; margin: 0 0 14px; font-size: 13px; }
+.ce-fechas dt{ color: #6B6259; }
+.ce-fechas dd{ margin: 2px 0 0; font-weight: 500; }
+.ce-acciones{ display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; }
+.ce-acciones:empty{ display: none; }
+.ce-chequeos summary{ cursor: pointer; font-size: 14px; font-weight: 500; padding: 6px 0; }
+.ce-chequeos ul{ list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 8px; }
+.ce-chequeo{ display: flex; gap: 10px; align-items: flex-start; font-size: 14px; }
+.ce-chequeo__marca{ flex: 0 0 22px; height: 22px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; color: #fff; font-size: 12px; font-weight: 700; }
+.ce-chequeo--ok .ce-chequeo__marca{ background: #1E7A3C; }
+.ce-chequeo--falta .ce-chequeo__marca{ background: #C51515; }
+.visually-hidden{ position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 </style>
