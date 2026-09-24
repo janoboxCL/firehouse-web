@@ -469,3 +469,88 @@ export async function enviarCorreoParticipacionGratisCampana(
     bcc,
   );
 }
+
+// ---------------------------------------------------------------------------
+// Cuenta corriente familiar (migración 0011)
+// ---------------------------------------------------------------------------
+
+export interface DatosComprobantePago {
+  nombre: string;
+  email: string;
+  numero: string; // commerce_order
+  fecha: string; // ISO
+  medio: 'MERCADOPAGO' | 'FLOW' | 'EFECTIVO' | 'TRANSFERENCIA' | string;
+  idPasarela: string | null;
+  lineas: Array<{ deportista: string | null; descripcion: string; monto: number }>;
+  total: number;
+  urlCuenta: string;
+}
+
+const MEDIO_PAGO_LABEL: Record<string, string> = {
+  MERCADOPAGO: 'Mercado Pago',
+  FLOW: 'Flow',
+  EFECTIVO: 'Efectivo',
+  TRANSFERENCIA: 'Transferencia',
+};
+
+function pesos(n: number): string {
+  return `$${n.toLocaleString('es-CL')}`;
+}
+
+export function construirHtmlComprobantePago(d: DatosComprobantePago): string {
+  const fecha = new Intl.DateTimeFormat('es-CL', { dateStyle: 'long', timeStyle: 'short', timeZone: 'America/Santiago' }).format(new Date(d.fecha));
+  const filas = d.lineas
+    .map(
+      (l) => `<tr>
+        <td style="padding:8px 0;border-bottom:1px solid rgba(245,239,232,.12);font-size:14px;color:#F5EFE8;">
+          ${l.deportista ? `<strong>${escaparHtml(l.deportista)}</strong><br/>` : ''}${escaparHtml(l.descripcion)}
+        </td>
+        <td style="padding:8px 0;border-bottom:1px solid rgba(245,239,232,.12);font-size:14px;color:#F5EFE8;text-align:right;white-space:nowrap;">${pesos(l.monto)}</td>
+      </tr>`,
+    )
+    .join('');
+  const cuerpo = `
+    <p style="font-size:15px;line-height:1.6;color:#F5EFE8;margin:0 0 18px;">
+      Hola, ${escaparHtml(d.nombre)}. Recibimos tu pago. Este es el detalle:
+    </p>
+    <table role="presentation" style="width:100%;border-collapse:collapse;margin:0 0 12px;">
+      ${filas}
+      <tr>
+        <td style="padding:10px 0;font-size:15px;color:#FFC400;font-weight:bold;">Total</td>
+        <td style="padding:10px 0;font-size:15px;color:#FFC400;font-weight:bold;text-align:right;">${pesos(d.total)}</td>
+      </tr>
+    </table>
+    <p style="font-size:13px;line-height:1.7;color:rgba(245,239,232,.75);margin:0 0 22px;">
+      N° de pago: ${escaparHtml(d.numero)}<br/>
+      Fecha: ${escaparHtml(fecha)}<br/>
+      Medio de pago: ${escaparHtml(MEDIO_PAGO_LABEL[d.medio] ?? d.medio)}${
+        d.idPasarela ? `<br/>ID de la operación en ${escaparHtml(MEDIO_PAGO_LABEL[d.medio] ?? d.medio)}: ${escaparHtml(d.idPasarela)}` : ''
+      }
+    </p>
+    <p style="font-size:14px;line-height:1.6;color:#F5EFE8;margin:0 0 24px;">
+      Puedes revisar tus pagos y lo que queda pendiente en tu página personal:<br/>
+      <a href="${escaparHtml(d.urlCuenta)}" style="color:#FFC400;">Ver mi cuenta Firehouse</a>
+    </p>`;
+  return plantillaBase('Comprobante de pago', 'Pago recibido ✓', cuerpo);
+}
+
+export async function enviarComprobantePagoCuenta(apiKey: string, remitente: string, datos: DatosComprobantePago, bcc?: string[]): Promise<void> {
+  await enviarCorreoGenerico(apiKey, remitente, datos.email, `Comprobante de pago Firehouse · ${datos.numero}`, construirHtmlComprobantePago(datos), bcc);
+}
+
+export async function enviarLinkCuenta(apiKey: string, remitente: string, datos: { nombre: string; email: string; url: string }): Promise<void> {
+  const cuerpo = `
+    <p style="font-size:15px;line-height:1.6;color:#F5EFE8;margin:0 0 22px;">
+      Hola, ${escaparHtml(datos.nombre)}. Este es el link de tu página personal de pagos Firehouse.
+      Guárdalo: es el mismo cada mes.
+    </p>
+    <p style="margin:0 0 26px;">
+      <a href="${escaparHtml(datos.url)}" style="display:inline-block;background:#FFC400;color:#171412;text-decoration:none;padding:13px 28px;border-radius:999px;font-size:14px;font-weight:bold;">
+        Ir a mi cuenta
+      </a>
+    </p>
+    <p style="font-size:13px;line-height:1.6;color:rgba(245,239,232,.7);margin:0 0 24px;">
+      Si no pediste este correo, puedes ignorarlo. El link solo sirve para ver y pagar la cuenta de tu familia.
+    </p>`;
+  await enviarCorreoGenerico(apiKey, remitente, datos.email, 'Tu link de pagos Firehouse', plantillaBase('Firehouse', 'Tu cuenta Firehouse', cuerpo));
+}

@@ -1,0 +1,97 @@
+---
+import Base from '../layouts/Base.astro';
+import { whatsapp } from '../data/sitio.js';
+---
+<Base titulo="Mi cuenta | Firehouse" descripcion="Pagos de tu familia en Firehouse Cheerleading All Stars." ruta="/pagar" noindex={true}>
+  <section class="pg-section">
+    <div class="wrap pg-wrap">
+      <p class="pg-eyebrow">Firehouse</p>
+
+      <div id="pg-cargando"><h1 class="pg-titulo">Cargando tu cuenta…</h1></div>
+
+      <div id="pg-cuenta" hidden>
+        <h1 class="pg-titulo">Hola, <span id="pg-familia"></span></h1>
+        <p class="pg-texto">Estos son los pagos de tu familia. Elige qué quieres pagar hoy.</p>
+
+        <form id="pg-form" class="pg-card" novalidate>
+          <div id="pg-pendientes"></div>
+          <p id="pg-al-dia" class="pg-al-dia" hidden>✓ Estás al día. No tienes pagos pendientes.</p>
+          <div id="pg-pie" class="pg-pie">
+            <p class="pg-total">Total <strong id="pg-total">$0</strong></p>
+            <button type="submit" id="pg-pagar" class="pg-btn">Pagar con Mercado Pago</button>
+            <p class="pg-nota">Serás redirigido a Mercado Pago. Al confirmarse el pago te enviamos el comprobante por correo.</p>
+            <p id="pg-error" class="pg-error" role="alert" hidden></p>
+          </div>
+        </form>
+
+        <section id="pg-historial-wrap" class="pg-historial" hidden>
+          <h2 class="pg-subtitulo">Pagos realizados</h2>
+          <ul id="pg-historial"></ul>
+        </section>
+      </div>
+
+      <div id="pg-sin-link" hidden>
+        <h1 class="pg-titulo">No pudimos abrir tu cuenta</h1>
+        <p class="pg-texto">El link no es válido o ya no está vigente. Escribe el correo que registraste y te enviamos el link vigente.</p>
+      </div>
+
+      <form id="pg-recuperar" class="pg-card pg-recuperar" novalidate hidden>
+        <label for="pg-email" class="pg-label">¿No encuentras tu link? Te lo enviamos a tu correo.</label>
+        <div class="pg-recuperar__fila">
+          <input id="pg-email" type="email" class="pg-input" placeholder="correo@ejemplo.cl" autocomplete="email" required />
+          <input type="text" name="sitio" id="pg-sitio" class="pg-oculto" tabindex="-1" autocomplete="off" aria-hidden="true" />
+          <button type="submit" class="pg-btn pg-btn--sec">Enviar link</button>
+        </div>
+        <p id="pg-recuperar-msg" class="pg-texto" role="status" hidden></p>
+      </form>
+
+      <a class="pg-ayuda" href={whatsapp('ayudaRegistroStar')} target="_blank" rel="noopener">¿Dudas? Escríbenos por WhatsApp →</a>
+    </div>
+  </section>
+</Base>
+
+<script>
+  import { iniciarPagar } from '../scripts/pagar.ts';
+  iniciarPagar();
+</script>
+
+<style is:global>
+.pg-section{ padding: var(--e-6) 0 var(--e-7); }
+.pg-wrap{ max-width: 620px; margin-inline: auto; }
+.pg-eyebrow{ font-family: var(--font-count); font-size: 11px; letter-spacing: .3em; color: var(--fire-yellow); text-transform: uppercase; }
+.pg-titulo{ font-family: var(--font-display); font-weight: 800; font-size: clamp(1.6rem, 4vw, 2.2rem); margin-top: var(--e-2); }
+.pg-subtitulo{ font-family: var(--font-display); font-weight: 800; font-size: 1.2rem; margin: 0 0 var(--e-2); }
+.pg-texto{ color: var(--txt-soft); font-size: 15px; line-height: 1.6; margin-top: var(--e-2); }
+.pg-card{ margin-top: var(--e-4); background: var(--ember-deep); border: 1px solid var(--hairline); border-radius: 16px; padding: var(--e-3); }
+.pg-deportista{ font-family: var(--font-display); font-weight: 800; font-size: 1.05rem; margin: 0 0 var(--e-1); color: var(--fire-yellow); }
+.pg-deportista:not(:first-child){ margin-top: var(--e-3); }
+.pg-item{ display: flex; align-items: flex-start; gap: 14px; padding: 12px 0; border-top: 1px solid var(--hairline); cursor: pointer; }
+.pg-item input{ width: 22px; height: 22px; margin-top: 2px; accent-color: var(--fire-yellow); flex-shrink: 0; cursor: pointer; }
+.pg-item__texto{ flex: 1; font-size: 15px; line-height: 1.45; }
+.pg-item__meta{ display: block; font-size: 13px; color: var(--txt-faint); margin-top: 2px; }
+.pg-item__meta--vencida{ color: #FF8A80; }
+.pg-item__monto{ font-weight: 700; white-space: nowrap; font-size: 15px; }
+.pg-pie{ border-top: 1px solid var(--hairline); margin-top: var(--e-2); padding-top: var(--e-3); }
+.pg-total{ display: flex; justify-content: space-between; align-items: baseline; font-size: 16px; margin: 0; }
+.pg-total strong{ font-family: var(--font-display); font-size: 1.6rem; color: var(--fire-yellow); }
+.pg-btn{
+  display: inline-flex; justify-content: center; width: 100%; margin-top: var(--e-3); background: var(--fire-red); color: #fff;
+  font-weight: 800; font-family: var(--font-display); padding: 15px 28px; border-radius: var(--radio); border: none; cursor: pointer; font-size: 16px;
+}
+.pg-btn:disabled{ opacity: .5; cursor: not-allowed; }
+.pg-btn:focus-visible, .pg-item input:focus-visible, .pg-input:focus-visible{ outline: 2px solid var(--fire-yellow); outline-offset: 3px; }
+.pg-btn--sec{ width: auto; margin-top: 0; background: transparent; border: 1px solid var(--fire-yellow); color: var(--fire-yellow); padding: 12px 22px; font-size: 14px; }
+.pg-nota{ font-size: 13px; color: var(--txt-faint); margin-top: var(--e-2); text-align: center; }
+.pg-error{ color: #FF8A80; font-size: 14px; margin-top: var(--e-2); text-align: center; }
+.pg-al-dia{ font-size: 16px; color: var(--txt); margin: 0; }
+.pg-historial{ margin-top: var(--e-5); }
+.pg-historial ul{ list-style: none; padding: 0; margin: 0; }
+.pg-historial li{ border-top: 1px solid var(--hairline); padding: 14px 0; font-size: 14px; color: var(--txt-soft); }
+.pg-historial li strong{ color: var(--txt); }
+.pg-recuperar{ margin-top: var(--e-4); }
+.pg-label{ display: block; font-size: 14px; color: var(--txt-soft); margin-bottom: var(--e-1); }
+.pg-recuperar__fila{ display: flex; flex-wrap: wrap; gap: 10px; }
+.pg-input{ flex: 1 1 220px; padding: 12px 16px; border-radius: var(--radio); border: 1px solid var(--hairline); background: var(--ember); color: var(--txt); font-size: 15px; }
+.pg-oculto{ position: absolute; left: -9999px; width: 1px; height: 1px; }
+.pg-ayuda{ display: inline-block; margin-top: var(--e-4); color: var(--fire-yellow); text-decoration: underline; font-size: 14px; }
+</style>

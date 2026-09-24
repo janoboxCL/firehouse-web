@@ -32,8 +32,10 @@ import {
   mensajeFaltantes,
   primerNombre,
   TALLAS_POLERA,
+  variablesUsadas,
 } from '../lib/crm/plantillas.ts';
 import type { SupabaseClient } from '@supabase/supabase-js';
+import { generarLinkPago } from '../lib/crm/admin-cuenta-api.ts';
 import { STAR_CLASS_START } from '../lib/crm/star-class.ts';
 import {
   coincidePrograma,
@@ -148,28 +150,19 @@ function bloqueMensajes(item: ItemPrimeraClase, supabase: SupabaseClient, ctx: C
     }
   });
 
-  boton.addEventListener('click', () => {
-    aviso.hidden = true;
-    const plantilla = ctx.plantillas.find((p) => p.id === selectPlantilla.value);
-    if (!plantilla) return;
-    const { texto, faltantes } = completarPlantilla(plantilla.cuerpo, {
-      nombre_apoderado: primerNombre(caso.atleta.apoderado.nombre),
-      nombre_atleta: primerNombre(caso.atleta.nombre),
-      remitente: ctx.firma.nombre,
-      cargo: ctx.firma.cargo,
-      fecha_clase: fechaClaseTexto(item.fecha),
-      hora_clase: horaClase(caso),
-      talla: ctx.tallas.get(caso.atleta.id) ?? null,
-      valor_inscripcion: ctx.valorInscripcion,
-      link_pago: null, // disponible con la página de pago (etapa C)
-    });
-    if (faltantes.length > 0) {
-      aviso.textContent = mensajeFaltantes(faltantes);
-      aviso.hidden = false;
-      return;
-    }
-    // Se abre WhatsApp antes de cualquier espera, para que el navegador no lo bloquee.
-    window.open(enlaceWhatsApp(caso.atleta.apoderado.telefono, texto), '_blank', 'noopener');
+  const datosPlantilla = (linkPago: string | null) => ({
+    nombre_apoderado: primerNombre(caso.atleta.apoderado.nombre),
+    nombre_atleta: primerNombre(caso.atleta.nombre),
+    remitente: ctx.firma.nombre,
+    cargo: ctx.firma.cargo,
+    fecha_clase: fechaClaseTexto(item.fecha),
+    hora_clase: horaClase(caso),
+    talla: ctx.tallas.get(caso.atleta.id) ?? null,
+    valor_inscripcion: ctx.valorInscripcion,
+    link_pago: linkPago,
+  });
+
+  const registrar = (plantilla: PlantillaClasePrueba) =>
     registrarEnvio(supabase, caso.id, plantilla)
       .then(() => {
         ctx.envios.push({ caso_id: caso.id, plantilla_id: plantilla.id, fecha: new Date().toISOString() });
@@ -181,6 +174,50 @@ function bloqueMensajes(item: ItemPrimeraClase, supabase: SupabaseClient, ctx: C
         aviso.textContent = mensajeErrorSupabase(err, 'El mensaje se abrió en WhatsApp, pero no pudimos registrar el envío.');
         aviso.hidden = false;
       });
+
+  boton.addEventListener('click', async () => {
+    aviso.hidden = true;
+    const plantilla = ctx.plantillas.find((p) => p.id === selectPlantilla.value);
+    if (!plantilla) return;
+    const necesitaLink = variablesUsadas(plantilla.cuerpo).includes('link_pago');
+
+    // Primero se revisa todo lo demás, con un link provisorio.
+    const previa = completarPlantilla(plantilla.cuerpo, datosPlantilla(necesitaLink ? 'pendiente' : null));
+    if (previa.faltantes.length > 0) {
+      aviso.textContent = mensajeFaltantes(previa.faltantes);
+      aviso.hidden = false;
+      return;
+    }
+    if (!necesitaLink) {
+      // Se abre WhatsApp antes de cualquier espera, para que el navegador no lo bloquee.
+      window.open(enlaceWhatsApp(caso.atleta.apoderado.telefono, previa.texto), '_blank', 'noopener');
+      void registrar(plantilla);
+      return;
+    }
+
+    // Con link de pago: la ventana se abre ya (evita el bloqueo) y se completa
+    // cuando el servidor prepara los cargos Star y el link de la familia.
+    const ventana = window.open('', '_blank');
+    boton.disabled = true;
+    try {
+      const { url } = await generarLinkPago(supabase, { atletaId: caso.atleta.id });
+      const { texto } = completarPlantilla(plantilla.cuerpo, datosPlantilla(url));
+      const destino = enlaceWhatsApp(caso.atleta.apoderado.telefono, texto);
+      if (ventana) {
+        ventana.opener = null;
+        ventana.location.href = destino;
+      } else {
+        aviso.innerHTML = `El navegador bloqueó la ventana. <a href="${destino}" target="_blank" rel="noopener">Abrir WhatsApp</a>`;
+        aviso.hidden = false;
+      }
+      void registrar(plantilla);
+    } catch (err) {
+      ventana?.close();
+      aviso.textContent = err instanceof Error ? err.message : 'No pudimos preparar el link de pago.';
+      aviso.hidden = false;
+    } finally {
+      boton.disabled = false;
+    }
   });
 
   return bloque;

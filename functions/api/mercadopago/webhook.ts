@@ -16,6 +16,7 @@ import { createClient } from '@supabase/supabase-js';
 import { construirPaymentProvider, type PaymentProvidersEnv } from '../../lib/payment-providers/index.ts';
 import { enviarCorreoConfirmacionCampana } from '../../lib/resend.ts';
 import { enviarConfirmacionStarSiCorresponde } from '../../lib/star-confirmation.ts';
+import { esPagoCuenta, procesarPagoCuenta } from '../../lib/cuenta-webhook.ts';
 
 interface Env extends PaymentProvidersEnv {
   SUPABASE_URL: string;
@@ -75,6 +76,13 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     }
 
     const supabase = createClient(context.env.SUPABASE_URL, context.env.SUPABASE_SERVICE_ROLE_KEY);
+
+    // Cuenta corriente familiar ("PAGO-..."): se procesa completo aquí y no
+    // pasa por las ramas de Star ni de la campaña.
+    if (esPagoCuenta(estado.commerceOrder)) {
+      return await procesarPagoCuenta(supabase, context.env, estado);
+    }
+
     const esStar = esOrdenStar(estado.commerceOrder);
 
     if (estado.estado === 'APROBADO' && esStar) {

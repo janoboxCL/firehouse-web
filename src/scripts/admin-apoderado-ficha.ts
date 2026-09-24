@@ -19,6 +19,7 @@ import { CRM_JOURNEYS_LABEL, CRM_ESTADOS_LABEL, RELACION_APODERADO_LABEL, CANAL_
 import { formatearFecha, formatearFechaHora, claseBadgeEstado, mensajeWhatsappSugerido, mensajeErrorSupabase, escaparHtml } from '../lib/crm/format.ts';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { obtenerFirma, type Firma } from '../lib/crm/admin-mensajes-api.ts';
+import { iniciarCuentaFamilia } from './admin-cuenta.ts';
 import { completarPlantilla, enlaceWhatsApp, mensajeFaltantes, primerNombre } from '../lib/crm/plantillas.ts';
 
 function $<T extends Element>(selector: string): T | null {
@@ -262,5 +263,6 @@ export async function iniciarFichaApoderado(): Promise<void> {
   poblarPlantillas(plantillas);
   conectarPlantillas(supabase, casos, plantillas);
   conectarNotas(supabase, apoderadoId, admins);
+  void iniciarCuentaFamilia(supabase, apoderadoId, casos[0].atleta.apoderado.telefono, casos[0].atleta.apoderado.nombre);
   conectarEliminar(supabase, apoderadoId, `${casos[0].atleta.apoderado.nombre} ${casos[0].atleta.apoderado.apellidos}`);
 }

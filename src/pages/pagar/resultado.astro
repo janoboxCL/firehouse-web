@@ -1,0 +1,41 @@
+---
+import Base from '../../layouts/Base.astro';
+import { whatsapp } from '../../data/sitio.js';
+---
+<Base titulo="Resultado del pago | Firehouse" descripcion="Estado de tu pago en Firehouse." ruta="/pagar/resultado" noindex={true}>
+  <section class="pr-section">
+    <div class="wrap pr-wrap">
+      <p class="pr-eyebrow">Firehouse</p>
+      <div id="pr-cargando"><h1 class="pr-titulo">Confirmando tu pago…</h1><p class="pr-texto">Esto toma solo unos segundos.</p></div>
+      <div id="pr-aprobado" hidden>
+        <h1 class="pr-titulo">¡Pago recibido! ✓</h1>
+        <p class="pr-texto">Pagaste <strong id="pr-total"></strong>. Te enviamos el comprobante a tu correo.</p>
+      </div>
+      <div id="pr-pendiente" hidden>
+        <h1 class="pr-titulo">Tu pago está en proceso</h1>
+        <p class="pr-texto">Mercado Pago aún no lo confirma. Apenas se acredite, te llegará el comprobante por correo.</p>
+      </div>
+      <div id="pr-rechazado" hidden>
+        <h1 class="pr-titulo">El pago no se completó</h1>
+        <p class="pr-texto">No se hizo ningún cargo. Puedes intentarlo nuevamente desde tu cuenta.</p>
+      </div>
+      <a id="pr-volver" class="pr-btn" href="/pagar" hidden>Volver a mi cuenta</a>
+      <a class="pr-ayuda" href={whatsapp('ayudaRegistroStar')} target="_blank" rel="noopener">¿Dudas? Escríbenos por WhatsApp →</a>
+    </div>
+  </section>
+</Base>
+
+<script>
+  import { iniciarResultadoPago } from '../../scripts/pagar-resultado.ts';
+  iniciarResultadoPago();
+</script>
+
+<style is:global>
+.pr-section{ padding: var(--e-7) 0; min-height: 50vh; }
+.pr-wrap{ max-width: 560px; margin-inline: auto; text-align: center; }
+.pr-eyebrow{ font-family: var(--font-count); font-size: 11px; letter-spacing: .3em; color: var(--fire-yellow); text-transform: uppercase; }
+.pr-titulo{ font-family: var(--font-display); font-weight: 800; font-size: clamp(1.6rem, 4vw, 2.2rem); margin-top: var(--e-2); }
+.pr-texto{ color: var(--txt-soft); font-size: 15px; line-height: 1.6; margin-top: var(--e-2); }
+.pr-btn{ display: inline-flex; margin-top: var(--e-4); background: var(--fire-red); color: #fff; font-weight: 800; font-family: var(--font-display); padding: 13px 28px; border-radius: var(--radio); text-decoration: none; }
+.pr-ayuda{ display: block; margin-top: var(--e-4); color: var(--fire-yellow); text-decoration: underline; font-size: 14px; }
+</style>

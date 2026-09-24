@@ -71,6 +71,36 @@ import { LIMITES } from '../../lib/crm/constants.ts';
           </table>
         </section>
 
+        <section class="admin-card ficha-bloque" id="cu-seccion">
+          <div class="cu-cabecera">
+            <h2 class="ficha-bloque__titulo">Cuenta y pagos</h2>
+            <div class="cu-link" id="cu-link"></div>
+          </div>
+          <div id="cu-error" class="admin-error" hidden></div>
+          <p id="cu-ok" class="ficha-guardado" hidden></p>
+          <div id="cu-preparar" class="cu-preparar"></div>
+          <div class="cu-scroll">
+            <table class="cu-tabla">
+              <thead><tr><th></th><th>Deportista</th><th>Concepto</th><th class="cu-num">Monto</th><th class="cu-num">Saldo</th><th>Vence</th><th>Estado</th><th></th></tr></thead>
+              <tbody id="cu-cargos"></tbody>
+            </table>
+          </div>
+          <p id="cu-sin-cargos" class="admin-vacio" hidden>Esta familia aún no tiene cargos.</p>
+          <form id="cu-form-manual" class="cu-manual" novalidate>
+            <p class="cu-manual__titulo">Registrar pago en efectivo o transferencia</p>
+            <div class="cu-manual__campos">
+              <select id="cu-medio" class="admin-select" aria-label="Medio de pago">
+                <option value="EFECTIVO">Efectivo</option>
+                <option value="TRANSFERENCIA">Transferencia</option>
+              </select>
+              <input id="cu-referencia" class="admin-input" maxlength="200" placeholder="Referencia (opcional)" aria-label="Referencia" />
+              <button type="submit" id="cu-registrar" class="admin-btn" disabled>Selecciona cargos</button>
+            </div>
+          </form>
+          <h3 class="ficha-bloque__subtitulo">Pagos</h3>
+          <ul id="cu-pagos" class="cu-pagos"></ul>
+        </section>
+
         <section class="admin-card ficha-bloque ficha-peligro">
           <h2 class="ficha-bloque__titulo">Eliminar</h2>
           <p class="ficha-peligro__texto">
@@ -101,4 +131,30 @@ import { LIMITES } from '../../lib/crm/constants.ts';
 #ap-form-nota{ border-top: 1px solid #EFEBE4; padding-top: 16px; margin-top: 4px; }
 #ap-form-nota textarea{ margin-bottom: 10px; }
 .familia-card__atletas tr{ cursor: pointer; }
+
+.cu-cabecera{ display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; }
+.cu-link{ display: flex; flex-wrap: wrap; gap: 8px; }
+.cu-link .admin-btn, .cu-preparar .admin-btn{ min-height: 36px; padding: 8px 14px; font-size: 13px; }
+.cu-preparar{ display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
+.cu-preparar:empty{ display: none; }
+.cu-scroll{ overflow-x: auto; }
+.cu-tabla{ width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 8px; }
+.cu-tabla th{ text-align: left; font-weight: 500; color: #6B6259; font-size: 12px; padding: 8px 6px; border-bottom: 1px solid #E4DFD6; white-space: nowrap; }
+.cu-tabla td{ padding: 9px 6px; border-top: 1px solid #EFEBE4; vertical-align: middle; }
+.cu-tabla input[type=checkbox]{ width: 18px; height: 18px; accent-color: var(--fire-red); }
+.cu-num{ text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.cu-vencido{ color: #C51515; font-weight: 600; }
+.cu-estado{ display: inline-block; padding: 2px 9px; border-radius: 999px; font-size: 11px; font-weight: 700; color: #fff; }
+.cu-estado--pagado{ background: #1E7A3C; }
+.cu-estado--pendiente{ background: #B07800; }
+.cu-estado--parcial{ background: #1B4FA8; }
+.cu-estado--anulado{ background: #8A7F7B; }
+.cu-anular{ background: none; border: 0; color: #C51515; font: inherit; font-size: 12px; text-decoration: underline; cursor: pointer; }
+.cu-manual{ margin: 16px 0; padding-top: 14px; border-top: 1px solid #EFEBE4; }
+.cu-manual__titulo{ font-size: 14px; font-weight: 600; margin: 0 0 8px; }
+.cu-manual__campos{ display: flex; flex-wrap: wrap; gap: 10px; }
+.cu-manual__campos .admin-input{ flex: 1 1 200px; }
+.cu-pagos{ list-style: none; padding: 0; margin: 0; }
+.cu-pagos li{ border-top: 1px solid #EFEBE4; padding: 10px 0; font-size: 13px; }
+.cu-pagos li:first-child{ border-top: 0; }
 </style>
