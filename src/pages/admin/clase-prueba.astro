@@ -9,8 +9,8 @@ import AdminBase from '../../layouts/AdminBase.astro';
   </div>
   <p class="admin-intro">
     Quiénes vienen a una clase de prueba o a su primera clase de Firehouse Star, agrupados por
-    fecha. Registra la talla, envía los mensajes de la secuencia por WhatsApp y marca la asistencia
-    apenas lleguen.
+    fecha. Registra la talla, envía los mensajes de la secuencia por WhatsApp o por correo y marca
+    la asistencia apenas lleguen.
   </p>
 
   <div id="cp-error" class="admin-error" hidden></div>
@@ -65,6 +65,17 @@ import AdminBase from '../../layouts/AdminBase.astro';
     <p id="cp-vacio" class="admin-vacio" hidden>No hay clases de prueba agendadas todavía.</p>
     <div id="cp-grupos"></div>
   </section>
+
+  <dialog id="cp-dialogo-correo" class="cp-dialogo" aria-labelledby="cp-dialogo-titulo">
+    <h2 id="cp-dialogo-titulo" class="ficha-bloque__titulo">Revisa el correo antes de enviarlo</h2>
+    <p class="cp-dialogo__dato">Para: <strong id="cp-correo-para"></strong></p>
+    <p class="cp-dialogo__dato">Asunto: <strong id="cp-correo-asunto"></strong></p>
+    <iframe id="cp-correo-previa" class="cp-dialogo__previa" title="Vista previa del correo" sandbox=""></iframe>
+    <div class="ficha-acciones">
+      <button type="button" id="cp-correo-enviar" class="admin-btn">Enviar correo</button>
+      <button type="button" id="cp-correo-cancelar" class="admin-btn admin-btn--secundario">Cancelar</button>
+    </div>
+  </dialog>
 </AdminBase>
 
 <script>
@@ -121,8 +132,23 @@ import AdminBase from '../../layouts/AdminBase.astro';
 .cp-mensajes__plantilla{ flex: 1 1 220px; }
 .cp-mensajes__plantilla .admin-select{ width: 100%; }
 .cp-mensajes__aviso{ margin: 10px 0 0; font-size: 13px; color: var(--fire-red, #C51515); }
+.cp-mensajes__aviso--ok{ color: #1E7A34; font-weight: 600; }
+.cp-mensajes__botones{ display: flex; flex-wrap: wrap; gap: 8px; }
 .cp-enviados{ display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
 .cp-enviados:empty{ display: none; }
 .cp-enviado{ font-size: 12px; padding: 3px 10px; border-radius: 999px; background: #1E7A3C; color: #fff; }
+.cp-enviado--correo{ background: #1B4FA8; }
+
+.cp-dialogo{
+  width: min(640px, calc(100vw - 24px)); max-height: calc(100vh - 32px); padding: 20px;
+  border: none; border-radius: 16px; box-shadow: 0 20px 60px rgba(0,0,0,.35);
+}
+.cp-dialogo::backdrop{ background: rgba(23,20,18,.6); }
+.cp-dialogo__dato{ margin: 0 0 6px; font-size: 14px; color: #6B6259; overflow-wrap: anywhere; }
+.cp-dialogo__dato strong{ color: var(--ember, #171412); }
+.cp-dialogo__previa{
+  display: block; width: 100%; height: min(60vh, 560px); margin: 12px 0 16px;
+  border: 1px solid #E4DFD6; border-radius: 12px; background: #171412;
+}
 </style>
 

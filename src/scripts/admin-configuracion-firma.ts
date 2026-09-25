@@ -3,6 +3,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { guardarNombreFirma, obtenerFirma } from '../lib/crm/admin-mensajes-api.ts';
 import { mensajeErrorSupabase } from '../lib/crm/format.ts';
+import { cargoEnMensaje } from '../lib/crm/plantillas.ts';
 
 function $<T extends Element>(s: string): T {
   const el = document.querySelector<T>(s);
@@ -11,7 +12,7 @@ function $<T extends Element>(s: string): T {
 }
 
 function vistaPrevia(nombre: string, cargo: string): string {
-  return `Hola, soy ${nombre || '…'}, ${cargo} de Firehouse Star.`;
+  return `Hola, soy ${nombre || '…'}, ${cargoEnMensaje(cargo) ?? cargo} de Firehouse Star.`;
 }
 
 export async function iniciarFirma(supabase: SupabaseClient): Promise<void> {

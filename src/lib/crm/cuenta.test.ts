@@ -11,11 +11,13 @@ test('prorrateo por semana de la primera clase', () => {
   assert.equal(mensualidadProrrateada(30000, '2026-10-17'), 15000);
   assert.equal(mensualidadProrrateada(30000, '2026-10-24'), 7500);
   assert.equal(mensualidadProrrateada(30000, '2026-10-31'), 7500);
+  assert.equal(mensualidadProrrateada(40000, '2026-10-10', [100, 80, 60, 40]), 32000);
 });
 
 test('periodos y textos', () => {
   assert.equal(periodoDe('2026-10-03'), '2026-10-01');
   assert.equal(vencimientoMensualidad('2026-10-01'), '2026-10-05');
+  assert.equal(vencimientoMensualidad('2026-10-01', 10), '2026-10-10');
   assert.equal(nombreMes('2026-10-01'), 'octubre 2026');
   assert.equal(descripcionMensualidad('Firehouse Star', '2026-10-01', true), 'Mensualidad Firehouse Star · octubre 2026 (proporcional)');
 });

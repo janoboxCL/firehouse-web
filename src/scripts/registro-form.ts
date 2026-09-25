@@ -55,6 +55,8 @@ function opcionesExperiencia(): string {
 }
 
 let DIAS_HABILITADOS: DiasHabilitados = { viernes: false, sabado: false };
+/** Disciplina y horario de cada día, ej.: "Gimnasia, 16:00–18:00". */
+let HORARIOS_DIA: Record<string, string> = {};
 
 /** true cuando se llega desde /firehouse-star vía /registro?origen=star. */
 function esOrigenStar(): boolean {
@@ -67,6 +69,7 @@ async function cargarDiasHabilitados(): Promise<void> {
     if (!res.ok) return;
     const datos = await res.json();
     DIAS_HABILITADOS = { viernes: datos?.viernes === true, sabado: datos?.sabado === true };
+    if (datos?.horarios && typeof datos.horarios === 'object') HORARIOS_DIA = datos.horarios as Record<string, string>;
   } catch {
     // Sin conexión al endpoint: nos quedamos con "nada habilitado", que es lo
     // más seguro (nunca ofrecer un día que en realidad no está disponible).
@@ -77,6 +80,10 @@ function hayAlgunDiaHabilitado(): boolean {
   return DIAS_HABILITADOS.viernes || DIAS_HABILITADOS.sabado;
 }
 
+function escaparTexto(v: string): string {
+  return v.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
+}
+
 function pillsDiaClasePrueba(idBase: string): string {
   const dias = (['VIERNES', 'SABADO'] as DiaClasePrueba[]).filter((d) => diaEstaHabilitado(d, DIAS_HABILITADOS));
   // Si sólo hay un día habilitado no hay nada que elegir de verdad — lo dejamos
@@ -85,7 +92,9 @@ function pillsDiaClasePrueba(idBase: string): string {
   return dias
     .map(
       (d) =>
-        `<label class="pill"><input type="radio" name="${idBase}-dia-clase" value="${d}" ${unicoDia ? 'checked' : ''} /> ${DIA_CLASE_PRUEBA_LABEL[d]}</label>`,
+        `<label class="pill"><input type="radio" name="${idBase}-dia-clase" value="${d}" ${unicoDia ? 'checked' : ''} /> ${DIA_CLASE_PRUEBA_LABEL[d]}${
+          HORARIOS_DIA[d] ? ` <small>· ${escaparTexto(HORARIOS_DIA[d])}</small>` : ''
+        }</label>`,
     )
     .join('');
 }

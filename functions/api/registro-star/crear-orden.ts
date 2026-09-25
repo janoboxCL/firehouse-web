@@ -17,6 +17,8 @@
 // fecha de la primera clase — ese segundo cobro es trabajo pendiente, no
 // está en este endpoint.
 
+import { leerConfigAcademia, leerPreciosStar } from '../../lib/config-servidor.ts';
+import { getNextStarClassDate } from '../../../src/lib/crm/star-class.ts';
 import { createClient } from '@supabase/supabase-js';
 import { elegirPasarelaHabilitada, construirPaymentProvider, type PaymentProvidersEnv } from '../../lib/payment-providers/index.ts';
 import { validarRegistroStar } from '../../../src/lib/crm/registro-star.ts';
@@ -60,13 +62,19 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       return jsonResponse(400, { error: 'json_invalido' });
     }
 
-    const validacion = validarRegistroStar(body);
+    const supabase = createClient(context.env.SUPABASE_URL, context.env.SUPABASE_SERVICE_ROLE_KEY);
+
+    // El valor del kit sale de Configuración (precio de inscripción Star de la
+    // temporada de la próxima clase), nunca del navegador.
+    const config = await leerConfigAcademia(supabase);
+    const temporada = Number(getNextStarClassDate(new Date(), config.starPrimeraClase).slice(0, 4));
+    const { matricula } = await leerPreciosStar(supabase, temporada);
+
+    const validacion = validarRegistroStar(body, matricula);
     if (!validacion.ok) {
       return jsonResponse(400, { error: validacion.error });
     }
     const { apoderado, atletas, montoTotal } = validacion.datos;
-
-    const supabase = createClient(context.env.SUPABASE_URL, context.env.SUPABASE_SERVICE_ROLE_KEY);
 
     const pasarelaId = await elegirPasarelaHabilitada(supabase);
     if (!pasarelaId) {

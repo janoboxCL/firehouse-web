@@ -2,6 +2,7 @@ import { requireAdminSession, montarCabeceraAdmin } from '../lib/crm/auth.ts';
 import {
   obtenerCasos,
   agruparPrimerasClases,
+  enviarCorreoAdmin,
   actualizarCaso,
   registrarVisitaRapida,
   validarDatosVisitaRapida,
@@ -18,6 +19,9 @@ import {
   obtenerAsistenciasPrimeraClase,
   registrarAsistenciaPrimeraClase,
   registrarEnvio,
+  sirveParaCorreo,
+  sirveParaWhatsApp,
+  type CanalEnvio,
   type EnvioPlantilla,
   type Firma,
   type PlantillaClasePrueba,
@@ -26,17 +30,19 @@ import { etiquetaDia, HORA_CLASE_PRUEBA, type DiaClasePrueba } from '../lib/crm/
 import { CRM_ESTADOS, CRM_JOURNEYS } from '../lib/crm/constants.ts';
 import { mensajeErrorSupabase, escaparHtml } from '../lib/crm/format.ts';
 import {
+  cargoEnMensaje,
   completarPlantilla,
   enlaceWhatsApp,
   fechaClaseTexto,
   mensajeFaltantes,
   primerNombre,
-  TALLAS_POLERA,
   variablesUsadas,
 } from '../lib/crm/plantillas.ts';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { generarLinkPago } from '../lib/crm/admin-cuenta-api.ts';
-import { STAR_CLASS_START } from '../lib/crm/star-class.ts';
+import { obtenerConfigAcademia, obtenerHorariosClasePrueba } from '../lib/crm/admin-config-api.ts';
+import { CONFIG_RESPALDO, type ConfigAcademia, type HorarioClasePrueba } from '../lib/crm/config-academia.ts';
+import { renderizarCorreo, type CorreoRenderizado } from '../lib/crm/correo-plantilla.ts';
 import {
   coincidePrograma,
   contarPorPrograma,
@@ -60,10 +66,59 @@ function esStar(caso: CasoResumen): boolean {
   return caso.journey === CRM_JOURNEYS.CLASE_PRUEBA_STAR || caso.journey === CRM_JOURNEYS.FIREHOUSE_STAR;
 }
 
+// Configuración editable en /admin/configuracion (migración 0012). Si no se
+// puede leer, se usan los valores de respaldo del código.
+let CONFIG: ConfigAcademia = CONFIG_RESPALDO;
+let HORARIOS = new Map<string, HorarioClasePrueba>();
+
+async function cargarConfiguracion(supabase: SupabaseClient): Promise<void> {
+  const [config, horarios] = await Promise.all([
+    obtenerConfigAcademia(supabase).catch(() => null),
+    obtenerHorariosClasePrueba(supabase).catch(() => null),
+  ]);
+  if (config) CONFIG = config.config;
+  if (horarios?.conHorario) HORARIOS = new Map(horarios.horarios.map((h) => [h.dia, h]));
+}
+
 function horaClase(caso: CasoResumen): string | null {
-  if (esStar(caso)) return STAR_CLASS_START;
+  if (esStar(caso)) return CONFIG.starHoraInicio;
   const dia = caso.dia_clase_prueba as DiaClasePrueba | null;
-  return dia ? HORA_CLASE_PRUEBA[dia] : null;
+  return dia ? (HORARIOS.get(dia)?.horaInicio ?? HORA_CLASE_PRUEBA[dia]) : null;
+}
+
+function horaFinClase(caso: CasoResumen): string | null {
+  if (esStar(caso)) return CONFIG.starHoraFin;
+  const dia = caso.dia_clase_prueba as DiaClasePrueba | null;
+  return dia ? (HORARIOS.get(dia)?.horaFin ?? null) : null;
+}
+
+function tallasDisponibles(actual: string): string[] {
+  return actual && !CONFIG.tallas.includes(actual) ? [...CONFIG.tallas, actual] : CONFIG.tallas;
+}
+
+const CANAL_TEXTO: Record<CanalEnvio, string> = { WHATSAPP: 'WhatsApp', EMAIL: 'Correo' };
+
+/** Muestra el correo tal como llegará y resuelve true si se confirma el envío. */
+function confirmarCorreo(para: string, correo: CorreoRenderizado): Promise<boolean> {
+  const dialogo = $<HTMLDialogElement>('#cp-dialogo-correo')!;
+  $<HTMLElement>('#cp-correo-para')!.textContent = para;
+  $<HTMLElement>('#cp-correo-asunto')!.textContent = correo.asunto;
+  $<HTMLIFrameElement>('#cp-correo-previa')!.srcdoc = correo.html;
+  const enviar = $<HTMLButtonElement>('#cp-correo-enviar')!;
+  const cancelar = $<HTMLButtonElement>('#cp-correo-cancelar')!;
+  return new Promise((resolver) => {
+    const cerrar = (valor: boolean) => {
+      enviar.onclick = null;
+      cancelar.onclick = null;
+      dialogo.onclose = null;
+      if (dialogo.open) dialogo.close();
+      resolver(valor);
+    };
+    enviar.onclick = () => cerrar(true);
+    cancelar.onclick = () => cerrar(false);
+    dialogo.onclose = () => cerrar(false);
+    dialogo.showModal();
+  });
 }
 
 function $<T extends Element>(selector: string): T | null {
@@ -92,7 +147,10 @@ function renderEnviados(contenedor: HTMLElement, caso: CasoResumen, ctx: Context
   contenedor.innerHTML = envios
     .map((e) => {
       const p = ctx.plantillas.find((x) => x.id === e.plantilla_id);
-      return `<span class="cp-enviado">✓ ${escaparHtml(p?.nombre ?? 'Plantilla')} · ${fechaCorta(e.fecha)}</span>`;
+      const canal = e.tipo === 'EMAIL' ? 'EMAIL' : 'WHATSAPP';
+      return `<span class="cp-enviado${canal === 'EMAIL' ? ' cp-enviado--correo' : ''}">✓ ${escaparHtml(p?.nombre ?? 'Plantilla')} · ${
+        CANAL_TEXTO[canal]
+      } · ${fechaCorta(e.fecha)}</span>`;
     })
     .join('');
 }
@@ -111,7 +169,7 @@ function bloqueMensajes(item: ItemPrimeraClase, supabase: SupabaseClient, ctx: C
         <label class="admin-label" for="${idTalla}">Talla de polera</label>
         <select id="${idTalla}" class="admin-select cp-select-talla">
           <option value="">Sin registrar</option>
-          ${TALLAS_POLERA.map((t) => `<option value="${t}" ${t === tallaActual ? 'selected' : ''}>${t}</option>`).join('')}
+          ${tallasDisponibles(tallaActual).map((t) => `<option value="${t}" ${t === tallaActual ? 'selected' : ''}>${t}</option>`).join('')}
         </select>
       </div>
       <div class="cp-mensajes__plantilla">
@@ -120,7 +178,10 @@ function bloqueMensajes(item: ItemPrimeraClase, supabase: SupabaseClient, ctx: C
           ${ctx.plantillas.map((p) => `<option value="${p.id}">${escaparHtml(p.nombre)}</option>`).join('')}
         </select>
       </div>
-      <button type="button" class="admin-btn admin-btn--whatsapp cp-btn-enviar">Enviar por WhatsApp</button>
+      <div class="cp-mensajes__botones">
+        <button type="button" class="admin-btn admin-btn--whatsapp cp-btn-enviar">Enviar por WhatsApp</button>
+        <button type="button" class="admin-btn admin-btn--secundario cp-btn-correo">Enviar por correo</button>
+      </div>
     </div>
     <p class="cp-mensajes__aviso" hidden></p>
     <div class="cp-enviados"></div>`;
@@ -128,6 +189,8 @@ function bloqueMensajes(item: ItemPrimeraClase, supabase: SupabaseClient, ctx: C
   const selectTalla = bloque.querySelector<HTMLSelectElement>(`#${CSS.escape(idTalla)}`)!;
   const selectPlantilla = bloque.querySelector<HTMLSelectElement>(`#${CSS.escape(idPlantilla)}`)!;
   const boton = bloque.querySelector<HTMLButtonElement>('.cp-btn-enviar')!;
+  const botonCorreo = bloque.querySelector<HTMLButtonElement>('.cp-btn-correo')!;
+  const email = caso.atleta.apoderado.email?.trim() ?? '';
   const aviso = bloque.querySelector<HTMLElement>('.cp-mensajes__aviso')!;
   const enviados = bloque.querySelector<HTMLElement>('.cp-enviados')!;
   renderEnviados(enviados, caso, ctx);
@@ -135,6 +198,19 @@ function bloqueMensajes(item: ItemPrimeraClase, supabase: SupabaseClient, ctx: C
   // Sugiere el primer mensaje que aún no se envía.
   const siguiente = ctx.plantillas.find((p) => !ctx.envios.some((e) => e.caso_id === caso.id && e.plantilla_id === p.id));
   if (siguiente) selectPlantilla.value = siguiente.id;
+
+  // Cada botón se habilita según el canal de la plantilla elegida.
+  const actualizarBotones = () => {
+    const p = ctx.plantillas.find((x) => x.id === selectPlantilla.value);
+    boton.disabled = !p || !sirveParaWhatsApp(p);
+    botonCorreo.disabled = !p || !sirveParaCorreo(p) || !email;
+    botonCorreo.title = email ? '' : 'Este apoderado no tiene correo registrado.';
+  };
+  actualizarBotones();
+  selectPlantilla.addEventListener('change', () => {
+    aviso.hidden = true;
+    actualizarBotones();
+  });
 
   selectTalla.addEventListener('change', async () => {
     aviso.hidden = true;
@@ -154,7 +230,7 @@ function bloqueMensajes(item: ItemPrimeraClase, supabase: SupabaseClient, ctx: C
     nombre_apoderado: primerNombre(caso.atleta.apoderado.nombre),
     nombre_atleta: primerNombre(caso.atleta.nombre),
     remitente: ctx.firma.nombre,
-    cargo: ctx.firma.cargo,
+    cargo: cargoEnMensaje(ctx.firma.cargo),
     fecha_clase: fechaClaseTexto(item.fecha),
     hora_clase: horaClase(caso),
     talla: ctx.tallas.get(caso.atleta.id) ?? null,
@@ -162,21 +238,71 @@ function bloqueMensajes(item: ItemPrimeraClase, supabase: SupabaseClient, ctx: C
     link_pago: linkPago,
   });
 
-  const registrar = (plantilla: PlantillaClasePrueba) =>
-    registrarEnvio(supabase, caso.id, plantilla)
+  const registrar = (plantilla: PlantillaClasePrueba, canal: CanalEnvio = 'WHATSAPP') =>
+    registrarEnvio(supabase, caso.id, plantilla, canal)
       .then(() => {
-        ctx.envios.push({ caso_id: caso.id, plantilla_id: plantilla.id, fecha: new Date().toISOString() });
+        ctx.envios.push({ caso_id: caso.id, plantilla_id: plantilla.id, fecha: new Date().toISOString(), tipo: canal });
         renderEnviados(enviados, caso, ctx);
         const proxima = ctx.plantillas.find((p) => !ctx.envios.some((e) => e.caso_id === caso.id && e.plantilla_id === p.id));
         if (proxima) selectPlantilla.value = proxima.id;
+        actualizarBotones();
       })
       .catch((err) => {
-        aviso.textContent = mensajeErrorSupabase(err, 'El mensaje se abrió en WhatsApp, pero no pudimos registrar el envío.');
+        const texto =
+          canal === 'EMAIL'
+            ? 'El correo se envió, pero no pudimos registrar el envío.'
+            : 'El mensaje se abrió en WhatsApp, pero no pudimos registrar el envío.';
+        aviso.textContent = mensajeErrorSupabase(err, texto);
         aviso.hidden = false;
       });
 
+  const correoDe = (plantilla: PlantillaClasePrueba, linkPago: string | null) =>
+    renderizarCorreo({
+      asunto: plantilla.asunto?.trim() || plantilla.nombre,
+      cuerpo: plantilla.cuerpo_email?.trim() || plantilla.cuerpo,
+      datos: datosPlantilla(linkPago),
+      clase: { etiqueta: esStar(caso) ? 'Tu primera clase' : 'Tu clase de prueba', horaFin: horaFinClase(caso) },
+    });
+
+  botonCorreo.addEventListener('click', async () => {
+    aviso.hidden = true;
+    aviso.classList.remove('cp-mensajes__aviso--ok');
+    const plantilla = ctx.plantillas.find((p) => p.id === selectPlantilla.value);
+    if (!plantilla || !email) return;
+    const textos = `${plantilla.asunto ?? ''}\n${plantilla.cuerpo_email ?? plantilla.cuerpo}`;
+    const necesitaLink = variablesUsadas(textos).includes('link_pago');
+
+    // Se revisan los datos con un link provisorio antes de crear cargos.
+    const previa = correoDe(plantilla, necesitaLink ? 'https://firehousecheer.cl' : null);
+    if (previa.faltantes.length > 0) {
+      aviso.textContent = mensajeFaltantes(previa.faltantes);
+      aviso.hidden = false;
+      return;
+    }
+
+    botonCorreo.disabled = true;
+    try {
+      const correo = necesitaLink
+        ? correoDe(plantilla, (await generarLinkPago(supabase, { atletaId: caso.atleta.id })).url)
+        : previa;
+      if (!(await confirmarCorreo(email, correo))) return;
+      await enviarCorreoAdmin(supabase, email, correo.asunto, correo.html, correo.texto);
+      aviso.textContent = `Correo enviado a ${email} ✓`;
+      aviso.classList.add('cp-mensajes__aviso--ok');
+      aviso.hidden = false;
+      void registrar(plantilla, 'EMAIL');
+    } catch (err) {
+      aviso.classList.remove('cp-mensajes__aviso--ok');
+      aviso.textContent = err instanceof Error ? err.message : 'No pudimos enviar el correo.';
+      aviso.hidden = false;
+    } finally {
+      actualizarBotones();
+    }
+  });
+
   boton.addEventListener('click', async () => {
     aviso.hidden = true;
+    aviso.classList.remove('cp-mensajes__aviso--ok');
     const plantilla = ctx.plantillas.find((p) => p.id === selectPlantilla.value);
     if (!plantilla) return;
     const necesitaLink = variablesUsadas(plantilla.cuerpo).includes('link_pago');
@@ -331,7 +457,8 @@ async function renderizarLista(supabase: SupabaseClient): Promise<void> {
     return;
   }
 
-  const todos = agruparPrimerasClases(casos);
+  await cargarConfiguracion(supabase);
+  const todos = agruparPrimerasClases(casos, new Date(), CONFIG.starPrimeraClase);
   const itemsTodos = todos.flatMap((g) => g.items);
   const ctx = await cargarContexto(supabase, itemsTodos.map((i) => i.caso));
 

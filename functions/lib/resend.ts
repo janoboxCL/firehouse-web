@@ -8,7 +8,7 @@ export interface DatosCorreoConfirmacion {
   nombresAtletas: string[];
   /** Si alguien de la familia pidió clase de prueba, el correo cambia de tono
    * y contenido — deja de ser un "recibimos tu registro" genérico. */
-  claseDePrueba?: { dia: string; fecha: string } | null;
+  claseDePrueba?: { dia: string; fecha: string; horario?: string | null } | null;
   claseDePruebaStar?: { fecha: string; inicio: string; fin: string } | null;
 }
 
@@ -93,7 +93,7 @@ function construirHtml(datos: DatosCorreoConfirmacion): string {
 
   if (datos.claseDePrueba) {
     const diaNombre = NOMBRE_DIA[datos.claseDePrueba.dia] ?? datos.claseDePrueba.dia.toLowerCase();
-    const horario = HORARIO_POR_DIA[datos.claseDePrueba.dia] ?? '';
+    const horario = datos.claseDePrueba.horario || HORARIO_POR_DIA[datos.claseDePrueba.dia] || '';
     const fechaLegible = formatearFechaEmail(datos.claseDePrueba.fecha);
     const cuerpo = `
     <p style="font-size:15px;line-height:1.65;color:rgba(245,239,232,.86);margin:0 0 16px;">
@@ -206,6 +206,7 @@ export async function enviarCorreoGenerico(
   asunto: string,
   html: string,
   bcc?: string[],
+  extra: { texto?: string; responderA?: string } = {},
 ): Promise<void> {
   const res = await fetch('https://api.resend.com/emails', {
     method: 'POST',
@@ -218,6 +219,8 @@ export async function enviarCorreoGenerico(
       to: destinatario,
       subject: asunto,
       html,
+      ...(extra.texto ? { text: extra.texto } : {}),
+      ...(extra.responderA ? { reply_to: extra.responderA } : {}),
       ...(bcc && bcc.length > 0 ? { bcc } : {}),
     }),
   });

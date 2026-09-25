@@ -16,16 +16,24 @@ export interface CargoSaldo {
   estado: EstadoCargo;
 }
 
-/** Proporción de la mensualidad según la semana del mes de la primera clase (acordado para Star). */
-export const PRORRATEO_SEMANA = [1, 0.75, 0.5, 0.25] as const;
+/**
+ * Porcentaje de la mensualidad según la semana del mes de la primera clase.
+ * El vigente se edita en /admin/configuracion; este es el respaldo.
+ */
+export const PRORRATEO_SEMANA = [100, 75, 50, 25] as const;
+export const DIA_VENCIMIENTO = 5;
 
 export function semanaDelMes(fechaISO: string): number {
   const dia = Number(fechaISO.slice(8, 10));
   return Math.min(4, Math.ceil(dia / 7));
 }
 
-export function mensualidadProrrateada(mensualidad: number, fechaPrimeraClase: string): number {
-  return Math.round(mensualidad * PRORRATEO_SEMANA[semanaDelMes(fechaPrimeraClase) - 1]);
+export function mensualidadProrrateada(
+  mensualidad: number,
+  fechaPrimeraClase: string,
+  prorrateo: readonly number[] = PRORRATEO_SEMANA,
+): number {
+  return Math.round((mensualidad * prorrateo[semanaDelMes(fechaPrimeraClase) - 1]) / 100);
 }
 
 export function periodoDe(fechaISO: string): string {
@@ -38,9 +46,9 @@ export function nombreMes(periodo: string): string {
   return `${MESES[Number(periodo.slice(5, 7)) - 1]} ${periodo.slice(0, 4)}`;
 }
 
-/** Vencimiento de la mensualidad: el día 5 del mes. */
-export function vencimientoMensualidad(periodo: string): string {
-  return `${periodo.slice(0, 7)}-05`;
+/** Vencimiento de la mensualidad: el día configurado del mes (por defecto, el 5). */
+export function vencimientoMensualidad(periodo: string, dia: number = DIA_VENCIMIENTO): string {
+  return `${periodo.slice(0, 7)}-${String(dia).padStart(2, '0')}`;
 }
 
 export function descripcionInscripcionStar(temporada: number): string {

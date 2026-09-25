@@ -11,7 +11,8 @@ import { LIMITES } from '../../lib/crm/constants.ts';
     <code>{'{cargo}'}</code> (según quién envía). En las plantillas de clase de prueba además:
     <code>{'{fecha_clase}'}</code>, <code>{'{hora_clase}'}</code>, <code>{'{talla}'}</code>,
     <code>{'{valor_inscripcion}'}</code> y <code>{'{link_pago}'}</code>. Si falta un dato, el panel avisa
-    y no deja enviar el mensaje incompleto.
+    y no deja enviar el mensaje incompleto. Cada plantilla puede tener una versión para WhatsApp y
+    otra, con diseño Firehouse Star, para correo.
   </p>
 
   <div id="pl-error" class="admin-error" hidden></div>
@@ -44,8 +45,23 @@ import { LIMITES } from '../../lib/crm/constants.ts';
         <input id="pl-asunto" class="admin-input" type="text" maxlength="200" />
       </div>
       <div class="admin-campo">
-        <label class="admin-label" for="pl-cuerpo">Mensaje</label>
-        <textarea id="pl-cuerpo" class="admin-textarea" maxlength={LIMITES.NOTA_INTERACCION_MAX} required></textarea>
+        <label class="admin-label" for="pl-cuerpo" id="pl-cuerpo-label">Mensaje de WhatsApp</label>
+        <textarea id="pl-cuerpo" class="admin-textarea pl-textarea" maxlength={LIMITES.NOTA_INTERACCION_MAX} required></textarea>
+      </div>
+      <div class="admin-campo" id="pl-email-wrap" hidden>
+        <label class="admin-label" for="pl-cuerpo-email">Versión correo</label>
+        <textarea id="pl-cuerpo-email" class="admin-textarea pl-textarea pl-textarea--alta" maxlength="5000"></textarea>
+        <details class="pl-ayuda">
+          <summary>Cómo dar formato al correo</summary>
+          <ul>
+            <li>Deja una <strong>línea en blanco</strong> entre párrafos.</li>
+            <li>Si el primer párrafo es una sola línea corta (ej.: <code>Hola, {'{nombre_apoderado}'}:</code>), se muestra como título.</li>
+            <li>Empieza una línea con <code>- </code> para hacer una lista.</li>
+            <li><code>[[clase]]</code> agrega una tarjeta con la fecha, el horario y la dirección de la clase (solo en plantillas de clase de prueba).</li>
+            <li><code>[[boton: Texto del botón | https://…]]</code> agrega un botón amarillo. El link puede ser <code>{'{link_pago}'}</code>.</li>
+            <li>Si dejas este campo vacío, el correo usa el mensaje de WhatsApp como texto simple.</li>
+          </ul>
+        </details>
       </div>
       <label class="pl-activo-label">
         <input type="checkbox" id="pl-activo" checked /> Activa (aparece para elegir en las fichas)
@@ -55,6 +71,26 @@ import { LIMITES } from '../../lib/crm/constants.ts';
         <button type="button" id="pl-btn-cancelar" class="admin-btn admin-btn--secundario" hidden>Cancelar edición</button>
       </div>
     </form>
+  </section>
+
+  <section class="admin-card pl-previa-card">
+    <h2 class="ficha-bloque__titulo">Vista previa</h2>
+    <p class="admin-intro pl-previa-intro">Con datos de ejemplo y tu firma. Se actualiza mientras escribes.</p>
+    <p id="pl-previa-faltan" class="pl-previa-faltan" hidden></p>
+    <div class="pl-previa">
+      <div class="pl-previa__col" id="pl-previa-wa-wrap">
+        <p class="pl-previa__titulo">WhatsApp</p>
+        <div class="pl-burbuja" id="pl-previa-wa"></div>
+      </div>
+      <div class="pl-previa__col" id="pl-previa-correo-wrap" hidden>
+        <p class="pl-previa__titulo">Correo · <span id="pl-previa-asunto"></span></p>
+        <iframe id="pl-previa-correo" class="pl-previa__correo" title="Vista previa del correo" sandbox=""></iframe>
+        <div class="pl-previa__acciones">
+          <button type="button" id="pl-btn-prueba" class="admin-btn admin-btn--secundario">Enviarme un correo de prueba</button>
+          <span id="pl-prueba-estado" class="pl-prueba-estado" hidden></span>
+        </div>
+      </div>
+    </div>
   </section>
 
   <section class="admin-card">
@@ -88,4 +124,27 @@ import { LIMITES } from '../../lib/crm/constants.ts';
 .pl-item__accion--editar{ color: var(--ember); }
 .pl-item__accion--eliminar{ color: #A91111; }
 .pl-item--inactiva{ opacity: .55; }
+
+.pl-textarea{ min-height: 170px; }
+.pl-textarea--alta{ min-height: 260px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 13px; }
+.pl-ayuda{ margin-top: 8px; font-size: 13px; color: #6B6259; }
+.pl-ayuda summary{ cursor: pointer; font-weight: 600; color: var(--ember); }
+.pl-ayuda ul{ margin: 8px 0 0; padding-left: 20px; }
+.pl-ayuda li{ margin-bottom: 4px; }
+
+.pl-previa-card{ margin-bottom: 20px; }
+.pl-previa-intro{ margin-top: -4px; }
+.pl-previa-faltan{ font-size: 13px; color: #8A5A00; background: #FFF4D6; border-radius: 8px; padding: 8px 12px; }
+.pl-previa{ display: grid; gap: 20px; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); align-items: start; }
+.pl-previa__titulo{ font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #6B6259; margin: 0 0 8px; overflow-wrap: anywhere; }
+.pl-previa__titulo span{ text-transform: none; letter-spacing: 0; color: var(--ember); }
+.pl-burbuja{
+  background: #DCF8C6; color: #111; border-radius: 12px 12px 12px 2px; padding: 10px 12px;
+  font-size: 14px; line-height: 1.45; white-space: pre-wrap; overflow-wrap: anywhere; max-width: 420px;
+}
+.pl-burbuja:empty::before{ content: 'Escribe el mensaje para ver la vista previa.'; color: #6B6259; }
+.pl-previa__correo{ display: block; width: 100%; height: 620px; border: 1px solid #E4DFD6; border-radius: 12px; background: #171412; }
+.pl-previa__acciones{ display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 10px; }
+.pl-prueba-estado{ font-size: 13px; color: #1E7A34; font-weight: 600; }
+.pl-prueba-estado--error{ color: var(--fire-red, #C51515); }
 </style>

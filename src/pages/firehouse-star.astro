@@ -64,7 +64,7 @@ const navEnlacesStar = [
         </li>
         <li>
           <svg class="star-datos__icono" viewBox="0 0 48 48" aria-hidden="true"><rect x="6" y="10" width="36" height="32" rx="4" fill="none" stroke="currentColor" stroke-width="3.2"/><path d="M6 19h36" stroke="currentColor" stroke-width="3.2"/><path d="M15 6v9M33 6v9" stroke="currentColor" stroke-width="3.2" stroke-linecap="round"/></svg>
-          <span>Cuándo</span><b>Sábados<br />18:30–20:00</b>
+          <span>Cuándo</span><b>Sábados<br /><span data-cfg="star-horario">18:30–20:00</span></b>
         </li>
         <li>
           <svg class="star-datos__icono" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="18" fill="none" stroke="currentColor" stroke-width="3.2"/><path d="M24 14v10l8 5" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -72,7 +72,7 @@ const navEnlacesStar = [
         </li>
         <li>
           <svg class="star-datos__icono" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="18" fill="none" stroke="currentColor" stroke-width="3.2"/><text x="24" y="31" text-anchor="middle" font-weight="800" font-size="20" fill="currentColor">$</text></svg>
-          <span>Mensualidad</span><b>$30.000</b>
+          <span>Mensualidad</span><b data-cfg="star-mensualidad">$30.000</b>
         </li>
         </ul>
 
@@ -339,12 +339,12 @@ const navEnlacesStar = [
 
       <div class="star-precio-card reveal">
         <span class="star-precio-card__etq">Para comenzar</span>
-        <span class="star-precio-card__num">$40.000</span>
-        <p class="star-precio-card__desglose">$10.000 inscripción + $30.000 primera mensualidad</p>
+        <span class="star-precio-card__num" data-cfg="star-primer-mes">$40.000</span>
+        <p class="star-precio-card__desglose"><span data-cfg="star-matricula">$10.000</span> inscripción + <span data-cfg="star-mensualidad">$30.000</span> primera mensualidad</p>
 
         <div class="star-precio-card__despues">
           <span>Después</span>
-          <b>$30.000<small>/mes</small></b>
+          <b><span data-cfg="star-mensualidad">$30.000</span><small>/mes</small></b>
           <span class="star-precio-card__detalle">1 clase semanal · 90 minutos</span>
         </div>
 
@@ -371,10 +371,10 @@ const navEnlacesStar = [
           <table class="star-tabla">
             <thead><tr><th>Ingresas en</th><th>Pagas ese mes</th></tr></thead>
             <tbody>
-              <tr><td>Semana 1</td><td>$30.000 <span class="star-tabla__nota">(mes completo)</span></td></tr>
-              <tr><td>Semana 2</td><td>$22.500</td></tr>
-              <tr><td>Semana 3</td><td>$15.000</td></tr>
-              <tr><td>Semana 4</td><td>$7.500</td></tr>
+              <tr><td>Semana 1</td><td><span data-cfg="star-prorrateo-1">$30.000</span> <span class="star-tabla__nota">(mes completo)</span></td></tr>
+              <tr><td>Semana 2</td><td data-cfg="star-prorrateo-2">$22.500</td></tr>
+              <tr><td>Semana 3</td><td data-cfg="star-prorrateo-3">$15.000</td></tr>
+              <tr><td>Semana 4</td><td data-cfg="star-prorrateo-4">$7.500</td></tr>
             </tbody>
           </table>
         </details>
@@ -451,18 +451,23 @@ const navEnlacesStar = [
           <span class="star-choice__meta">Clase de prueba gratuita · sin pago</span>
         </a>
       </div>
-      <p class="star-nota">Sábados 18:30–20:00 · Santa Corina 197, La Cisterna</p>
+      <p class="star-nota">Sábados <span data-cfg="star-horario">18:30–20:00</span> · Santa Corina 197, La Cisterna</p>
       <p class="star-nota"><a class="star-cta-texto" href={whatsapp('ayudaRegistroStar')} target="_blank" rel="noopener">¿Tienes una duda? WhatsApp</a></p>
     </div>
   </section>
 
   <!-- ============ BARRA FIJA MÓVIL ============ -->
   <div class="star-barra-fija" id="star-barra-fija">
-    <div class="star-barra-fija__info"><b>STAR</b><span>$30.000/mes</span></div>
+    <div class="star-barra-fija__info"><b>STAR</b><span><span data-cfg="star-mensualidad">$30.000</span>/mes</span></div>
     <a class="star-btn star-btn--chica" href="/registro-star" id="wa-star-barra">QUIERO EMPEZAR ⭐</a>
   </div>
 
 </Base>
+
+<script>
+  import { aplicarConfigPublica } from '../scripts/config-publica.ts';
+  void aplicarConfigPublica();
+</script>
 
 <script>
   (() => {

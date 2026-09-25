@@ -13,7 +13,12 @@ interface Env {
   RESEND_API_KEY?: string;
   EMAIL_FROM?: string;
   EMAIL_BCC?: string;
+  /** A dónde llegan las respuestas de las familias. */
+  EMAIL_REPLY_TO?: string;
 }
+
+const RESPONDER_A_POR_DEFECTO = 'allstarfirehouse@gmail.com';
+const MAX_TEXTO = 10_000;
 
 const MAX_HTML = 20_000;
 const MAX_ASUNTO = 200;
@@ -70,16 +75,22 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     return jsonResponse(400, { error: 'VALIDATION_ERROR' });
   }
 
-  const { to, subject, html } = body ?? {};
+  const { to, subject, html, text } = body ?? {};
   if (typeof to !== 'string' || typeof subject !== 'string' || typeof html !== 'string' || !to || !subject || !html) {
     return jsonResponse(400, { error: 'VALIDATION_ERROR', message: 'Faltan campos (to, subject, html).' });
   }
-  if (subject.length > MAX_ASUNTO || html.length > MAX_HTML) {
+  if (text !== undefined && typeof text !== 'string') {
+    return jsonResponse(400, { error: 'VALIDATION_ERROR' });
+  }
+  if (subject.length > MAX_ASUNTO || html.length > MAX_HTML || (text?.length ?? 0) > MAX_TEXTO) {
     return jsonResponse(400, { error: 'VALIDATION_ERROR', message: 'El contenido es demasiado largo.' });
   }
 
   try {
-    await enviarCorreoGenerico(env.RESEND_API_KEY, env.EMAIL_FROM, to, subject, html, resolverBcc(env.EMAIL_BCC));
+    await enviarCorreoGenerico(env.RESEND_API_KEY, env.EMAIL_FROM, to, subject, html, resolverBcc(env.EMAIL_BCC), {
+      texto: text || undefined,
+      responderA: env.EMAIL_REPLY_TO?.trim() || RESPONDER_A_POR_DEFECTO,
+    });
   } catch (err) {
     console.error('admin_enviar_correo_error', (err as Error).message?.slice(0, 200));
     return jsonResponse(500, { error: 'INTERNAL_ERROR', message: 'No pudimos enviar el correo.' });

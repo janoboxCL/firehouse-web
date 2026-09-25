@@ -364,7 +364,11 @@ const ESTADOS_CERRADOS_NO_ASISTE = ['NO_INTERESADO', 'NO_CONTINUA'];
  * (general y Star) y las inscripciones Star cuya primera clase aún no pasa o fue
  * hace menos de una semana.
  */
-export function agruparPrimerasClases(casos: CasoResumen[], ahora: Date = new Date()): GrupoPrimeraClase[] {
+export function agruparPrimerasClases(
+  casos: CasoResumen[],
+  ahora: Date = new Date(),
+  primeraClaseStar?: string,
+): GrupoPrimeraClase[] {
   const hace7 = new Date(ahora.getTime() - 7 * 86_400_000).toISOString().slice(0, 10);
   const items: ItemPrimeraClase[] = [];
   for (const caso of casos) {
@@ -372,7 +376,7 @@ export function agruparPrimerasClases(casos: CasoResumen[], ahora: Date = new Da
     if (esPrueba && caso.fecha_clase_prueba) {
       items.push({ caso, tipo: 'PRUEBA', fecha: caso.fecha_clase_prueba });
     } else if (caso.journey === CRM_JOURNEYS.FIREHOUSE_STAR && !ESTADOS_CERRADOS_NO_ASISTE.includes(caso.estado)) {
-      const fecha = getNextStarClassDate(new Date(caso.created_at));
+      const fecha = getNextStarClassDate(new Date(caso.created_at), primeraClaseStar);
       if (fecha >= hace7) items.push({ caso, tipo: 'INSCRIPCION', fecha });
     }
   }
@@ -439,6 +443,8 @@ export interface PlantillaMensaje {
   canal: CanalPlantilla;
   asunto: string | null;
   cuerpo: string;
+  /** Versión correo con formato simple (migración 0012). */
+  cuerpo_email: string | null;
   activo: boolean;
   categoria: CategoriaPlantilla;
   orden: number;
@@ -450,7 +456,7 @@ export type CategoriaPlantilla = 'GENERAL' | 'CLASE_PRUEBA';
 export async function obtenerPlantillas(supabase: SupabaseClient, soloActivas = false): Promise<PlantillaMensaje[]> {
   let query = supabase
     .from('plantillas_mensaje')
-    .select('id, nombre, canal, asunto, cuerpo, activo, categoria, orden, created_at')
+    .select('id, nombre, canal, asunto, cuerpo, cuerpo_email, activo, categoria, orden, created_at')
     .order('categoria')
     .order('orden')
     .order('created_at', { ascending: false });
@@ -465,6 +471,7 @@ export interface DatosPlantilla {
   canal: CanalPlantilla;
   asunto: string | null;
   cuerpo: string;
+  cuerpo_email: string | null;
   activo: boolean;
   categoria: CategoriaPlantilla;
 }
@@ -498,6 +505,7 @@ export async function enviarCorreoAdmin(
   to: string,
   subject: string,
   html: string,
+  text?: string,
 ): Promise<void> {
   const {
     data: { session },
@@ -507,7 +515,7 @@ export async function enviarCorreoAdmin(
   const res = await fetch('/api/admin/enviar-correo', {
     method: 'POST',
     headers: { 'content-type': 'application/json', authorization: `Bearer ${session.access_token}` },
-    body: JSON.stringify({ to, subject, html }),
+    body: JSON.stringify({ to, subject, html, ...(text ? { text } : {}) }),
   });
 
   if (!res.ok) {

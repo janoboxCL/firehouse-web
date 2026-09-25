@@ -7,6 +7,7 @@
 // a la tabla, mismo criterio que el resto del CRM).
 
 import { createClient } from '@supabase/supabase-js';
+import { horarioDesdeFila, textoHorario } from '../../../src/lib/crm/config-academia.ts';
 
 interface Env {
   SUPABASE_URL: string;
@@ -35,12 +36,18 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
     const supabase = createClient(env.SUPABASE_URL, env.SUPABASE_SERVICE_ROLE_KEY, {
       auth: { persistSession: false },
     });
-    const { data, error } = await supabase.from('configuracion_clase_prueba').select('dia, habilitado');
+    const { data, error } = await supabase.from('configuracion_clase_prueba').select('*');
     if (error || !data) return jsonResponse(200, RESPALDO);
 
     const viernes = data.find((d) => d.dia === 'VIERNES')?.habilitado === true;
     const sabado = data.find((d) => d.dia === 'SABADO')?.habilitado === true;
-    return jsonResponse(200, { viernes, sabado });
+    // Texto del horario de cada día (disciplina y horas), editable en Configuración.
+    const horarios: Record<string, string> = {};
+    for (const fila of data) {
+      const texto = textoHorario(horarioDesdeFila(fila as Record<string, unknown>));
+      if (texto) horarios[fila.dia as string] = texto;
+    }
+    return jsonResponse(200, { viernes, sabado, horarios });
   } catch (err) {
     console.error('dias_clase_prueba_error', (err as Error).message?.slice(0, 200));
     return jsonResponse(200, RESPALDO);

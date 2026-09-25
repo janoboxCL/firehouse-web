@@ -1,3 +1,4 @@
+import { aplicarConfigPublica, obtenerConfigPublica } from './config-publica.ts';
 // Formulario corto de Firehouse Star. A diferencia de /registro (3 pasos,
 // para triage entre varios journeys), acá el journey ya se sabe de
 // antemano — este script valida, arma el arreglo de niñas/niños, llama a
@@ -7,7 +8,9 @@
 // solo se piden nombre, apellidos y fecha de nacimiento).
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const MONTO_KIT = 10000;
+// Valor de respaldo; se reemplaza por el configurado en el CRM al cargar la página.
+// El monto que se cobra lo calcula siempre el servidor.
+let MONTO_KIT = 10000;
 const MAX_ATLETAS = 5;
 
 let contadorAtletas = 0;
@@ -127,6 +130,13 @@ function leerAtletas(): { nombre: string; apellidos: string; fechaNacimiento: st
 }
 
 export function iniciarFormularioStar(): void {
+  void aplicarConfigPublica();
+  void obtenerConfigPublica().then((c) => {
+    if (c?.star?.matricula) {
+      MONTO_KIT = c.star.matricula;
+      actualizarTotal();
+    }
+  });
   const form = $<HTMLFormElement>('#rstar-form');
   const btn = $<HTMLButtonElement>('#rstar-enviar');
   const error = $<HTMLParagraphElement>('#rstar-error');

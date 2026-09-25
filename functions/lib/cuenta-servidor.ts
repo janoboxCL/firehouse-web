@@ -12,6 +12,7 @@ import {
   type CargoSaldo,
 } from '../../src/lib/crm/cuenta.ts';
 import { getNextStarClassDate } from '../../src/lib/crm/star-class.ts';
+import { leerConfigAcademia } from './config-servidor.ts';
 
 export function primerNombre(n: string | null | undefined): string {
   return (n ?? '').trim().split(/\s+/)[0] ?? '';
@@ -59,10 +60,11 @@ export async function asegurarCargosStar(
     .order('created_at', { ascending: false });
   const star = (casos ?? []).find((c) => c.programa === 'STAR' || c.journey === 'CLASE_PRUEBA_STAR' || c.journey === 'FIREHOUSE_STAR');
   if (!star) throw new Error('sin_caso_star');
+  const config = await leerConfigAcademia(supabase);
   const fechaPrimeraClase =
     star.journey === 'CLASE_PRUEBA_STAR' && star.fecha_clase_prueba
       ? (star.fecha_clase_prueba as string)
-      : getNextStarClassDate(new Date(star.created_at as string));
+      : getNextStarClassDate(new Date(star.created_at as string), config.starPrimeraClase);
 
   const temporada = Number(fechaPrimeraClase.slice(0, 4));
   const { data: precio } = await supabase
@@ -100,8 +102,8 @@ export async function asegurarCargosStar(
   }
 
   const periodo = periodoDe(fechaPrimeraClase);
-  const monto = mensualidadProrrateada(precio.mensualidad as number, fechaPrimeraClase);
-  const vencDia5 = vencimientoMensualidad(periodo);
+  const monto = mensualidadProrrateada(precio.mensualidad as number, fechaPrimeraClase, config.prorrateo);
+  const vencDia5 = vencimientoMensualidad(periodo, config.diaVencimiento);
   const { error: errMes } = await supabase.from('cargos').insert({
     apoderado_id: atleta.apoderado_id,
     atleta_id: atletaId,

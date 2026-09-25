@@ -14,3 +14,8 @@ test('después del inicio usa la siguiente fecha del calendario semanal', () => 
   assert.equal(getNextStarClassDate(new Date('2026-10-04T12:00:00-03:00')), '2026-10-10');
   assert.equal(getNextStarClassDate(new Date('2026-10-10T12:00:00-03:00')), '2026-10-10');
 });
+
+test('usa la primera clase configurada', () => {
+  assert.equal(getNextStarClassDate(new Date('2026-10-20T12:00:00-03:00'), '2026-10-24'), '2026-10-24');
+  assert.equal(getNextStarClassDate(new Date('2026-10-25T12:00:00-03:00'), '2026-10-24'), '2026-10-31');
+});

@@ -11,7 +11,9 @@ import { validarRegistroPublico } from '../../src/lib/crm/registro.ts';
 import type { DiasHabilitados } from '../../src/lib/crm/clase-prueba.ts';
 import { proximaFechaParaDia, type DiaClasePrueba } from '../../src/lib/crm/clase-prueba.ts';
 import { enviarCorreoConfirmacion, resolverBcc } from '../lib/resend.ts';
-import { getNextStarClassDate, STAR_CLASS_START, STAR_CLASS_END } from '../../src/lib/crm/star-class.ts';
+import { getNextStarClassDate } from '../../src/lib/crm/star-class.ts';
+import { leerConfigAcademia, leerHorariosClasePrueba } from '../lib/config-servidor.ts';
+import { textoHorario } from '../../src/lib/crm/config-academia.ts';
 import { CRM_JOURNEYS } from '../../src/lib/crm/constants.ts';
 
 interface Env {
@@ -159,10 +161,13 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     try {
       const atletaConClase = validacion.value.atletas.find((a) => a.diaClasePrueba);
       const tieneClaseStar = validacion.value.atletas.some((a) => a.journey === CRM_JOURNEYS.CLASE_PRUEBA_STAR);
+      const [config, horarios] = await Promise.all([leerConfigAcademia(supabase), leerHorariosClasePrueba(supabase)]);
+      const horarioDia = horarios.find((h) => h.dia === atletaConClase?.diaClasePrueba);
       const claseDePrueba = atletaConClase?.diaClasePrueba
         ? {
             dia: atletaConClase.diaClasePrueba,
             fecha: proximaFechaParaDia(atletaConClase.diaClasePrueba as DiaClasePrueba),
+            horario: horarioDia ? `${textoHorario(horarioDia)} hrs` : null,
           }
         : null;
 
@@ -175,7 +180,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
           nombresAtletas,
           claseDePrueba,
           claseDePruebaStar: tieneClaseStar
-            ? { fecha: getNextStarClassDate(), inicio: STAR_CLASS_START, fin: STAR_CLASS_END }
+            ? { fecha: getNextStarClassDate(new Date(), config.starPrimeraClase), inicio: config.starHoraInicio, fin: config.starHoraFin }
             : null,
         },
         resolverBcc(env.EMAIL_BCC),

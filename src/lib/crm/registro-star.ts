@@ -34,7 +34,8 @@ export type ResultadoValidacionStar =
   | { ok: true; datos: RegistroStarValidado }
   | { ok: false; error: string };
 
-export function validarRegistroStar(body: Record<string, unknown>): ResultadoValidacionStar {
+/** `montoKit`: valor de la inscripción Star vigente (Configuración); por defecto, el de respaldo. */
+export function validarRegistroStar(body: Record<string, unknown>, montoKit: number = MONTO_KIT_STAR): ResultadoValidacionStar {
   const apoderadoCrudo = (body.apoderado ?? {}) as Record<string, unknown>;
   const atletasCrudos = Array.isArray(body.atletas) ? body.atletas : [];
 
@@ -74,7 +75,7 @@ export function validarRegistroStar(body: Record<string, unknown>): ResultadoVal
     datos: {
       apoderado: { nombre: apNombre, apellidos: apApellidos, telefono: apTelefono, email: apEmail, comuna: apComuna },
       atletas,
-      montoTotal: MONTO_KIT_STAR * atletas.length,
+      montoTotal: montoKit * atletas.length,
     },
   };
 }

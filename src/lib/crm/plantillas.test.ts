@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { completarPlantilla, enlaceWhatsApp, fechaClaseTexto, mensajeFaltantes, primerNombre, variablesUsadas } from './plantillas.ts';
+import { cargoEnMensaje, completarPlantilla, enlaceWhatsApp, fechaClaseTexto, mensajeFaltantes, primerNombre, variablesUsadas } from './plantillas.ts';
 
 const BIENVENIDA = '¡Hola, {nombre_apoderado}! Soy {remitente}, {cargo} de Firehouse Star. Te esperamos {fecha_clase} a las {hora_clase} con {nombre_atleta}.';
 
@@ -29,4 +29,12 @@ test('formatos de apoyo', () => {
   assert.equal(fechaClaseTexto(null), null);
   assert.equal(primerNombre('  Carolina Andrea Pérez '), 'Carolina');
   assert.equal(enlaceWhatsApp('+56 9 8611 4663', 'Hola & chao'), 'https://wa.me/56986114663?text=Hola%20%26%20chao');
+});
+
+test('el cargo va en minúscula dentro de la frase, salvo Head Coach', () => {
+  assert.equal(cargoEnMensaje('Asistente'), 'asistente');
+  assert.equal(cargoEnMensaje('Coach'), 'coach');
+  assert.equal(cargoEnMensaje('Head Coach'), 'Head Coach');
+  assert.equal(cargoEnMensaje(null), null);
+  assert.equal(cargoEnMensaje(' '), null);
 });

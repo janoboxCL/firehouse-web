@@ -17,15 +17,25 @@ export interface Firma {
 export interface PlantillaClasePrueba {
   id: string;
   nombre: string;
+  canal: 'WHATSAPP' | 'EMAIL' | 'AMBOS';
+  asunto: string | null;
   cuerpo: string;
+  /** Versión correo (migración 0012). Si falta, el correo usa `cuerpo`. */
+  cuerpo_email: string | null;
   orden: number;
 }
+
+export type CanalEnvio = 'WHATSAPP' | 'EMAIL';
 
 export interface EnvioPlantilla {
   caso_id: string;
   plantilla_id: string;
   fecha: string;
+  tipo: CanalEnvio;
 }
+
+export const sirveParaWhatsApp = (p: { canal: string }) => p.canal === 'WHATSAPP' || p.canal === 'AMBOS';
+export const sirveParaCorreo = (p: { canal: string }) => p.canal === 'EMAIL' || p.canal === 'AMBOS';
 
 async function usuarioActual(supabase: SupabaseClient): Promise<string | null> {
   return (await supabase.auth.getSession()).data.session?.user.id ?? null;
@@ -63,10 +73,9 @@ export async function guardarNombreFirma(supabase: SupabaseClient, nombre: strin
 export async function obtenerPlantillasClasePrueba(supabase: SupabaseClient): Promise<PlantillaClasePrueba[]> {
   const { data, error } = await supabase
     .from('plantillas_mensaje')
-    .select('id, nombre, cuerpo, orden')
+    .select('id, nombre, canal, asunto, cuerpo, cuerpo_email, orden')
     .eq('categoria', 'CLASE_PRUEBA')
     .eq('activo', true)
-    .in('canal', ['WHATSAPP', 'AMBOS'])
     .order('orden');
   if (error) throw error;
   return (data ?? []) as PlantillaClasePrueba[];
@@ -76,7 +85,7 @@ export async function obtenerEnvios(supabase: SupabaseClient, casoIds: string[])
   if (casoIds.length === 0) return [];
   const { data, error } = await supabase
     .from('interacciones')
-    .select('caso_id, plantilla_id, fecha')
+    .select('caso_id, plantilla_id, fecha, tipo')
     .in('caso_id', casoIds)
     .not('plantilla_id', 'is', null);
   if (error) throw error;
@@ -87,11 +96,12 @@ export async function registrarEnvio(
   supabase: SupabaseClient,
   casoId: string,
   plantilla: { id: string; nombre: string },
+  canal: CanalEnvio = 'WHATSAPP',
 ): Promise<void> {
   const { error } = await supabase.from('interacciones').insert({
     caso_id: casoId,
-    tipo: 'WHATSAPP',
-    nota: `Plantilla enviada: ${plantilla.nombre}`,
+    tipo: canal,
+    nota: `Plantilla enviada por ${canal === 'EMAIL' ? 'correo' : 'WhatsApp'}: ${plantilla.nombre}`,
     responsable_id: await usuarioActual(supabase),
     plantilla_id: plantilla.id,
   });

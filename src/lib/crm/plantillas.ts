@@ -7,7 +7,7 @@ export const VARIABLES_PLANTILLA = {
   nombre_apoderado: 'Nombre de pila del apoderado',
   nombre_atleta: 'Nombre de la niña o niño',
   remitente: 'Tu nombre para mensajes (Configuración)',
-  cargo: 'Tu cargo: Head Coach o Asistente',
+  cargo: 'Tu cargo: Head Coach, coach o asistente',
   fecha_clase: 'Fecha de la clase de prueba, ej.: "el sábado 3 de octubre"',
   hora_clase: 'Hora de la clase de prueba',
   talla: 'Talla de polera registrada',
@@ -59,6 +59,16 @@ export function mensajeFaltantes(faltantes: VariablePlantilla[]): string {
   return `Para enviar esta plantilla falta: ${partes.join(', ')}.`;
 }
 
+/**
+ * Cargo tal como va dentro de una frase: "Head Coach" se mantiene (es un
+ * título), "Coach" y "Asistente" van en minúscula ("Alejandro, asistente de…").
+ */
+export function cargoEnMensaje(cargo: string | null | undefined): string | null {
+  const limpio = (cargo ?? '').trim();
+  if (!limpio) return null;
+  return limpio === 'Head Coach' ? limpio : limpio.toLowerCase();
+}
+
 export function primerNombre(nombre: string | null | undefined): string {
   return (nombre ?? '').trim().split(/\s+/)[0] ?? '';
 }
@@ -76,4 +86,4 @@ export function enlaceWhatsApp(telefono: string, texto: string): string {
   return `https://wa.me/${telefono.replace(/\D/g, '')}?text=${encodeURIComponent(texto)}`;
 }
 
-export const TALLAS_POLERA = ['4', '6', '8', '10', '12', '14', '16', 'XS', 'S', 'M', 'L', 'XL'] as const;
+// Las tallas de polera se editan en Configuración (config-academia.ts guarda el respaldo).

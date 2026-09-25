@@ -16,11 +16,12 @@ import {
   type PlantillaMensaje,
 } from '../lib/crm/admin-api.ts';
 import { CRM_JOURNEYS_LABEL, CRM_ESTADOS_LABEL, RELACION_APODERADO_LABEL, CANAL_PREFERIDO_LABEL } from '../lib/crm/constants.ts';
-import { formatearFecha, formatearFechaHora, claseBadgeEstado, mensajeWhatsappSugerido, mensajeErrorSupabase, escaparHtml } from '../lib/crm/format.ts';
+import { formatearFecha, formatearFechaHora, claseBadgeEstado, mensajeWhatsappSugerido, mensajeErrorSupabase } from '../lib/crm/format.ts';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { obtenerFirma, type Firma } from '../lib/crm/admin-mensajes-api.ts';
 import { iniciarCuentaFamilia } from './admin-cuenta.ts';
-import { completarPlantilla, enlaceWhatsApp, mensajeFaltantes, primerNombre } from '../lib/crm/plantillas.ts';
+import { cargoEnMensaje, completarPlantilla, enlaceWhatsApp, mensajeFaltantes, primerNombre } from '../lib/crm/plantillas.ts';
+import { renderizarCorreo } from '../lib/crm/correo-plantilla.ts';
 
 function $<T extends Element>(selector: string): T | null {
   return document.querySelector<T>(selector);
@@ -125,13 +126,17 @@ function poblarPlantillas(plantillas: PlantillaMensaje[]): void {
   });
 }
 
-function textoPlantilla(plantilla: PlantillaMensaje, nombreCompleto: string, atletas: string, firma: Firma): { texto: string; faltantes: string } {
-  const { texto, faltantes } = completarPlantilla(plantilla.cuerpo, {
+function datosFicha(nombreCompleto: string, atletas: string, firma: Firma) {
+  return {
     nombre_apoderado: primerNombre(nombreCompleto),
     nombre_atleta: atletas,
     remitente: firma.nombre,
-    cargo: firma.cargo,
-  });
+    cargo: cargoEnMensaje(firma.cargo),
+  };
+}
+
+function textoPlantilla(plantilla: PlantillaMensaje, nombreCompleto: string, atletas: string, firma: Firma): { texto: string; faltantes: string } {
+  const { texto, faltantes } = completarPlantilla(plantilla.cuerpo, datosFicha(nombreCompleto, atletas, firma));
   return { texto, faltantes: mensajeFaltantes(faltantes) };
 }
 
@@ -170,11 +175,15 @@ function conectarPlantillas(supabase: SupabaseClient, casos: CasoResumen[], plan
     btnEmail.disabled = true;
     estado.hidden = true;
     try {
-      const asunto = plantilla.asunto || plantilla.nombre;
-      const { texto: cuerpo, faltantes } = textoPlantilla(plantilla, nombreCompleto, atletas, firma);
-      if (faltantes) throw new Error(faltantes);
-      const html = `<div style="font-family:Arial,sans-serif;font-size:15px;line-height:1.6;color:#171412;white-space:pre-wrap;">${escaparHtml(cuerpo)}</div>`;
-      await enviarCorreoAdmin(supabase, ap.email, asunto, html);
+      // Mismo diseño que los correos de clase de prueba (sin tarjeta de clase).
+      const correo = renderizarCorreo({
+        asunto: plantilla.asunto || plantilla.nombre,
+        cuerpo: plantilla.cuerpo_email?.trim() || plantilla.cuerpo,
+        datos: datosFicha(nombreCompleto, atletas, firma),
+      });
+      if (correo.faltantes.length) throw new Error(mensajeFaltantes(correo.faltantes));
+      if (!window.confirm(`¿Enviar "${correo.asunto}" a ${ap.email}?`)) return;
+      await enviarCorreoAdmin(supabase, ap.email, correo.asunto, correo.html, correo.texto);
       estado.textContent = 'Correo enviado ✓';
       estado.hidden = false;
     } catch (err) {
