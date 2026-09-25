@@ -1,0 +1,201 @@
+---
+import AdminBase from '../../layouts/AdminBase.astro';
+---
+<AdminBase titulo="Pagos">
+  <a href="/admin" class="ficha-volver">← Volver al listado de casos</a>
+  <div class="pg-cabecera">
+    <h1 class="db-titulo">Pagos</h1>
+    <button type="button" id="pg-btn-cargo" class="admin-btn admin-btn--secundario">+ Agregar cargo</button>
+  </div>
+  <p class="admin-intro">
+    Lo que debe y lo que pagó cada familia, por programa. Desde aquí envías el link de pago,
+    registras pagos en efectivo o transferencia y agregas cargos, sin entrar a cada ficha.
+  </p>
+
+  <div id="pg-programa" class="fh-programa" role="tablist" aria-label="Programa">
+    <button type="button" class="fh-programa__tab fh-programa__tab--star" role="tab" data-programa="STAR" aria-selected="true">Firehouse Star</button>
+    <button type="button" class="fh-programa__tab fh-programa__tab--all_star" role="tab" data-programa="ALL_STAR" aria-selected="false">Firehouse All Star</button>
+  </div>
+
+  <div id="pg-error" class="admin-error" hidden></div>
+  <p id="pg-ok" class="ficha-guardado" hidden></p>
+
+  <section class="pg-totales" aria-label="Resumen">
+    <div class="pg-total"><p class="pg-total__etiqueta">Por cobrar</p><p class="pg-total__valor" id="pg-t-cobrar">—</p></div>
+    <div class="pg-total pg-total--vencido"><p class="pg-total__etiqueta">Vencido</p><p class="pg-total__valor" id="pg-t-vencido">—</p></div>
+    <div class="pg-total pg-total--ok"><p class="pg-total__etiqueta" id="pg-t-mes-etiqueta">Recaudado este mes</p><p class="pg-total__valor" id="pg-t-mes">—</p></div>
+    <div class="pg-total"><p class="pg-total__etiqueta">Familias con deuda</p><p class="pg-total__valor" id="pg-t-familias">—</p></div>
+  </section>
+
+  <section class="admin-card pg-lista-card">
+    <div class="pg-herramientas">
+      <input id="pg-buscar" class="admin-input pg-buscar" type="search" placeholder="Buscar familia o deportista" aria-label="Buscar familia o deportista" />
+      <div id="pg-filtro" class="pg-filtro" role="group" aria-label="Estado"></div>
+      <label class="pg-check"><input type="checkbox" id="pg-ver-prueba" /> Mostrar familias de prueba</label>
+    </div>
+    <p id="pg-aviso-programa" class="pg-aviso" hidden></p>
+    <p id="pg-cargando" class="admin-spinner">Cargando…</p>
+    <p id="pg-vacio" class="admin-vacio" hidden>No hay familias en esta vista.</p>
+    <div id="pg-familias"></div>
+  </section>
+
+  <!-- Registrar pago en efectivo o transferencia -->
+  <dialog id="pg-dialogo-pago" class="pg-dialogo" aria-labelledby="pg-pago-titulo">
+    <form id="pg-form-pago" method="dialog" novalidate>
+      <h2 id="pg-pago-titulo" class="ficha-bloque__titulo">Registrar pago</h2>
+      <p class="pg-dialogo__sub" id="pg-pago-familia"></p>
+      <div id="pg-pago-cargos" class="pg-pago-cargos"></div>
+      <div class="pg-dialogo__campos">
+        <div>
+          <label class="admin-label" for="pg-pago-medio">Medio de pago</label>
+          <select id="pg-pago-medio" class="admin-select">
+            <option value="TRANSFERENCIA">Transferencia</option>
+            <option value="EFECTIVO">Efectivo</option>
+          </select>
+        </div>
+        <div>
+          <label class="admin-label" for="pg-pago-referencia">Referencia (opcional)</label>
+          <input id="pg-pago-referencia" class="admin-input" maxlength="200" placeholder="Ej.: n.º de transferencia" />
+        </div>
+      </div>
+      <p class="pg-dialogo__nota">La familia recibe el comprobante por correo. Si tiene una mensualidad vencida, debe incluirse la más antigua.</p>
+      <p id="pg-pago-error" class="pg-dialogo__error" hidden></p>
+      <div class="ficha-acciones">
+        <button type="submit" id="pg-pago-registrar" class="admin-btn" disabled>Selecciona cargos</button>
+        <button type="button" class="admin-btn admin-btn--secundario" data-cerrar>Cancelar</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Agregar cargo -->
+  <dialog id="pg-dialogo-cargo" class="pg-dialogo" aria-labelledby="pg-cargo-titulo">
+    <form id="pg-form-cargo" method="dialog" novalidate>
+      <h2 id="pg-cargo-titulo" class="ficha-bloque__titulo">Agregar cargo</h2>
+      <div id="pg-cargo-busqueda">
+        <label class="admin-label" for="pg-cargo-buscar">Familia</label>
+        <input id="pg-cargo-buscar" class="admin-input" type="search" placeholder="Nombre, correo o teléfono del apoderado" autocomplete="off" />
+        <div id="pg-cargo-resultados" class="pg-resultados"></div>
+      </div>
+      <p class="pg-dialogo__sub" id="pg-cargo-familia" hidden></p>
+      <div class="pg-dialogo__campos">
+        <div>
+          <label class="admin-label" for="pg-cargo-programa">Programa</label>
+          <select id="pg-cargo-programa" class="admin-select">
+            <option value="STAR">Firehouse Star</option>
+            <option value="ALL_STAR">Firehouse All Star</option>
+          </select>
+        </div>
+        <div>
+          <label class="admin-label" for="pg-cargo-atleta">Deportista</label>
+          <select id="pg-cargo-atleta" class="admin-select"></select>
+        </div>
+        <div>
+          <label class="admin-label" for="pg-cargo-concepto">Tipo de cargo</label>
+          <select id="pg-cargo-concepto" class="admin-select">
+            <option value="UNIFORME">Uniforme</option>
+            <option value="PACK_COMPETITIVO">Pack competitivo (All Star)</option>
+            <option value="CARGO_MANUAL">Otro cargo</option>
+          </select>
+        </div>
+        <div>
+          <label class="admin-label" for="pg-cargo-monto">Monto ($)</label>
+          <input id="pg-cargo-monto" class="admin-input" type="number" inputmode="numeric" min="1" step="1" placeholder="Ej.: 15000" />
+        </div>
+        <div class="pg-campo-ancho">
+          <label class="admin-label" for="pg-cargo-descripcion">Descripción (la ve la familia)</label>
+          <input id="pg-cargo-descripcion" class="admin-input" maxlength="200" placeholder="Ej.: Polera de entrenamiento adicional" />
+        </div>
+        <div>
+          <label class="admin-label" for="pg-cargo-vencimiento">Vence (opcional)</label>
+          <input id="pg-cargo-vencimiento" class="admin-input" type="date" />
+        </div>
+      </div>
+      <p id="pg-cargo-error" class="pg-dialogo__error" hidden></p>
+      <div class="ficha-acciones">
+        <button type="submit" id="pg-cargo-crear" class="admin-btn">Agregar cargo</button>
+        <button type="button" class="admin-btn admin-btn--secundario" data-cerrar>Cancelar</button>
+      </div>
+    </form>
+  </dialog>
+</AdminBase>
+
+<script>
+  import { iniciarPagos } from '../../scripts/admin-pagos.ts';
+  iniciarPagos();
+</script>
+
+<style is:global>
+.pg-cabecera{ display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+
+.pg-totales{ display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); margin: 0 0 16px; }
+.pg-total{ background: #fff; border: 1px solid #E4DFD6; border-left: 4px solid var(--ember, #171412); border-radius: 12px; padding: 12px 16px; }
+.pg-total--vencido{ border-left-color: #C51515; }
+.pg-total--ok{ border-left-color: #1E7A3C; }
+.pg-total__etiqueta{ margin: 0; font-size: 12px; color: #6B6259; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; }
+.pg-total__valor{ margin: 4px 0 0; font-family: var(--font-display); font-weight: 800; font-size: 1.5rem; }
+.pg-total--vencido .pg-total__valor{ color: #C51515; }
+
+.pg-lista-card{ padding: 16px; }
+.pg-herramientas{ display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; margin-bottom: 14px; }
+.pg-buscar{ flex: 1 1 220px; max-width: 320px; }
+.pg-filtro{ display: flex; flex-wrap: wrap; gap: 6px; }
+.pg-chip{ border: 1px solid #E4DFD6; background: #fff; border-radius: 999px; padding: 6px 12px; font: inherit; font-size: 13px; cursor: pointer; color: #3D3630; }
+.pg-chip[aria-pressed="true"]{ background: var(--ember, #171412); border-color: var(--ember, #171412); color: #fff; }
+.pg-check{ display: flex; align-items: center; gap: 6px; font-size: 13px; color: #6B6259; }
+.pg-aviso{ font-size: 13px; color: #8A5A00; background: #FFF4D6; border-radius: 8px; padding: 8px 12px; margin: 0 0 12px; }
+
+.pg-familia{ border: 1px solid #E4DFD6; border-radius: 12px; padding: 14px 16px; margin-bottom: 10px; }
+.pg-familia--prueba{ border-style: dashed; background: #FAF8F5; }
+.pg-familia__top{ display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.pg-familia__nombre{ margin: 0; font-weight: 700; }
+.pg-familia__nombre a{ color: inherit; }
+.pg-familia__detalle{ margin: 2px 0 0; font-size: 13px; color: #6B6259; }
+.pg-familia__saldo{ text-align: right; }
+.pg-familia__monto{ margin: 0; font-family: var(--font-display); font-weight: 800; font-size: 1.25rem; }
+.pg-familia__vencido{ margin: 0; font-size: 12px; color: #C51515; font-weight: 700; }
+.pg-estado{ display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 700; color: #fff; vertical-align: middle; margin-left: 6px; }
+.pg-estado--VENCIDO{ background: #C51515; }
+.pg-estado--PENDIENTE{ background: #B07800; }
+.pg-estado--SIN_CARGOS{ background: #6B6259; }
+.pg-estado--AL_DIA{ background: #1E7A3C; }
+.pg-estado--prueba{ background: #fff; color: #6B6259; border: 1px dashed #6B6259; }
+.pg-atletas{ display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0 0; }
+.pg-atleta{ font-size: 12px; padding: 3px 10px; border-radius: 999px; background: #F2EEE8; color: #3D3630; }
+.pg-atleta--kit{ background: #E3F3E5; color: #1E5E2F; }
+.pg-cargos{ width: 100%; border-collapse: collapse; margin: 10px 0 0; font-size: 13px; }
+.pg-cargos td{ padding: 5px 6px; border-top: 1px solid #EFEBE4; }
+.pg-cargos .pg-num{ text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.pg-cargos .pg-vence{ white-space: nowrap; color: #6B6259; }
+.pg-cargos tr.pg-vencido td{ color: #A91111; }
+@media (max-width: 600px){
+  .pg-total{ padding: 10px 12px; }
+  .pg-total__valor{ font-size: 1.2rem; }
+  .pg-cargos, .pg-cargos tbody{ display: block; }
+  .pg-cargos tr{ display: grid; grid-template-columns: 1fr auto; grid-template-areas: "a s" "d d" "v v"; border-top: 1px solid #EFEBE4; padding: 6px 0; }
+  .pg-cargos td{ border: 0; padding: 1px 0; }
+  .pg-cargos td:nth-child(1){ grid-area: a; font-weight: 600; }
+  .pg-cargos td:nth-child(2){ grid-area: d; }
+  .pg-cargos td:nth-child(3){ grid-area: v; font-size: 12px; }
+  .pg-cargos td:nth-child(4){ grid-area: s; }
+}
+.pg-alerta{ margin: 10px 0 0; padding: 10px 12px; border-radius: 10px; background: #FFF4D6; font-size: 13px; color: #5C3D00; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
+.pg-acciones{ display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; align-items: center; }
+.pg-acciones .admin-btn{ padding: 8px 14px; font-size: 13px; }
+.pg-link-suave{ background: none; border: 0; padding: 4px; font: inherit; font-size: 12px; color: #6B6259; text-decoration: underline; cursor: pointer; margin-left: auto; }
+
+.pg-dialogo{ width: min(620px, calc(100vw - 24px)); max-height: calc(100vh - 32px); padding: 20px; border: none; border-radius: 16px; box-shadow: 0 20px 60px rgba(0,0,0,.35); }
+.pg-dialogo::backdrop{ background: rgba(23,20,18,.6); }
+.pg-dialogo__sub{ margin: -4px 0 12px; font-size: 14px; color: #6B6259; }
+.pg-dialogo__campos{ display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); margin: 12px 0; }
+.pg-dialogo__campos .admin-input, .pg-dialogo__campos .admin-select{ width: 100%; }
+.pg-campo-ancho{ grid-column: 1 / -1; }
+.pg-dialogo__nota{ font-size: 12px; color: #6B6259; margin: 0 0 8px; }
+.pg-dialogo__error{ font-size: 13px; color: #C51515; margin: 0 0 8px; }
+.pg-pago-cargos label{ display: flex; align-items: center; gap: 10px; padding: 8px 0; border-top: 1px solid #EFEBE4; font-size: 14px; }
+.pg-pago-cargos label span:last-child{ margin-left: auto; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.pg-pago-cargos input{ width: 18px; height: 18px; accent-color: var(--fire-red); }
+.pg-resultados{ display: flex; flex-direction: column; gap: 4px; margin-top: 6px; }
+.pg-resultado{ text-align: left; border: 1px solid #E4DFD6; background: #fff; border-radius: 8px; padding: 8px 10px; font: inherit; font-size: 13px; cursor: pointer; }
+.pg-resultado:hover{ background: #F5EFE8; }
+.pg-resultado small{ display: block; color: #6B6259; }
+</style>

@@ -98,6 +98,18 @@ function tallasDisponibles(actual: string): string[] {
 
 const CANAL_TEXTO: Record<CanalEnvio, string> = { WHATSAPP: 'WhatsApp', EMAIL: 'Correo' };
 
+/**
+ * Una plantilla que invita a pagar la inscripción no se envía a quien ya la
+ * pagó (el caso queda "Inscrito" al pagar el kit o la inscripción).
+ */
+function avisoYaInscrito(caso: CasoResumen, plantilla: PlantillaClasePrueba): string | null {
+  if (caso.estado !== CRM_ESTADOS.INSCRITO) return null;
+  const textos = `${plantilla.asunto ?? ''}\n${plantilla.cuerpo}\n${plantilla.cuerpo_email ?? ''}`;
+  return variablesUsadas(textos).includes('valor_inscripcion')
+    ? 'Esta familia ya pagó la inscripción: este mensaje la invita a pagarla de nuevo. Elige otro mensaje.'
+    : null;
+}
+
 /** Muestra el correo tal como llegará y resuelve true si se confirma el envío. */
 function confirmarCorreo(para: string, correo: CorreoRenderizado): Promise<boolean> {
   const dialogo = $<HTMLDialogElement>('#cp-dialogo-correo')!;
@@ -196,7 +208,9 @@ function bloqueMensajes(item: ItemPrimeraClase, supabase: SupabaseClient, ctx: C
   renderEnviados(enviados, caso, ctx);
 
   // Sugiere el primer mensaje que aún no se envía.
-  const siguiente = ctx.plantillas.find((p) => !ctx.envios.some((e) => e.caso_id === caso.id && e.plantilla_id === p.id));
+  const siguiente = ctx.plantillas.find(
+    (p) => !avisoYaInscrito(caso, p) && !ctx.envios.some((e) => e.caso_id === caso.id && e.plantilla_id === p.id),
+  );
   if (siguiente) selectPlantilla.value = siguiente.id;
 
   // Cada botón se habilita según el canal de la plantilla elegida.
@@ -269,6 +283,12 @@ function bloqueMensajes(item: ItemPrimeraClase, supabase: SupabaseClient, ctx: C
     aviso.classList.remove('cp-mensajes__aviso--ok');
     const plantilla = ctx.plantillas.find((p) => p.id === selectPlantilla.value);
     if (!plantilla || !email) return;
+    const yaInscrito = avisoYaInscrito(caso, plantilla);
+    if (yaInscrito) {
+      aviso.textContent = yaInscrito;
+      aviso.hidden = false;
+      return;
+    }
     const textos = `${plantilla.asunto ?? ''}\n${plantilla.cuerpo_email ?? plantilla.cuerpo}`;
     const necesitaLink = variablesUsadas(textos).includes('link_pago');
 
@@ -305,6 +325,12 @@ function bloqueMensajes(item: ItemPrimeraClase, supabase: SupabaseClient, ctx: C
     aviso.classList.remove('cp-mensajes__aviso--ok');
     const plantilla = ctx.plantillas.find((p) => p.id === selectPlantilla.value);
     if (!plantilla) return;
+    const yaInscrito = avisoYaInscrito(caso, plantilla);
+    if (yaInscrito) {
+      aviso.textContent = yaInscrito;
+      aviso.hidden = false;
+      return;
+    }
     const necesitaLink = variablesUsadas(plantilla.cuerpo).includes('link_pago');
 
     // Primero se revisa todo lo demás, con un link provisorio.
