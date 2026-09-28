@@ -58,6 +58,11 @@ import AdminBase from '../../layouts/AdminBase.astro';
   </section>
 
  <div id="cp-programa" class="fh-programa" aria-label="Programa"></div>
+  <div class="cp-herramientas">
+    <input id="cp-buscar" class="admin-input cp-buscar" type="search" placeholder="Buscar alumna, apoderado o teléfono" aria-label="Buscar" />
+    <div id="cp-filtro" class="cp-filtro" role="group" aria-label="Filtrar"></div>
+    <select id="cp-orden" class="admin-select cp-orden" aria-label="Ordenar por"></select>
+  </div>
   <div id="cp-aviso-mensajes" class="admin-aviso-cerrado" hidden></div>
 
   <section class="admin-card cp-lista-wrap">
@@ -206,6 +211,13 @@ import AdminBase from '../../layouts/AdminBase.astro';
 .cp-grupo__cabecera{ display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px 12px; margin-bottom: 12px; }
 .cp-grupo__cabecera .cp-grupo__titulo{ margin: 0; }
 .cp-grupo__correo{ padding: 8px 14px; font-size: 13px; }
+.cp-grupo__botones{ display: flex; flex-wrap: wrap; gap: 8px; }
+.cp-herramientas{ display: flex; flex-wrap: wrap; align-items: center; gap: 10px 12px; margin: 0 0 16px; }
+.cp-buscar{ flex: 1 1 220px; max-width: 320px; }
+.cp-orden{ width: auto; max-width: 260px; }
+.cp-filtro{ display: flex; flex-wrap: wrap; gap: 6px; }
+.cp-chip{ border: 1px solid #E4DFD6; background: #fff; border-radius: 999px; padding: 6px 12px; font: inherit; font-size: 13px; cursor: pointer; color: #3D3630; }
+.cp-chip[aria-pressed="true"]{ background: var(--ember, #171412); border-color: var(--ember, #171412); color: #fff; }
 .cp-link-fecha{ background: none; border: 0; padding: 0 2px; font: inherit; font-size: 13px; color: var(--fire-red, #C51515); text-decoration: underline; cursor: pointer; }
 .cp-fecha{ flex-basis: 100%; border-top: 1px solid #EFEBE4; padding-top: 10px; }
 .cp-fecha__campos{ display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }

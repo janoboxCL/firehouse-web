@@ -48,6 +48,18 @@ import { opcionesDeFecha, validarNuevaFecha, type ReglasFecha } from '../lib/crm
 import { hoyChile } from '../lib/crm/programas.ts';
 import { abrirEnvioGrupal } from './admin-clase-prueba-grupo.ts';
 import {
+  FILTRO_CLASE_LABEL,
+  ORDEN_CLASE_LABEL,
+  csvAsistencia,
+  cumpleBusqueda,
+  cumpleFiltro,
+  filasAsistencia,
+  htmlAsistencia,
+  ordenarItems,
+  type FiltroClase,
+  type OrdenClase,
+} from '../lib/crm/clase-prueba-lista.ts';
+import {
   coincidePrograma,
   contarPorPrograma,
   leerSeleccion,
@@ -583,6 +595,38 @@ async function cargarContexto(supabase: SupabaseClient, casos: CasoResumen[]): P
 }
 
 let PROGRAMA: SeleccionPrograma = 'TODOS';
+let FILTRO: FiltroClase = 'TODOS';
+let ORDEN: OrdenClase = 'ALUMNA';
+/** Vuelve a dibujar con los filtros actuales (lo asigna renderizarLista). */
+let DIBUJAR: () => void = () => {};
+
+/** Lista de asistencia de una fecha: página imprimible o archivo Excel (CSV). */
+function exportarAsistencia(fecha: string, items: ItemPrimeraClase[], ctx: ContextoMensajes, formato: 'IMPRIMIR' | 'EXCEL'): void {
+  const filas = filasAsistencia(items, ctx.tallas, fecha);
+  const titulo = `Asistencia · ${tituloGrupo(fecha)}`;
+  if (formato === 'EXCEL') {
+    const blob = new Blob([csvAsistencia(filas)], { type: 'text/csv;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `asistencia-${fecha}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    return;
+  }
+  const horario = [CONFIG.starHoraInicio, CONFIG.starHoraFin].filter(Boolean).join(' a ');
+  const subtitulo = `Firehouse Star y clases de prueba · ${horario ? `${horario} h · ` : ''}Santa Corina 197, La Cisterna`;
+  const ventana = window.open('', '_blank');
+  if (!ventana) {
+    mostrarError('El navegador bloqueó la ventana de la lista. Permite las ventanas emergentes para este sitio.');
+    return;
+  }
+  ventana.document.open();
+  ventana.document.write(htmlAsistencia(titulo, subtitulo, filas));
+  ventana.document.close();
+}
 
 async function renderizarLista(supabase: SupabaseClient): Promise<void> {
   let casos: CasoResumen[];
@@ -613,11 +657,35 @@ async function renderizarLista(supabase: SupabaseClient): Promise<void> {
     const vacio = $<HTMLElement>('#cp-vacio')!;
     const contenedor = $<HTMLElement>('#cp-grupos')!;
     contenedor.innerHTML = '';
-    const grupos = todos
+    const texto = $<HTMLInputElement>('#cp-buscar')!.value;
+    const delPrograma = todos
       .map((g) => ({ fecha: g.fecha, items: g.items.filter((i) => coincidePrograma(i.caso.programa, PROGRAMA)) }))
       .filter((g) => g.items.length > 0);
 
+    // Filtros con su cantidad (sobre el programa elegido y la búsqueda).
+    const buscados = delPrograma.flatMap((g) => g.items).filter((i) => cumpleBusqueda(i, texto));
+    $<HTMLElement>('#cp-filtro')!.innerHTML = (Object.keys(FILTRO_CLASE_LABEL) as FiltroClase[])
+      .map((f) => {
+        const n = buscados.filter((i) => cumpleFiltro(i, f, ctx.tallas.get(i.caso.atleta.id))).length;
+        return `<button type="button" class="cp-chip" data-filtro="${f}" aria-pressed="${f === FILTRO}">${FILTRO_CLASE_LABEL[f]} (${n})</button>`;
+      })
+      .join('');
+
+    const grupos = delPrograma
+      .map((g) => ({
+        fecha: g.fecha,
+        todos: g.items,
+        items: ordenarItems(
+          g.items.filter((i) => cumpleBusqueda(i, texto) && cumpleFiltro(i, FILTRO, ctx.tallas.get(i.caso.atleta.id))),
+          ORDEN,
+        ),
+      }))
+      .filter((g) => g.items.length > 0);
+
     if (grupos.length === 0) {
+      vacio.textContent = delPrograma.length
+        ? 'Ninguna alumna coincide con la búsqueda o el filtro.'
+        : 'No hay clases de prueba agendadas todavía.';
       vacio.hidden = false;
       return;
     }
@@ -634,10 +702,28 @@ async function renderizarLista(supabase: SupabaseClient): Promise<void> {
         pruebas ? `${pruebas} clase${pruebas === 1 ? '' : 's'} de prueba` : '',
         inscripciones ? `${inscripciones} inscripci${inscripciones === 1 ? 'ón' : 'ones'} Star` : '',
       ].filter(Boolean);
-      titulo.textContent = `${tituloGrupo(grupo.fecha)} · ${partes.join(' y ')}`;
+      const filtrado = grupo.items.length !== grupo.todos.length ? ` (mostrando ${grupo.items.length} de ${grupo.todos.length})` : '';
+      titulo.textContent = `${tituloGrupo(grupo.fecha)} · ${partes.join(' y ')}${filtrado}`;
       const cabecera = document.createElement('div');
       cabecera.className = 'cp-grupo__cabecera';
       cabecera.appendChild(titulo);
+      const botones = document.createElement('div');
+      botones.className = 'cp-grupo__botones';
+      cabecera.appendChild(botones);
+      // La lista de asistencia siempre incluye a todas las de esa fecha (del programa elegido).
+      const botonLista = document.createElement('button');
+      botonLista.type = 'button';
+      botonLista.className = 'admin-btn admin-btn--secundario cp-grupo__correo';
+      botonLista.textContent = '🖨 Lista de asistencia';
+      botonLista.title = 'Lista para pasar asistencia, lista para imprimir o guardar como PDF';
+      botonLista.addEventListener('click', () => exportarAsistencia(grupo.fecha, grupo.todos, ctx, 'IMPRIMIR'));
+      const botonExcel = document.createElement('button');
+      botonExcel.type = 'button';
+      botonExcel.className = 'admin-btn admin-btn--secundario cp-grupo__correo';
+      botonExcel.textContent = '⬇ Excel';
+      botonExcel.title = 'Descargar la lista de asistencia para abrir en Excel';
+      botonExcel.addEventListener('click', () => exportarAsistencia(grupo.fecha, grupo.todos, ctx, 'EXCEL'));
+      botones.append(botonLista, botonExcel);
       if (ctx.activo && ctx.plantillas.some((p) => sirveParaCorreo(p))) {
         const botonGrupo = document.createElement('button');
         botonGrupo.type = 'button';
@@ -647,7 +733,7 @@ async function renderizarLista(supabase: SupabaseClient): Promise<void> {
           abrirEnvioGrupal({
             supabase,
             titulo: tituloGrupo(grupo.fecha),
-            items: grupo.items,
+            items: grupo.todos,
             plantillas: ctx.plantillas.filter((p) => sirveParaCorreo(p)),
             envios: ctx.envios,
             correoPara: (item, plantilla, link, aviso) => correoPara(item, plantilla, ctx, link, aviso),
@@ -656,7 +742,7 @@ async function renderizarLista(supabase: SupabaseClient): Promise<void> {
             alTerminar: () => RECARGAR(),
           }),
         );
-        cabecera.appendChild(botonGrupo);
+        botones.prepend(botonGrupo);
       }
       seccion.appendChild(cabecera);
       grupo.items.forEach((i) => seccion.appendChild(filaCaso(i, supabase, ctx)));
@@ -668,7 +754,27 @@ async function renderizarLista(supabase: SupabaseClient): Promise<void> {
     PROGRAMA = v;
     dibujar();
   });
+  DIBUJAR = dibujar;
   dibujar();
+}
+
+/** Búsqueda, filtros y orden del listado (se conectan una sola vez). */
+function conectarHerramientas(): void {
+  const orden = $<HTMLSelectElement>('#cp-orden')!;
+  orden.innerHTML = (Object.keys(ORDEN_CLASE_LABEL) as OrdenClase[])
+    .map((o) => `<option value="${o}">Ordenar: ${ORDEN_CLASE_LABEL[o]}</option>`)
+    .join('');
+  orden.addEventListener('change', () => {
+    ORDEN = orden.value as OrdenClase;
+    DIBUJAR();
+  });
+  $('#cp-buscar')!.addEventListener('input', () => DIBUJAR());
+  $('#cp-filtro')!.addEventListener('click', (e) => {
+    const b = (e.target as HTMLElement).closest<HTMLButtonElement>('[data-filtro]');
+    if (!b) return;
+    FILTRO = b.dataset.filtro as FiltroClase;
+    DIBUJAR();
+  });
 }
 
 function limpiarFormularioVisita(): void {
@@ -734,5 +840,6 @@ export async function iniciarClasePrueba(): Promise<void> {
   PROGRAMA = leerSeleccion();
 
   conectarVisitaRapida(supabase);
+  conectarHerramientas();
   await renderizarLista(supabase);
 }

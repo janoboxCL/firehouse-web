@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { armarFamilias, mesChile, normalizarBusqueda, textoBusqueda, totalesPagos, validarCargoManual, type EntradaFamilias } from './pagos-panel.ts';
+import { armarFamilias, mesChile, normalizarBusqueda, ordenarFamilias, pendientesDeCobro, textoBusqueda, totalesPagos, validarCargoManual, type EntradaFamilias } from './pagos-panel.ts';
 
 const A1 = '00000000-0000-0000-0000-00000000a001';
 const A2 = '00000000-0000-0000-0000-00000000a002';
@@ -114,4 +114,19 @@ test('limpia el texto de búsqueda', () => {
 
 test('compara nombres sin tildes ni mayúsculas', () => {
   assert.equal(normalizarBusqueda('  Céspedes  MUÑOZ '), 'cespedes munoz');
+});
+
+test('lista a quienes falta preparar el cobro, sin familias de prueba', () => {
+  const e = entrada();
+  const p = pendientesDeCobro(armarFamilias(e));
+  // Carla (b1) ya tiene cargos; Daniela (b2) no; Alejandro es de prueba.
+  assert.deepEqual(p.map((x) => x.atletaId), ['b2']);
+  assert.deepEqual(p[0].kitsSinRegistrar, ['o2'], 'su kit pagado en el registro se pasa a la cuenta primero');
+});
+
+test('ordena familias por nombre, saldo o estado', () => {
+  const f = armarFamilias(entrada());
+  assert.deepEqual(ordenarFamilias(f, 'NOMBRE').map((x) => x.apoderado.nombre), ['Alejandro', 'Carla', 'Daniela']);
+  assert.equal(ordenarFamilias(f, 'SALDO')[0].apoderado.nombre, 'Carla');
+  assert.equal(ordenarFamilias(f, 'ESTADO')[0].estado, 'VENCIDO');
 });

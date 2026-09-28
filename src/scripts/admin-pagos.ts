@@ -15,7 +15,12 @@ import {
 } from '../lib/crm/admin-pagos-api.ts';
 import {
   ESTADO_FAMILIA_LABEL,
+  ORDEN_PAGOS_LABEL,
   mensajeLinkPago,
+  ordenarFamilias,
+  pendientesDeCobro,
+  type OrdenPagos,
+  type PendienteDeCobro,
   type EstadoFamilia,
   type FamiliaPagos,
   type ProgramaPagos,
@@ -45,6 +50,7 @@ let PROGRAMA: ProgramaPagos = 'STAR';
 let RESUMEN: ResumenPagos | null = null;
 let FILTRO: Filtro = 'TODAS';
 let VER_PRUEBA = false;
+let ORDEN: OrdenPagos = 'ESTADO';
 
 function mostrarError(m: string): void {
   const e = $<HTMLElement>('#pg-error');
@@ -96,7 +102,7 @@ async function cargar(): Promise<void> {
 function familiasVisibles(): FamiliaPagos[] {
   if (!RESUMEN) return [];
   const q = $<HTMLInputElement>('#pg-buscar').value.trim().toLowerCase();
-  return RESUMEN.familias.filter((f) => {
+  return ordenarFamilias(RESUMEN.familias, ORDEN).filter((f) => {
     if (f.apoderado.es_prueba && !VER_PRUEBA) return false;
     if (FILTRO !== 'TODAS' && f.estado !== FILTRO) return false;
     if (!q) return true;
@@ -129,6 +135,13 @@ function dibujar(): void {
     const etiqueta = f === 'TODAS' ? 'Todas' : ESTADO_FAMILIA_LABEL[f];
     return `<button type="button" class="pg-chip" data-filtro="${f}" aria-pressed="${f === FILTRO}">${etiqueta} (${n})</button>`;
   }).join('');
+
+  // Star: niñas inscritas que aún no tienen su cuenta preparada.
+  const pendientes = PROGRAMA === 'STAR' ? pendientesDeCobro(RESUMEN.familias) : [];
+  $<HTMLElement>('#pg-preparar-aviso').hidden = pendientes.length === 0;
+  $<HTMLElement>('#pg-preparar-texto').textContent = `${pendientes.length} ${
+    pendientes.length === 1 ? 'niña inscrita aún no tiene' : 'niñas inscritas aún no tienen'
+  } su cobro preparado (inscripción y primera mensualidad).`;
 
   const visibles = familiasVisibles();
   $<HTMLElement>('#pg-vacio').hidden = visibles.length > 0;
@@ -168,8 +181,9 @@ function tarjeta(f: FamiliaPagos): string {
     .join('');
 
   const preparar =
-    PROGRAMA === 'STAR' && f.estado === 'SIN_CARGOS'
+    PROGRAMA === 'STAR'
       ? f.atletas
+          .filter((a) => !a.conCargos)
           .map(
             (a) =>
               `<button type="button" class="admin-btn admin-btn--secundario" data-accion="preparar" data-atleta="${escaparHtml(a.id)}" data-apoderado="${id}">Preparar cobro Star de ${escaparHtml(a.nombre)}</button>`,
@@ -434,6 +448,65 @@ async function enviarCargo(evt: Event): Promise<void> {
 }
 
 // ---------------------------------------------------------------------------
+// Diálogo: preparar el cobro Star de todas las inscritas
+
+let PENDIENTES: PendienteDeCobro[] = [];
+let PREPARANDO = false;
+let PREPARADAS = 0;
+
+function abrirPreparar(): void {
+  if (!RESUMEN) return;
+  PENDIENTES = pendientesDeCobro(RESUMEN.familias);
+  PREPARADAS = 0;
+  $<HTMLElement>('#pg-preparar-lista').innerHTML = PENDIENTES.map(
+    (p) => `<label><input type="checkbox" value="${escaparHtml(p.atletaId)}" checked />
+      <span>${escaparHtml(p.atleta)} · ${escaparHtml(p.familia)}${p.kitsSinRegistrar.length ? ' <small>(kit pagado en el registro: se pasa a su cuenta)</small>' : ''}</span>
+      <span class="pg-preparar-res" data-res="${escaparHtml(p.atletaId)}"></span></label>`,
+  ).join('');
+  $<HTMLElement>('#pg-preparar-progreso').hidden = true;
+  $<HTMLButtonElement>('#pg-preparar-confirmar').disabled = false;
+  $<HTMLDialogElement>('#pg-dialogo-preparar').showModal();
+}
+
+async function prepararTodas(): Promise<void> {
+  const marcados = new Set([...document.querySelectorAll<HTMLInputElement>('#pg-preparar-lista input:checked')].map((i) => i.value));
+  const elegidos = PENDIENTES.filter((p) => marcados.has(p.atletaId));
+  if (!elegidos.length) return;
+  PREPARANDO = true;
+  const confirmar = $<HTMLButtonElement>('#pg-preparar-confirmar');
+  const cerrar = $<HTMLButtonElement>('#pg-preparar-cerrar');
+  confirmar.disabled = true;
+  cerrar.disabled = true;
+  document.querySelectorAll<HTMLInputElement>('#pg-preparar-lista input').forEach((i) => (i.disabled = true));
+  const barra = $<HTMLProgressElement>('#pg-preparar-barra');
+  const estado = $<HTMLElement>('#pg-preparar-estado');
+  $<HTMLElement>('#pg-preparar-progreso').hidden = false;
+  barra.max = elegidos.length;
+  let ok = 0;
+  for (let i = 0; i < elegidos.length; i++) {
+    const p = elegidos[i];
+    barra.value = i;
+    estado.textContent = `Preparando ${i + 1} de ${elegidos.length}: ${p.atleta}`;
+    const res = document.querySelector<HTMLElement>(`[data-res="${CSS.escape(p.atletaId)}"]`);
+    try {
+      // Primero el kit pagado en el registro, así su cuenta lo muestra pagado.
+      for (const orden of p.kitsSinRegistrar) await registrarKitStar(supabase, orden);
+      await generarLinkPago(supabase, { atletaId: p.atletaId });
+      ok += 1;
+      if (res) res.innerHTML = '<strong class="pg-ok">✓ Lista</strong>';
+    } catch (err) {
+      if (res) res.innerHTML = `<strong class="pg-error-txt">✗ ${escaparHtml((err as Error).message)}</strong>`;
+    }
+  }
+  barra.value = elegidos.length;
+  PREPARADAS = ok;
+  const fallas = elegidos.length - ok;
+  estado.textContent = `Listo: ${ok} ${ok === 1 ? 'cuenta preparada' : 'cuentas preparadas'}${fallas ? `, ${fallas} con error` : ''}. No se envió nada a las familias.`;
+  PREPARANDO = false;
+  cerrar.disabled = false;
+}
+
+// ---------------------------------------------------------------------------
 
 export async function iniciarPagos(): Promise<void> {
   const sesion = await requireAdminSession();
@@ -456,6 +529,26 @@ export async function iniciarPagos(): Promise<void> {
     dibujar();
   });
   $('#pg-buscar').addEventListener('input', dibujar);
+  const orden = $<HTMLSelectElement>('#pg-orden');
+  orden.innerHTML = (Object.keys(ORDEN_PAGOS_LABEL) as OrdenPagos[])
+    .map((o) => `<option value="${o}">Ordenar: ${ORDEN_PAGOS_LABEL[o]}</option>`)
+    .join('');
+  orden.addEventListener('change', () => {
+    ORDEN = orden.value as OrdenPagos;
+    dibujar();
+  });
+  $('#pg-btn-preparar').addEventListener('click', abrirPreparar);
+  $('#pg-preparar-confirmar').addEventListener('click', () => void prepararTodas());
+  const dialogoPreparar = $<HTMLDialogElement>('#pg-dialogo-preparar');
+  $('#pg-preparar-cerrar').addEventListener('click', () => dialogoPreparar.close());
+  dialogoPreparar.addEventListener('cancel', (e) => {
+    if (PREPARANDO) e.preventDefault();
+  });
+  dialogoPreparar.addEventListener('close', () => {
+    if (!PREPARADAS) return;
+    mostrarOk(`${PREPARADAS} ${PREPARADAS === 1 ? 'cuenta preparada' : 'cuentas preparadas'}. Cada familia la ve al abrir su link de pago.`);
+    void cargar();
+  });
   $<HTMLInputElement>('#pg-ver-prueba').addEventListener('change', (e) => {
     VER_PRUEBA = (e.target as HTMLInputElement).checked;
     dibujar();

@@ -31,7 +31,12 @@ import AdminBase from '../../layouts/AdminBase.astro';
     <div class="pg-herramientas">
       <input id="pg-buscar" class="admin-input pg-buscar" type="search" placeholder="Buscar familia o deportista" aria-label="Buscar familia o deportista" />
       <div id="pg-filtro" class="pg-filtro" role="group" aria-label="Estado"></div>
+      <select id="pg-orden" class="admin-select pg-orden" aria-label="Ordenar por"></select>
       <label class="pg-check"><input type="checkbox" id="pg-ver-prueba" /> Mostrar familias de prueba</label>
+    </div>
+    <div id="pg-preparar-aviso" class="pg-preparar" hidden>
+      <span id="pg-preparar-texto"></span>
+      <button type="button" id="pg-btn-preparar" class="admin-btn">Preparar cobro de todas</button>
     </div>
     <p id="pg-aviso-programa" class="pg-aviso" hidden></p>
     <p id="pg-cargando" class="admin-spinner">Cargando…</p>
@@ -65,6 +70,23 @@ import AdminBase from '../../layouts/AdminBase.astro';
         <button type="button" class="admin-btn admin-btn--secundario" data-cerrar>Cancelar</button>
       </div>
     </form>
+  </dialog>
+
+  <!-- Preparar cobro Star de todas -->
+  <dialog id="pg-dialogo-preparar" class="pg-dialogo" aria-labelledby="pg-preparar-titulo">
+    <h2 id="pg-preparar-titulo" class="ficha-bloque__titulo">Preparar cobro Firehouse Star</h2>
+    <p class="pg-dialogo__sub">A cada niña marcada se le crea su cuenta: la inscripción (solo si no pagó el kit)
+      y la primera mensualidad, proporcional según la semana de su primera clase. También su link de pago.
+      No se envía nada a las familias.</p>
+    <div id="pg-preparar-lista" class="pg-pago-cargos"></div>
+    <div id="pg-preparar-progreso" class="pg-progreso" hidden>
+      <progress id="pg-preparar-barra" value="0" max="1"></progress>
+      <span id="pg-preparar-estado"></span>
+    </div>
+    <div class="ficha-acciones">
+      <button type="button" id="pg-preparar-confirmar" class="admin-btn">Preparar</button>
+      <button type="button" id="pg-preparar-cerrar" class="admin-btn admin-btn--secundario">Cerrar</button>
+    </div>
   </dialog>
 
   <!-- Agregar cargo -->
@@ -142,6 +164,13 @@ import AdminBase from '../../layouts/AdminBase.astro';
 .pg-chip{ border: 1px solid #E4DFD6; background: #fff; border-radius: 999px; padding: 6px 12px; font: inherit; font-size: 13px; cursor: pointer; color: #3D3630; }
 .pg-chip[aria-pressed="true"]{ background: var(--ember, #171412); border-color: var(--ember, #171412); color: #fff; }
 .pg-check{ display: flex; align-items: center; gap: 6px; font-size: 13px; color: #6B6259; }
+.pg-orden{ width: auto; max-width: 240px; }
+.pg-preparar{ display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; margin: 0 0 12px; padding: 12px 14px; border-radius: 10px; background: #FFF4D6; font-size: 14px; color: #5C3D00; }
+.pg-preparar[hidden], .pg-progreso[hidden]{ display: none; }
+.pg-progreso{ display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 12px 0 0; font-size: 13px; }
+.pg-progreso progress{ width: 200px; accent-color: var(--fire-red); }
+.pg-ok{ color: #1E7A34; font-size: 12px; white-space: nowrap; }
+.pg-error-txt{ color: #C51515; font-size: 12px; }
 .pg-aviso{ font-size: 13px; color: #8A5A00; background: #FFF4D6; border-radius: 8px; padding: 8px 12px; margin: 0 0 12px; }
 
 .pg-familia{ border: 1px solid #E4DFD6; border-radius: 12px; padding: 14px 16px; margin-bottom: 10px; }

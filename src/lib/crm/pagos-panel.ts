@@ -75,6 +75,8 @@ export interface AtletaFamilia {
   estadoCaso: string | null;
   /** Kit pagado en el registro Star: REGISTRADO en la cuenta o PENDIENTE de registrar. */
   kit: 'REGISTRADO' | 'PENDIENTE' | null;
+  /** true si ya tiene algún cargo (no anulado) en este programa. */
+  conCargos: boolean;
 }
 
 export interface FamiliaPagos {
@@ -128,6 +130,7 @@ export function armarFamilias(e: EntradaFamilias): FamiliaPagos[] {
     });
   }
 
+  const atletasConCargos = new Set(e.cargos.filter((c) => c.estado !== 'ANULADO' && c.atleta_id).map((c) => c.atleta_id as string));
   const kitsPorAtleta = new Map<string, KitRegistro[]>();
   e.kits.forEach((k) => kitsPorAtleta.set(k.atleta_id, [...(kitsPorAtleta.get(k.atleta_id) ?? []), k]));
 
@@ -136,7 +139,7 @@ export function armarFamilias(e: EntradaFamilias): FamiliaPagos[] {
     if (!f) continue;
     const kits = kitsPorAtleta.get(a.id) ?? [];
     const kit = kits.length === 0 ? null : kits.every((k) => k.registrado) ? 'REGISTRADO' : 'PENDIENTE';
-    f.atletas.push({ id: a.id, nombre: primerNombre(a.nombre), estadoCaso: e.estadoCaso[a.id] ?? null, kit });
+    f.atletas.push({ id: a.id, nombre: primerNombre(a.nombre), estadoCaso: e.estadoCaso[a.id] ?? null, kit, conCargos: atletasConCargos.has(a.id) });
     for (const k of kits) {
       if (!k.registrado && !f.kitsSinRegistrar.some((x) => x.orden_id === k.orden_id)) {
         f.kitsSinRegistrar.push({ orden_id: k.orden_id, commerce_order: k.commerce_order, monto: k.monto, fecha: k.fecha });
@@ -200,6 +203,51 @@ export function mesChile(iso: string | null): string | null {
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return null;
   return new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Santiago', year: 'numeric', month: '2-digit' }).format(d).slice(0, 7);
+}
+
+export interface PendienteDeCobro {
+  apoderadoId: string;
+  familia: string;
+  atletaId: string;
+  atleta: string;
+  /** Órdenes del registro Star ya pagadas que se pasan a la cuenta antes de preparar el cobro. */
+  kitsSinRegistrar: string[];
+}
+
+/**
+ * Deportistas Star que aún no tienen cargos: a quienes "Preparar cobro de todas"
+ * les crea la inscripción (si no pagaron el kit) y la primera mensualidad.
+ * Las familias de prueba quedan fuera.
+ */
+export function pendientesDeCobro(familias: FamiliaPagos[]): PendienteDeCobro[] {
+  return familias
+    .filter((f) => !f.apoderado.es_prueba)
+    .flatMap((f) =>
+      f.atletas
+        .filter((a) => !a.conCargos)
+        .map((a, i) => ({
+          apoderadoId: f.apoderado.id,
+          familia: f.nombre,
+          atletaId: a.id,
+          atleta: a.nombre,
+          // Los kits de la familia se registran una sola vez (con la primera niña).
+          kitsSinRegistrar: i === 0 ? f.kitsSinRegistrar.map((k) => k.orden_id) : [],
+        })),
+    );
+}
+
+export type OrdenPagos = 'ESTADO' | 'NOMBRE' | 'SALDO';
+export const ORDEN_PAGOS_LABEL: Record<OrdenPagos, string> = {
+  ESTADO: 'Estado (vencidos primero)',
+  NOMBRE: 'Nombre del apoderado (A-Z)',
+  SALDO: 'Saldo (mayor a menor)',
+};
+
+export function ordenarFamilias(familias: FamiliaPagos[], orden: OrdenPagos): FamiliaPagos[] {
+  const copia = [...familias];
+  if (orden === 'NOMBRE') return copia.sort((a, b) => a.nombre.localeCompare(b.nombre, 'es'));
+  if (orden === 'SALDO') return copia.sort((a, b) => b.saldo - a.saldo || a.nombre.localeCompare(b.nombre, 'es'));
+  return copia.sort((a, b) => ORDEN_ESTADO[a.estado] - ORDEN_ESTADO[b.estado] || a.nombre.localeCompare(b.nombre, 'es'));
 }
 
 // ---------------------------------------------------------------------------
