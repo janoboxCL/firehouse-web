@@ -61,10 +61,11 @@ export async function asegurarCargosStar(
   const star = (casos ?? []).find((c) => c.programa === 'STAR' || c.journey === 'CLASE_PRUEBA_STAR' || c.journey === 'FIREHOUSE_STAR');
   if (!star) throw new Error('sin_caso_star');
   const config = await leerConfigAcademia(supabase);
-  const fechaPrimeraClase =
-    star.journey === 'CLASE_PRUEBA_STAR' && star.fecha_clase_prueba
-      ? (star.fecha_clase_prueba as string)
-      : getNextStarClassDate(new Date(star.created_at as string), config.starPrimeraClase);
+  // La fecha guardada en el caso manda (se puede cambiar desde Clase de prueba);
+  // si no hay, la que le correspondió al inscribirse.
+  const fechaPrimeraClase = star.fecha_clase_prueba
+    ? (star.fecha_clase_prueba as string)
+    : getNextStarClassDate(new Date(star.created_at as string), config.starPrimeraClase, config.starHoraInicio);
 
   const temporada = Number(fechaPrimeraClase.slice(0, 4));
   const { data: precio } = await supabase

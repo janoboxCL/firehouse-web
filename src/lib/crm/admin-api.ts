@@ -127,6 +127,9 @@ export interface CambiosCaso {
   proxima_accion?: string | null;
   fecha_proxima_accion?: string | null;
   prioridad?: string;
+  /** Fecha de la clase de prueba o de la primera clase Star (se cambia desde Clase de prueba). */
+  fecha_clase_prueba?: string | null;
+  dia_clase_prueba?: string | null;
 }
 
 export async function actualizarCaso(supabase: SupabaseClient, id: string, cambios: CambiosCaso): Promise<void> {
@@ -368,6 +371,7 @@ export function agruparPrimerasClases(
   casos: CasoResumen[],
   ahora: Date = new Date(),
   primeraClaseStar?: string,
+  horaInicioStar?: string,
 ): GrupoPrimeraClase[] {
   const hace7 = new Date(ahora.getTime() - 7 * 86_400_000).toISOString().slice(0, 10);
   const items: ItemPrimeraClase[] = [];
@@ -376,7 +380,8 @@ export function agruparPrimerasClases(
     if (esPrueba && caso.fecha_clase_prueba) {
       items.push({ caso, tipo: 'PRUEBA', fecha: caso.fecha_clase_prueba });
     } else if (caso.journey === CRM_JOURNEYS.FIREHOUSE_STAR && !ESTADOS_CERRADOS_NO_ASISTE.includes(caso.estado)) {
-      const fecha = getNextStarClassDate(new Date(caso.created_at), primeraClaseStar);
+      // Fecha guardada (0014, editable desde Clase de prueba) o la que le tocó al inscribirse.
+      const fecha = caso.fecha_clase_prueba ?? getNextStarClassDate(new Date(caso.created_at), primeraClaseStar, horaInicioStar);
       if (fecha >= hace7) items.push({ caso, tipo: 'INSCRIPCION', fecha });
     }
   }
@@ -506,6 +511,7 @@ export async function enviarCorreoAdmin(
   subject: string,
   html: string,
   text?: string,
+  opciones: { sinCopia?: boolean; copiaInterna?: boolean } = {},
 ): Promise<void> {
   const {
     data: { session },
@@ -515,7 +521,7 @@ export async function enviarCorreoAdmin(
   const res = await fetch('/api/admin/enviar-correo', {
     method: 'POST',
     headers: { 'content-type': 'application/json', authorization: `Bearer ${session.access_token}` },
-    body: JSON.stringify({ to, subject, html, ...(text ? { text } : {}) }),
+    body: JSON.stringify({ to, subject, html, ...(text ? { text } : {}), ...(opciones.sinCopia ? { sinCopia: true } : {}), ...(opciones.copiaInterna ? { copiaInterna: true } : {}) }),
   });
 
   if (!res.ok) {

@@ -67,7 +67,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     // El valor del kit sale de Configuración (precio de inscripción Star de la
     // temporada de la próxima clase), nunca del navegador.
     const config = await leerConfigAcademia(supabase);
-    const temporada = Number(getNextStarClassDate(new Date(), config.starPrimeraClase).slice(0, 4));
+    const temporada = Number(getNextStarClassDate(new Date(), config.starPrimeraClase, config.starHoraInicio).slice(0, 4));
     const { matricula } = await leerPreciosStar(supabase, temporada);
 
     const validacion = validarRegistroStar(body, matricula);

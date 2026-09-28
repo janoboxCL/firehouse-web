@@ -319,7 +319,7 @@ async function prepararEjemplo(supabase: SupabaseClient): Promise<void> {
   const c = config?.config ?? CONFIG_RESPALDO;
   if (firma?.nombre) EJEMPLO.remitente = firma.nombre;
   if (firma?.cargo) EJEMPLO.cargo = cargoEnMensaje(firma.cargo);
-  EJEMPLO.fecha_clase = fechaClaseTexto(getNextStarClassDate(new Date(), c.starPrimeraClase)) ?? EJEMPLO.fecha_clase;
+  EJEMPLO.fecha_clase = fechaClaseTexto(getNextStarClassDate(new Date(), c.starPrimeraClase, c.starHoraInicio)) ?? EJEMPLO.fecha_clase;
   EJEMPLO.hora_clase = c.starHoraInicio;
   if (valor) EJEMPLO.valor_inscripcion = valor;
   CLASE_EJEMPLO = { etiqueta: 'Tu primera clase', horaFin: c.starHoraFin };

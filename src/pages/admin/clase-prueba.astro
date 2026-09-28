@@ -9,8 +9,8 @@ import AdminBase from '../../layouts/AdminBase.astro';
   </div>
   <p class="admin-intro">
     Quiénes vienen a una clase de prueba o a su primera clase de Firehouse Star, agrupados por
-    fecha. Registra la talla, envía los mensajes de la secuencia por WhatsApp o por correo y marca
-    la asistencia apenas lleguen.
+    fecha. Registra la talla, envía los mensajes por WhatsApp o por correo (a una familia o a todo
+    el grupo de una fecha), cambia la fecha si alguien no puede venir y marca la asistencia.
   </p>
 
   <div id="cp-error" class="admin-error" hidden></div>
@@ -74,6 +74,42 @@ import AdminBase from '../../layouts/AdminBase.astro';
     <div class="ficha-acciones">
       <button type="button" id="cp-correo-enviar" class="admin-btn">Enviar correo</button>
       <button type="button" id="cp-correo-cancelar" class="admin-btn admin-btn--secundario">Cancelar</button>
+    </div>
+  </dialog>
+
+  <dialog id="cp-dialogo-grupo" class="cp-dialogo cp-dialogo--grupo" aria-labelledby="cp-grupo-titulo">
+    <h2 id="cp-grupo-titulo" class="ficha-bloque__titulo">Enviar correo al grupo</h2>
+    <div class="cp-grupo-cols">
+      <div class="cp-grupo-izq">
+        <label class="admin-label" for="cp-grupo-plantilla">Mensaje</label>
+        <select id="cp-grupo-plantilla" class="admin-select"></select>
+        <div class="cp-grupo__barra">
+          <span class="admin-label">Familias</span>
+          <span>
+            <button type="button" id="cp-grupo-todos" class="cp-link-fecha">Todas</button>
+            <button type="button" id="cp-grupo-ninguno" class="cp-link-fecha">Ninguna</button>
+          </span>
+        </div>
+        <ul id="cp-grupo-lista" class="cp-grupo__lista"></ul>
+        <label class="cp-grupo__copia">
+          <input type="checkbox" id="cp-grupo-copia" checked />
+          <span>Enviar una copia con el resumen a quienes hoy reciben las copias de los correos del panel (en vez de una copia por cada familia)</span>
+        </label>
+      </div>
+      <div class="cp-grupo-der">
+        <p class="cp-dialogo__dato">Vista previa: <strong id="cp-grupo-previa-para"></strong></p>
+        <p class="cp-dialogo__dato">Asunto: <strong id="cp-grupo-previa-asunto"></strong></p>
+        <iframe id="cp-grupo-previa" class="cp-dialogo__previa" title="Vista previa del correo" sandbox=""></iframe>
+        <p id="cp-grupo-previa-link" class="cp-fecha__nota" hidden>El link de pago de cada familia se crea al enviar (y prepara sus cargos Star).</p>
+      </div>
+    </div>
+    <div id="cp-grupo-progreso" class="cp-grupo__progreso" hidden>
+      <progress id="cp-grupo-barra" value="0" max="1"></progress>
+      <span id="cp-grupo-progreso-texto"></span>
+    </div>
+    <div class="ficha-acciones">
+      <button type="button" id="cp-grupo-enviar" class="admin-btn">Enviar</button>
+      <button type="button" id="cp-grupo-cerrar" class="admin-btn admin-btn--secundario">Cerrar</button>
     </div>
   </dialog>
 </AdminBase>
@@ -144,6 +180,37 @@ import AdminBase from '../../layouts/AdminBase.astro';
   border: none; border-radius: 16px; box-shadow: 0 20px 60px rgba(0,0,0,.35);
 }
 .cp-dialogo::backdrop{ background: rgba(23,20,18,.6); }
+.cp-dialogo--grupo{ width: min(1080px, calc(100vw - 24px)); }
+.cp-grupo-cols{ display: grid; gap: 20px; grid-template-columns: minmax(280px, 1fr) minmax(300px, 1.2fr); align-items: start; margin-top: 8px; }
+@media (max-width: 760px){ .cp-grupo-cols{ grid-template-columns: 1fr; } }
+.cp-grupo-izq .admin-select{ width: 100%; }
+.cp-grupo__barra{ display: flex; justify-content: space-between; align-items: center; margin: 14px 0 4px; }
+.cp-grupo__barra .admin-label{ margin: 0; }
+.cp-grupo__lista{ list-style: none; margin: 0; padding: 0; max-height: 46vh; overflow-y: auto; border: 1px solid #E4DFD6; border-radius: 10px; }
+.cp-grupo__item{ display: flex; justify-content: space-between; gap: 8px; padding: 8px 10px; border-top: 1px solid #EFEBE4; font-size: 13px; }
+.cp-grupo__item:first-child{ border-top: 0; }
+.cp-grupo__item--previa{ background: #FFF8E1; }
+.cp-grupo__item--no{ color: #8C847B; }
+.cp-grupo__check{ display: flex; gap: 8px; align-items: flex-start; cursor: pointer; min-width: 0; }
+.cp-grupo__check input{ margin-top: 3px; width: 16px; height: 16px; accent-color: var(--fire-red); flex-shrink: 0; }
+.cp-grupo__check small{ color: #6B6259; overflow-wrap: anywhere; }
+.cp-grupo__nota{ display: block; color: #8A5A00 !important; }
+.cp-grupo__lado{ display: flex; flex-direction: column; align-items: flex-end; gap: 2px; flex-shrink: 0; }
+.cp-grupo__ok{ color: #1E7A34; font-weight: 700; font-size: 12px; white-space: nowrap; }
+.cp-grupo__error{ color: #C51515; font-weight: 700; font-size: 12px; max-width: 160px; text-align: right; }
+.cp-grupo__copia{ display: flex; gap: 8px; align-items: flex-start; margin: 12px 0 0; font-size: 13px; color: #3D3630; cursor: pointer; }
+.cp-grupo__copia input{ margin-top: 2px; width: 16px; height: 16px; accent-color: var(--fire-red); flex-shrink: 0; }
+.cp-grupo__progreso{ display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 14px 0 0; font-size: 13px; }
+.cp-grupo__progreso[hidden], .cp-fecha[hidden]{ display: none; }
+.cp-grupo__progreso progress{ width: 220px; accent-color: var(--fire-red); }
+.cp-grupo__cabecera{ display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px 12px; margin-bottom: 12px; }
+.cp-grupo__cabecera .cp-grupo__titulo{ margin: 0; }
+.cp-grupo__correo{ padding: 8px 14px; font-size: 13px; }
+.cp-link-fecha{ background: none; border: 0; padding: 0 2px; font: inherit; font-size: 13px; color: var(--fire-red, #C51515); text-decoration: underline; cursor: pointer; }
+.cp-fecha{ flex-basis: 100%; border-top: 1px solid #EFEBE4; padding-top: 10px; }
+.cp-fecha__campos{ display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.cp-fecha__campos .admin-btn{ padding: 8px 14px; font-size: 13px; }
+.cp-fecha__nota{ font-size: 12px; color: #6B6259; margin: 6px 0 0; }
 .cp-dialogo__dato{ margin: 0 0 6px; font-size: 14px; color: #6B6259; overflow-wrap: anywhere; }
 .cp-dialogo__dato strong{ color: var(--ember, #171412); }
 .cp-dialogo__previa{

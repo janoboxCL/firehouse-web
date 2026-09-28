@@ -180,7 +180,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
           nombresAtletas,
           claseDePrueba,
           claseDePruebaStar: tieneClaseStar
-            ? { fecha: getNextStarClassDate(new Date(), config.starPrimeraClase), inicio: config.starHoraInicio, fin: config.starHoraFin }
+            ? { fecha: getNextStarClassDate(new Date(), config.starPrimeraClase, config.starHoraInicio), inicio: config.starHoraInicio, fin: config.starHoraFin }
             : null,
         },
         resolverBcc(env.EMAIL_BCC),

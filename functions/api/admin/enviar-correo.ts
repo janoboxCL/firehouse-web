@@ -75,7 +75,9 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     return jsonResponse(400, { error: 'VALIDATION_ERROR' });
   }
 
-  const { to, subject, html, text } = body ?? {};
+  // sinCopia: correos de un envío por grupo (sin copia oculta en cada uno).
+  // copiaInterna: el resumen de ese envío, que va a quienes reciben las copias.
+  const { to, subject, html, text, sinCopia, copiaInterna } = body ?? {};
   if (typeof to !== 'string' || typeof subject !== 'string' || typeof html !== 'string' || !to || !subject || !html) {
     return jsonResponse(400, { error: 'VALIDATION_ERROR', message: 'Faltan campos (to, subject, html).' });
   }
@@ -87,7 +89,10 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
   }
 
   try {
-    await enviarCorreoGenerico(env.RESEND_API_KEY, env.EMAIL_FROM, to, subject, html, resolverBcc(env.EMAIL_BCC), {
+    const copias = resolverBcc(env.EMAIL_BCC);
+    const destino = copiaInterna === true ? copias : to;
+    const bcc = copiaInterna === true || sinCopia === true ? undefined : copias;
+    await enviarCorreoGenerico(env.RESEND_API_KEY, env.EMAIL_FROM, destino, subject, html, bcc, {
       texto: text || undefined,
       responderA: env.EMAIL_REPLY_TO?.trim() || RESPONDER_A_POR_DEFECTO,
     });

@@ -202,7 +202,7 @@ export function resolverBcc(valorEnv: string | undefined): string[] {
 export async function enviarCorreoGenerico(
   apiKey: string,
   remitente: string,
-  destinatario: string,
+  destinatario: string | string[],
   asunto: string,
   html: string,
   bcc?: string[],

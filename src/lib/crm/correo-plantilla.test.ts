@@ -102,3 +102,12 @@ test('convierte en link las URL https escritas en el texto', () => {
   const r = renderizarCorreo({ asunto: 'A', cuerpo: 'Hola\n\nMira https://firehousecheer.cl/star.', datos: {} });
   assert.match(r.html, /<a href="https:\/\/firehousecheer\.cl\/star"/);
 });
+
+test('la copia interna muestra el resumen arriba y lo escapa', () => {
+  const r = renderizarCorreo({ asunto: 'A', cuerpo: 'Hola', datos: {}, avisoInterno: ['Enviado a 2 familias:', '✓ Sofía <b>'] });
+  assert.match(r.html, /Copia interna/);
+  assert.match(r.html, /✓ Sofía &lt;b&gt;/);
+  assert.match(r.texto, /^COPIA INTERNA/);
+  const normal = renderizarCorreo({ asunto: 'A', cuerpo: 'Hola', datos: {} });
+  assert.doesNotMatch(normal.html, /Copia interna/);
+});

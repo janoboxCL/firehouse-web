@@ -19,7 +19,7 @@ export const onRequestGet: PagesFunction<Env> = async ({ env }) => {
 
   const supabase = createClient(env.SUPABASE_URL, env.SUPABASE_SERVICE_ROLE_KEY, { auth: { persistSession: false } });
   const config = await leerConfigAcademia(supabase);
-  const proximaClase = getNextStarClassDate(new Date(), config.starPrimeraClase);
+  const proximaClase = getNextStarClassDate(new Date(), config.starPrimeraClase, config.starHoraInicio);
   const [precios, horarios] = await Promise.all([
     leerPreciosStar(supabase, Number(proximaClase.slice(0, 4))),
     leerHorariosClasePrueba(supabase),

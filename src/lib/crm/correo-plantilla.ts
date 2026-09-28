@@ -105,6 +105,8 @@ export interface OpcionesCorreo {
   clase?: ClaseCorreo;
   /** Origen para las imágenes (en la vista previa, el del panel). */
   sitio?: string;
+  /** Solo para la copia interna: resumen que se muestra arriba del correo. */
+  avisoInterno?: string[];
 }
 
 export interface CorreoRenderizado {
@@ -217,6 +219,13 @@ export function renderizarCorreo(op: OpcionesCorreo): CorreoRenderizado {
   }
 
   const sitio = (op.sitio ?? SITIO_FIREHOUSE).replace(/\/$/, '');
+  const aviso = op.avisoInterno?.length
+    ? `<tr><td style="padding:0 0 18px;"><div style="background:#FFFFFF;color:#171412;border-radius:12px;padding:16px 18px;font-size:13px;line-height:1.55;">
+        <p style="margin:0 0 8px;font-size:11px;letter-spacing:.18em;text-transform:uppercase;font-weight:bold;color:#C51515;">Copia interna · no es lo que ven las familias</p>
+        ${op.avisoInterno.map((l) => `<div>${escaparCorreo(l)}</div>`).join('')}
+        <p style="margin:10px 0 0;color:#6B6259;">Abajo, el correo tal como lo recibió la primera familia de la lista.</p>
+      </div></td></tr>`
+    : '';
   const html = `<!doctype html>
 <html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="dark"><title>${escaparCorreo(asunto)}</title></head>
 <body style="margin:0;padding:0;background:#171412;">
@@ -224,6 +233,7 @@ export function renderizarCorreo(op: OpcionesCorreo): CorreoRenderizado {
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#171412;">
 <tr><td align="center" style="padding:28px 14px;font-family:Arial,Helvetica,sans-serif;">
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;">
+    ${aviso}
     <tr><td align="center" style="padding:0 0 18px;">
       <img src="${sitio}/media/correo/star-logo.png" width="170" height="115" alt="Firehouse Star" style="display:block;border:0;width:170px;height:auto;">
     </td></tr>
@@ -245,6 +255,7 @@ export function renderizarCorreo(op: OpcionesCorreo): CorreoRenderizado {
 </table>
 </body></html>`;
 
-  const texto = `${partesTexto.join('\n\n')}\n\n--\nFirehouse Cheerleading All Stars\n${DIRECCION_FIREHOUSE}\nWhatsApp ${WHATSAPP_TEXTO}`;
+  const encabezado = op.avisoInterno?.length ? `COPIA INTERNA\n${op.avisoInterno.join('\n')}\n\n--\n\n` : '';
+  const texto = `${encabezado}${partesTexto.join('\n\n')}\n\n--\nFirehouse Cheerleading All Stars\n${DIRECCION_FIREHOUSE}\nWhatsApp ${WHATSAPP_TEXTO}`;
   return { asunto, html, texto, faltantes: [...faltantes] };
 }

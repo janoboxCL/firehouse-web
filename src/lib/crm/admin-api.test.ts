@@ -208,3 +208,17 @@ test('filtrarCasos: filtra por programa', () => {
   assert.deepEqual(filtrarCasos([star, allStar, sin], { programa: 'SIN_PROGRAMA' }).map((c) => c.id), ['x']);
   assert.equal(filtrarCasos([star, allStar, sin], { programa: 'TODOS' }).length, 3);
 });
+
+test('agruparPrimerasClases: una inscripción Star con fecha cambiada aparece en su nueva fecha', () => {
+  const ahora = new Date('2026-09-28T12:00:00-03:00');
+  const movida = caso({ id: 'm', journey: 'FIREHOUSE_STAR', estado: 'INSCRITO', created_at: '2026-09-20T12:00:00Z', fecha_clase_prueba: '2026-10-10' });
+  const normal = caso({ id: 'n', journey: 'FIREHOUSE_STAR', estado: 'NUEVO', created_at: '2026-09-22T12:00:00Z' });
+  const grupos = agruparPrimerasClases([movida, normal], ahora);
+  assert.deepEqual(grupos.map((g) => `${g.fecha}:${g.items.map((i) => i.caso.id).join(',')}`), ['2026-10-03:n', '2026-10-10:m']);
+});
+
+test('agruparPrimerasClases: inscrita el sábado después de la hora de inicio queda para el sábado siguiente', () => {
+  const tarde = caso({ id: 't', journey: 'FIREHOUSE_STAR', estado: 'NUEVO', created_at: '2026-10-03T22:00:00Z' }); // 19:00 en Chile
+  const grupos = agruparPrimerasClases([tarde], new Date('2026-10-04T12:00:00-03:00'), '2026-10-03', '18:30');
+  assert.equal(grupos[0].fecha, '2026-10-10');
+});

@@ -4,6 +4,7 @@ import {
   agruparPrimerasClases,
   enviarCorreoAdmin,
   actualizarCaso,
+  agregarInteraccion,
   registrarVisitaRapida,
   validarDatosVisitaRapida,
   type CasoResumen,
@@ -43,6 +44,9 @@ import { generarLinkPago } from '../lib/crm/admin-cuenta-api.ts';
 import { obtenerConfigAcademia, obtenerHorariosClasePrueba } from '../lib/crm/admin-config-api.ts';
 import { CONFIG_RESPALDO, type ConfigAcademia, type HorarioClasePrueba } from '../lib/crm/config-academia.ts';
 import { renderizarCorreo, type CorreoRenderizado } from '../lib/crm/correo-plantilla.ts';
+import { opcionesDeFecha, validarNuevaFecha, type ReglasFecha } from '../lib/crm/clase-fecha.ts';
+import { hoyChile } from '../lib/crm/programas.ts';
+import { abrirEnvioGrupal } from './admin-clase-prueba-grupo.ts';
 import {
   coincidePrograma,
   contarPorPrograma,
@@ -108,6 +112,43 @@ function avisoYaInscrito(caso: CasoResumen, plantilla: PlantillaClasePrueba): st
   return variablesUsadas(textos).includes('valor_inscripcion')
     ? 'Esta familia ya pagó la inscripción: este mensaje la invita a pagarla de nuevo. Elige otro mensaje.'
     : null;
+}
+
+/** Datos de la plantilla para un deportista del listado. */
+function datosPara(item: ItemPrimeraClase, ctx: ContextoMensajes, linkPago: string | null) {
+  const caso = item.caso;
+  return {
+    nombre_apoderado: primerNombre(caso.atleta.apoderado.nombre),
+    nombre_atleta: primerNombre(caso.atleta.nombre),
+    remitente: ctx.firma.nombre,
+    cargo: cargoEnMensaje(ctx.firma.cargo),
+    fecha_clase: fechaClaseTexto(item.fecha),
+    hora_clase: horaClase(caso),
+    talla: ctx.tallas.get(caso.atleta.id) ?? null,
+    valor_inscripcion: ctx.valorInscripcion,
+    link_pago: linkPago,
+  };
+}
+
+/** Correo con diseño de una plantilla para un deportista del listado. */
+function correoPara(
+  item: ItemPrimeraClase,
+  plantilla: PlantillaClasePrueba,
+  ctx: ContextoMensajes,
+  linkPago: string | null,
+  avisoInterno?: string[],
+) {
+  return renderizarCorreo({
+    avisoInterno,
+    asunto: plantilla.asunto?.trim() || plantilla.nombre,
+    cuerpo: plantilla.cuerpo_email?.trim() || plantilla.cuerpo,
+    datos: datosPara(item, ctx, linkPago),
+    clase: { etiqueta: esStar(item.caso) ? 'Tu primera clase' : 'Tu clase de prueba', horaFin: horaFinClase(item.caso) },
+  });
+}
+
+function necesitaLinkCorreo(plantilla: PlantillaClasePrueba): boolean {
+  return variablesUsadas(`${plantilla.asunto ?? ''}\n${plantilla.cuerpo_email ?? plantilla.cuerpo}`).includes('link_pago');
 }
 
 /** Muestra el correo tal como llegará y resuelve true si se confirma el envío. */
@@ -240,17 +281,7 @@ function bloqueMensajes(item: ItemPrimeraClase, supabase: SupabaseClient, ctx: C
     }
   });
 
-  const datosPlantilla = (linkPago: string | null) => ({
-    nombre_apoderado: primerNombre(caso.atleta.apoderado.nombre),
-    nombre_atleta: primerNombre(caso.atleta.nombre),
-    remitente: ctx.firma.nombre,
-    cargo: cargoEnMensaje(ctx.firma.cargo),
-    fecha_clase: fechaClaseTexto(item.fecha),
-    hora_clase: horaClase(caso),
-    talla: ctx.tallas.get(caso.atleta.id) ?? null,
-    valor_inscripcion: ctx.valorInscripcion,
-    link_pago: linkPago,
-  });
+  const datosPlantilla = (linkPago: string | null) => datosPara(item, ctx, linkPago);
 
   const registrar = (plantilla: PlantillaClasePrueba, canal: CanalEnvio = 'WHATSAPP') =>
     registrarEnvio(supabase, caso.id, plantilla, canal)
@@ -270,13 +301,7 @@ function bloqueMensajes(item: ItemPrimeraClase, supabase: SupabaseClient, ctx: C
         aviso.hidden = false;
       });
 
-  const correoDe = (plantilla: PlantillaClasePrueba, linkPago: string | null) =>
-    renderizarCorreo({
-      asunto: plantilla.asunto?.trim() || plantilla.nombre,
-      cuerpo: plantilla.cuerpo_email?.trim() || plantilla.cuerpo,
-      datos: datosPlantilla(linkPago),
-      clase: { etiqueta: esStar(caso) ? 'Tu primera clase' : 'Tu clase de prueba', horaFin: horaFinClase(caso) },
-    });
+  const correoDe = (plantilla: PlantillaClasePrueba, linkPago: string | null) => correoPara(item, plantilla, ctx, linkPago);
 
   botonCorreo.addEventListener('click', async () => {
     aviso.hidden = true;
@@ -289,8 +314,7 @@ function bloqueMensajes(item: ItemPrimeraClase, supabase: SupabaseClient, ctx: C
       aviso.hidden = false;
       return;
     }
-    const textos = `${plantilla.asunto ?? ''}\n${plantilla.cuerpo_email ?? plantilla.cuerpo}`;
-    const necesitaLink = variablesUsadas(textos).includes('link_pago');
+    const necesitaLink = necesitaLinkCorreo(plantilla);
 
     // Se revisan los datos con un link provisorio antes de crear cargos.
     const previa = correoDe(plantilla, necesitaLink ? 'https://firehousecheer.cl' : null);
@@ -375,6 +399,90 @@ function bloqueMensajes(item: ItemPrimeraClase, supabase: SupabaseClient, ctx: C
   return bloque;
 }
 
+/** Vuelve a cargar el listado (lo asigna renderizarLista). */
+let RECARGAR: () => Promise<void> = async () => {};
+
+function reglasFecha(caso: CasoResumen): ReglasFecha {
+  return {
+    esStar: esStar(caso),
+    hoy: hoyChile(),
+    primeraClaseStar: CONFIG.starPrimeraClase,
+    diasHabilitados: {
+      VIERNES: HORARIOS.get('VIERNES')?.habilitado ?? true,
+      SABADO: HORARIOS.get('SABADO')?.habilitado ?? true,
+    },
+  };
+}
+
+function textoFechaOpcion(fecha: string): string {
+  const t = fechaClaseTexto(fecha) ?? fecha;
+  return t.replace(/^el /, '').replace(/^./, (c) => c.toUpperCase());
+}
+
+/** Control para cambiar la fecha de la clase (prueba o primera clase Star). */
+function controlFecha(item: ItemPrimeraClase, supabase: SupabaseClient): { enlace: HTMLButtonElement; panel: HTMLElement } {
+  const caso = item.caso;
+  const enlace = document.createElement('button');
+  enlace.type = 'button';
+  enlace.className = 'cp-link-fecha';
+  enlace.textContent = 'Cambiar fecha';
+
+  const panel = document.createElement('div');
+  panel.className = 'cp-fecha';
+  panel.hidden = true;
+  const idSelect = `cp-fecha-${caso.id}`;
+  const reglas = reglasFecha(caso);
+  const opciones = opcionesDeFecha(reglas, item.fecha, 8);
+  panel.innerHTML = `
+    <label class="admin-label" for="${idSelect}">${item.tipo === 'INSCRIPCION' ? 'Nueva fecha de su primera clase' : 'Nueva fecha de la clase de prueba'}</label>
+    <div class="cp-fecha__campos">
+      <select id="${idSelect}" class="admin-select">
+        ${opciones.map((f) => `<option value="${f}" ${f === item.fecha ? 'selected' : ''}>${escaparHtml(textoFechaOpcion(f))}${f === item.fecha ? ' (actual)' : ''}</option>`).join('')}
+      </select>
+      <button type="button" class="admin-btn cp-fecha__guardar">Guardar</button>
+      <button type="button" class="admin-btn admin-btn--secundario cp-fecha__cancelar">Cancelar</button>
+    </div>
+    <p class="cp-fecha__nota">Los mensajes que envíes después usarán la nueva fecha. Queda registrado en la ficha del caso.</p>
+    <p class="cp-mensajes__aviso" hidden></p>`;
+
+  const select = panel.querySelector<HTMLSelectElement>('select')!;
+  const aviso = panel.querySelector<HTMLElement>('.cp-mensajes__aviso')!;
+  const guardar = panel.querySelector<HTMLButtonElement>('.cp-fecha__guardar')!;
+  enlace.addEventListener('click', () => {
+    panel.hidden = !panel.hidden;
+  });
+  panel.querySelector('.cp-fecha__cancelar')!.addEventListener('click', () => {
+    panel.hidden = true;
+    select.value = item.fecha;
+  });
+  guardar.addEventListener('click', async () => {
+    aviso.hidden = true;
+    const nueva = select.value;
+    if (nueva === item.fecha) {
+      panel.hidden = true;
+      return;
+    }
+    const v = validarNuevaFecha(nueva, reglas);
+    if (!v.ok) {
+      aviso.textContent = v.error;
+      aviso.hidden = false;
+      return;
+    }
+    guardar.disabled = true;
+    try {
+      await actualizarCaso(supabase, caso.id, { fecha_clase_prueba: nueva, dia_clase_prueba: v.dia });
+      const que = item.tipo === 'INSCRIPCION' ? 'Primera clase Firehouse Star' : 'Clase de prueba';
+      await agregarInteraccion(supabase, caso.id, 'NOTA', `${que} cambiada: ${textoFechaOpcion(item.fecha)} → ${textoFechaOpcion(nueva)}`).catch(() => {});
+      await RECARGAR();
+    } catch (err) {
+      aviso.textContent = mensajeErrorSupabase(err, 'No pudimos cambiar la fecha.');
+      aviso.hidden = false;
+      guardar.disabled = false;
+    }
+  });
+  return { enlace, panel };
+}
+
 const ESTADO_PAGO_STAR: Record<string, { texto: string; clase: string }> = {
   INSCRITO: { texto: 'Kit pagado', clase: 'cp-pago--ok' },
   NUEVO: { texto: 'Kit pendiente de pago', clase: 'cp-pago--pendiente' },
@@ -441,7 +549,9 @@ function filaCaso(item: ItemPrimeraClase, supabase: SupabaseClient, ctx: Context
     accion.appendChild(boton);
   }
 
-  fila.append(info, accion);
+  const fecha = controlFecha(item, supabase);
+  info.querySelector('.cp-fila__detalle')?.append(' · ', fecha.enlace);
+  fila.append(info, accion, fecha.panel);
   if (ctx.activo && ctx.plantillas.length > 0) fila.appendChild(bloqueMensajes(item, supabase, ctx));
   return fila;
 }
@@ -483,8 +593,9 @@ async function renderizarLista(supabase: SupabaseClient): Promise<void> {
     return;
   }
 
+  RECARGAR = () => renderizarLista(supabase);
   await cargarConfiguracion(supabase);
-  const todos = agruparPrimerasClases(casos, new Date(), CONFIG.starPrimeraClase);
+  const todos = agruparPrimerasClases(casos, new Date(), CONFIG.starPrimeraClase, CONFIG.starHoraInicio);
   const itemsTodos = todos.flatMap((g) => g.items);
   const ctx = await cargarContexto(supabase, itemsTodos.map((i) => i.caso));
 
@@ -524,7 +635,30 @@ async function renderizarLista(supabase: SupabaseClient): Promise<void> {
         inscripciones ? `${inscripciones} inscripci${inscripciones === 1 ? 'ón' : 'ones'} Star` : '',
       ].filter(Boolean);
       titulo.textContent = `${tituloGrupo(grupo.fecha)} · ${partes.join(' y ')}`;
-      seccion.appendChild(titulo);
+      const cabecera = document.createElement('div');
+      cabecera.className = 'cp-grupo__cabecera';
+      cabecera.appendChild(titulo);
+      if (ctx.activo && ctx.plantillas.some((p) => sirveParaCorreo(p))) {
+        const botonGrupo = document.createElement('button');
+        botonGrupo.type = 'button';
+        botonGrupo.className = 'admin-btn admin-btn--secundario cp-grupo__correo';
+        botonGrupo.textContent = '✉ Enviar correo al grupo';
+        botonGrupo.addEventListener('click', () =>
+          abrirEnvioGrupal({
+            supabase,
+            titulo: tituloGrupo(grupo.fecha),
+            items: grupo.items,
+            plantillas: ctx.plantillas.filter((p) => sirveParaCorreo(p)),
+            envios: ctx.envios,
+            correoPara: (item, plantilla, link, aviso) => correoPara(item, plantilla, ctx, link, aviso),
+            necesitaLink: necesitaLinkCorreo,
+            bloqueo: avisoYaInscrito,
+            alTerminar: () => RECARGAR(),
+          }),
+        );
+        cabecera.appendChild(botonGrupo);
+      }
+      seccion.appendChild(cabecera);
       grupo.items.forEach((i) => seccion.appendChild(filaCaso(i, supabase, ctx)));
       contenedor.appendChild(seccion);
     });
