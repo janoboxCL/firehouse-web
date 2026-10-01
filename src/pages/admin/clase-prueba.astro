@@ -2,15 +2,13 @@
 import AdminBase from '../../layouts/AdminBase.astro';
 ---
 <AdminBase titulo="Clase de prueba">
-  <a href="/admin" class="ficha-volver">← Volver al listado de casos</a>
   <div class="cp-header">
-    <h1 class="db-titulo">Clases de prueba y primeras clases</h1>
-    <button type="button" id="cp-btn-visita-rapida" class="admin-btn admin-btn--secundario">+ Agregar visita rápida</button>
+    <h1 class="db-titulo">Clase de hoy</h1>
+    <button type="button" id="cp-btn-visita-rapida" class="admin-btn admin-btn--secundario cp-btn-visita">+ Visita rápida</button>
   </div>
-  <p class="admin-intro">
-    Quiénes vienen a una clase de prueba o a su primera clase de Firehouse Star, agrupados por
-    fecha. Registra la talla, envía los mensajes por WhatsApp o por correo (a una familia o a todo
-    el grupo de una fecha), cambia la fecha si alguien no puede venir y marca la asistencia.
+  <p class="admin-intro cp-intro">
+    Marca a quienes llegaron y presiona <strong>Grabar asistencia</strong>. Con <strong>⋯</strong> ves el
+    contacto, cambias la fecha, registras la talla y envías mensajes.
   </p>
 
   <div id="cp-error" class="admin-error" hidden></div>
@@ -63,6 +61,7 @@ import AdminBase from '../../layouts/AdminBase.astro';
     <div id="cp-filtro" class="cp-filtro" role="group" aria-label="Filtrar"></div>
     <select id="cp-orden" class="admin-select cp-orden" aria-label="Ordenar por"></select>
   </div>
+  <div id="cp-aviso-asistencia" class="admin-aviso-cerrado" hidden></div>
   <div id="cp-aviso-mensajes" class="admin-aviso-cerrado" hidden></div>
 
   <section class="admin-card cp-lista-wrap">
@@ -70,6 +69,11 @@ import AdminBase from '../../layouts/AdminBase.astro';
     <p id="cp-vacio" class="admin-vacio" hidden>No hay clases de prueba agendadas todavía.</p>
     <div id="cp-grupos"></div>
   </section>
+
+  <div id="cp-barra-asistencia" class="cp-barra" role="status" aria-live="polite" hidden>
+    <span id="cp-barra-texto" class="cp-barra__texto"></span>
+    <button type="button" id="cp-barra-grabar" class="admin-btn cp-barra__grabar">Grabar asistencia</button>
+  </div>
 
   <dialog id="cp-dialogo-correo" class="cp-dialogo" aria-labelledby="cp-dialogo-titulo">
     <h2 id="cp-dialogo-titulo" class="ficha-bloque__titulo">Revisa el correo antes de enviarlo</h2>
@@ -136,37 +140,70 @@ import AdminBase from '../../layouts/AdminBase.astro';
 }
 .cp-consentimiento input{ margin-top: 3px; width: 18px; height: 18px; accent-color: var(--fire-red); flex-shrink: 0; }
 
-.cp-grupo{ margin-bottom: 24px; }
+.cp-grupo{ margin-bottom: 28px; }
 .cp-grupo:last-child{ margin-bottom: 0; }
 .cp-grupo__titulo{
-  font-family: var(--font-display); font-weight: 800; font-size: 1.1rem;
-  margin: 0 0 12px; color: var(--ember);
+  font-family: var(--font-display); font-weight: 800; font-size: 1.2rem;
+  margin: 0; color: var(--ember);
+}
+.cp-grupo__sub{ margin: 2px 0 0; font-size: 13px; color: #6B6259; }
+.cp-grupo__conteo{ display: flex; align-items: center; gap: 10px; flex: 1 1 220px; max-width: 360px; }
+.cp-grupo__barra{ flex: 1; height: 8px; border-radius: 999px; background: #EFEBE4; overflow: hidden; }
+.cp-grupo__barra-relleno{ display: block; height: 100%; width: 0; border-radius: 999px; background: #1E7A34; transition: width var(--t-interfaz, 180ms); }
+.cp-grupo__conteo-texto{ font-size: 14px; font-weight: 700; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.cp-grupo__accion{
+  background: none; border: 0; padding: 6px 2px; min-height: 36px; font: inherit; font-size: 13px; font-weight: 600;
+  color: #3D3630; text-decoration: underline; text-underline-offset: 3px; cursor: pointer;
+}
+.cp-grupo__accion:hover{ color: var(--fire-red, #C51515); }
+
+.cp-lista{ border: 1px solid #E4DFD6; border-radius: 12px; overflow: hidden; background: #fff; }
+.cp-fila{ border-top: 1px solid #EFEBE4; }
+.cp-fila:first-child{ border-top: 0; }
+.cp-fila--presente{ background: #F1F8F2; }
+.cp-fila__principal{ display: flex; align-items: center; min-height: 60px; }
+.cp-fila__marca{ flex: 1; min-width: 0; display: flex; align-items: center; gap: 14px; padding: 8px 4px 8px 14px; cursor: pointer; }
+.cp-check{ flex-shrink: 0; width: 26px; height: 26px; margin: 0; accent-color: #1E7A34; cursor: pointer; }
+.cp-check:disabled{ cursor: not-allowed; }
+.cp-fila__textos{ display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.cp-fila__nombre{ color: var(--ember, #171412); font-weight: 600; font-size: 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cp-fila__detalle{ font-size: 13px; line-height: 1.4; color: #6B6259; }
+.cp-kit{ white-space: nowrap; }
+.cp-tipo{ font-weight: 700; }
+.cp-tipo--star{ color: #8A5A00; }
+.cp-tipo--prueba{ color: #1B4FA8; }
+.cp-kit{ color: #8A5A00; font-weight: 600; }
+.cp-fila__mas{
+  flex-shrink: 0; width: 48px; height: 48px; margin-right: 4px; border: 0; border-radius: 10px;
+  background: transparent; color: #6B6259; display: flex; align-items: center; justify-content: center; cursor: pointer;
+}
+.cp-fila__mas:hover, .cp-fila--abierta .cp-fila__mas{ background: #F4F1EC; color: var(--ember, #171412); }
+.cp-fila__panel{ padding: 4px 16px 16px 54px; display: flex; flex-direction: column; gap: 10px; }
+.cp-fila__panel[hidden]{ display: none; }
+.cp-fila__contacto{ margin: 0; font-size: 14px; color: #3D3630; }
+.cp-fila__contacto a{ color: var(--fire-red, #C51515); }
+.cp-fila__nota{ font-size: 13px; color: var(--ember); margin: 0; font-style: italic; }
+@media (max-width: 600px){
+  .cp-fila__panel{ padding-left: 14px; }
+  .cp-lista-wrap{ padding: 12px; }
+  .cp-intro{ font-size: 14px; }
 }
 
-.cp-fila{
-  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px;
-  padding: 14px 16px; border: 1px solid #E4DFD6; border-radius: 12px; margin-bottom: 10px;
+.cp-barra{
+  position: fixed; left: 50%; bottom: 16px; transform: translateX(-50%); z-index: 20;
+  width: min(560px, calc(100vw - 24px)); box-sizing: border-box;
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 10px 10px 10px 18px; border-radius: 14px; background: var(--ember, #171412); color: #fff;
+  box-shadow: 0 10px 30px rgba(23,20,18,.3);
 }
-.cp-fila--asistio{ background: #E3F3E5; border-color: #BFE2C4; }
-.cp-fila__info{ min-width: 0; }
-.cp-fila__nombre{ font-weight: 600; margin: 0; }
-.cp-fila__detalle{ font-size: 13px; color: #6B6259; margin: 2px 0 0; }
-.cp-fila__nota{ font-size: 13px; color: var(--ember); margin: 6px 0 0; font-style: italic; }
-.cp-fila__accion{ flex-shrink: 0; }
-.cp-fila__confirmado{ color: #1E7A34; font-weight: 600; font-size: 14px; white-space: nowrap; }
-.cp-etiqueta-star{
-  display: inline-block; margin-left: 6px; padding: 2px 8px; border-radius: 999px;
-  background: var(--fire-yellow, #FFC400); color: var(--ember, #171412); font-size: 11px; font-weight: 700; vertical-align: middle;
-}
-.cp-etiqueta-general{
-  display: inline-block; margin-left: 6px; padding: 2px 8px; border-radius: 999px;
-  background: #E4DFD6; color: var(--ember, #171412); font-size: 11px; font-weight: 700; vertical-align: middle;
-}
-.cp-pago{ display: inline-block; margin-left: 4px; padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 700; vertical-align: middle; color: #fff; }
-.cp-pago--ok{ background: #1E7A3C; }
-.cp-pago--pendiente{ background: #B07800; }
-.cp-mensajes{ flex-basis: 100%; border-top: 1px solid #EFEBE4; padding-top: 12px; }
-.cp-fila--asistio .cp-mensajes{ border-top-color: #BFE2C4; }
+.cp-barra[hidden]{ display: none; }
+.cp-barra__texto{ flex: 1; min-width: 0; font-size: 14px; font-weight: 600; line-height: 1.3; }
+.cp-barra__grabar{ flex-shrink: 0; min-height: 48px; padding: 0 18px; font-size: 15px; font-weight: 700; white-space: nowrap; }
+.cp-barra__grabar[hidden]{ display: none; }
+.cp-barra--ok{ background: #1E7A34; }
+.cp-barra--error{ background: #7A1414; }
+body.cp-con-barra .cp-lista-wrap{ margin-bottom: 96px; }
+.cp-mensajes{ border-top: 1px solid #EFEBE4; padding-top: 12px; }
 .cp-mensajes__campos{ display: flex; flex-wrap: wrap; align-items: flex-end; gap: 12px; }
 .cp-mensajes__campos .admin-label{ font-size: 12px; margin-bottom: 4px; }
 .cp-select-talla{ min-width: 130px; }
@@ -219,7 +256,7 @@ import AdminBase from '../../layouts/AdminBase.astro';
 .cp-chip{ border: 1px solid #E4DFD6; background: #fff; border-radius: 999px; padding: 6px 12px; font: inherit; font-size: 13px; cursor: pointer; color: #3D3630; }
 .cp-chip[aria-pressed="true"]{ background: var(--ember, #171412); border-color: var(--ember, #171412); color: #fff; }
 .cp-link-fecha{ background: none; border: 0; padding: 0 2px; font: inherit; font-size: 13px; color: var(--fire-red, #C51515); text-decoration: underline; cursor: pointer; }
-.cp-fecha{ flex-basis: 100%; border-top: 1px solid #EFEBE4; padding-top: 10px; }
+.cp-fecha{ border-top: 1px solid #EFEBE4; padding-top: 10px; }
 .cp-fecha__campos{ display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 .cp-fecha__campos .admin-btn{ padding: 8px 14px; font-size: 13px; }
 .cp-fecha__nota{ font-size: 12px; color: #6B6259; margin: 6px 0 0; }

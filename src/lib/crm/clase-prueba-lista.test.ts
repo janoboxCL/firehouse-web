@@ -37,6 +37,14 @@ test('filtra por estado de pago, tipo, talla y correo', () => {
   assert.equal(ids('TODOS').length, 3);
 });
 
+test('filtra por asistencia marcada: por llegar y presentes', () => {
+  const presentes = new Set(['a-1', 'a-3']);
+  const ids = (f: 'POR_LLEGAR' | 'PRESENTES') =>
+    todas.filter((i) => cumpleFiltro(i, f, null, presentes.has(i.caso.atleta.id))).map((i) => i.caso.id);
+  assert.deepEqual(ids('PRESENTES'), ['1', '3']);
+  assert.deepEqual(ids('POR_LLEGAR'), ['2']);
+});
+
 test('busca por alumna, apoderado o teléfono sin importar tildes', () => {
   assert.equal(cumpleBusqueda(sofia, 'sofia'), true);
   assert.equal(cumpleBusqueda(emilia, 'alvaro'), true);
