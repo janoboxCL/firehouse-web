@@ -11,6 +11,7 @@ import {
   ordenarGruposPorUrgencia,
   agruparClasePruebaPorFecha,
   agruparPrimerasClases,
+  agregarAlumnasStar,
   rellenarPlantilla,
   type CasoResumen,
 } from './admin-api.ts';
@@ -221,4 +222,26 @@ test('agruparPrimerasClases: inscrita el sábado después de la hora de inicio q
   const tarde = caso({ id: 't', journey: 'FIREHOUSE_STAR', estado: 'NUEVO', created_at: '2026-10-03T22:00:00Z' }); // 19:00 en Chile
   const grupos = agruparPrimerasClases([tarde], new Date('2026-10-04T12:00:00-03:00'), '2026-10-03', '18:30');
   assert.equal(grupos[0].fecha, '2026-10-10');
+});
+
+test('agregarAlumnasStar: cada sábado incluye a las alumnas Star que ya tuvieron su primera clase', () => {
+  const conAtleta = (id: string, o: Partial<CasoResumen>) => {
+    const c = caso({ id, ...o });
+    return { ...c, atleta: { ...c.atleta, id: `at-${id}` } };
+  };
+  const antigua = conAtleta('v', { journey: 'FIREHOUSE_STAR', estado: 'INSCRITO', fecha_clase_prueba: '2026-10-03' });
+  const nueva = conAtleta('n', { journey: 'FIREHOUSE_STAR', estado: 'NUEVO', fecha_clase_prueba: '2026-10-10' });
+  const futura = conAtleta('f', { journey: 'FIREHOUSE_STAR', estado: 'INSCRITO', fecha_clase_prueba: '2026-10-17' });
+  const retirada = conAtleta('r', { journey: 'FIREHOUSE_STAR', estado: 'NO_CONTINUA', fecha_clase_prueba: '2026-10-03' });
+  const ahora = new Date('2026-10-10T19:00:00-03:00'); // sábado 10, durante la clase
+  const casos = [antigua, nueva, futura, retirada];
+  const grupos = agregarAlumnasStar(agruparPrimerasClases(casos, ahora, '2026-10-03', '18:30'), casos, ahora, '2026-10-03');
+  const del10 = grupos.find((g) => g.fecha === '2026-10-10')!;
+  assert.deepEqual(del10.items.map((i) => `${i.caso.id}:${i.tipo}`).sort(), ['n:INSCRIPCION', 'v:ALUMNA']);
+  assert.ok(grupos.every((g, i) => i === 0 || grupos[i - 1].fecha < g.fecha));
+});
+
+test('agregarAlumnasStar: sin alumnas que agregar deja los grupos igual', () => {
+  const grupos = agruparPrimerasClases([], new Date('2026-10-01T12:00:00-03:00'));
+  assert.equal(agregarAlumnasStar(grupos, [], new Date('2026-10-01T12:00:00-03:00')), grupos);
 });

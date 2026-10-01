@@ -1,0 +1,119 @@
+---
+import AdminBase from '../../layouts/AdminBase.astro';
+---
+<AdminBase titulo="Deportistas">
+  <div class="dp-cabecera">
+    <div>
+      <h1 class="db-titulo">Deportistas</h1>
+      <p id="dp-resumen" class="dp-resumen">Cargando…</p>
+    </div>
+    <button type="button" id="dp-excel" class="admin-btn admin-btn--secundario dp-excel">Exportar Excel</button>
+  </div>
+
+  <div id="dp-error" class="admin-error" hidden></div>
+  <div id="dp-aviso" class="admin-aviso-cerrado" hidden></div>
+
+  <div class="dp-herramientas">
+    <input id="dp-buscar" class="admin-input dp-buscar" type="search" placeholder="Buscar deportista, apoderado, teléfono o comuna" aria-label="Buscar" />
+    <select id="dp-orden" class="admin-select dp-orden" aria-label="Ordenar por"></select>
+  </div>
+  <div id="dp-programas" class="dp-chips" role="group" aria-label="Programa"></div>
+  <div id="dp-extras" class="dp-chips dp-chips--extra" role="group" aria-label="Filtros"></div>
+
+  <section class="dp-tabla-wrap" aria-live="polite">
+    <table class="dp-tabla" id="dp-tabla" hidden>
+      <thead>
+        <tr>
+          <th scope="col" class="dp-col-nombre">Deportista</th>
+          <th scope="col" class="dp-ext dp-col-estado">Estado</th>
+          <th scope="col" class="dp-ext dp-col-apoderado">Apoderado/a</th>
+          <th scope="col" class="dp-ext dp-col-comuna">Comuna</th>
+          <th scope="col" class="dp-col-fecha">Ingreso</th>
+          <th scope="col" class="dp-ext dp-col-fecha">1ª clase</th>
+          <th scope="col" class="dp-col-fecha">Últ. clase</th>
+          <th scope="col" class="dp-col-asist">Asist.</th>
+          <th scope="col" class="dp-ext dp-col-kit">Kit</th>
+        </tr>
+      </thead>
+      <tbody id="dp-cuerpo"></tbody>
+    </table>
+    <p id="dp-vacio" class="admin-vacio" hidden>No hay deportistas que coincidan con la búsqueda o el filtro.</p>
+  </section>
+  <p class="dp-nota">Asistencia: sábados presentes de los que le correspondían desde su primera clase (Star) o su clase de prueba. Toca una fila para abrir la ficha.</p>
+</AdminBase>
+
+<script>
+  import { iniciarDeportistas } from '../../scripts/admin-deportistas.ts';
+  iniciarDeportistas();
+</script>
+
+<style is:global>
+.dp-cabecera{ display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+.dp-cabecera .db-titulo{ margin-bottom: 2px; }
+.dp-resumen{ margin: 0 0 14px; font-size: 14px; color: #6B6259; }
+.dp-excel{ flex-shrink: 0; }
+.dp-herramientas{ display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 10px; }
+.dp-buscar{ flex: 1 1 260px; max-width: 420px; }
+.dp-orden{ width: auto; flex: 0 1 260px; }
+.dp-chips{ display: flex; gap: 6px; overflow-x: auto; padding-bottom: 6px; scrollbar-width: none; }
+.dp-chips::-webkit-scrollbar{ display: none; }
+.dp-chips--extra{ margin-bottom: 10px; }
+.dp-chip{
+  flex-shrink: 0; border: 1px solid #D8D2C8; background: #fff; border-radius: 999px; min-height: 36px; padding: 0 14px;
+  font: inherit; font-size: 14px; color: #3D3630; cursor: pointer; white-space: nowrap;
+}
+.dp-chip[aria-pressed="true"]{ background: var(--ember, #171412); border-color: var(--ember, #171412); color: #fff; font-weight: 600; }
+.dp-chip--alerta[aria-pressed="false"]{ color: #A91111; border-color: #E8A6A6; }
+
+.dp-tabla-wrap{ background: #fff; border: 1px solid #E4DFD6; border-radius: 14px; overflow: hidden; }
+.dp-tabla{ width: 100%; border-collapse: collapse; table-layout: fixed; font-variant-numeric: tabular-nums; }
+.dp-tabla th{
+  text-align: left; padding: 10px 12px; background: #FAF8F4; border-bottom: 1px solid #E4DFD6;
+  font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: #6B6259;
+}
+.dp-tabla td{ padding: 9px 12px; border-bottom: 1px solid #EFEBE4; font-size: 14px; vertical-align: middle; }
+.dp-tabla tbody tr{ cursor: pointer; }
+.dp-tabla tbody tr:hover{ background: #FAF8F4; }
+.dp-tabla tbody tr:last-child td{ border-bottom: 0; }
+.dp-col-fecha{ width: 80px; }
+.dp-col-asist{ width: 120px; }
+.dp-col-estado{ width: 118px; }
+.dp-col-apoderado{ width: 190px; }
+.dp-col-comuna{ width: 150px; }
+.dp-col-kit{ width: 96px; }
+.dp-nombre{ display: block; font-weight: 600; font-size: 15px; color: var(--ember, #171412) !important; text-decoration: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dp-nombre:hover{ text-decoration: underline; }
+.dp-sub{ display: block; font-size: 13px; color: #6B6259; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dp-kit-pend{ color: #8A5A00; font-weight: 600; }
+.dp-kit-ok{ color: #1E7A34; font-weight: 600; }
+.dp-baja{ color: #A91111; font-weight: 700; }
+.dp-asist{ display: flex; align-items: center; gap: 8px; }
+.dp-asist__barra{ flex: 1; height: 6px; border-radius: 999px; background: #EFEBE4; overflow: hidden; }
+.dp-asist__barra span{ display: block; height: 100%; border-radius: 999px; background: #1E7A34; }
+.dp-asist__barra--baja span{ background: #A91111; }
+.dp-asist__n{ font-weight: 700; min-width: 30px; text-align: right; }
+.dp-estado{ display: inline-block; padding: 3px 10px; border-radius: 999px; font-size: 12px; font-weight: 700; background: #F1EAE6; color: #6B6259; white-space: nowrap; }
+.dp-estado--ok{ background: #E3F3E5; color: #1E7A34; }
+.dp-estado--info{ background: #E9EEF9; color: #1B4FA8; }
+.dp-estado--no{ background: #FBE3E3; color: #A91111; }
+.dp-tel{ display: block; font-size: 13px; color: #6B6259; }
+.dp-nota{ font-size: 13px; color: #6B6259; margin: 10px 2px 0; }
+.dp-solo-movil{ display: none; }
+
+@media (max-width: 899px){
+  .dp-ext{ display: none; }
+  .dp-solo-movil{ display: inline; }
+  .dp-tabla th, .dp-tabla td{ padding: 9px 8px; }
+  .dp-tabla th:first-child, .dp-tabla td:first-child{ padding-left: 12px; }
+  .dp-col-fecha{ width: 58px; }
+  .dp-col-asist{ width: 50px; text-align: right; }
+  .dp-asist__barra{ display: none; }
+  .dp-asist{ justify-content: flex-end; }
+  .dp-tabla td{ font-size: 13px; }
+  .dp-tabla tbody tr{ height: 58px; }
+}
+@media (max-width: 600px){
+  .dp-excel{ padding: 8px 12px; font-size: 13px; }
+  .dp-orden{ flex: 1 1 100%; }
+}
+</style>

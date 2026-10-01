@@ -1,0 +1,91 @@
+---
+import AdminBase from '../../layouts/AdminBase.astro';
+---
+<AdminBase titulo="Asistencia">
+  <div class="as-cabecera">
+    <h1 class="db-titulo">Asistencia</h1>
+    <a href="/admin/clase-prueba" class="admin-btn as-tomar">Tomar asistencia</a>
+  </div>
+  <p class="admin-intro">Cuántos y quiénes vinieron cada día de clase, y quiénes están faltando.</p>
+
+  <div id="as-error" class="admin-error" hidden></div>
+  <div id="as-aviso" class="admin-aviso-cerrado" hidden></div>
+
+  <div id="as-programa" class="as-segmento" role="group" aria-label="Programa">
+    <button type="button" data-valor="TODOS" aria-pressed="true">Todos</button>
+    <button type="button" data-valor="STAR" aria-pressed="false">Firehouse Star</button>
+    <button type="button" data-valor="PRUEBA" aria-pressed="false">Clase de prueba</button>
+  </div>
+
+  <section class="as-kpis" aria-label="Resumen">
+    <div class="as-kpi"><p class="as-kpi__label">Asistencia promedio</p><p class="as-kpi__valor" id="as-k-promedio">—</p></div>
+    <div class="as-kpi"><p class="as-kpi__label">Días con asistencia</p><p class="as-kpi__valor" id="as-k-sesiones">—</p></div>
+    <div class="as-kpi"><p class="as-kpi__label">Faltan 2 seguidos</p><p class="as-kpi__valor" id="as-k-faltan">—</p></div>
+  </section>
+
+  <section id="as-faltan" class="as-card as-faltan" hidden>
+    <h2 class="as-h2">Faltan 2 sábados seguidos</h2>
+    <p class="as-nota">Alumnas Star activas que no vinieron a las dos últimas clases que les correspondían.</p>
+    <ul id="as-faltan-lista" class="as-lista"></ul>
+  </section>
+
+  <p id="as-cargando" class="admin-spinner">Cargando…</p>
+  <p id="as-vacio" class="admin-vacio" hidden>Todavía no hay asistencia grabada. Se registra desde Clase de hoy con el botón Grabar asistencia.</p>
+  <div id="as-sesiones" class="as-sesiones"></div>
+</AdminBase>
+
+<script>
+  import { iniciarAsistencia } from '../../scripts/admin-asistencia.ts';
+  iniciarAsistencia();
+</script>
+
+<style is:global>
+.as-cabecera{ display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.as-tomar{ text-decoration: none; color: #fff !important; flex-shrink: 0; }
+.as-segmento{ display: inline-flex; gap: 4px; padding: 4px; background: #fff; border: 1px solid #E4DFD6; border-radius: 12px; margin: 0 0 14px; max-width: 100%; overflow-x: auto; }
+.as-segmento button{ border: 0; background: transparent; border-radius: 9px; min-height: 38px; padding: 0 14px; font: inherit; font-size: 14px; color: #6B6259; cursor: pointer; white-space: nowrap; }
+.as-segmento button[aria-pressed="true"]{ background: var(--ember, #171412); color: #fff; font-weight: 600; }
+.as-kpis{ display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-bottom: 14px; }
+.as-kpi{ background: #fff; border: 1px solid #E4DFD6; border-radius: 14px; padding: 12px 14px; }
+.as-kpi__label{ margin: 0; font-size: 13px; color: #6B6259; }
+.as-kpi__valor{ margin: 2px 0 0; font-family: var(--font-display); font-weight: 800; font-size: 28px; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.as-kpi__valor--alerta{ color: #A91111; }
+.as-card{ background: #fff; border: 1px solid #E4DFD6; border-radius: 14px; padding: 16px; margin-bottom: 12px; }
+.as-card[hidden]{ display: none; }
+.as-faltan{ border-color: #E8A6A6; }
+.as-h2{ font-family: var(--font-display); font-weight: 800; font-size: 1.05rem; margin: 0; }
+.as-nota{ font-size: 13px; color: #6B6259; margin: 4px 0 10px; }
+.as-lista{ list-style: none; margin: 0; padding: 0; }
+.as-lista li{ display: flex; justify-content: space-between; align-items: center; gap: 10px; min-height: 40px; border-top: 1px solid #EFEBE4; font-size: 14px; }
+.as-lista li:first-child{ border-top: 0; }
+.as-lista a{ font-weight: 600; color: var(--ember, #171412) !important; text-decoration: none; }
+.as-lista a:hover{ text-decoration: underline; }
+.as-lista small{ color: #6B6259; font-size: 13px; text-align: right; }
+.as-lista small a{ font-weight: 400; color: var(--fire-red, #C51515) !important; }
+.as-sesiones{ display: flex; flex-direction: column; gap: 10px; }
+.as-sesion{ background: #fff; border: 1px solid #E4DFD6; border-radius: 14px; overflow: hidden; }
+.as-sesion summary{ list-style: none; cursor: pointer; padding: 14px 16px; display: flex; flex-direction: column; gap: 8px; }
+.as-sesion summary::-webkit-details-marker{ display: none; }
+.as-sesion__fila{ display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+.as-sesion__fecha{ font-weight: 700; font-size: 16px; }
+.as-sesion__fecha::after{ content: ' ▾'; color: #8C847B; font-weight: 400; }
+.as-sesion[open] .as-sesion__fecha::after{ content: ' ▴'; }
+.as-sesion__total{ font-size: 15px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.as-barra{ height: 8px; border-radius: 999px; background: #EFEBE4; overflow: hidden; }
+.as-barra span{ display: block; height: 100%; border-radius: 999px; background: #1E7A34; }
+.as-sesion__cuerpo{ padding: 0 16px 16px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.as-sesion__cuerpo h3{ margin: 0 0 4px; font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: #6B6259; }
+.as-sesion__pie{ grid-column: 1 / -1; }
+.as-vinieron summary{ list-style: none; cursor: pointer; min-height: 32px; }
+.as-vinieron summary::-webkit-details-marker{ display: none; }
+.as-ver{ text-transform: none; letter-spacing: 0; font-weight: 600; color: var(--fire-red, #C51515); text-decoration: underline; margin-left: 4px; }
+.as-vinieron[open] .as-ver{ display: none; }
+.as-link{ background: none; border: 0; padding: 0; min-height: 32px; font: inherit; font-size: 14px; font-weight: 600; color: var(--fire-red, #C51515); text-decoration: underline; cursor: pointer; }
+@media (max-width: 600px){
+  .as-kpis{ gap: 6px; }
+  .as-kpi{ padding: 10px; }
+  .as-kpi__label{ font-size: 12px; }
+  .as-kpi__valor{ font-size: 22px; }
+  .as-sesion__cuerpo{ grid-template-columns: 1fr; }
+}
+</style>

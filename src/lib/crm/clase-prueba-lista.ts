@@ -59,7 +59,7 @@ export function cumpleFiltro(
     case 'KIT_PAGADO':
       return kitPagado(i);
     case 'KIT_PENDIENTE':
-      return i.tipo === 'INSCRIPCION' && !kitPagado(i);
+      return i.tipo !== 'PRUEBA' && !kitPagado(i);
     case 'PRUEBA':
       return i.tipo === 'PRUEBA';
     case 'SIN_TALLA':
@@ -84,7 +84,7 @@ export function cumpleBusqueda(i: ItemPrimeraClase, texto: string): boolean {
 const nombreAlumna = (i: ItemPrimeraClase) => `${i.caso.atleta.nombre} ${i.caso.atleta.apellidos}`;
 const nombreApoderado = (i: ItemPrimeraClase) => `${i.caso.atleta.apoderado.nombre} ${i.caso.atleta.apoderado.apellidos}`;
 /** Pendientes de pago primero, luego clases de prueba, luego pagadas. */
-const rangoEstado = (i: ItemPrimeraClase) => (i.tipo === 'INSCRIPCION' && !kitPagado(i) ? 0 : i.tipo === 'PRUEBA' ? 1 : 2);
+const rangoEstado = (i: ItemPrimeraClase) => (i.tipo !== 'PRUEBA' && !kitPagado(i) ? 0 : i.tipo === 'PRUEBA' ? 1 : 2);
 
 export function ordenarItems(items: ItemPrimeraClase[], orden: OrdenClase): ItemPrimeraClase[] {
   const porAlumna = (a: ItemPrimeraClase, b: ItemPrimeraClase) => nombreAlumna(a).localeCompare(nombreAlumna(b), 'es');
@@ -121,6 +121,7 @@ export interface FilaAsistencia {
 
 function tipoItem(i: ItemPrimeraClase): string {
   if (i.tipo === 'INSCRIPCION') return 'Inscripción Star';
+  if (i.tipo === 'ALUMNA') return 'Alumna Star';
   return i.caso.journey === 'CLASE_PRUEBA_STAR' ? 'Prueba Star' : 'Clase de prueba';
 }
 
@@ -136,7 +137,7 @@ export function filasAsistencia(items: ItemPrimeraClase[], tallas: Map<string, s
       fechaNacimiento: a.fecha_nacimiento,
       talla: tallas.get(a.id) ?? '',
       tipo: tipoItem(i),
-      pago: i.tipo === 'INSCRIPCION' ? (kitPagado(i) ? 'Kit pagado' : 'Kit pendiente') : kitPagado(i) ? 'Inscrita' : '',
+      pago: i.tipo !== 'PRUEBA' ? (kitPagado(i) ? 'Kit pagado' : 'Kit pendiente') : kitPagado(i) ? 'Inscrita' : '',
       apoderado: `${a.apoderado.nombre} ${a.apoderado.apellidos}`.trim(),
       relacion: RELACION_APODERADO_LABEL[a.apoderado.relacion] ?? a.apoderado.relacion ?? '',
       telefono: a.apoderado.telefono,

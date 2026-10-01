@@ -2,6 +2,7 @@ import { requireAdminSession, montarCabeceraAdmin } from '../lib/crm/auth.ts';
 import {
   obtenerCasos,
   agruparPrimerasClases,
+  agregarAlumnasStar,
   enviarCorreoAdmin,
   actualizarCaso,
   agregarInteraccion,
@@ -530,7 +531,8 @@ function estaPresente(item: ItemPrimeraClase): boolean {
 }
 
 function tipoDe(item: ItemPrimeraClase): { texto: string; clase: string } {
-  if (item.tipo === 'INSCRIPCION') return { texto: 'Star', clase: 'cp-tipo--star' };
+  if (item.tipo === 'INSCRIPCION') return { texto: 'Star · 1ª clase', clase: 'cp-tipo--star' };
+  if (item.tipo === 'ALUMNA') return { texto: 'Star', clase: 'cp-tipo--star' };
   return esStar(item.caso) ? { texto: 'Prueba Star', clase: 'cp-tipo--star' } : { texto: 'Prueba', clase: 'cp-tipo--prueba' };
 }
 
@@ -551,7 +553,7 @@ function filaCaso(item: ItemPrimeraClase, supabase: SupabaseClient, ctx: Context
   const nombre = `${caso.atleta.nombre} ${caso.atleta.apellidos}`.trim();
   const edad = calcularEdad(caso.atleta.fecha_nacimiento, new Date(`${item.fecha}T12:00:00Z`))?.edad;
   const tipo = tipoDe(item);
-  const kitPendiente = item.tipo === 'INSCRIPCION' && caso.estado !== CRM_ESTADOS.INSCRITO;
+  const kitPendiente = item.tipo !== 'PRUEBA' && caso.estado !== CRM_ESTADOS.INSCRITO;
   const dia = !esStar(caso) && caso.dia_clase_prueba ? etiquetaDia(caso.dia_clase_prueba as DiaClasePrueba) : '';
   const hora = horaClase(caso);
   const idCheck = `cp-check-${caso.id}`;
@@ -591,9 +593,12 @@ function filaCaso(item: ItemPrimeraClase, supabase: SupabaseClient, ctx: Context
   let armado = false;
   boton.addEventListener('click', () => {
     if (!armado) {
-      const fecha = controlFecha(item, supabase);
-      panel.querySelector('.cp-fila__contacto')!.append(' · ', fecha.enlace);
-      panel.appendChild(fecha.panel);
+      // La fecha se cambia solo en la clase de prueba o la primera clase, no en la clase semanal.
+      if (item.tipo !== 'ALUMNA') {
+        const fecha = controlFecha(item, supabase);
+        panel.querySelector('.cp-fila__contacto')!.append(' · ', fecha.enlace);
+        panel.appendChild(fecha.panel);
+      }
       if (ctx.activo && ctx.plantillas.length > 0) panel.appendChild(bloqueMensajes(item, supabase, ctx));
       armado = true;
     }
@@ -765,7 +770,13 @@ async function renderizarLista(supabase: SupabaseClient): Promise<void> {
 
   RECARGAR = () => renderizarLista(supabase);
   await cargarConfiguracion(supabase);
-  const todos = agruparPrimerasClases(casos, new Date(), CONFIG.starPrimeraClase, CONFIG.starHoraInicio);
+  const ahora = new Date();
+  const todos = agregarAlumnasStar(
+    agruparPrimerasClases(casos, ahora, CONFIG.starPrimeraClase, CONFIG.starHoraInicio),
+    casos,
+    ahora,
+    CONFIG.starPrimeraClase,
+  );
   const itemsTodos = todos.flatMap((g) => g.items);
   const ctx = await cargarContexto(supabase, itemsTodos.map((i) => i.caso));
 
