@@ -6,8 +6,7 @@ import {
   enviarCorreoAdmin,
   actualizarCaso,
   agregarInteraccion,
-  registrarVisitaRapida,
-  validarDatosVisitaRapida,
+  registrarExpress,
   type CasoResumen,
   type ItemPrimeraClase,
 } from '../lib/crm/admin-api.ts';
@@ -26,6 +25,7 @@ import {
   type Firma,
   type PlantillaClasePrueba,
 } from '../lib/crm/admin-mensajes-api.ts';
+import { datosPorCompletar, payloadExpress, TALLA_NO_SABE } from '../lib/crm/registro-express.ts';
 import { etiquetaDia, HORA_CLASE_PRUEBA, type DiaClasePrueba } from '../lib/crm/clase-prueba.ts';
 import { obtenerAsistencias, grabarAsistencia, type DeportistaAsistencia } from '../lib/crm/admin-asistencia-api.ts';
 import {
@@ -569,7 +569,7 @@ function filaCaso(item: ItemPrimeraClase, supabase: SupabaseClient, ctx: Context
           <span class="cp-fila__nombre">${escaparHtml(nombre)}</span>
           <span class="cp-fila__detalle">${edad !== undefined && edad !== null ? `${edad} años · ` : ''}<span class="cp-tipo ${tipo.clase}">${tipo.texto}</span>${
             kitPendiente ? ' · <span class="cp-kit">Kit pendiente</span>' : ''
-          }${dia ? ` · ${escaparHtml(dia)}` : ''}</span>
+          }${datosPorCompletar(caso.atleta).length > 0 ? ' · <span class="cp-kit">Datos por completar</span>' : ''}${dia ? ` · ${escaparHtml(dia)}` : ''}</span>
         </span>
       </label>
       <button type="button" class="cp-fila__mas" aria-expanded="false" aria-controls="${idPanel}" aria-label="Contacto, mensajes y fecha de ${escaparHtml(nombre)}">${ICONO_MAS}</button>
@@ -680,6 +680,7 @@ async function grabarCambios(supabase: SupabaseClient): Promise<boolean> {
       presentes.forEach((id) => reflejarEstado(items.get(id), true));
       ausentes.forEach((id) => reflejarEstado(items.get(id), false));
       confirmarGrabado(a);
+      VERSION_GRABADO += 1;
     }
     const ahora = new Intl.DateTimeFormat('es-CL', { hour: '2-digit', minute: '2-digit', hourCycle: 'h23', timeZone: 'America/Santiago' }).format(new Date());
     avisoBarra(`Asistencia grabada · ${ahora} ✓`, 'ok');
@@ -698,6 +699,33 @@ async function grabarCambios(supabase: SupabaseClient): Promise<boolean> {
 // Modo Recepción: cada llegada se graba sola, poco después de marcarla.
 
 let RECEPCION: Recepcion | null = null;
+/** Sube con cada grabación: permite notar que se grabó algo mientras se recargaba la lista. */
+let VERSION_GRABADO = 0;
+/** Contexto vigente (tallas, plantillas); lo renueva renderizarLista. */
+let CTX: ContextoMensajes | null = null;
+let TIMER_SINCRONIZAR: ReturnType<typeof setInterval> | undefined;
+let SINCRONIZANDO = false;
+
+/** Lista de una fecha tal como la muestra Recepción (del programa elegido). */
+function itemsRecepcion(fecha: string): ItemPrimeraClase[] {
+  return [...(ITEMS_POR_FECHA.get(fecha)?.values() ?? [])].filter((i) => coincidePrograma(i.caso.programa, PROGRAMA));
+}
+
+/**
+ * Con dos personas recibiendo, cada celular trae cada cierto rato lo que marcó
+ * o registró el otro. No corre mientras hay cambios sin guardar ni mientras se
+ * llena un registro express.
+ */
+async function sincronizarRecepcion(fecha: string): Promise<void> {
+  if (!RECEPCION || SINCRONIZANDO || AUTO_GUARDANDO || RECEPCION.ocupada() || totalCambios(ASISTENCIA) > 0 || document.hidden) return;
+  SINCRONIZANDO = true;
+  try {
+    await RECARGAR();
+    RECEPCION?.recargar(itemsRecepcion(fecha));
+  } finally {
+    SINCRONIZANDO = false;
+  }
+}
 let TIMER_AUTO: ReturnType<typeof setTimeout> | undefined;
 let AUTO_GUARDANDO = false;
 let AUTO_PENDIENTE = false;
@@ -735,13 +763,28 @@ async function autoguardar(supabase: SupabaseClient): Promise<void> {
   );
 }
 
-function abrirModoRecepcion(supabase: SupabaseClient, fecha: string, items: ItemPrimeraClase[], ctx: ContextoMensajes): void {
+function abrirModoRecepcion(supabase: SupabaseClient, fecha: string, items: ItemPrimeraClase[], ctx: ContextoMensajes, abrirEnExpress = false): void {
+  const tallas = () => (CTX ?? ctx).tallas;
+  clearInterval(TIMER_SINCRONIZAR);
+  TIMER_SINCRONIZAR = setInterval(() => void sincronizarRecepcion(fecha), 20_000);
   RECEPCION = abrirRecepcion({
+    abrirEnExpress,
+    registrarExpress: async (datos, opciones) => {
+      const resultado = await registrarExpress(supabase, payloadExpress(datos, fecha, opciones));
+      if (resultado.duplicado) return { resultado };
+      await RECARGAR();
+      // Si la recarga falló, al menos la talla recién elegida queda a la vista.
+      resultado.atletas.forEach((a, i) => {
+        const talla = datos.ninos[i]?.talla;
+        if (talla && talla !== TALLA_NO_SABE && !tallas().has(a.atletaId)) tallas().set(a.atletaId, talla);
+      });
+      return { resultado, items: itemsRecepcion(fecha) };
+    },
     titulo: tituloGrupo(fecha),
     fecha,
     items,
     tallas: CONFIG.tallas,
-    tallaDe: (atletaId) => ctx.tallas.get(atletaId) ?? null,
+    tallaDe: (atletaId) => tallas().get(atletaId) ?? null,
     estaPresente,
     marcar: (item, presente) => {
       alternar(asistenciaDe(item.fecha), item.caso.atleta.id, presente);
@@ -751,11 +794,12 @@ function abrirModoRecepcion(supabase: SupabaseClient, fecha: string, items: Item
     },
     guardarTalla: async (atletaId, talla) => {
       await guardarTalla(supabase, atletaId, talla);
-      ctx.tallas.set(atletaId, talla);
+      tallas().set(atletaId, talla);
     },
     reintentar: () => programarAutoguardado(supabase),
     alCerrar: () => {
       RECEPCION = null;
+      clearInterval(TIMER_SINCRONIZAR);
       // Si quedó algo sin grabar (por ejemplo, sin conexión), se intenta de nuevo.
       if (totalCambios(ASISTENCIA) > 0) void autoguardar(supabase);
       DIBUJAR();
@@ -852,12 +896,19 @@ async function renderizarLista(supabase: SupabaseClient): Promise<void> {
   );
   const itemsTodos = todos.flatMap((g) => g.items);
   const ctx = await cargarContexto(supabase, itemsTodos.map((i) => i.caso));
+  CTX = ctx;
 
   // Asistencia grabada de cada fecha del listado (migración 0016).
   ITEMS_POR_FECHA.clear();
   todos.forEach((g) => ITEMS_POR_FECHA.set(g.fecha, new Map(g.items.map((i) => [i.caso.atleta.id, i]))));
   try {
-    const cargadas = await obtenerAsistencias(supabase, todos.map((g) => g.fecha));
+    let version = VERSION_GRABADO;
+    let cargadas = await obtenerAsistencias(supabase, todos.map((g) => g.fecha));
+    // Si se grabó una llegada mientras se consultaba, lo leído ya está viejo: se vuelve a leer.
+    if (version !== VERSION_GRABADO) {
+      version = VERSION_GRABADO;
+      cargadas = await obtenerAsistencias(supabase, todos.map((g) => g.fecha));
+    }
     ASISTENCIA_DISPONIBLE = cargadas.disponible;
     cargadas.porFecha.forEach((ids, fecha) => ASISTENCIA.set(fecha, combinarAlRecargar(ASISTENCIA.get(fecha), ids)));
   } catch (err) {
@@ -1017,6 +1068,17 @@ async function renderizarLista(supabase: SupabaseClient): Promise<void> {
   });
   DIBUJAR = dibujar;
   dibujar();
+
+  ABRIR_EXPRESS = () => {
+    if (!ASISTENCIA_DISPONIBLE) {
+      mostrarError('Para el registro express falta ejecutar las migraciones 0016 y 0017 en Supabase.');
+      return;
+    }
+    // La clase de hoy; si hoy no hay, la próxima; si no hay ninguna, hoy.
+    const hoy = hoyChile();
+    const fecha = todos.find((g) => g.fecha >= hoy)?.fecha ?? hoy;
+    abrirModoRecepcion(supabase, fecha, itemsRecepcion(fecha), ctx, true);
+  };
 }
 
 /** Búsqueda, filtros y orden del listado (se conectan una sola vez). */
@@ -1038,61 +1100,11 @@ function conectarHerramientas(): void {
   });
 }
 
-function limpiarFormularioVisita(): void {
-  $<HTMLFormElement>('#cp-form-visita')?.reset();
-}
+/** Abre Recepción directamente en el registro express (clase de hoy o la más próxima). */
+let ABRIR_EXPRESS: () => void = () => {};
 
-function conectarVisitaRapida(supabase: SupabaseClient): void {
-  const wrap = $<HTMLElement>('#cp-visita-form-wrap')!;
-  const btnAbrir = $<HTMLButtonElement>('#cp-btn-visita-rapida')!;
-  const btnCancelar = $<HTMLButtonElement>('#cp-btn-cancelar-visita')!;
-  const form = $<HTMLFormElement>('#cp-form-visita')!;
-  const guardado = $<HTMLElement>('#cp-visita-guardada')!;
-
-  btnAbrir.addEventListener('click', () => {
-    wrap.hidden = !wrap.hidden;
-  });
-  btnCancelar.addEventListener('click', () => {
-    wrap.hidden = true;
-    limpiarFormularioVisita();
-  });
-
-  form.addEventListener('submit', async (evt) => {
-    evt.preventDefault();
-    guardado.hidden = true;
-
-    const datos = {
-      apoderadoNombre: $<HTMLInputElement>('#vr-apoderado-nombre')!.value,
-      apoderadoApellidos: $<HTMLInputElement>('#vr-apoderado-apellidos')!.value,
-      apoderadoTelefono: $<HTMLInputElement>('#vr-telefono')!.value,
-      apoderadoEmail: $<HTMLInputElement>('#vr-email')!.value,
-      nota: $<HTMLTextAreaElement>('#vr-nota')!.value,
-    };
-
-    const errores = validarDatosVisitaRapida(datos);
-    if (errores.length > 0) {
-      mostrarError(errores.join(' '));
-      return;
-    }
-    $<HTMLElement>('#cp-error')!.hidden = true;
-
-    const boton = form.querySelector<HTMLButtonElement>('button[type="submit"]')!;
-    boton.disabled = true;
-    try {
-      const resultado = await registrarVisitaRapida(supabase, datos);
-      limpiarFormularioVisita();
-      wrap.hidden = true;
-      guardado.textContent = resultado.possibleDuplicate
-        ? 'Visita registrada — ojo, puede ser un contacto duplicado (revisa en Contactos).'
-        : 'Visita registrada y marcada como asistió.';
-      guardado.hidden = false;
-      await renderizarLista(supabase);
-    } catch (err) {
-      mostrarError(mensajeErrorSupabase(err, 'No pudimos registrar la visita. Inténtalo nuevamente.'));
-    } finally {
-      boton.disabled = false;
-    }
-  });
+function conectarRegistroExpress(): void {
+  $<HTMLButtonElement>('#cp-btn-express')!.addEventListener('click', () => ABRIR_EXPRESS());
 }
 
 export async function iniciarClasePrueba(): Promise<void> {
@@ -1100,7 +1112,7 @@ export async function iniciarClasePrueba(): Promise<void> {
   montarCabeceraAdmin(perfil);
   PROGRAMA = leerSeleccion();
 
-  conectarVisitaRapida(supabase);
+  conectarRegistroExpress();
   conectarHerramientas();
   conectarBarraAsistencia(supabase);
   await renderizarLista(supabase);

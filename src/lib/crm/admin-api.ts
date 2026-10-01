@@ -3,6 +3,7 @@
 
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { coincidePrograma, type SeleccionPrograma } from './programa-filtro.ts';
+import type { PayloadExpress, ResultadoExpress } from './registro-express.ts';
 import { getNextStarClassDate } from './star-class.ts';
 import { ESTADOS_CERRADOS, CRM_ESTADOS, CRM_JOURNEYS } from './constants.ts';
 import { calcularEdad, normalizarTelefonoCL, validarEmail } from './validation.ts';
@@ -699,4 +700,22 @@ export async function registrarVisitaRapida(
   });
   if (error) throw error;
   return data as ResultadoVisitaRapida;
+}
+
+// ---------------------------------------------------------------------------
+// Registro express (migración 0017): reemplaza a la visita rápida.
+// ---------------------------------------------------------------------------
+
+/** Llama a fn_registro_express. Si el WhatsApp ya existe devuelve duplicado: true y no crea nada. */
+export async function registrarExpress(supabase: SupabaseClient, payload: PayloadExpress): Promise<ResultadoExpress> {
+  const { data, error } = await supabase.rpc('fn_registro_express', { payload });
+  if (error) {
+    const texto = `${error.code ?? ''} ${error.message ?? ''}`;
+    if (/PGRST202|42883|fn_registro_express/.test(texto) && /not find|does not exist|no existe|PGRST202|42883/i.test(texto)) {
+      throw new Error('Falta ejecutar la migración 0017 en el SQL Editor de Supabase para usar el registro express.');
+    }
+    if (/solo_admin/.test(texto)) throw new Error('Tu sesión expiró. Vuelve a entrar al panel e inténtalo de nuevo.');
+    throw new Error('No pudimos registrar. Revisa la conexión e inténtalo de nuevo.');
+  }
+  return data as ResultadoExpress;
 }

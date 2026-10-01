@@ -31,7 +31,7 @@ let ORDEN: OrdenDeportistas = 'INGRESO';
 
 const PROGRAMA_CORTO: Record<Programa, string> = { STAR: 'Star', ALL_STAR: 'All Star', PRUEBA: 'Prueba', OTRO: 'Sin programa' };
 const PROGRAMAS: FiltroPrograma[] = ['TODOS', 'STAR', 'PRUEBA', 'ALL_STAR', 'OTRO'];
-const EXTRAS: Array<Exclude<FiltroExtra, 'NINGUNO'>> = ['KIT_PENDIENTE', 'FALTAN', 'RETIRADOS'];
+const EXTRAS: Array<Exclude<FiltroExtra, 'NINGUNO'>> = ['KIT_PENDIENTE', 'FALTAN', 'POR_COMPLETAR', 'RETIRADOS'];
 
 function claseEstado(f: FilaDeportista): string {
   if (!f.activo) return 'dp-estado--no';
@@ -52,6 +52,7 @@ function filaHtml(f: FilaDeportista, anio: string): string {
     f.kit === 'PENDIENTE' && f.activo ? '<span class="dp-kit-pend"> · Kit pendiente</span>' : '',
     f.faltaSeguidas ? '<span class="dp-baja"> · Faltó 2 sáb.</span>' : '',
   ].join('');
+  const completar = f.porCompletar && f.activo ? '<span class="dp-kit-pend"> · Datos por completar</span>' : '';
   const kit = f.kit === 'PAGADO' ? '<span class="dp-kit-ok">Pagado</span>' : f.kit === 'PENDIENTE' ? '<span class="dp-kit-pend">Pendiente</span>' : '—';
   return `
     <tr data-caso="${escaparHtml(f.casoId)}">
@@ -59,7 +60,7 @@ function filaHtml(f: FilaDeportista, anio: string): string {
         <a class="dp-nombre" href="/admin/caso?id=${encodeURIComponent(f.casoId)}">${escaparHtml(f.nombre)}</a>
         <span class="dp-sub">${escaparHtml(sub)}<span class="dp-solo-movil">${avisos}</span><span class="dp-ext">${
           f.faltaSeguidas ? '<span class="dp-baja"> · Faltó 2 sáb.</span>' : ''
-        }</span></span>
+        }</span>${completar}</span>
       </td>
       <td class="dp-ext"><span class="dp-estado ${claseEstado(f)}">${escaparHtml(f.estadoTexto)}</span></td>
       <td class="dp-ext dp-ext2">${escaparHtml(f.apoderado)}<span class="dp-tel">${escaparHtml(f.telefono)}</span></td>
@@ -96,6 +97,7 @@ function dibujar(): void {
   }).join('');
   $<HTMLElement>('#dp-extras')!.innerHTML = EXTRAS.map((e) => {
     const n = filtrarFilas(filas, PROGRAMA, e, texto).length;
+    if (e === 'POR_COMPLETAR' && n === 0 && EXTRA !== e) return '';
     return chip(`${FILTRO_EXTRA_LABEL[e]} · ${n}`, e === EXTRA, e, e === 'FALTAN' && n > 0);
   }).join('');
 
