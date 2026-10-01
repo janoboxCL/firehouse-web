@@ -79,6 +79,22 @@ body.admin-tema a{ color: var(--fire-red); }
 }
 .admin-header__logout:hover{ border-color: var(--fire-red); color: var(--fire-red); }
 
+/* Móvil: el encabezado no queda fijo (deja espacio a la lista al hacer scroll)
+   y los enlaces van en una sola fila que se desliza hacia el lado. */
+@media (max-width: 700px){
+  .admin-header{ position: static; }
+  .admin-header__wrap{ flex-wrap: wrap; gap: 8px 12px; padding: 10px 16px 0; }
+  .admin-header__nav{
+    order: 3; flex-basis: 100%; gap: 4px 18px; overflow-x: auto; white-space: nowrap;
+    padding: 2px 0 10px; scrollbar-width: none;
+  }
+  .admin-header__nav::-webkit-scrollbar{ display: none; }
+  .admin-header__link{ font-size: 14px; padding: 8px 0; flex-shrink: 0; }
+  .admin-header__usuario{ display: none; }
+  .admin-header__logout{ padding: 6px 12px; flex-shrink: 0; }
+  .admin-main{ padding: 16px 12px 48px; }
+}
+
 .admin-main{ max-width: 1280px; margin-inline: auto; padding: 28px 24px 64px; }
 
 .admin-card{
@@ -255,10 +271,6 @@ body.admin-tema a{ color: var(--fire-red); }
 .prg-form-periodo{ border-top: 1px solid #E4DFD6; padding-top: 20px; }
 .prg-campos{ display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 14px; margin-bottom: 14px; }
 
-@media (max-width: 700px){
-  .admin-header__wrap{ flex-wrap: wrap; gap: 10px; }
-  .admin-header__nav{ flex-wrap: wrap; gap: 8px 14px; }
-}
 @media (max-width: 900px){
   .ficha-grid{ grid-template-columns: 1fr; }
 }

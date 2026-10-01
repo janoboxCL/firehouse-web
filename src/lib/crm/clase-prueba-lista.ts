@@ -8,9 +8,19 @@ import { calcularEdad } from './validation.ts';
 // ---------------------------------------------------------------------------
 // Filtros y orden
 
-export type FiltroClase = 'TODOS' | 'KIT_PAGADO' | 'KIT_PENDIENTE' | 'PRUEBA' | 'SIN_TALLA' | 'SIN_CORREO';
+export type FiltroClase =
+  | 'TODOS'
+  | 'POR_LLEGAR'
+  | 'PRESENTES'
+  | 'KIT_PAGADO'
+  | 'KIT_PENDIENTE'
+  | 'PRUEBA'
+  | 'SIN_TALLA'
+  | 'SIN_CORREO';
 export const FILTRO_CLASE_LABEL: Record<FiltroClase, string> = {
   TODOS: 'Todas',
+  POR_LLEGAR: 'Por llegar',
+  PRESENTES: 'Presentes',
   KIT_PAGADO: 'Kit pagado',
   KIT_PENDIENTE: 'Kit pendiente',
   PRUEBA: 'Clase de prueba',
@@ -34,8 +44,18 @@ function kitPagado(i: ItemPrimeraClase): boolean {
   return i.caso.estado === 'INSCRITO';
 }
 
-export function cumpleFiltro(i: ItemPrimeraClase, filtro: FiltroClase, talla: string | null | undefined): boolean {
+/** `presente`: si está marcado en la asistencia de su fecha (solo lo usan Por llegar y Presentes). */
+export function cumpleFiltro(
+  i: ItemPrimeraClase,
+  filtro: FiltroClase,
+  talla: string | null | undefined,
+  presente = false,
+): boolean {
   switch (filtro) {
+    case 'POR_LLEGAR':
+      return !presente;
+    case 'PRESENTES':
+      return presente;
     case 'KIT_PAGADO':
       return kitPagado(i);
     case 'KIT_PENDIENTE':

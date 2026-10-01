@@ -17,8 +17,6 @@ import {
   obtenerPlantillasClasePrueba,
   obtenerTallas,
   obtenerValorInscripcionStar,
-  obtenerAsistenciasPrimeraClase,
-  registrarAsistenciaPrimeraClase,
   registrarEnvio,
   sirveParaCorreo,
   sirveParaWhatsApp,
@@ -28,6 +26,20 @@ import {
   type PlantillaClasePrueba,
 } from '../lib/crm/admin-mensajes-api.ts';
 import { etiquetaDia, HORA_CLASE_PRUEBA, type DiaClasePrueba } from '../lib/crm/clase-prueba.ts';
+import { obtenerAsistencias, grabarAsistencia, type DeportistaAsistencia } from '../lib/crm/admin-asistencia-api.ts';
+import {
+  alternar,
+  cambiosDeFecha,
+  cantidadCambios,
+  combinarAlRecargar,
+  confirmarGrabado,
+  porcentaje,
+  textoCambios,
+  textoPresentes,
+  totalCambios,
+  type AsistenciaFecha,
+} from '../lib/crm/asistencia.ts';
+import { calcularEdad } from '../lib/crm/validation.ts';
 import { CRM_ESTADOS, CRM_JOURNEYS } from '../lib/crm/constants.ts';
 import { mensajeErrorSupabase, escaparHtml } from '../lib/crm/format.ts';
 import {
@@ -75,7 +87,6 @@ interface ContextoMensajes {
   envios: EnvioPlantilla[];
   tallas: Map<string, string | null>;
   valorInscripcion: string | null;
-  asistenciasPrimeraClase: Set<string>;
 }
 
 function esStar(caso: CasoResumen): boolean {
@@ -495,77 +506,194 @@ function controlFecha(item: ItemPrimeraClase, supabase: SupabaseClient): { enlac
   return { enlace, panel };
 }
 
-const ESTADO_PAGO_STAR: Record<string, { texto: string; clase: string }> = {
-  INSCRITO: { texto: 'Kit pagado', clase: 'cp-pago--ok' },
-  NUEVO: { texto: 'Kit pendiente de pago', clase: 'cp-pago--pendiente' },
-};
+// ---------------------------------------------------------------------------
+// Asistencia (migración 0016): se marca en pantalla y se graba con un botón.
 
-function marcarAsistio(accion: HTMLElement, fila: HTMLElement): void {
-  fila.classList.add('cp-fila--asistio');
-  accion.innerHTML = '<span class="cp-fila__confirmado">✓ Asistió</span>';
+/** fecha → asistencia grabada y marcada en pantalla. */
+const ASISTENCIA = new Map<string, AsistenciaFecha>();
+/** fecha → atleta_id → ítem del listado (para saber el caso de cada deportista). */
+const ITEMS_POR_FECHA = new Map<string, Map<string, ItemPrimeraClase>>();
+/** false mientras la migración 0016 no esté aplicada. */
+let ASISTENCIA_DISPONIBLE = true;
+
+function asistenciaDe(fecha: string): AsistenciaFecha {
+  let a = ASISTENCIA.get(fecha);
+  if (!a) {
+    a = combinarAlRecargar(undefined, []);
+    ASISTENCIA.set(fecha, a);
+  }
+  return a;
 }
 
-function filaCaso(item: ItemPrimeraClase, supabase: SupabaseClient, ctx: ContextoMensajes): HTMLElement {
+function estaPresente(item: ItemPrimeraClase): boolean {
+  return asistenciaDe(item.fecha).marcadas.has(item.caso.atleta.id);
+}
+
+function tipoDe(item: ItemPrimeraClase): { texto: string; clase: string } {
+  if (item.tipo === 'INSCRIPCION') return { texto: 'Star', clase: 'cp-tipo--star' };
+  return esStar(item.caso) ? { texto: 'Prueba Star', clase: 'cp-tipo--star' } : { texto: 'Prueba', clase: 'cp-tipo--prueba' };
+}
+
+const ICONO_MAS =
+  '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="5" cy="12" r="1.2"></circle><circle cx="12" cy="12" r="1.2"></circle><circle cx="19" cy="12" r="1.2"></circle></svg>';
+
+/**
+ * Una fila: check de asistencia, nombre y una línea de detalle. Contacto,
+ * cambio de fecha, talla y mensajes quedan en un panel que se abre con "⋯".
+ */
+function filaCaso(item: ItemPrimeraClase, supabase: SupabaseClient, ctx: ContextoMensajes, alCambiar: () => void): HTMLElement {
   const caso = item.caso;
-  const esInscripcion = item.tipo === 'INSCRIPCION';
+  const atletaId = caso.atleta.id;
+  const presente = estaPresente(item);
   const fila = document.createElement('div');
-  const yaAsistio = esInscripcion ? ctx.asistenciasPrimeraClase.has(caso.id) : caso.estado === CRM_ESTADOS.ASISTIO;
-  fila.className = `cp-fila${yaAsistio ? ' cp-fila--asistio' : ''}`;
+  fila.className = `cp-fila${presente ? ' cp-fila--presente' : ''}`;
 
-  const info = document.createElement('div');
-  info.className = 'cp-fila__info';
+  const nombre = `${caso.atleta.nombre} ${caso.atleta.apellidos}`.trim();
+  const edad = calcularEdad(caso.atleta.fecha_nacimiento, new Date(`${item.fecha}T12:00:00Z`))?.edad;
+  const tipo = tipoDe(item);
+  const kitPendiente = item.tipo === 'INSCRIPCION' && caso.estado !== CRM_ESTADOS.INSCRITO;
   const dia = !esStar(caso) && caso.dia_clase_prueba ? etiquetaDia(caso.dia_clase_prueba as DiaClasePrueba) : '';
-  const etiqueta = esInscripcion
-    ? '<span class="cp-etiqueta-star">Inscripción Star</span>'
-    : esStar(caso)
-      ? '<span class="cp-etiqueta-star">Prueba Star</span>'
-      : '<span class="cp-etiqueta-general">Prueba</span>';
-  const pago = esInscripcion ? ESTADO_PAGO_STAR[caso.estado] : undefined;
-  info.innerHTML = `
-    <p class="cp-fila__nombre">${escaparHtml(`${caso.atleta.nombre} ${caso.atleta.apellidos}`)} ${etiqueta}${
-      pago ? ` <span class="cp-pago ${pago.clase}">${pago.texto}</span>` : ''
-    }</p>
-    <p class="cp-fila__detalle">${escaparHtml(`${caso.atleta.apoderado.nombre} ${caso.atleta.apoderado.apellidos}`)} · ${escaparHtml(
-      caso.atleta.apoderado.telefono,
-    )}${dia ? ` · ${escaparHtml(dia)}` : ''}${horaClase(caso) ? ` · ${escaparHtml(horaClase(caso)!)}` : ''}</p>
-    ${caso.comentario_inicial ? `<p class="cp-fila__nota">📝 ${escaparHtml(caso.comentario_inicial)}</p>` : ''}
-  `;
+  const hora = horaClase(caso);
+  const idCheck = `cp-check-${caso.id}`;
+  const idPanel = `cp-panel-${caso.id}`;
+  const telefono = caso.atleta.apoderado.telefono;
 
-  const accion = document.createElement('div');
-  accion.className = 'cp-fila__accion';
+  fila.innerHTML = `
+    <div class="cp-fila__principal">
+      <label class="cp-fila__marca" for="${idCheck}">
+        <input type="checkbox" id="${idCheck}" class="cp-check" ${presente ? 'checked' : ''} ${ASISTENCIA_DISPONIBLE ? '' : 'disabled'} />
+        <span class="cp-fila__textos">
+          <span class="cp-fila__nombre">${escaparHtml(nombre)}</span>
+          <span class="cp-fila__detalle">${edad !== undefined && edad !== null ? `${edad} años · ` : ''}<span class="cp-tipo ${tipo.clase}">${tipo.texto}</span>${
+            kitPendiente ? ' · <span class="cp-kit">Kit pendiente</span>' : ''
+          }${dia ? ` · ${escaparHtml(dia)}` : ''}</span>
+        </span>
+      </label>
+      <button type="button" class="cp-fila__mas" aria-expanded="false" aria-controls="${idPanel}" aria-label="Contacto, mensajes y fecha de ${escaparHtml(nombre)}">${ICONO_MAS}</button>
+    </div>
+    <div class="cp-fila__panel" id="${idPanel}" hidden>
+      <p class="cp-fila__contacto">${escaparHtml(`${caso.atleta.apoderado.nombre} ${caso.atleta.apoderado.apellidos}`.trim())} · <a href="tel:${escaparHtml(
+        telefono.replace(/[^+\d]/g, ''),
+      )}">${escaparHtml(telefono)}</a>${hora ? ` · ${escaparHtml(hora)}` : ''} · <a href="/admin/caso?id=${encodeURIComponent(caso.id)}">Ver ficha</a></p>
+      ${caso.comentario_inicial ? `<p class="cp-fila__nota">${escaparHtml(caso.comentario_inicial)}</p>` : ''}
+    </div>`;
 
-  if (yaAsistio) {
-    accion.innerHTML = '<span class="cp-fila__confirmado">✓ Asistió</span>';
-  } else {
-    const boton = document.createElement('button');
-    boton.type = 'button';
-    boton.className = 'admin-btn admin-btn--secundario';
-    boton.textContent = '✓ Marcar asistencia';
-    boton.addEventListener('click', async () => {
-      boton.disabled = true;
-      try {
-        // En una inscripción Star el estado refleja el pago, así que la asistencia
-        // se registra como nota y el estado no cambia.
-        if (esInscripcion) {
-          await registrarAsistenciaPrimeraClase(supabase, caso.id);
-          ctx.asistenciasPrimeraClase.add(caso.id);
-        } else {
-          await actualizarCaso(supabase, caso.id, { estado: CRM_ESTADOS.ASISTIO });
-        }
-        marcarAsistio(accion, fila);
-      } catch (err) {
-        mostrarError(mensajeErrorSupabase(err, 'No pudimos marcar la asistencia. Inténtalo nuevamente.'));
-        boton.disabled = false;
-      }
-    });
-    accion.appendChild(boton);
-  }
+  const check = fila.querySelector<HTMLInputElement>('.cp-check')!;
+  check.addEventListener('change', () => {
+    alternar(asistenciaDe(item.fecha), atletaId, check.checked);
+    fila.classList.toggle('cp-fila--presente', check.checked);
+    alCambiar();
+  });
 
-  const fecha = controlFecha(item, supabase);
-  info.querySelector('.cp-fila__detalle')?.append(' · ', fecha.enlace);
-  fila.append(info, accion, fecha.panel);
-  if (ctx.activo && ctx.plantillas.length > 0) fila.appendChild(bloqueMensajes(item, supabase, ctx));
+  // El panel se arma la primera vez que se abre: la lista carga más rápido.
+  const panel = fila.querySelector<HTMLElement>('.cp-fila__panel')!;
+  const boton = fila.querySelector<HTMLButtonElement>('.cp-fila__mas')!;
+  let armado = false;
+  boton.addEventListener('click', () => {
+    if (!armado) {
+      const fecha = controlFecha(item, supabase);
+      panel.querySelector('.cp-fila__contacto')!.append(' · ', fecha.enlace);
+      panel.appendChild(fecha.panel);
+      if (ctx.activo && ctx.plantillas.length > 0) panel.appendChild(bloqueMensajes(item, supabase, ctx));
+      armado = true;
+    }
+    panel.hidden = !panel.hidden;
+    boton.setAttribute('aria-expanded', String(!panel.hidden));
+    fila.classList.toggle('cp-fila--abierta', !panel.hidden);
+  });
   return fila;
+}
+
+/** Barra inferior: cambios sin grabar y botón "Grabar asistencia". */
+let AVISO_BARRA: { texto: string; tipo: 'ok' | 'error' } | null = null;
+let TIMER_BARRA: ReturnType<typeof setTimeout> | undefined;
+
+function actualizarBarra(): void {
+  const barra = $<HTMLElement>('#cp-barra-asistencia');
+  if (!barra) return;
+  const n = totalCambios(ASISTENCIA);
+  const texto = $<HTMLElement>('#cp-barra-texto')!;
+  const grabar = $<HTMLButtonElement>('#cp-barra-grabar')!;
+  barra.classList.toggle('cp-barra--ok', n === 0 && AVISO_BARRA?.tipo === 'ok');
+  barra.classList.toggle('cp-barra--error', AVISO_BARRA?.tipo === 'error');
+  if (n > 0) {
+    texto.textContent = AVISO_BARRA?.tipo === 'error' ? AVISO_BARRA.texto : `${textoCambios(n)} sin grabar`;
+    grabar.hidden = false;
+    barra.hidden = false;
+  } else if (AVISO_BARRA) {
+    texto.textContent = AVISO_BARRA.texto;
+    grabar.hidden = true;
+    barra.hidden = false;
+  } else {
+    barra.hidden = true;
+  }
+  document.body.classList.toggle('cp-con-barra', !barra.hidden);
+}
+
+function avisoBarra(texto: string, tipo: 'ok' | 'error'): void {
+  AVISO_BARRA = { texto, tipo };
+  clearTimeout(TIMER_BARRA);
+  if (tipo === 'ok') {
+    TIMER_BARRA = setTimeout(() => {
+      AVISO_BARRA = null;
+      actualizarBarra();
+    }, 4000);
+  }
+  actualizarBarra();
+}
+
+const ESTADOS_ANTES_DE_LA_CLASE: readonly string[] = [
+  CRM_ESTADOS.NUEVO,
+  CRM_ESTADOS.CONTACTADO,
+  CRM_ESTADOS.SEGUIMIENTO,
+  CRM_ESTADOS.AGENDADO,
+  CRM_ESTADOS.NO_RESPONDE,
+];
+
+/** Refleja en pantalla el cambio de estado que hace fn_grabar_asistencia en las clases de prueba. */
+function reflejarEstado(item: ItemPrimeraClase | undefined, presente: boolean): void {
+  if (!item || item.tipo !== 'PRUEBA') return;
+  if (presente && ESTADOS_ANTES_DE_LA_CLASE.includes(item.caso.estado)) item.caso.estado = CRM_ESTADOS.ASISTIO;
+  if (!presente && item.caso.estado === CRM_ESTADOS.ASISTIO) item.caso.estado = CRM_ESTADOS.AGENDADO;
+}
+
+async function grabarCambios(supabase: SupabaseClient): Promise<void> {
+  const grabar = $<HTMLButtonElement>('#cp-barra-grabar')!;
+  grabar.disabled = true;
+  grabar.textContent = 'Grabando…';
+  AVISO_BARRA = null;
+  try {
+    for (const [fecha, a] of ASISTENCIA) {
+      if (cantidadCambios(a) === 0) continue;
+      const items = ITEMS_POR_FECHA.get(fecha) ?? new Map<string, ItemPrimeraClase>();
+      const { presentes, ausentes } = cambiosDeFecha(a);
+      const payload = (ids: string[]): DeportistaAsistencia[] =>
+        ids.map((atleta_id) => ({ atleta_id, caso_id: items.get(atleta_id)?.caso.id ?? '' }));
+      await grabarAsistencia(supabase, fecha, payload(presentes), payload(ausentes));
+      presentes.forEach((id) => reflejarEstado(items.get(id), true));
+      ausentes.forEach((id) => reflejarEstado(items.get(id), false));
+      confirmarGrabado(a);
+    }
+    const ahora = new Intl.DateTimeFormat('es-CL', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Santiago' }).format(new Date());
+    avisoBarra(`Asistencia grabada · ${ahora} ✓`, 'ok');
+  } catch (err) {
+    avisoBarra(mensajeErrorSupabase(err, 'No pudimos grabar la asistencia. Revisa tu conexión e inténtalo nuevamente.'), 'error');
+  } finally {
+    grabar.disabled = false;
+    grabar.textContent = 'Grabar asistencia';
+    DIBUJAR();
+  }
+}
+
+function conectarBarraAsistencia(supabase: SupabaseClient): void {
+  $('#cp-barra-grabar')?.addEventListener('click', () => void grabarCambios(supabase));
+  // Evita perder marcas sin grabar al cerrar o recargar la página.
+  window.addEventListener('beforeunload', (e) => {
+    if (totalCambios(ASISTENCIA) > 0) {
+      e.preventDefault();
+      e.returnValue = '';
+    }
+  });
 }
 
 async function cargarContexto(supabase: SupabaseClient, casos: CasoResumen[]): Promise<ContextoMensajes> {
@@ -576,19 +704,17 @@ async function cargarContexto(supabase: SupabaseClient, casos: CasoResumen[]): P
     envios: [],
     tallas: new Map(),
     valorInscripcion: null,
-    asistenciasPrimeraClase: new Set(),
   };
   try {
-    const [firma, plantillas, envios, tallas, valorInscripcion, asistenciasPrimeraClase] = await Promise.all([
+    const [firma, plantillas, envios, tallas, valorInscripcion] = await Promise.all([
       obtenerFirma(supabase),
       obtenerPlantillasClasePrueba(supabase),
       obtenerEnvios(supabase, casos.map((c) => c.id)),
       obtenerTallas(supabase, casos.map((c) => c.atleta.id)),
       obtenerValorInscripcionStar(supabase),
-      obtenerAsistenciasPrimeraClase(supabase, casos.map((c) => c.id)),
     ]);
-    if (!firma.disponible) return { ...vacio, asistenciasPrimeraClase };
-    return { activo: true, firma, plantillas, envios, tallas, valorInscripcion, asistenciasPrimeraClase };
+    if (!firma.disponible) return vacio;
+    return { activo: true, firma, plantillas, envios, tallas, valorInscripcion };
   } catch {
     return vacio;
   }
@@ -643,6 +769,24 @@ async function renderizarLista(supabase: SupabaseClient): Promise<void> {
   const itemsTodos = todos.flatMap((g) => g.items);
   const ctx = await cargarContexto(supabase, itemsTodos.map((i) => i.caso));
 
+  // Asistencia grabada de cada fecha del listado (migración 0016).
+  ITEMS_POR_FECHA.clear();
+  todos.forEach((g) => ITEMS_POR_FECHA.set(g.fecha, new Map(g.items.map((i) => [i.caso.atleta.id, i]))));
+  try {
+    const cargadas = await obtenerAsistencias(supabase, todos.map((g) => g.fecha));
+    ASISTENCIA_DISPONIBLE = cargadas.disponible;
+    cargadas.porFecha.forEach((ids, fecha) => ASISTENCIA.set(fecha, combinarAlRecargar(ASISTENCIA.get(fecha), ids)));
+  } catch (err) {
+    mostrarError(mensajeErrorSupabase(err, 'No pudimos cargar la asistencia grabada. Recarga la página.'));
+    ASISTENCIA_DISPONIBLE = false;
+  }
+  const avisoAsistencia = $<HTMLElement>('#cp-aviso-asistencia')!;
+  avisoAsistencia.hidden = ASISTENCIA_DISPONIBLE;
+  avisoAsistencia.textContent = ASISTENCIA_DISPONIBLE
+    ? ''
+    : 'Para marcar y grabar asistencia falta ejecutar la migración 0016 en el SQL Editor de Supabase.';
+  actualizarBarra();
+
   $('#cp-cargando')?.setAttribute('hidden', '');
   const avisoMensajes = $<HTMLElement>('#cp-aviso-mensajes')!;
   avisoMensajes.hidden = ctx.activo;
@@ -666,7 +810,7 @@ async function renderizarLista(supabase: SupabaseClient): Promise<void> {
     const buscados = delPrograma.flatMap((g) => g.items).filter((i) => cumpleBusqueda(i, texto));
     $<HTMLElement>('#cp-filtro')!.innerHTML = (Object.keys(FILTRO_CLASE_LABEL) as FiltroClase[])
       .map((f) => {
-        const n = buscados.filter((i) => cumpleFiltro(i, f, ctx.tallas.get(i.caso.atleta.id))).length;
+        const n = buscados.filter((i) => cumpleFiltro(i, f, ctx.tallas.get(i.caso.atleta.id), estaPresente(i))).length;
         return `<button type="button" class="cp-chip" data-filtro="${f}" aria-pressed="${f === FILTRO}">${FILTRO_CLASE_LABEL[f]} (${n})</button>`;
       })
       .join('');
@@ -676,7 +820,9 @@ async function renderizarLista(supabase: SupabaseClient): Promise<void> {
         fecha: g.fecha,
         todos: g.items,
         items: ordenarItems(
-          g.items.filter((i) => cumpleBusqueda(i, texto) && cumpleFiltro(i, FILTRO, ctx.tallas.get(i.caso.atleta.id))),
+          g.items.filter(
+            (i) => cumpleBusqueda(i, texto) && cumpleFiltro(i, FILTRO, ctx.tallas.get(i.caso.atleta.id), estaPresente(i)),
+          ),
           ORDEN,
         ),
       }))
@@ -694,42 +840,48 @@ async function renderizarLista(supabase: SupabaseClient): Promise<void> {
     grupos.forEach((grupo) => {
       const seccion = document.createElement('div');
       seccion.className = 'cp-grupo';
-      const titulo = document.createElement('p');
-      titulo.className = 'cp-grupo__titulo';
-      const pruebas = grupo.items.filter((i) => i.tipo === 'PRUEBA').length;
-      const inscripciones = grupo.items.length - pruebas;
+      const pruebas = grupo.todos.filter((i) => i.tipo === 'PRUEBA').length;
+      const inscripciones = grupo.todos.length - pruebas;
       const partes = [
-        pruebas ? `${pruebas} clase${pruebas === 1 ? '' : 's'} de prueba` : '',
-        inscripciones ? `${inscripciones} inscripci${inscripciones === 1 ? 'ón' : 'ones'} Star` : '',
+        inscripciones ? `${inscripciones} Star` : '',
+        pruebas ? `${pruebas} ${pruebas === 1 ? 'prueba' : 'pruebas'}` : '',
       ].filter(Boolean);
-      const filtrado = grupo.items.length !== grupo.todos.length ? ` (mostrando ${grupo.items.length} de ${grupo.todos.length})` : '';
-      titulo.textContent = `${tituloGrupo(grupo.fecha)} · ${partes.join(' y ')}${filtrado}`;
+      const filtrado = grupo.items.length !== grupo.todos.length ? ` · mostrando ${grupo.items.length}` : '';
+      const horario = [CONFIG.starHoraInicio, CONFIG.starHoraFin].filter(Boolean).join('–');
+
       const cabecera = document.createElement('div');
       cabecera.className = 'cp-grupo__cabecera';
-      cabecera.appendChild(titulo);
+      cabecera.innerHTML = `
+        <div class="cp-grupo__encabezado">
+          <p class="cp-grupo__titulo">${escaparHtml(tituloGrupo(grupo.fecha))}</p>
+          <p class="cp-grupo__sub">${escaparHtml([horario, partes.join(' · ')].filter(Boolean).join(' · '))}${escaparHtml(filtrado)}</p>
+        </div>
+        <div class="cp-grupo__conteo">
+          <span class="cp-grupo__barra" aria-hidden="true"><span class="cp-grupo__barra-relleno"></span></span>
+          <span class="cp-grupo__conteo-texto"></span>
+        </div>`;
+      const relleno = cabecera.querySelector<HTMLElement>('.cp-grupo__barra-relleno')!;
+      const conteoTexto = cabecera.querySelector<HTMLElement>('.cp-grupo__conteo-texto')!;
+      const actualizarConteo = () => {
+        const presentes = grupo.todos.filter((i) => estaPresente(i)).length;
+        conteoTexto.textContent = textoPresentes(presentes, grupo.todos.length);
+        relleno.style.width = `${porcentaje(presentes, grupo.todos.length)}%`;
+      };
+      actualizarConteo();
+
       const botones = document.createElement('div');
       botones.className = 'cp-grupo__botones';
-      cabecera.appendChild(botones);
-      // La lista de asistencia siempre incluye a todas las de esa fecha (del programa elegido).
-      const botonLista = document.createElement('button');
-      botonLista.type = 'button';
-      botonLista.className = 'admin-btn admin-btn--secundario cp-grupo__correo';
-      botonLista.textContent = '🖨 Lista de asistencia';
-      botonLista.title = 'Lista para pasar asistencia, lista para imprimir o guardar como PDF';
-      botonLista.addEventListener('click', () => exportarAsistencia(grupo.fecha, grupo.todos, ctx, 'IMPRIMIR'));
-      const botonExcel = document.createElement('button');
-      botonExcel.type = 'button';
-      botonExcel.className = 'admin-btn admin-btn--secundario cp-grupo__correo';
-      botonExcel.textContent = '⬇ Excel';
-      botonExcel.title = 'Descargar la lista de asistencia para abrir en Excel';
-      botonExcel.addEventListener('click', () => exportarAsistencia(grupo.fecha, grupo.todos, ctx, 'EXCEL'));
-      botones.append(botonLista, botonExcel);
+      const accion = (texto: string, titulo: string, alClic: () => void) => {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'cp-grupo__accion';
+        b.textContent = texto;
+        b.title = titulo;
+        b.addEventListener('click', alClic);
+        botones.appendChild(b);
+      };
       if (ctx.activo && ctx.plantillas.some((p) => sirveParaCorreo(p))) {
-        const botonGrupo = document.createElement('button');
-        botonGrupo.type = 'button';
-        botonGrupo.className = 'admin-btn admin-btn--secundario cp-grupo__correo';
-        botonGrupo.textContent = '✉ Enviar correo al grupo';
-        botonGrupo.addEventListener('click', () =>
+        accion('Correo al grupo', 'Enviar un correo con plantilla a todo el grupo', () =>
           abrirEnvioGrupal({
             supabase,
             titulo: tituloGrupo(grupo.fecha),
@@ -742,10 +894,25 @@ async function renderizarLista(supabase: SupabaseClient): Promise<void> {
             alTerminar: () => RECARGAR(),
           }),
         );
-        botones.prepend(botonGrupo);
       }
+      // La lista impresa y el Excel siempre incluyen a todos los de esa fecha (del programa elegido).
+      accion('Imprimir lista', 'Lista para imprimir o guardar como PDF', () => exportarAsistencia(grupo.fecha, grupo.todos, ctx, 'IMPRIMIR'));
+      accion('Excel', 'Descargar la lista para abrir en Excel', () => exportarAsistencia(grupo.fecha, grupo.todos, ctx, 'EXCEL'));
+      cabecera.appendChild(botones);
       seccion.appendChild(cabecera);
-      grupo.items.forEach((i) => seccion.appendChild(filaCaso(i, supabase, ctx)));
+
+      const lista = document.createElement('div');
+      lista.className = 'cp-lista';
+      grupo.items.forEach((i) =>
+        lista.appendChild(
+          filaCaso(i, supabase, ctx, () => {
+            actualizarConteo();
+            AVISO_BARRA = AVISO_BARRA?.tipo === 'error' ? AVISO_BARRA : null;
+            actualizarBarra();
+          }),
+        ),
+      );
+      seccion.appendChild(lista);
       contenedor.appendChild(seccion);
     });
   };
@@ -841,5 +1008,6 @@ export async function iniciarClasePrueba(): Promise<void> {
 
   conectarVisitaRapida(supabase);
   conectarHerramientas();
+  conectarBarraAsistencia(supabase);
   await renderizarLista(supabase);
 }
