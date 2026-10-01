@@ -70,7 +70,7 @@ import AdminBase from '../../layouts/AdminBase.astro';
 
 /* Barras horizontales */
 .es-fila{ display: grid; grid-template-columns: minmax(84px, 38%) minmax(0, 1fr) auto; gap: 10px; align-items: center; font-size: 14px; min-height: 28px; }
-.es-fila__etq{ overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.es-fila__etq{ line-height: 1.25; overflow-wrap: anywhere; }
 .es-fila__pista{ height: 14px; }
 .es-fila__barra{ height: 14px; background: #1B4FA8; border-radius: 0 4px 4px 0; min-width: 2px; }
 .es-fila__n{ text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
@@ -80,7 +80,7 @@ import AdminBase from '../../layouts/AdminBase.astro';
 .es-embudo__barra{ height: 22px; background: #1B4FA8; border-radius: 4px; min-width: 2px; }
 
 .es-tabla{ font-size: 13px; color: #3D3630; }
-.es-tabla summary{ cursor: pointer; color: #6B6259; min-height: 28px; }
+.es-tabla summary{ cursor: pointer; color: #6B6259; min-height: 44px; display: flex; align-items: center; }
 .es-tabla table{ width: 100%; border-collapse: collapse; margin-top: 6px; font-variant-numeric: tabular-nums; }
 .es-tabla th, .es-tabla td{ text-align: left; padding: 4px 6px; border-bottom: 1px solid #EFEBE4; }
 .es-tabla td:last-child, .es-tabla th:last-child{ text-align: right; }

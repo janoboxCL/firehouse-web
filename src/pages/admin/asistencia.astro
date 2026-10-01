@@ -56,9 +56,10 @@ import AdminBase from '../../layouts/AdminBase.astro';
 .as-h2{ font-family: var(--font-display); font-weight: 800; font-size: 1.05rem; margin: 0; }
 .as-nota{ font-size: 13px; color: #6B6259; margin: 4px 0 10px; }
 .as-lista{ list-style: none; margin: 0; padding: 0; }
-.as-lista li{ display: flex; justify-content: space-between; align-items: center; gap: 10px; min-height: 40px; border-top: 1px solid #EFEBE4; font-size: 14px; }
+.as-lista li{ display: flex; justify-content: space-between; align-items: center; gap: 10px; min-height: 44px; border-top: 1px solid #EFEBE4; font-size: 14px; }
 .as-lista li:first-child{ border-top: 0; }
-.as-lista a{ font-weight: 600; color: var(--ember, #171412) !important; text-decoration: none; }
+.as-lista a{ font-weight: 600; color: var(--ember, #171412) !important; text-decoration: none; display: inline-flex; align-items: center; min-height: 44px; }
+.as-lista small a{ min-height: 0; display: inline; }
 .as-lista a:hover{ text-decoration: underline; }
 .as-lista small{ color: #6B6259; font-size: 13px; text-align: right; }
 .as-lista small a{ font-weight: 400; color: var(--fire-red, #C51515) !important; }
@@ -80,7 +81,7 @@ import AdminBase from '../../layouts/AdminBase.astro';
 .as-vinieron summary::-webkit-details-marker{ display: none; }
 .as-ver{ text-transform: none; letter-spacing: 0; font-weight: 600; color: var(--fire-red, #C51515); text-decoration: underline; margin-left: 4px; }
 .as-vinieron[open] .as-ver{ display: none; }
-.as-link{ background: none; border: 0; padding: 0; min-height: 32px; font: inherit; font-size: 14px; font-weight: 600; color: var(--fire-red, #C51515); text-decoration: underline; cursor: pointer; }
+.as-link{ background: none; border: 0; padding: 0; min-height: 44px; font: inherit; font-size: 14px; font-weight: 600; color: var(--fire-red, #C51515); text-decoration: underline; cursor: pointer; }
 @media (max-width: 600px){
   .as-kpis{ gap: 6px; }
   .as-kpi{ padding: 10px; }

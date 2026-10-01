@@ -67,6 +67,11 @@ body.admin-tema h1, body.admin-tema h2, body.admin-tema h3{
   color: var(--ember);
 }
 body.admin-tema a{ color: var(--fire-red); }
+/* Enlaces con forma de botón: conservan el color del botón (antes heredaban el rojo de los enlaces). */
+body.admin-tema a.admin-btn{ color: #fff; text-decoration: none; }
+body.admin-tema a.admin-btn--whatsapp{ color: #08380F; }
+body.admin-tema a.admin-btn--secundario{ color: var(--ember); }
+body.admin-tema a.admin-btn--peligro{ color: var(--fire-red); }
 
 .admin-header{
   background: #fff; border-bottom: 1px solid #E4DFD6;
@@ -102,7 +107,7 @@ body.admin-tema a{ color: var(--fire-red); }
     padding: 2px 0 10px; scrollbar-width: none;
   }
   .admin-header__nav::-webkit-scrollbar{ display: none; }
-  .admin-header__link{ font-size: 14px; padding: 8px 0; flex-shrink: 0; }
+  .admin-header__link{ font-size: 14px; padding: 0; min-height: 44px; display: inline-flex; align-items: center; flex-shrink: 0; }
   .admin-header__usuario{ display: none; }
   .admin-header__logout{ padding: 6px 12px; flex-shrink: 0; }
   .admin-main{ padding: 16px 12px 48px; }
@@ -177,14 +182,14 @@ body.admin-tema a{ color: var(--fire-red); }
 .ficha-duplicado{ margin-bottom: 20px; }
 
 .ficha-grid{ display: grid; grid-template-columns: 1.2fr 1fr; gap: 20px; align-items: start; }
-.ficha-col{ display: flex; flex-direction: column; gap: 20px; }
+.ficha-col{ display: flex; flex-direction: column; gap: 20px; min-width: 0; }
 
 .ficha-bloque__titulo{ font-size: 1.1rem; margin: 0 0 16px; }
 .ficha-bloque__subtitulo{ font-size: 14px; font-weight: 500; margin: 0 0 10px; }
 
 .ficha-datos{ display: grid; grid-template-columns: auto 1fr; gap: 10px 18px; margin: 0; font-size: 14px; }
 .ficha-datos dt{ color: #6B6259; }
-.ficha-datos dd{ margin: 0; font-weight: 500; }
+.ficha-datos dd{ margin: 0; font-weight: 500; min-width: 0; overflow-wrap: anywhere; }
 
 .ficha-acciones{ display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
 .ficha-whatsapp-nota{ font-size: 12px; color: #6B6259; margin-top: 10px; }
@@ -315,5 +320,27 @@ body.admin-tema a{ color: var(--fire-red); }
   }
   .familia-card__atletas tr{ padding: 10px 0; border-top: 1px solid #EFEBE4; }
   .familia-card__atletas td{ border: none; padding: 2px 0; }
+}
+/* Móvil (al final para que prevalezca sobre las reglas generales). */
+@media (max-width: 700px){
+  /* Objetivos táctiles de al menos 44 px en móvil. */
+  body.admin-tema .admin-btn{ min-height: 44px; }
+  .admin-header__logout{ min-height: 44px; }
+  /* Selector de programa: una fila que se desliza, no una lista vertical. */
+  .fh-programa{ flex-wrap: nowrap; overflow-x: auto; width: 100%; box-sizing: border-box; scrollbar-width: none; }
+  .fh-programa::-webkit-scrollbar{ display: none; }
+  .fh-programa__tab{ flex-shrink: 0; min-height: 44px; white-space: nowrap; }
+  .admin-header__marca{ min-height: 44px; display: inline-flex; align-items: center; gap: .3em; }
+  .ficha-volver{ display: inline-flex; align-items: center; min-height: 44px; margin-bottom: 4px; }
+  /* Campos y controles de páginas específicas (más especificidad que los estilos de cada página). */
+  body.admin-tema .admin-input, body.admin-tema .admin-select{ min-height: 44px; }
+  body.admin-tema .pg-chip{ min-height: 44px; }
+  body.admin-tema .pg-link-suave{ min-height: 44px; padding: 0 4px; }
+  body.admin-tema .cfg-indice a{ display: inline-flex; align-items: center; min-height: 44px; }
+  body.admin-tema .cfg-indice{ gap: 0 16px; }
+  /* Títulos de página más compactos: el contenido aparece antes. */
+  body.admin-tema h1.db-titulo{ font-size: 1.6rem; margin-bottom: 8px; }
+  body.admin-tema .as-segmento button, body.admin-tema .es-chips button{ min-height: 44px; }
+  body.admin-tema .db-lista select, body.admin-tema .familia-card select{ min-height: 44px; }
 }
 </style>

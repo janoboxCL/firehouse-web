@@ -172,7 +172,12 @@ import { LIMITES } from '../../lib/crm/constants.ts';
 .pl-dialogo__cerrar{ border: 0; background: none; font-size: 20px; line-height: 1; cursor: pointer; padding: 4px 8px; color: #6B6259; }
 .pl-dialogo .pl-previa__correo{ height: min(62vh, 640px); }
 .pl-dialogo .pl-previa-intro{ margin: 0 0 16px; font-size: 13px; color: #6B6259; }
-.pl-item__acciones{ display: flex; gap: 10px; flex-shrink: 0; }
+.pl-item__acciones{ display: flex; flex-wrap: wrap; gap: 4px 10px; flex-shrink: 0; }
+@media (max-width: 600px){
+  .pl-item{ flex-wrap: wrap; }
+  .pl-item__acciones{ flex-basis: 100%; }
+  .pl-item__accion{ min-height: 44px; padding: 0 6px; }
+}
 .pl-item__accion{
   background: none; border: none; font-size: 13px; cursor: pointer; text-decoration: underline; padding: 4px;
 }

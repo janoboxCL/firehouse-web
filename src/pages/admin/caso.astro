@@ -94,7 +94,7 @@ import {
       <form id="form-interaccion" class="ficha-nueva-interaccion">
         <p class="ficha-bloque__subtitulo">+ Agregar nota / interacción</p>
         <div class="ficha-nueva-interaccion__fila">
-          <select id="i-tipo" class="admin-select">
+          <select id="i-tipo" class="admin-select" aria-label="Tipo de interacción">
             {Object.values(INTERACCION_TIPOS).filter((v) => v !== 'CAMBIO_ESTADO').map((v) => (
               <option value={v}>{INTERACCION_TIPOS_LABEL[v]}</option>
             ))}

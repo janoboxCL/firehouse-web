@@ -66,7 +66,7 @@ import AdminBase from '../../layouts/AdminBase.astro';
     <p id="ca-ordenes-pendientes-linea" class="cc-sub">Órdenes pendientes de pago: <strong id="ca-ordenes-pendientes">—</strong></p>
     <p id="ca-distribucion" class="cc-sub"></p>
 
-    <section class="admin-card"><h2 class="cc-bloque__titulo">Participantes (vista unificada)</h2><div class="cc-tabla-wrap"><table class="cc-tabla" id="ca-tabla-participantes"><thead><tr><th>Participante</th><th>RUT</th><th>Compra</th><th>Gratis</th><th>Total</th><th>Códigos</th><th>Órdenes</th><th>Correo</th></tr></thead><tbody></tbody></table></div></section>
+    <section class="admin-card"><h2 class="cc-bloque__titulo">Participantes (vista unificada)</h2><div class="cc-tabla-wrap" tabindex="0" role="region" aria-label="Tabla con desplazamiento"><table class="cc-tabla" id="ca-tabla-participantes"><thead><tr><th>Participante</th><th>RUT</th><th>Compra</th><th>Gratis</th><th>Total</th><th>Códigos</th><th>Órdenes</th><th>Correo</th></tr></thead><tbody></tbody></table></div></section>
 
     <section class="admin-card">
       <h2 class="cc-bloque__titulo">Pasarelas</h2>
@@ -75,7 +75,7 @@ import AdminBase from '../../layouts/AdminBase.astro';
 
     <section class="admin-card">
       <h2 class="cc-bloque__titulo">Órdenes</h2>
-      <div class="cc-tabla-wrap">
+      <div class="cc-tabla-wrap" tabindex="0" role="region" aria-label="Tabla con desplazamiento">
         <table class="cc-tabla" id="ca-tabla-ordenes">
           <thead>
             <tr><th>Comprador</th><th>Productos</th><th>Monto</th><th>Pago</th><th>Estado</th><th>Código(s)</th><th>Fecha</th></tr>
@@ -87,7 +87,7 @@ import AdminBase from '../../layouts/AdminBase.astro';
 
     <section class="admin-card">
       <h2 class="cc-bloque__titulo">Participación sin compra</h2>
-      <div class="cc-tabla-wrap">
+      <div class="cc-tabla-wrap" tabindex="0" role="region" aria-label="Tabla con desplazamiento">
         <table class="cc-tabla" id="ca-tabla-gratis">
           <thead>
             <tr><th>Nombre</th><th>RUT</th><th>Contacto</th><th>Código</th><th>Fecha</th></tr>
@@ -132,8 +132,8 @@ import AdminBase from '../../layouts/AdminBase.astro';
 .cc-tabla tbody tr:hover{ background: #FAF8F4; }
 .cc-num{ text-align: right; font-family: var(--font-count); white-space: nowrap; }
 .cc-mono{ font-family: var(--font-count); font-size: 12.5px; }
-.cc-sub{ color: #8A8074; font-size: 12px; }
-.cc-vacio{ text-align: center; color: #8A8074; padding: 24px 0 !important; }
+.cc-sub{ color: #6B6259; font-size: 12px; }
+.cc-vacio{ text-align: center; color: #6B6259; padding: 24px 0 !important; }
 
 .cc-badge{
   display: inline-block; padding: 3px 9px; border-radius: 99px; font-size: 12px; font-weight: 600;

@@ -72,13 +72,14 @@ import AdminBase from '../../layouts/AdminBase.astro';
 .apoderados-tabla-wrap{ padding: 0; overflow-x: auto; }
 .apoderados-tabla td{ vertical-align: middle; }
 .apoderados-tabla tbody tr:hover{ background: #FAF8F4; }
-.apoderados-tabla input[type="checkbox"]{ width: 18px; height: 18px; accent-color: var(--fire-red); }
+.apoderados-tabla input[type="checkbox"]{ width: 20px; height: 20px; accent-color: var(--fire-red); }
+.apoderados-check{ display: inline-flex; align-items: center; justify-content: center; min-width: 44px; min-height: 44px; cursor: pointer; }
 .apoderados-fila-dup{ background: #FFF8EC; }
 .apoderados-eliminar-fila{
   background: none; border: none; color: #A91111; font-size: 13px;
-  cursor: pointer; text-decoration: underline; padding: 6px;
+  cursor: pointer; text-decoration: underline; padding: 0 8px; min-height: 44px; margin-left: 8px;
 }
-.apoderados-ver-fila{ color: var(--fire-red); font-size: 13px; text-decoration: underline; padding: 6px; margin-right: 4px; }
+.apoderados-ver-fila{ color: var(--fire-red); font-size: 13px; text-decoration: underline; padding: 0 8px; min-height: 44px; display: inline-flex; align-items: center; }
 
 .fusion-panel{
   position: fixed; inset: 0; background: rgba(23,20,18,.5);
