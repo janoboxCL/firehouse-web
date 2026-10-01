@@ -124,11 +124,11 @@ import { LIMITES } from '../../lib/crm/constants.ts';
 <style is:global>
 .ap-plantilla{
   margin-top: 20px; padding: 16px; border-radius: 12px;
-  background: #FAF8F4; border: 1px solid #EFEBE4;
+  background: var(--crm-superficie-2); border: 1px solid var(--crm-linea-suave);
 }
 .ap-plantilla__titulo{ font-weight: 600; margin: 0 0 12px; font-size: 14px; }
 .ap-plantilla__acciones{ display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
-#ap-form-nota{ border-top: 1px solid #EFEBE4; padding-top: 16px; margin-top: 4px; }
+#ap-form-nota{ border-top: 1px solid var(--crm-linea-suave); padding-top: 16px; margin-top: 4px; }
 #ap-form-nota textarea{ margin-bottom: 10px; }
 .familia-card__atletas tr{ cursor: pointer; }
 
@@ -139,22 +139,22 @@ import { LIMITES } from '../../lib/crm/constants.ts';
 .cu-preparar:empty{ display: none; }
 .cu-scroll{ overflow-x: auto; }
 .cu-tabla{ width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 8px; }
-.cu-tabla th{ text-align: left; font-weight: 500; color: #6B6259; font-size: 12px; padding: 8px 6px; border-bottom: 1px solid #E4DFD6; white-space: nowrap; }
-.cu-tabla td{ padding: 9px 6px; border-top: 1px solid #EFEBE4; vertical-align: middle; }
+.cu-tabla th{ text-align: left; font-weight: 500; color: var(--crm-texto-2); font-size: 12px; padding: 8px 6px; border-bottom: 1px solid var(--crm-linea); white-space: nowrap; }
+.cu-tabla td{ padding: 9px 6px; border-top: 1px solid var(--crm-linea-suave); vertical-align: middle; }
 .cu-tabla input[type=checkbox]{ width: 18px; height: 18px; accent-color: var(--fire-red); }
 .cu-num{ text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
-.cu-vencido{ color: #C51515; font-weight: 600; }
+.cu-vencido{ color: var(--crm-rojo); font-weight: 600; }
 .cu-estado{ display: inline-block; padding: 2px 9px; border-radius: 999px; font-size: 11px; font-weight: 700; color: #fff; }
-.cu-estado--pagado{ background: #1E7A3C; }
+.cu-estado--pagado{ background: var(--crm-ok); }
 .cu-estado--pendiente{ background: #B07800; }
-.cu-estado--parcial{ background: #1B4FA8; }
+.cu-estado--parcial{ background: var(--crm-info); }
 .cu-estado--anulado{ background: #8A7F7B; }
-.cu-anular{ background: none; border: 0; color: #C51515; font: inherit; font-size: 12px; text-decoration: underline; cursor: pointer; }
-.cu-manual{ margin: 16px 0; padding-top: 14px; border-top: 1px solid #EFEBE4; }
+.cu-anular{ background: none; border: 0; color: var(--crm-rojo); font: inherit; font-size: 12px; text-decoration: underline; cursor: pointer; }
+.cu-manual{ margin: 16px 0; padding-top: 14px; border-top: 1px solid var(--crm-linea-suave); }
 .cu-manual__titulo{ font-size: 14px; font-weight: 600; margin: 0 0 8px; }
 .cu-manual__campos{ display: flex; flex-wrap: wrap; gap: 10px; }
 .cu-manual__campos .admin-input{ flex: 1 1 200px; }
 .cu-pagos{ list-style: none; padding: 0; margin: 0; }
-.cu-pagos li{ border-top: 1px solid #EFEBE4; padding: 10px 0; font-size: 13px; }
+.cu-pagos li{ border-top: 1px solid var(--crm-linea-suave); padding: 10px 0; font-size: 13px; }
 .cu-pagos li:first-child{ border-top: 0; }
 </style>

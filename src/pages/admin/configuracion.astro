@@ -252,9 +252,9 @@ import AdminBase from '../../layouts/AdminBase.astro';
 
 <style is:global>
 .cfg-indice{ display: flex; flex-wrap: wrap; gap: 6px 14px; margin: 0 0 20px; font-size: 13px; }
-.cfg-indice a{ color: var(--ember); text-decoration: underline; text-decoration-color: #D8D2C8; text-underline-offset: 3px; }
+.cfg-indice a{ color: var(--ember); text-decoration: underline; text-decoration-color: var(--crm-borde); text-underline-offset: 3px; }
 .cfg-indice a:hover{ color: var(--fire-red); }
-.cfg-dia{ display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; padding: 14px 0; border-bottom: 1px solid #EFEBE4; }
+.cfg-dia{ display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; padding: 14px 0; border-bottom: 1px solid var(--crm-linea-suave); }
 .cfg-dia__check{ display: flex; align-items: center; gap: 12px; min-width: 120px; cursor: pointer; }
 .cfg-dia__check input{ width: 22px; height: 22px; accent-color: var(--fire-red); flex-shrink: 0; }
 .cfg-dia__nombre{ font-weight: 600; margin: 0; }
@@ -262,10 +262,10 @@ import AdminBase from '../../layouts/AdminBase.astro';
 #cfg-form > .admin-btn{ margin-top: 12px; }
 .cfg-campos{ display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 14px; align-items: end; margin-bottom: 14px; }
 .cfg-campos--ancho{ grid-template-columns: minmax(220px, 1fr) auto; }
-.cfg-vista{ font-size: 13px; color: #6B6259; margin: 4px 0 0; }
+.cfg-vista{ font-size: 13px; color: var(--crm-texto-2); margin: 4px 0 0; }
 .cb-pct{ max-width: 110px; }
 .ps-lista{ list-style: none; padding: 0; margin: 0; }
-.ps-item{ display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; padding: 12px 0; border-top: 1px solid #EFEBE4; }
+.ps-item{ display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; padding: 12px 0; border-top: 1px solid var(--crm-linea-suave); }
 .ps-item:first-child{ border-top: 0; }
 .ps-item__nombre{ font-weight: 600; margin: 0; }
 .ps-item__estado{ display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }

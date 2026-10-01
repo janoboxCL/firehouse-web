@@ -62,8 +62,8 @@ function filaHtml(f: FilaDeportista, anio: string): string {
         }</span></span>
       </td>
       <td class="dp-ext"><span class="dp-estado ${claseEstado(f)}">${escaparHtml(f.estadoTexto)}</span></td>
-      <td class="dp-ext">${escaparHtml(f.apoderado)}<span class="dp-tel">${escaparHtml(f.telefono)}</span></td>
-      <td class="dp-ext">${escaparHtml(f.comuna || '—')}</td>
+      <td class="dp-ext dp-ext2">${escaparHtml(f.apoderado)}<span class="dp-tel">${escaparHtml(f.telefono)}</span></td>
+      <td class="dp-ext dp-ext2">${escaparHtml(f.comuna || '—')}</td>
       <td>${fechaCorta(f.ingreso, anio)}</td>
       <td class="dp-ext">${fechaCorta(f.primeraClase, anio)}</td>
       <td>${fechaCorta(f.ultimaClase, anio)}</td>
