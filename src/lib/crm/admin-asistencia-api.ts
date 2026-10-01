@@ -55,3 +55,29 @@ export async function grabarAsistencia(
     throw error;
   }
 }
+
+export interface TodasLasAsistencias {
+  disponible: boolean;
+  registros: Array<{ atleta_id: string; fecha: string }>;
+}
+
+/** Todas las asistencias grabadas, en páginas de 1.000 (el máximo por consulta de Supabase). */
+export async function obtenerTodasAsistencias(supabase: SupabaseClient): Promise<TodasLasAsistencias> {
+  const registros: Array<{ atleta_id: string; fecha: string }> = [];
+  const tam = 1000;
+  for (let desde = 0; ; desde += tam) {
+    const { data, error } = await supabase
+      .from('asistencias')
+      .select('atleta_id, fecha')
+      .order('fecha', { ascending: true })
+      .order('atleta_id', { ascending: true })
+      .range(desde, desde + tam - 1);
+    if (error) {
+      if (faltaMigracion(error)) return { disponible: false, registros: [] };
+      throw error;
+    }
+    registros.push(...((data ?? []) as Array<{ atleta_id: string; fecha: string }>));
+    if (!data || data.length < tam) break;
+  }
+  return { disponible: true, registros };
+}

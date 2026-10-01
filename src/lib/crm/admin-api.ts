@@ -350,8 +350,12 @@ export async function actualizarProgramaCaso(supabase: SupabaseClient, casoId: s
 
 export interface ItemPrimeraClase {
   caso: CasoResumen;
-  /** PRUEBA: clase de prueba · INSCRIPCION: inscripción Star que viene a su primera clase. */
-  tipo: 'PRUEBA' | 'INSCRIPCION';
+  /**
+   * PRUEBA: clase de prueba · INSCRIPCION: inscripción Star que viene a su
+   * primera clase · ALUMNA: alumna Star que ya tuvo su primera clase y viene
+   * a la clase semanal.
+   */
+  tipo: 'PRUEBA' | 'INSCRIPCION' | 'ALUMNA';
   fecha: string;
 }
 
@@ -396,6 +400,35 @@ export function agruparPrimerasClases(
       items: lista.sort((a, b) => a.caso.atleta.apoderado.nombre.localeCompare(b.caso.atleta.apoderado.nombre, 'es')),
     }))
     .sort((a, b) => a.fecha.localeCompare(b.fecha));
+}
+
+/**
+ * Agrega al sábado Star de esta semana (o al de hoy, todo el día) a las alumnas
+ * Star activas que ya tuvieron su primera clase, para tomarles asistencia
+ * semanal. Quien tiene su primera clase ese día ya viene como INSCRIPCION.
+ */
+export function agregarAlumnasStar(
+  grupos: GrupoPrimeraClase[],
+  casos: CasoResumen[],
+  ahora: Date = new Date(),
+  primeraClaseStar?: string,
+): GrupoPrimeraClase[] {
+  const fecha = getNextStarClassDate(ahora, primeraClaseStar);
+  const existente = grupos.find((g) => g.fecha === fecha);
+  const presentes = new Set((existente?.items ?? []).map((i) => i.caso.atleta.id));
+  const nuevos: ItemPrimeraClase[] = [];
+  for (const caso of casos) {
+    if (caso.journey !== CRM_JOURNEYS.FIREHOUSE_STAR || ESTADOS_CERRADOS_NO_ASISTE.includes(caso.estado)) continue;
+    if (presentes.has(caso.atleta.id)) continue;
+    const primera = caso.fecha_clase_prueba ?? getNextStarClassDate(new Date(caso.created_at), primeraClaseStar);
+    if (primera < fecha) {
+      nuevos.push({ caso, tipo: 'ALUMNA', fecha });
+      presentes.add(caso.atleta.id);
+    }
+  }
+  if (nuevos.length === 0) return grupos;
+  const resto = grupos.filter((g) => g.fecha !== fecha);
+  return [...resto, { fecha, items: [...(existente?.items ?? []), ...nuevos] }].sort((a, b) => a.fecha.localeCompare(b.fecha));
 }
 
 export function nombreAdminDe(admins: AdminMini[], id: string | null): string {

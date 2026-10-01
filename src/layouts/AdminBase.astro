@@ -2,6 +2,23 @@
 import '../styles/tokens.css';
 
 const { titulo, ocultarCabecera = false } = Astro.props;
+
+// Las secciones de uso diario primero; el resto después.
+const ENLACES = [
+  { href: '/admin/clase-prueba', texto: 'Clase de hoy' },
+  { href: '/admin/deportistas', texto: 'Deportistas' },
+  { href: '/admin/asistencia', texto: 'Asistencia' },
+  { href: '/admin/estadisticas', texto: 'Estadísticas' },
+  { href: '/admin', texto: 'Casos' },
+  { href: '/admin/pagos', texto: 'Pagos' },
+  { href: '/admin/concurso', texto: 'Concurso' },
+  { href: '/admin/campana-2026', texto: 'Campaña 2026' },
+  { href: '/admin/configuracion', texto: 'Configuración' },
+  { href: '/admin/plantillas', texto: 'Plantillas' },
+  { href: '/admin/apoderados', texto: 'Contactos' },
+  { href: '/admin/esquema', texto: 'Esquema' },
+];
+const ruta = Astro.url.pathname.replace(/\.html$/, '').replace(/\/$/, '') || '/admin';
 ---
 <!doctype html>
 <html lang="es-CL">
@@ -21,14 +38,9 @@ const { titulo, ocultarCabecera = false } = Astro.props;
       <div class="admin-header__wrap">
         <a href="/admin" class="admin-header__marca">Firehouse <span>CRM</span></a>
         <nav class="admin-header__nav">
-          <a href="/admin/clase-prueba" class="admin-header__link">Clase de prueba</a>
-          <a href="/admin/pagos" class="admin-header__link">Pagos</a>
-          <a href="/admin/concurso" class="admin-header__link">Concurso</a>
-          <a href="/admin/campana-2026" class="admin-header__link">Campaña 2026</a>
-          <a href="/admin/configuracion" class="admin-header__link">Configuración</a>
-          <a href="/admin/plantillas" class="admin-header__link">Plantillas</a>
-          <a href="/admin/apoderados" class="admin-header__link">Contactos</a>
-          <a href="/admin/esquema" class="admin-header__link">Esquema</a>
+          {ENLACES.map((e) => (
+            <a href={e.href} class={`admin-header__link${ruta === e.href ? ' admin-header__link--activo' : ''}`} aria-current={ruta === e.href ? 'page' : undefined}>{e.texto}</a>
+          ))}
           <span id="admin-usuario" class="admin-header__usuario"></span>
           <button type="button" id="admin-logout" class="admin-header__logout">Cerrar sesión</button>
         </nav>
@@ -65,12 +77,13 @@ body.admin-tema a{ color: var(--fire-red); }
   display: flex; align-items: center; justify-content: space-between;
 }
 .admin-header__marca{
-  font-family: var(--font-display); font-weight: 800; font-size: 1.1rem;
+  font-family: var(--font-display); font-weight: 800; font-size: 1.1rem; white-space: nowrap; flex-shrink: 0; margin-right: 24px;
   color: var(--ember); text-decoration: none;
 }
 .admin-header__marca span{ color: var(--fire-red); }
-.admin-header__nav{ display: flex; align-items: center; gap: 16px; }
+.admin-header__nav{ display: flex; flex-wrap: wrap; justify-content: flex-end; align-items: center; gap: 6px 16px; }
 .admin-header__link{ font-size: 13px; color: var(--ember); text-decoration: none; }
+.admin-header__link--activo{ color: var(--fire-red) !important; font-weight: 700; }
 .admin-header__link:hover{ color: var(--fire-red); }
 .admin-header__usuario{ font-size: 13px; color: #6B6259; }
 .admin-header__logout{
@@ -85,7 +98,7 @@ body.admin-tema a{ color: var(--fire-red); }
   .admin-header{ position: static; }
   .admin-header__wrap{ flex-wrap: wrap; gap: 8px 12px; padding: 10px 16px 0; }
   .admin-header__nav{
-    order: 3; flex-basis: 100%; gap: 4px 18px; overflow-x: auto; white-space: nowrap;
+    order: 3; flex-basis: 100%; flex-wrap: nowrap; justify-content: flex-start; gap: 4px 18px; overflow-x: auto; white-space: nowrap;
     padding: 2px 0 10px; scrollbar-width: none;
   }
   .admin-header__nav::-webkit-scrollbar{ display: none; }
