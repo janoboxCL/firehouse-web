@@ -135,7 +135,7 @@ import AdminBase from '../../layouts/AdminBase.astro';
 .cp-visita-form{ margin: 16px 0 20px; }
 .cp-visita-grid{ display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
 .cp-consentimiento{
-  display: flex; align-items: flex-start; gap: 10px; font-size: 13px; color: #6B6259;
+  display: flex; align-items: flex-start; gap: 10px; font-size: 13px; color: var(--crm-texto-2);
   margin: 16px 0; cursor: pointer;
 }
 .cp-consentimiento input{ margin-top: 3px; width: 18px; height: 18px; accent-color: var(--fire-red); flex-shrink: 0; }
@@ -146,48 +146,43 @@ import AdminBase from '../../layouts/AdminBase.astro';
   font-family: var(--font-display); font-weight: 800; font-size: 1.2rem;
   margin: 0; color: var(--ember);
 }
-.cp-grupo__sub{ margin: 2px 0 0; font-size: 13px; color: #6B6259; }
+.cp-grupo__sub{ margin: 2px 0 0; font-size: 13px; color: var(--crm-texto-2); }
 .cp-grupo__conteo{ display: flex; align-items: center; gap: 10px; flex: 1 1 220px; max-width: 360px; }
-.cp-grupo__barra{ flex: 1; height: 8px; border-radius: 999px; background: #EFEBE4; overflow: hidden; }
-.cp-grupo__barra-relleno{ display: block; height: 100%; width: 0; border-radius: 999px; background: #1E7A34; transition: width var(--t-interfaz, 180ms); }
+.cp-grupo__barra{ flex: 1; height: 8px; border-radius: 999px; background: var(--crm-linea-suave); overflow: hidden; }
+.cp-grupo__barra-relleno{ display: block; height: 100%; width: 0; border-radius: 999px; background: var(--crm-ok); transition: width var(--t-interfaz, 180ms); }
 .cp-grupo__conteo-texto{ font-size: 14px; font-weight: 700; white-space: nowrap; font-variant-numeric: tabular-nums; }
 .cp-grupo__accion{
   background: none; border: 0; padding: 6px 2px; min-height: 36px; font: inherit; font-size: 13px; font-weight: 600;
-  color: #3D3630; text-decoration: underline; text-underline-offset: 3px; cursor: pointer;
+  color: var(--crm-texto); text-decoration: underline; text-underline-offset: 3px; cursor: pointer;
 }
-.cp-grupo__accion:hover{ color: var(--fire-red, #C51515); }
+.cp-grupo__accion:hover{ color: var(--crm-rojo); }
 
-.cp-lista{ border: 1px solid #E4DFD6; border-radius: 12px; overflow: hidden; background: #fff; }
-.cp-fila{ border-top: 1px solid #EFEBE4; }
+.cp-lista{ border: 1px solid var(--crm-linea); border-radius: 12px; overflow: hidden; background: #fff; }
+.cp-fila{ border-top: 1px solid var(--crm-linea-suave); }
 .cp-fila:first-child{ border-top: 0; }
 .cp-fila--presente{ background: #F1F8F2; }
 .cp-fila__principal{ display: flex; align-items: center; min-height: 60px; }
 .cp-fila__marca{ flex: 1; min-width: 0; display: flex; align-items: center; gap: 14px; padding: 8px 4px 8px 14px; cursor: pointer; }
-.cp-check{ flex-shrink: 0; width: 26px; height: 26px; margin: 0; accent-color: #1E7A34; cursor: pointer; }
+.cp-check{ flex-shrink: 0; width: 26px; height: 26px; margin: 0; accent-color: var(--crm-ok); cursor: pointer; }
 .cp-check:disabled{ cursor: not-allowed; }
 .cp-fila__textos{ display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-.cp-fila__nombre{ color: var(--ember, #171412); font-weight: 600; font-size: 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.cp-fila__detalle{ font-size: 13px; line-height: 1.4; color: #6B6259; }
+.cp-fila__nombre{ color: var(--ember, #171412); font-weight: 600; font-size: 16px; line-height: 1.3; overflow-wrap: anywhere; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.cp-fila__detalle{ font-size: 13px; line-height: 1.4; color: var(--crm-texto-2); }
 .cp-kit{ white-space: nowrap; }
 .cp-tipo{ font-weight: 700; }
-.cp-tipo--star{ color: #8A5A00; }
-.cp-tipo--prueba{ color: #1B4FA8; }
-.cp-kit{ color: #8A5A00; font-weight: 600; }
+.cp-tipo--star{ color: var(--crm-star-texto); }
+.cp-tipo--prueba{ color: var(--crm-prueba); }
+.cp-kit{ color: var(--crm-pendiente); font-weight: 600; }
 .cp-fila__mas{
   flex-shrink: 0; width: 48px; height: 48px; margin-right: 4px; border: 0; border-radius: 10px;
-  background: transparent; color: #6B6259; display: flex; align-items: center; justify-content: center; cursor: pointer;
+  background: transparent; color: var(--crm-texto-2); display: flex; align-items: center; justify-content: center; cursor: pointer;
 }
-.cp-fila__mas:hover, .cp-fila--abierta .cp-fila__mas{ background: #F4F1EC; color: var(--ember, #171412); }
+.cp-fila__mas:hover, .cp-fila--abierta .cp-fila__mas{ background: var(--crm-fondo); color: var(--ember, #171412); }
 .cp-fila__panel{ padding: 4px 16px 16px 54px; display: flex; flex-direction: column; gap: 10px; }
 .cp-fila__panel[hidden]{ display: none; }
-.cp-fila__contacto{ margin: 0; font-size: 14px; color: #3D3630; }
-.cp-fila__contacto a{ color: var(--fire-red, #C51515); }
+.cp-fila__contacto{ margin: 0; font-size: 14px; color: var(--crm-texto); }
+.cp-fila__contacto a{ color: var(--crm-rojo); }
 .cp-fila__nota{ font-size: 13px; color: var(--ember); margin: 0; font-style: italic; }
-@media (max-width: 600px){
-  .cp-fila__panel{ padding-left: 14px; }
-  .cp-lista-wrap{ padding: 12px; }
-  .cp-intro{ font-size: 14px; }
-}
 
 .cp-barra{
   position: fixed; left: 50%; bottom: 16px; transform: translateX(-50%); z-index: 20;
@@ -200,22 +195,22 @@ import AdminBase from '../../layouts/AdminBase.astro';
 .cp-barra__texto{ flex: 1; min-width: 0; font-size: 14px; font-weight: 600; line-height: 1.3; }
 .cp-barra__grabar{ flex-shrink: 0; min-height: 48px; padding: 0 18px; font-size: 15px; font-weight: 700; white-space: nowrap; }
 .cp-barra__grabar[hidden]{ display: none; }
-.cp-barra--ok{ background: #1E7A34; }
+.cp-barra--ok{ background: var(--crm-ok); }
 .cp-barra--error{ background: #7A1414; }
 body.cp-con-barra .cp-lista-wrap{ margin-bottom: 96px; }
-.cp-mensajes{ border-top: 1px solid #EFEBE4; padding-top: 12px; }
+.cp-mensajes{ border-top: 1px solid var(--crm-linea-suave); padding-top: 12px; }
 .cp-mensajes__campos{ display: flex; flex-wrap: wrap; align-items: flex-end; gap: 12px; }
 .cp-mensajes__campos .admin-label{ font-size: 12px; margin-bottom: 4px; }
 .cp-select-talla{ min-width: 130px; }
 .cp-mensajes__plantilla{ flex: 1 1 220px; }
 .cp-mensajes__plantilla .admin-select{ width: 100%; }
-.cp-mensajes__aviso{ margin: 10px 0 0; font-size: 13px; color: var(--fire-red, #C51515); }
-.cp-mensajes__aviso--ok{ color: #1E7A34; font-weight: 600; }
+.cp-mensajes__aviso{ margin: 10px 0 0; font-size: 13px; color: var(--crm-rojo); }
+.cp-mensajes__aviso--ok{ color: var(--crm-ok); font-weight: 600; }
 .cp-mensajes__botones{ display: flex; flex-wrap: wrap; gap: 8px; }
 .cp-enviados{ display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
 .cp-enviados:empty{ display: none; }
-.cp-enviado{ font-size: 12px; padding: 3px 10px; border-radius: 999px; background: #1E7A3C; color: #fff; }
-.cp-enviado--correo{ background: #1B4FA8; }
+.cp-enviado{ font-size: 12px; padding: 3px 10px; border-radius: 999px; background: var(--crm-ok); color: #fff; }
+.cp-enviado--correo{ background: var(--crm-info); }
 
 .cp-dialogo{
   width: min(640px, calc(100vw - 24px)); max-height: calc(100vh - 32px); padding: 20px;
@@ -228,19 +223,19 @@ body.cp-con-barra .cp-lista-wrap{ margin-bottom: 96px; }
 .cp-grupo-izq .admin-select{ width: 100%; }
 .cp-grupo__barra{ display: flex; justify-content: space-between; align-items: center; margin: 14px 0 4px; }
 .cp-grupo__barra .admin-label{ margin: 0; }
-.cp-grupo__lista{ list-style: none; margin: 0; padding: 0; max-height: 46vh; overflow-y: auto; border: 1px solid #E4DFD6; border-radius: 10px; }
-.cp-grupo__item{ display: flex; justify-content: space-between; gap: 8px; padding: 8px 10px; border-top: 1px solid #EFEBE4; font-size: 13px; }
+.cp-grupo__lista{ list-style: none; margin: 0; padding: 0; max-height: 46vh; overflow-y: auto; border: 1px solid var(--crm-linea); border-radius: 10px; }
+.cp-grupo__item{ display: flex; justify-content: space-between; gap: 8px; padding: 8px 10px; border-top: 1px solid var(--crm-linea-suave); font-size: 13px; }
 .cp-grupo__item:first-child{ border-top: 0; }
 .cp-grupo__item--previa{ background: #FFF8E1; }
 .cp-grupo__item--no{ color: #8C847B; }
 .cp-grupo__check{ display: flex; gap: 8px; align-items: flex-start; cursor: pointer; min-width: 0; }
 .cp-grupo__check input{ margin-top: 3px; width: 16px; height: 16px; accent-color: var(--fire-red); flex-shrink: 0; }
-.cp-grupo__check small{ color: #6B6259; overflow-wrap: anywhere; }
-.cp-grupo__nota{ display: block; color: #8A5A00 !important; }
+.cp-grupo__check small{ color: var(--crm-texto-2); overflow-wrap: anywhere; }
+.cp-grupo__nota{ display: block; color: var(--crm-pendiente) !important; }
 .cp-grupo__lado{ display: flex; flex-direction: column; align-items: flex-end; gap: 2px; flex-shrink: 0; }
-.cp-grupo__ok{ color: #1E7A34; font-weight: 700; font-size: 12px; white-space: nowrap; }
-.cp-grupo__error{ color: #C51515; font-weight: 700; font-size: 12px; max-width: 160px; text-align: right; }
-.cp-grupo__copia{ display: flex; gap: 8px; align-items: flex-start; margin: 12px 0 0; font-size: 13px; color: #3D3630; cursor: pointer; }
+.cp-grupo__ok{ color: var(--crm-ok); font-weight: 700; font-size: 12px; white-space: nowrap; }
+.cp-grupo__error{ color: var(--crm-rojo); font-weight: 700; font-size: 12px; max-width: 160px; text-align: right; }
+.cp-grupo__copia{ display: flex; gap: 8px; align-items: flex-start; margin: 12px 0 0; font-size: 13px; color: var(--crm-texto); cursor: pointer; }
 .cp-grupo__copia input{ margin-top: 2px; width: 16px; height: 16px; accent-color: var(--fire-red); flex-shrink: 0; }
 .cp-grupo__progreso{ display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 14px 0 0; font-size: 13px; }
 .cp-grupo__progreso[hidden], .cp-fecha[hidden]{ display: none; }
@@ -253,18 +248,41 @@ body.cp-con-barra .cp-lista-wrap{ margin-bottom: 96px; }
 .cp-buscar{ flex: 1 1 220px; max-width: 320px; }
 .cp-orden{ width: auto; max-width: 260px; }
 .cp-filtro{ display: flex; flex-wrap: wrap; gap: 6px; }
-.cp-chip{ border: 1px solid #E4DFD6; background: #fff; border-radius: 999px; padding: 6px 12px; font: inherit; font-size: 13px; cursor: pointer; color: #3D3630; }
+.cp-chip{ border: 1px solid var(--crm-linea); background: #fff; border-radius: 999px; padding: 6px 12px; font: inherit; font-size: 13px; cursor: pointer; color: var(--crm-texto); }
 .cp-chip[aria-pressed="true"]{ background: var(--ember, #171412); border-color: var(--ember, #171412); color: #fff; }
-.cp-link-fecha{ background: none; border: 0; padding: 0 2px; font: inherit; font-size: 13px; color: var(--fire-red, #C51515); text-decoration: underline; cursor: pointer; }
-.cp-fecha{ border-top: 1px solid #EFEBE4; padding-top: 10px; }
+.cp-link-fecha{ background: none; border: 0; padding: 0 2px; font: inherit; font-size: 13px; color: var(--crm-rojo); text-decoration: underline; cursor: pointer; }
+.cp-fecha{ border-top: 1px solid var(--crm-linea-suave); padding-top: 10px; }
 .cp-fecha__campos{ display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 .cp-fecha__campos .admin-btn{ padding: 8px 14px; font-size: 13px; }
-.cp-fecha__nota{ font-size: 12px; color: #6B6259; margin: 6px 0 0; }
-.cp-dialogo__dato{ margin: 0 0 6px; font-size: 14px; color: #6B6259; overflow-wrap: anywhere; }
+.cp-fecha__nota{ font-size: 12px; color: var(--crm-texto-2); margin: 6px 0 0; }
+.cp-dialogo__dato{ margin: 0 0 6px; font-size: 14px; color: var(--crm-texto-2); overflow-wrap: anywhere; }
 .cp-dialogo__dato strong{ color: var(--ember, #171412); }
 .cp-dialogo__previa{
   display: block; width: 100%; height: min(60vh, 560px); margin: 12px 0 16px;
-  border: 1px solid #E4DFD6; border-radius: 12px; background: #171412;
+  border: 1px solid var(--crm-linea); border-radius: 12px; background: #171412;
+}
+@media (max-width: 600px){
+  .cp-fila__panel{ padding-left: 14px; }
+  /* Que la lista aparezca antes: la explicación se omite y los filtros van en una fila deslizable. */
+  .cp-intro{ display: none; }
+  .cp-herramientas{ gap: 8px; margin-bottom: 12px; }
+  .cp-header{ flex-wrap: nowrap; }
+  .cp-btn-visita{ flex-shrink: 0; padding: 0 14px; }
+  .cp-buscar{ flex: 1 1 55%; max-width: none; min-width: 0; }
+  .cp-filtro{ flex-wrap: nowrap; overflow-x: auto; width: 100%; padding-bottom: 2px; scrollbar-width: none; }
+  .cp-filtro::-webkit-scrollbar{ display: none; }
+  .cp-chip{ flex-shrink: 0; min-height: 44px; white-space: nowrap; }
+  .cp-orden{ flex: 1 1 40%; max-width: none; min-width: 0; order: 1; }
+  .cp-filtro{ order: 2; }
+  .cp-grupo__accion{ min-height: 44px; padding: 0 6px; }
+  .cp-grupo__botones{ gap: 4px 14px; }
+  .cp-lista-wrap{ padding: 12px; }
+  .cp-intro{ font-size: 14px; }
+}
+
+@media (max-width: 700px){
+  /* La barra de grabar queda sobre las pestañas del celular. */
+  .cp-barra{ bottom: calc(74px + env(safe-area-inset-bottom, 0px)); }
 }
 </style>
 

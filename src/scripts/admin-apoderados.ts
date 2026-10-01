@@ -6,7 +6,7 @@ import {
   type ApoderadoConAtletas,
 } from '../lib/crm/admin-api.ts';
 import { RELACION_APODERADO_LABEL } from '../lib/crm/constants.ts';
-import { mensajeErrorSupabase } from '../lib/crm/format.ts';
+import { escaparHtml, mensajeErrorSupabase } from '../lib/crm/format.ts';
 import type { SupabaseClient } from '@supabase/supabase-js';
 
 function $<T extends Element>(selector: string): T | null {
@@ -67,12 +67,12 @@ function filaApoderado(ap: ApoderadoConAtletas, supabase: SupabaseClient, onCamb
   if (ap.possible_duplicate) tr.classList.add('apoderados-fila-dup');
 
   tr.innerHTML = `
-    <td><input type="checkbox" data-ap-checkbox="${ap.id}" /></td>
-    <td>${ap.nombre} ${ap.apellidos}${ap.possible_duplicate ? ' <span class="admin-badge admin-badge--vencido">Posible duplicado</span>' : ''}</td>
-    <td>${ap.telefono}</td>
-    <td>${ap.email}</td>
-    <td>${ap.comuna}</td>
-    <td>${nombresAtletas(ap)}</td>
+    <td><label class="apoderados-check"><input type="checkbox" data-ap-checkbox="${escaparHtml(ap.id)}" aria-label="Seleccionar a ${escaparHtml(`${ap.nombre} ${ap.apellidos}`)} para fusionar" /></label></td>
+    <td>${escaparHtml(`${ap.nombre} ${ap.apellidos}`)}${ap.possible_duplicate ? ' <span class="admin-badge admin-badge--vencido">Posible duplicado</span>' : ''}</td>
+    <td>${escaparHtml(ap.telefono)}</td>
+    <td>${escaparHtml(ap.email)}</td>
+    <td>${escaparHtml(ap.comuna)}</td>
+    <td>${escaparHtml(nombresAtletas(ap))}</td>
     <td></td>
   `;
 

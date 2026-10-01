@@ -1,0 +1,70 @@
+/* ============================================================================
+   Paleta institucional del CRM Firehouse
+   ============================================================================
+   Colores de marca medidos sobre public/logo.png; estados y neutros elegidos
+   para cumplir WCAG 2.1 AA (texto normal ≥ 4,5:1). Contrastes verificados:
+
+     Blanco sobre rojo Firehouse ............ 6,47:1
+     Carbón sobre naranjo llama ............. 8,60:1   (y naranjo sobre carbón)
+     Tiza sobre carbón ...................... 16,06:1
+     Texto secundario sobre fondo ........... 6,29:1
+     Estados (texto sobre su fondo claro) ... 4,68 a 6,62:1
+
+   Reglas de uso:
+   - Rojo Firehouse: acciones principales y la marca. No se usa para estados.
+   - Naranjo llama: acento (página activa, programa Star). Texto encima: carbón.
+   - Carbón: encabezado y texto principal.
+   - Estados (ok, pendiente, alerta, info): siempre con texto o etiqueta,
+     nunca solo color. La alerta usa fondo claro para no confundirse con
+     un botón principal.
+   - Programas: Star = naranjo · All Star = azul · Clase de prueba = pizarra.
+   ========================================================================== */
+
+:root {
+  /* Marca (logo) */
+  --crm-rojo: #BF0702;
+  --crm-rojo-hover: #9A0602;
+  --crm-naranjo: #F99D00;
+  --crm-carbon: #171412;
+  --crm-carbon-2: #2A2420;
+  --crm-tiza: #F5EFE8;
+  --crm-tiza-suave: #B9AEA6;
+
+  /* Neutros */
+  --crm-fondo: #F4F1EC;
+  --crm-superficie: #FFFFFF;
+  --crm-superficie-2: #FAF8F4;
+  --crm-linea: #E4DFD6;
+  --crm-linea-suave: #EFEBE4;
+  --crm-borde: #D8D2C8;
+  --crm-texto: #3D3630;
+  --crm-texto-2: #6B6259;
+
+  /* Estados */
+  --crm-ok: #1E7A34;
+  --crm-ok-fondo: #E3F3E5;
+  --crm-pendiente: #8A5A00;
+  --crm-pendiente-fondo: #FFF3D6;
+  --crm-alerta: #A91111;
+  --crm-alerta-fondo: #FBE3E3;
+  --crm-info: #1B4FA8;
+  --crm-info-fondo: #E9EEF9;
+
+  /* Programas */
+  --crm-star: #F99D00;
+  --crm-star-texto: #7A4A00;
+  --crm-star-fondo: #FFF0D1;
+  --crm-allstar: #1B4FA8;
+  --crm-allstar-fondo: #E9EEF9;
+  --crm-prueba: #3F4A55;
+  --crm-prueba-fondo: #ECEFF2;
+}
+
+/* En el panel, los tokens del sitio público toman los valores de esta paleta,
+   así cada página que ya usa var(--fire-red) o var(--fire-yellow) queda alineada. */
+body.admin-tema {
+  --fire-red: var(--crm-rojo);
+  --fire-yellow: var(--crm-naranjo);
+  --ember: var(--crm-carbon);
+  --mat-blue: var(--crm-info);
+}

@@ -65,20 +65,21 @@ import AdminBase from '../../layouts/AdminBase.astro';
 
 .apoderados-barra{
   display: flex; align-items: center; justify-content: space-between;
-  background: #fff; border: 1px solid #E4DFD6; border-radius: 12px;
-  padding: 12px 18px; margin-bottom: 16px; font-size: 14px; color: #6B6259;
+  background: #fff; border: 1px solid var(--crm-linea); border-radius: 12px;
+  padding: 12px 18px; margin-bottom: 16px; font-size: 14px; color: var(--crm-texto-2);
 }
 
 .apoderados-tabla-wrap{ padding: 0; overflow-x: auto; }
 .apoderados-tabla td{ vertical-align: middle; }
-.apoderados-tabla tbody tr:hover{ background: #FAF8F4; }
-.apoderados-tabla input[type="checkbox"]{ width: 18px; height: 18px; accent-color: var(--fire-red); }
+.apoderados-tabla tbody tr:hover{ background: var(--crm-superficie-2); }
+.apoderados-tabla input[type="checkbox"]{ width: 20px; height: 20px; accent-color: var(--fire-red); }
+.apoderados-check{ display: inline-flex; align-items: center; justify-content: center; min-width: 44px; min-height: 44px; cursor: pointer; }
 .apoderados-fila-dup{ background: #FFF8EC; }
 .apoderados-eliminar-fila{
-  background: none; border: none; color: #A91111; font-size: 13px;
-  cursor: pointer; text-decoration: underline; padding: 6px;
+  background: none; border: none; color: var(--crm-alerta); font-size: 13px;
+  cursor: pointer; text-decoration: underline; padding: 0 8px; min-height: 44px; margin-left: 8px;
 }
-.apoderados-ver-fila{ color: var(--fire-red); font-size: 13px; text-decoration: underline; padding: 6px; margin-right: 4px; }
+.apoderados-ver-fila{ color: var(--fire-red); font-size: 13px; text-decoration: underline; padding: 0 8px; min-height: 44px; display: inline-flex; align-items: center; }
 
 .fusion-panel{
   position: fixed; inset: 0; background: rgba(23,20,18,.5);
@@ -89,10 +90,10 @@ import AdminBase from '../../layouts/AdminBase.astro';
 .fusion-panel__opciones{ display: grid; gap: 14px; margin: 18px 0; }
 @media (min-width: 640px){ .fusion-panel__opciones{ grid-template-columns: 1fr 1fr; } }
 .fusion-opcion{
-  border: 1px solid #E4DFD6; border-radius: 12px; padding: 16px; text-align: left;
+  border: 1px solid var(--crm-linea); border-radius: 12px; padding: 16px; text-align: left;
   background: #fff; cursor: pointer; font-family: var(--font-body);
 }
 .fusion-opcion:hover{ border-color: var(--fire-red); }
 .fusion-opcion__nombre{ font-weight: 600; margin: 0 0 6px; }
-.fusion-opcion__dato{ font-size: 13px; color: #6B6259; margin: 2px 0; }
+.fusion-opcion__dato{ font-size: 13px; color: var(--crm-texto-2); margin: 2px 0; }
 </style>

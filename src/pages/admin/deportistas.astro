@@ -26,8 +26,8 @@ import AdminBase from '../../layouts/AdminBase.astro';
         <tr>
           <th scope="col" class="dp-col-nombre">Deportista</th>
           <th scope="col" class="dp-ext dp-col-estado">Estado</th>
-          <th scope="col" class="dp-ext dp-col-apoderado">Apoderado/a</th>
-          <th scope="col" class="dp-ext dp-col-comuna">Comuna</th>
+          <th scope="col" class="dp-ext dp-ext2 dp-col-apoderado">Apoderado/a</th>
+          <th scope="col" class="dp-ext dp-ext2 dp-col-comuna">Comuna</th>
           <th scope="col" class="dp-col-fecha">Ingreso</th>
           <th scope="col" class="dp-ext dp-col-fecha">1ª clase</th>
           <th scope="col" class="dp-col-fecha">Últ. clase</th>
@@ -50,7 +50,7 @@ import AdminBase from '../../layouts/AdminBase.astro';
 <style is:global>
 .dp-cabecera{ display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
 .dp-cabecera .db-titulo{ margin-bottom: 2px; }
-.dp-resumen{ margin: 0 0 14px; font-size: 14px; color: #6B6259; }
+.dp-resumen{ margin: 0 0 14px; font-size: 14px; color: var(--crm-texto-2); }
 .dp-excel{ flex-shrink: 0; }
 .dp-herramientas{ display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 10px; }
 .dp-buscar{ flex: 1 1 260px; max-width: 420px; }
@@ -59,21 +59,21 @@ import AdminBase from '../../layouts/AdminBase.astro';
 .dp-chips::-webkit-scrollbar{ display: none; }
 .dp-chips--extra{ margin-bottom: 10px; }
 .dp-chip{
-  flex-shrink: 0; border: 1px solid #D8D2C8; background: #fff; border-radius: 999px; min-height: 36px; padding: 0 14px;
-  font: inherit; font-size: 14px; color: #3D3630; cursor: pointer; white-space: nowrap;
+  flex-shrink: 0; border: 1px solid var(--crm-borde); background: #fff; border-radius: 999px; min-height: 36px; padding: 0 14px;
+  font: inherit; font-size: 14px; color: var(--crm-texto); cursor: pointer; white-space: nowrap;
 }
 .dp-chip[aria-pressed="true"]{ background: var(--ember, #171412); border-color: var(--ember, #171412); color: #fff; font-weight: 600; }
-.dp-chip--alerta[aria-pressed="false"]{ color: #A91111; border-color: #E8A6A6; }
+.dp-chip--alerta[aria-pressed="false"]{ color: var(--crm-alerta); border-color: #E8A6A6; }
 
-.dp-tabla-wrap{ background: #fff; border: 1px solid #E4DFD6; border-radius: 14px; overflow: hidden; }
+.dp-tabla-wrap{ background: #fff; border: 1px solid var(--crm-linea); border-radius: 14px; overflow: hidden; }
 .dp-tabla{ width: 100%; border-collapse: collapse; table-layout: fixed; font-variant-numeric: tabular-nums; }
 .dp-tabla th{
-  text-align: left; padding: 10px 12px; background: #FAF8F4; border-bottom: 1px solid #E4DFD6;
-  font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: #6B6259;
+  text-align: left; padding: 10px 12px; background: var(--crm-superficie-2); border-bottom: 1px solid var(--crm-linea);
+  font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--crm-texto-2);
 }
-.dp-tabla td{ padding: 9px 12px; border-bottom: 1px solid #EFEBE4; font-size: 14px; vertical-align: middle; }
+.dp-tabla td{ padding: 9px 12px; border-bottom: 1px solid var(--crm-linea-suave); font-size: 14px; vertical-align: middle; }
 .dp-tabla tbody tr{ cursor: pointer; }
-.dp-tabla tbody tr:hover{ background: #FAF8F4; }
+.dp-tabla tbody tr:hover{ background: var(--crm-superficie-2); }
 .dp-tabla tbody tr:last-child td{ border-bottom: 0; }
 .dp-col-fecha{ width: 80px; }
 .dp-col-asist{ width: 120px; }
@@ -81,23 +81,23 @@ import AdminBase from '../../layouts/AdminBase.astro';
 .dp-col-apoderado{ width: 190px; }
 .dp-col-comuna{ width: 150px; }
 .dp-col-kit{ width: 96px; }
-.dp-nombre{ display: block; font-weight: 600; font-size: 15px; color: var(--ember, #171412) !important; text-decoration: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dp-nombre{ font-weight: 600; font-size: 15px; line-height: 1.3; color: var(--ember, #171412) !important; text-decoration: none; overflow-wrap: anywhere; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .dp-nombre:hover{ text-decoration: underline; }
-.dp-sub{ display: block; font-size: 13px; color: #6B6259; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.dp-kit-pend{ color: #8A5A00; font-weight: 600; }
-.dp-kit-ok{ color: #1E7A34; font-weight: 600; }
-.dp-baja{ color: #A91111; font-weight: 700; }
+.dp-sub{ display: block; font-size: 13px; color: var(--crm-texto-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dp-kit-pend{ color: var(--crm-pendiente); font-weight: 600; }
+.dp-kit-ok{ color: var(--crm-ok); font-weight: 600; }
+.dp-baja{ color: var(--crm-alerta); font-weight: 700; }
 .dp-asist{ display: flex; align-items: center; gap: 8px; }
-.dp-asist__barra{ flex: 1; height: 6px; border-radius: 999px; background: #EFEBE4; overflow: hidden; }
-.dp-asist__barra span{ display: block; height: 100%; border-radius: 999px; background: #1E7A34; }
-.dp-asist__barra--baja span{ background: #A91111; }
+.dp-asist__barra{ flex: 1; height: 6px; border-radius: 999px; background: var(--crm-linea-suave); overflow: hidden; }
+.dp-asist__barra span{ display: block; height: 100%; border-radius: 999px; background: var(--crm-ok); }
+.dp-asist__barra--baja span{ background: var(--crm-alerta); }
 .dp-asist__n{ font-weight: 700; min-width: 30px; text-align: right; }
-.dp-estado{ display: inline-block; padding: 3px 10px; border-radius: 999px; font-size: 12px; font-weight: 700; background: #F1EAE6; color: #6B6259; white-space: nowrap; }
-.dp-estado--ok{ background: #E3F3E5; color: #1E7A34; }
-.dp-estado--info{ background: #E9EEF9; color: #1B4FA8; }
-.dp-estado--no{ background: #FBE3E3; color: #A91111; }
-.dp-tel{ display: block; font-size: 13px; color: #6B6259; }
-.dp-nota{ font-size: 13px; color: #6B6259; margin: 10px 2px 0; }
+.dp-estado{ display: inline-block; padding: 3px 10px; border-radius: 999px; font-size: 12px; font-weight: 700; background: #F1EAE6; color: var(--crm-texto-2); white-space: nowrap; }
+.dp-estado--ok{ background: var(--crm-ok-fondo); color: var(--crm-ok); }
+.dp-estado--info{ background: var(--crm-info-fondo); color: var(--crm-info); }
+.dp-estado--no{ background: var(--crm-alerta-fondo); color: var(--crm-alerta); }
+.dp-tel{ display: block; font-size: 13px; color: var(--crm-texto-2); }
+.dp-nota{ font-size: 13px; color: var(--crm-texto-2); margin: 10px 2px 0; }
 .dp-solo-movil{ display: none; }
 
 @media (max-width: 899px){
@@ -113,7 +113,17 @@ import AdminBase from '../../layouts/AdminBase.astro';
   .dp-tabla tbody tr{ height: 58px; }
 }
 @media (max-width: 600px){
-  .dp-excel{ padding: 8px 12px; font-size: 13px; }
-  .dp-orden{ flex: 1 1 100%; }
+  .dp-excel{ padding: 0 12px; font-size: 13px; }
+  .dp-herramientas{ flex-wrap: nowrap; gap: 8px; }
+  .dp-buscar{ flex: 1 1 55%; min-width: 0; }
+  .dp-orden{ flex: 1 1 45%; min-width: 0; }
+}
+@media (max-width: 899px){
+  .dp-chip{ min-height: 44px; }
+  .dp-sub{ white-space: normal; }
+}
+@media (min-width: 900px) and (max-width: 1199px){
+  /* Escritorio angosto: se ocultan Apoderado y Comuna para que el nombre tenga espacio. */
+  .dp-ext2{ display: none; }
 }
 </style>

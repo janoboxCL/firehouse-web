@@ -66,7 +66,7 @@ import AdminBase from '../../layouts/AdminBase.astro';
     <p id="ca-ordenes-pendientes-linea" class="cc-sub">Órdenes pendientes de pago: <strong id="ca-ordenes-pendientes">—</strong></p>
     <p id="ca-distribucion" class="cc-sub"></p>
 
-    <section class="admin-card"><h2 class="cc-bloque__titulo">Participantes (vista unificada)</h2><div class="cc-tabla-wrap"><table class="cc-tabla" id="ca-tabla-participantes"><thead><tr><th>Participante</th><th>RUT</th><th>Compra</th><th>Gratis</th><th>Total</th><th>Códigos</th><th>Órdenes</th><th>Correo</th></tr></thead><tbody></tbody></table></div></section>
+    <section class="admin-card"><h2 class="cc-bloque__titulo">Participantes (vista unificada)</h2><div class="cc-tabla-wrap" tabindex="0" role="region" aria-label="Tabla con desplazamiento"><table class="cc-tabla" id="ca-tabla-participantes"><thead><tr><th>Participante</th><th>RUT</th><th>Compra</th><th>Gratis</th><th>Total</th><th>Códigos</th><th>Órdenes</th><th>Correo</th></tr></thead><tbody></tbody></table></div></section>
 
     <section class="admin-card">
       <h2 class="cc-bloque__titulo">Pasarelas</h2>
@@ -75,7 +75,7 @@ import AdminBase from '../../layouts/AdminBase.astro';
 
     <section class="admin-card">
       <h2 class="cc-bloque__titulo">Órdenes</h2>
-      <div class="cc-tabla-wrap">
+      <div class="cc-tabla-wrap" tabindex="0" role="region" aria-label="Tabla con desplazamiento">
         <table class="cc-tabla" id="ca-tabla-ordenes">
           <thead>
             <tr><th>Comprador</th><th>Productos</th><th>Monto</th><th>Pago</th><th>Estado</th><th>Código(s)</th><th>Fecha</th></tr>
@@ -87,7 +87,7 @@ import AdminBase from '../../layouts/AdminBase.astro';
 
     <section class="admin-card">
       <h2 class="cc-bloque__titulo">Participación sin compra</h2>
-      <div class="cc-tabla-wrap">
+      <div class="cc-tabla-wrap" tabindex="0" role="region" aria-label="Tabla con desplazamiento">
         <table class="cc-tabla" id="ca-tabla-gratis">
           <thead>
             <tr><th>Nombre</th><th>RUT</th><th>Contacto</th><th>Código</th><th>Fecha</th></tr>
@@ -111,10 +111,10 @@ import AdminBase from '../../layouts/AdminBase.astro';
 @media (min-width: 720px){ .cc-resumen{ grid-template-columns: repeat(4, 1fr); } }
 .cc-metrica{ text-align: center; }
 .cc-metrica__valor{ font-family: var(--font-count); font-size: 1.7rem; font-weight: 700; margin: 0; color: var(--fire-red); }
-.cc-metrica__label{ font-size: 13px; color: #6B6259; margin: 4px 0 0; }
+.cc-metrica__label{ font-size: 13px; color: var(--crm-texto-2); margin: 4px 0 0; }
 .cc-metrica__desglose{
   display: flex; flex-direction: column; gap: 2px; margin-top: 8px;
-  padding-top: 8px; border-top: 1px solid #EFEBE4; font-size: 12px; color: #6B6259;
+  padding-top: 8px; border-top: 1px solid var(--crm-linea-suave); font-size: 12px; color: var(--crm-texto-2);
 }
 .cc-metrica__desglose strong{ color: var(--ember); font-family: var(--font-count); font-weight: 700; }
 
@@ -125,41 +125,41 @@ import AdminBase from '../../layouts/AdminBase.astro';
 .cc-tabla-wrap{ overflow-x: auto; }
 .cc-tabla{ width: 100%; border-collapse: collapse; font-size: 13.5px; }
 .cc-tabla th{
-  text-align: left; padding: 8px 10px; border-bottom: 2px solid #E4DFD6;
-  font-weight: 600; color: #6B6259; white-space: nowrap;
+  text-align: left; padding: 8px 10px; border-bottom: 2px solid var(--crm-linea);
+  font-weight: 600; color: var(--crm-texto-2); white-space: nowrap;
 }
-.cc-tabla td{ padding: 10px; border-bottom: 1px solid #EFEBE4; vertical-align: top; }
-.cc-tabla tbody tr:hover{ background: #FAF8F4; }
+.cc-tabla td{ padding: 10px; border-bottom: 1px solid var(--crm-linea-suave); vertical-align: top; }
+.cc-tabla tbody tr:hover{ background: var(--crm-superficie-2); }
 .cc-num{ text-align: right; font-family: var(--font-count); white-space: nowrap; }
 .cc-mono{ font-family: var(--font-count); font-size: 12.5px; }
-.cc-sub{ color: #8A8074; font-size: 12px; }
-.cc-vacio{ text-align: center; color: #8A8074; padding: 24px 0 !important; }
+.cc-sub{ color: var(--crm-texto-2); font-size: 12px; }
+.cc-vacio{ text-align: center; color: var(--crm-texto-2); padding: 24px 0 !important; }
 
 .cc-badge{
   display: inline-block; padding: 3px 9px; border-radius: 99px; font-size: 12px; font-weight: 600;
   white-space: nowrap;
 }
-.cc-badge--pagada{ background: rgba(27,79,168,.1); color: #1B4FA8; }
+.cc-badge--pagada{ background: rgba(27,79,168,.1); color: var(--crm-info); }
 .cc-badge--pendiente{ background: rgba(255,196,0,.18); color: #8a6d00; }
 .cc-badge--rechazada, .cc-badge--anulada, .cc-badge--expirada{ background: rgba(197,21,21,.1); color: var(--fire-red); }
 .cc-correo{ margin-bottom: 6px; font-size: 13px; }
-  .cc-btn-link{ background: none; border: 0; padding: 0; color: var(--fire-red, #C8102E); font: inherit; font-size: 13px; text-decoration: underline; cursor: pointer; }
-  .cc-btn-link:disabled{ color: #6B6259; cursor: default; text-decoration: none; }
+  .cc-btn-link{ background: none; border: 0; padding: 0; color: var(--crm-rojo); font: inherit; font-size: 13px; text-decoration: underline; cursor: pointer; }
+  .cc-btn-link:disabled{ color: var(--crm-texto-2); cursor: default; text-decoration: none; }
 .ce-panel{ margin-bottom: 20px; }
 .ce-cabecera{ display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; }
 .ce-cabecera .cc-bloque__titulo{ margin: 0; }
-.ce-estado{ display: inline-block; padding: 6px 14px; border-radius: 999px; font-size: 13px; font-weight: 600; color: #fff; background: #6B6259; }
-.ce-estado--abierta{ background: #1E7A3C; }
+.ce-estado{ display: inline-block; padding: 6px 14px; border-radius: 999px; font-size: 13px; font-weight: 600; color: #fff; background: var(--crm-texto-2); }
+.ce-estado--abierta{ background: var(--crm-ok); }
 .ce-estado--fuera_de_periodo{ background: #B07800; }
-.ce-estado--cerrada{ background: #6B6259; }
-.ce-estado--sorteo_cerrado{ background: #1B4FA8; }
+.ce-estado--cerrada{ background: var(--crm-texto-2); }
+.ce-estado--sorteo_cerrado{ background: var(--crm-info); }
 .ce-descripcion{ margin: 10px 0 14px; font-size: 14px; }
 .ce-controles{ display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; margin: 14px 0; }
-.ce-control{ display: flex; align-items: center; justify-content: space-between; gap: 12px; border: 1px solid #EFEBE4; border-radius: 10px; padding: 12px 14px; }
+.ce-control{ display: flex; align-items: center; justify-content: space-between; gap: 12px; border: 1px solid var(--crm-linea-suave); border-radius: 10px; padding: 12px 14px; }
 .ce-control__titulo{ margin: 0; font-weight: 600; }
 .ce-control .cc-sub{ margin: 2px 0 0; }
 .ce-fechas{ display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 8px 16px; margin: 0 0 14px; font-size: 13px; }
-.ce-fechas dt{ color: #6B6259; }
+.ce-fechas dt{ color: var(--crm-texto-2); }
 .ce-fechas dd{ margin: 2px 0 0; font-weight: 500; }
 .ce-acciones{ display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; }
 .ce-acciones:empty{ display: none; }
@@ -167,7 +167,7 @@ import AdminBase from '../../layouts/AdminBase.astro';
 .ce-chequeos ul{ list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 8px; }
 .ce-chequeo{ display: flex; gap: 10px; align-items: flex-start; font-size: 14px; }
 .ce-chequeo__marca{ flex: 0 0 22px; height: 22px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; color: #fff; font-size: 12px; font-weight: 700; }
-.ce-chequeo--ok .ce-chequeo__marca{ background: #1E7A3C; }
-.ce-chequeo--falta .ce-chequeo__marca{ background: #C51515; }
+.ce-chequeo--ok .ce-chequeo__marca{ background: var(--crm-ok); }
+.ce-chequeo--falta .ce-chequeo__marca{ background: var(--crm-rojo); }
 .visually-hidden{ position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 </style>
