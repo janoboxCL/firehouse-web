@@ -60,6 +60,7 @@ import { renderizarCorreo, type CorreoRenderizado } from '../lib/crm/correo-plan
 import { opcionesDeFecha, validarNuevaFecha, type ReglasFecha } from '../lib/crm/clase-fecha.ts';
 import { hoyChile } from '../lib/crm/programas.ts';
 import { abrirEnvioGrupal } from './admin-clase-prueba-grupo.ts';
+import { abrirRecepcion, type Recepcion } from './admin-clase-recepcion.ts';
 import {
   FILTRO_CLASE_LABEL,
   ORDEN_CLASE_LABEL,
@@ -662,7 +663,8 @@ function reflejarEstado(item: ItemPrimeraClase | undefined, presente: boolean): 
   if (!presente && item.caso.estado === CRM_ESTADOS.ASISTIO) item.caso.estado = CRM_ESTADOS.AGENDADO;
 }
 
-async function grabarCambios(supabase: SupabaseClient): Promise<void> {
+/** Graba todos los cambios pendientes. Resuelve true si se grabó todo. */
+async function grabarCambios(supabase: SupabaseClient): Promise<boolean> {
   const grabar = $<HTMLButtonElement>('#cp-barra-grabar')!;
   grabar.disabled = true;
   grabar.textContent = 'Grabando…';
@@ -679,15 +681,86 @@ async function grabarCambios(supabase: SupabaseClient): Promise<void> {
       ausentes.forEach((id) => reflejarEstado(items.get(id), false));
       confirmarGrabado(a);
     }
-    const ahora = new Intl.DateTimeFormat('es-CL', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Santiago' }).format(new Date());
+    const ahora = new Intl.DateTimeFormat('es-CL', { hour: '2-digit', minute: '2-digit', hourCycle: 'h23', timeZone: 'America/Santiago' }).format(new Date());
     avisoBarra(`Asistencia grabada · ${ahora} ✓`, 'ok');
+    return true;
   } catch (err) {
     avisoBarra(mensajeErrorSupabase(err, 'No pudimos grabar la asistencia. Revisa tu conexión e inténtalo nuevamente.'), 'error');
+    return false;
   } finally {
     grabar.disabled = false;
     grabar.textContent = 'Grabar asistencia';
     DIBUJAR();
   }
+}
+
+// ---------------------------------------------------------------------------
+// Modo Recepción: cada llegada se graba sola, poco después de marcarla.
+
+let RECEPCION: Recepcion | null = null;
+let TIMER_AUTO: ReturnType<typeof setTimeout> | undefined;
+let AUTO_GUARDANDO = false;
+let AUTO_PENDIENTE = false;
+
+function horaAhora(): string {
+  return new Intl.DateTimeFormat('es-CL', { hour: '2-digit', minute: '2-digit', hourCycle: 'h23', timeZone: 'America/Santiago' }).format(new Date());
+}
+
+function programarAutoguardado(supabase: SupabaseClient): void {
+  clearTimeout(TIMER_AUTO);
+  RECEPCION?.estadoGuardado({ tipo: 'guardando', texto: 'Guardando…' });
+  // Una pausa breve agrupa varias marcas seguidas en una sola grabación.
+  TIMER_AUTO = setTimeout(() => void autoguardar(supabase), 700);
+}
+
+async function autoguardar(supabase: SupabaseClient): Promise<void> {
+  if (AUTO_GUARDANDO) {
+    AUTO_PENDIENTE = true;
+    return;
+  }
+  if (totalCambios(ASISTENCIA) === 0) {
+    RECEPCION?.estadoGuardado({ tipo: 'ok', texto: `Guardado ${horaAhora()} ✓` });
+    return;
+  }
+  AUTO_GUARDANDO = true;
+  const ok = await grabarCambios(supabase);
+  AUTO_GUARDANDO = false;
+  if (ok && AUTO_PENDIENTE) {
+    AUTO_PENDIENTE = false;
+    return autoguardar(supabase);
+  }
+  AUTO_PENDIENTE = false;
+  RECEPCION?.estadoGuardado(
+    ok ? { tipo: 'ok', texto: `Guardado ${horaAhora()} ✓` } : { tipo: 'error', texto: 'Sin conexión: falta guardar.' },
+  );
+}
+
+function abrirModoRecepcion(supabase: SupabaseClient, fecha: string, items: ItemPrimeraClase[], ctx: ContextoMensajes): void {
+  RECEPCION = abrirRecepcion({
+    titulo: tituloGrupo(fecha),
+    fecha,
+    items,
+    tallas: CONFIG.tallas,
+    tallaDe: (atletaId) => ctx.tallas.get(atletaId) ?? null,
+    estaPresente,
+    marcar: (item, presente) => {
+      alternar(asistenciaDe(item.fecha), item.caso.atleta.id, presente);
+      AVISO_BARRA = null;
+      actualizarBarra();
+      programarAutoguardado(supabase);
+    },
+    guardarTalla: async (atletaId, talla) => {
+      await guardarTalla(supabase, atletaId, talla);
+      ctx.tallas.set(atletaId, talla);
+    },
+    reintentar: () => programarAutoguardado(supabase),
+    alCerrar: () => {
+      RECEPCION = null;
+      // Si quedó algo sin grabar (por ejemplo, sin conexión), se intenta de nuevo.
+      if (totalCambios(ASISTENCIA) > 0) void autoguardar(supabase);
+      DIBUJAR();
+    },
+  });
 }
 
 function conectarBarraAsistencia(supabase: SupabaseClient): void {
@@ -882,6 +955,16 @@ async function renderizarLista(supabase: SupabaseClient): Promise<void> {
 
       const botones = document.createElement('div');
       botones.className = 'cp-grupo__botones';
+      if (ASISTENCIA_DISPONIBLE) {
+        const recepcion = document.createElement('button');
+        recepcion.type = 'button';
+        recepcion.className = 'admin-btn cp-recepcion';
+        recepcion.innerHTML =
+          '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5 9-10"></path></svg> Recepción';
+        recepcion.title = 'Recibir a las familias: buscar rápido, marcar llegada y talla';
+        recepcion.addEventListener('click', () => abrirModoRecepcion(supabase, grupo.fecha, grupo.todos, ctx));
+        botones.appendChild(recepcion);
+      }
       const accion = (texto: string, titulo: string, alClic: () => void) => {
         const b = document.createElement('button');
         b.type = 'button';
