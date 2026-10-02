@@ -10,6 +10,7 @@ import { COMO_CONOCIO_LABEL, CRM_ESTADOS, CRM_ESTADOS_LABEL, CRM_JOURNEYS } from
 import { esDiaClaseStar, getNextStarClassDate } from './star-class.ts';
 import { calcularEdad } from './validation.ts';
 import { normalizar } from './clase-prueba-lista.ts';
+import { datosPorCompletar } from './registro-express.ts';
 
 export type Programa = 'STAR' | 'ALL_STAR' | 'PRUEBA' | 'OTRO';
 export const PROGRAMA_LABEL: Record<Programa, string> = {
@@ -54,6 +55,8 @@ export interface FilaDeportista {
   faltaSeguidas: boolean;
   kit: Kit;
   fechasAsistidas: string[];
+  /** Registro express u otra ficha a la que le faltan apellidos, correo o comuna. */
+  porCompletar: boolean;
 }
 
 const ESTADOS_RETIRADOS: readonly string[] = [CRM_ESTADOS.NO_CONTINUA, CRM_ESTADOS.NO_INTERESADO];
@@ -161,6 +164,7 @@ export function construirFilas(casos: CasoResumen[], asistencias: RegistroAsiste
       faltaSeguidas,
       kit: programa === 'STAR' && caso.journey === CRM_JOURNEYS.FIREHOUSE_STAR ? (caso.estado === CRM_ESTADOS.INSCRITO ? 'PAGADO' : 'PENDIENTE') : null,
       fechasAsistidas: fechas,
+      porCompletar: datosPorCompletar(atleta).length > 0,
     });
   }
   return filas;
@@ -170,10 +174,11 @@ export function construirFilas(casos: CasoResumen[], asistencias: RegistroAsiste
 // Filtros y orden de la grilla
 
 export type FiltroPrograma = 'TODOS' | Programa;
-export type FiltroExtra = 'NINGUNO' | 'KIT_PENDIENTE' | 'FALTAN' | 'RETIRADOS';
+export type FiltroExtra = 'NINGUNO' | 'KIT_PENDIENTE' | 'FALTAN' | 'POR_COMPLETAR' | 'RETIRADOS';
 export const FILTRO_EXTRA_LABEL: Record<Exclude<FiltroExtra, 'NINGUNO'>, string> = {
   KIT_PENDIENTE: 'Kit pendiente',
   FALTAN: 'Faltan 2 sábados seguidos',
+  POR_COMPLETAR: 'Datos por completar',
   RETIRADOS: 'Retirados',
 };
 
@@ -191,6 +196,8 @@ export function cumpleExtra(f: FilaDeportista, extra: FiltroExtra): boolean {
       return f.activo && f.kit === 'PENDIENTE';
     case 'FALTAN':
       return f.faltaSeguidas;
+    case 'POR_COMPLETAR':
+      return f.activo && f.porCompletar;
     case 'RETIRADOS':
       return !f.activo;
     default:

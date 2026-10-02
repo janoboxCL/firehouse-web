@@ -4,7 +4,7 @@ import AdminBase from '../../layouts/AdminBase.astro';
 <AdminBase titulo="Clase de prueba">
   <div class="cp-header">
     <h1 class="db-titulo">Clase de hoy</h1>
-    <button type="button" id="cp-btn-visita-rapida" class="admin-btn admin-btn--secundario cp-btn-visita">+ Visita rápida</button>
+    <button type="button" id="cp-btn-express" class="admin-btn admin-btn--secundario cp-btn-visita" title="Para quien llega sin haberse inscrito">+ Registro express</button>
   </div>
   <p class="admin-intro cp-intro">
     Marca a quienes llegaron y presiona <strong>Grabar asistencia</strong>. Con <strong>⋯</strong> ves el
@@ -12,48 +12,6 @@ import AdminBase from '../../layouts/AdminBase.astro';
   </p>
 
   <div id="cp-error" class="admin-error" hidden></div>
-  <p id="cp-visita-guardada" class="ficha-guardado" hidden></p>
-
-  <section class="admin-card cp-visita-form" id="cp-visita-form-wrap" hidden>
-    <h2 class="ficha-bloque__titulo">Visita rápida</h2>
-    <p class="admin-intro">
-      Para alguien que llegó a probar sin haberse registrado antes. Queda marcado
-      como asistió hoy mismo — más adelante le enviamos un link para completar
-      el resto del registro.
-    </p>
-    <form id="cp-form-visita">
-      <div class="cp-visita-grid">
-        <div class="admin-campo">
-          <label class="admin-label" for="vr-apoderado-nombre">Nombre del apoderado</label>
-          <input id="vr-apoderado-nombre" class="admin-input" type="text" required />
-        </div>
-        <div class="admin-campo">
-          <label class="admin-label" for="vr-apoderado-apellidos">Apellidos del apoderado</label>
-          <input id="vr-apoderado-apellidos" class="admin-input" type="text" />
-        </div>
-        <div class="admin-campo">
-          <label class="admin-label" for="vr-telefono">Teléfono</label>
-          <input id="vr-telefono" class="admin-input" type="tel" placeholder="9 1234 5678" required />
-        </div>
-        <div class="admin-campo">
-          <label class="admin-label" for="vr-email">Correo</label>
-          <input id="vr-email" class="admin-input" type="email" required />
-        </div>
-      </div>
-      <div class="admin-campo">
-        <label class="admin-label" for="vr-nota">Nota</label>
-        <textarea id="vr-nota" class="admin-textarea" placeholder='Ej: "Dos niñas de 12 y 10 años"' required></textarea>
-      </div>
-      <label class="cp-consentimiento">
-        <input type="checkbox" id="vr-consentimiento" required />
-        Confirmo que el apoderado autorizó verbalmente que Firehouse lo contacte.
-      </label>
-      <div class="ficha-acciones">
-        <button type="submit" class="admin-btn">Registrar visita</button>
-        <button type="button" id="cp-btn-cancelar-visita" class="admin-btn admin-btn--secundario">Cancelar</button>
-      </div>
-    </form>
-  </section>
 
  <div id="cp-programa" class="fh-programa" aria-label="Programa"></div>
   <div class="cp-herramientas">
@@ -132,8 +90,6 @@ import AdminBase from '../../layouts/AdminBase.astro';
 .cp-header{ display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
 .cp-lista-wrap{ padding: 20px; }
 
-.cp-visita-form{ margin: 16px 0 20px; }
-.cp-visita-grid{ display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
 .cp-consentimiento{
   display: flex; align-items: flex-start; gap: 10px; font-size: 13px; color: var(--crm-texto-2);
   margin: 16px 0; cursor: pointer;
@@ -356,6 +312,57 @@ body.cp-con-barra .cp-lista-wrap{ margin-bottom: 96px; }
 .rc__accion--llego:hover{ background: #D5ECD9; }
 .rc__vacio{ margin: 8px 4px; font-size: 15px; color: var(--crm-texto-2); }
 .rc__vacio[hidden]{ display: none; }
+/* Registro express dentro de Recepción */
+.rc__completar{ color: var(--crm-pendiente); font-weight: 600; }
+.rc__express-abrir{
+  min-height: 52px; padding: 0 16px; border: 2px dashed var(--crm-borde); border-radius: 14px; background: transparent;
+  font: inherit; font-size: 16px; font-weight: 700; color: var(--crm-carbon); cursor: pointer; flex-shrink: 0;
+}
+.rc__express-abrir:hover{ border-color: var(--crm-carbon); background: var(--crm-superficie); }
+.rc__ultimo-express{ margin: 0; font-size: 14px; color: var(--crm-ok); }
+.rc__form{ display: none; flex: 1; min-height: 0; flex-direction: column; margin: 0; }
+.rc--express .rc__form{ display: flex; }
+.rc--express .rc__buscar, .rc--express .rc__letras, .rc--express .rc__modos, .rc--express .rc__cuerpo, .rc--express .rc__pie{ display: none; }
+.rc__cuerpo > *{ flex-shrink: 0; }
+.rc__pie{ display: flex; padding: 8px 12px calc(8px + env(safe-area-inset-bottom)); border-top: 1px solid var(--crm-linea); background: var(--crm-fondo); }
+.rc__pie .rc__express-abrir{ flex: 1; }
+.rc__form-cuerpo{ flex: 1; min-height: 0; overflow-y: auto; padding: 14px 12px 16px; display: flex; flex-direction: column; gap: 12px; }
+.rc__form-titulo{ margin: 0; font-family: var(--font-display); font-weight: 800; font-size: 20px; }
+.rc__form-sub{ margin: 2px 0 0; font-size: 14px; color: var(--crm-texto-2); }
+.rc__nino{ margin: 0; min-width: 0; padding: 12px 14px 14px; border: 1px solid var(--crm-linea); border-radius: 14px; background: var(--crm-superficie); display: flex; flex-direction: column; gap: 6px; }
+.rc__nino legend{ padding: 0 6px; font-weight: 700; font-size: 15px; }
+.rc__label{ margin: 6px 0 0; font-size: 14px; font-weight: 600; color: var(--crm-texto-2); }
+.rc__input{
+  width: 100%; box-sizing: border-box; height: 52px; padding: 0 14px; border: 2px solid var(--crm-borde); border-radius: 12px;
+  background: var(--crm-superficie); font: inherit; font-size: 17px; color: var(--crm-carbon);
+}
+.rc__input:focus{ outline: none; border-color: var(--crm-carbon); }
+.rc__chips{ display: flex; flex-wrap: wrap; gap: 8px; }
+.rc__chips button{
+  min-width: 48px; height: 48px; padding: 0 12px; border-radius: 10px; border: 1px solid var(--crm-borde); background: var(--crm-superficie);
+  font: inherit; font-size: 16px; font-weight: 700; color: var(--crm-carbon); cursor: pointer;
+}
+.rc__chips button[aria-pressed="true"]{ background: var(--crm-carbon); border-color: var(--crm-carbon); color: #fff; }
+.rc__chips button:focus-visible, .rc__boton:focus-visible, .rc__express-abrir:focus-visible{ outline: 2px solid var(--crm-naranjo); outline-offset: 2px; }
+.rc__tel{ display: flex; align-items: center; gap: 8px; }
+.rc__tel span{ flex-shrink: 0; font-size: 17px; font-weight: 700; }
+.rc__ayuda{ margin: 0; font-size: 13px; color: var(--crm-texto-2); }
+.rc__consent{ display: flex; align-items: center; gap: 12px; min-height: 48px; margin-top: 6px; font-size: 15px; cursor: pointer; }
+.rc__consent input{ width: 24px; height: 24px; flex-shrink: 0; accent-color: var(--crm-rojo); }
+.rc__campo-error, .rc__form-error{ margin: 0; font-size: 14px; font-weight: 600; color: var(--crm-alerta); }
+.rc__dup{ padding: 12px 14px; border: 1px solid var(--crm-pendiente); border-radius: 14px; background: var(--crm-pendiente-fondo); display: flex; flex-direction: column; gap: 10px; }
+.rc__dup p{ margin: 0; font-size: 15px; }
+.rc__dup-familia{ display: flex; flex-direction: column; gap: 8px; }
+.rc__form-acciones{ display: flex; gap: 10px; padding: 10px 12px calc(10px + env(safe-area-inset-bottom)); border-top: 1px solid var(--crm-linea); background: var(--crm-superficie); }
+.rc__boton{
+  flex: 1; min-height: 52px; padding: 8px 14px; border: 0; border-radius: 12px; background: var(--crm-rojo); color: #fff;
+  font: inherit; font-size: 16px; font-weight: 700; cursor: pointer;
+}
+.rc__boton:hover{ background: var(--crm-rojo-hover); }
+.rc__boton:disabled{ opacity: .6; cursor: default; }
+.rc__boton--sec{ background: var(--crm-superficie); color: var(--crm-carbon); border: 1px solid var(--crm-borde); }
+.rc__boton--sec:hover{ background: var(--crm-linea-suave); }
+.rc__form-acciones .rc__boton--sec{ flex: 0 0 auto; }
 @media (max-width: 700px){
   .rc{ width: 100vw; height: 100dvh; border-radius: 0; margin: 0; }
 }
