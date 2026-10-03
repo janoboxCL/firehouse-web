@@ -1,0 +1,119 @@
+---
+import AdminBase from '../../layouts/AdminBase.astro';
+---
+<AdminBase titulo="Poleras">
+  <div class="po-cabecera">
+    <h1 class="db-titulo">Poleras</h1>
+    <button type="button" id="po-excel" class="admin-btn admin-btn--secundario" hidden>Excel</button>
+  </div>
+  <p class="admin-intro">Ventas de poleras por la página. Se entregan en el gimnasio: marca cada pedido cuando lo entregues.</p>
+
+  <div id="po-error" class="admin-error" hidden></div>
+  <div id="po-aviso" class="admin-aviso-cerrado" hidden></div>
+  <p id="po-cargando" class="admin-intro">Cargando…</p>
+
+  <div id="po-contenido" hidden>
+    <section class="po-kpis" aria-label="Resumen">
+      <div class="po-kpi"><p class="po-kpi__label">Pedidos pagados</p><p class="po-kpi__valor" id="po-k-pedidos">—</p></div>
+      <div class="po-kpi"><p class="po-kpi__label">Recaudado</p><p class="po-kpi__valor" id="po-k-recaudado">—</p></div>
+      <div class="po-kpi"><p class="po-kpi__label">Poleras por entregar</p><p class="po-kpi__valor" id="po-k-entregar">—</p></div>
+    </section>
+
+    <section class="po-card" id="po-tallas-wrap" hidden>
+      <h2 class="po-h2">Por entregar, por talla</h2>
+      <p class="po-nota">Pagadas y aún no entregadas: lo que hay que encargar o tener a mano.</p>
+      <div id="po-tallas" class="po-tallas"></div>
+    </section>
+
+    <div class="po-herramientas">
+      <div id="po-filtro" class="po-segmento" role="group" aria-label="Mostrar pedidos"></div>
+      <input id="po-buscar" class="admin-input po-buscar" type="search" placeholder="Buscar alumno, apoderado o correo" aria-label="Buscar pedido" />
+    </div>
+    <div id="po-lista" class="po-lista"></div>
+    <p id="po-vacio" class="admin-intro" hidden></p>
+
+    <details class="po-card po-config" id="po-config">
+      <summary class="po-h2">Configuración de la venta <span id="po-estado-venta" class="po-etiqueta"></span></summary>
+      <form id="po-form" novalidate>
+        <div class="po-campos">
+          <div>
+            <label class="admin-label" for="po-nombre">Nombre</label>
+            <input id="po-nombre" class="admin-input" type="text" maxlength="60" required />
+          </div>
+          <div>
+            <label class="admin-label" for="po-precio">Precio por polera ($)</label>
+            <input id="po-precio" class="admin-input" type="text" inputmode="numeric" autocomplete="off" required />
+          </div>
+        </div>
+        <label class="admin-label" for="po-descripcion">Descripción breve (opcional)</label>
+        <input id="po-descripcion" class="admin-input" type="text" maxlength="160" placeholder="Ej.: Polera oficial de entrenamiento." />
+        <p class="po-nota">Tallas a la venta: <strong id="po-tallas-texto"></strong></p>
+        <label class="po-check">
+          <input type="checkbox" id="po-activo" />
+          <span>A la venta en <a href="/poleras" target="_blank" rel="noopener">firehousecheer.cl/poleras</a></span>
+        </label>
+        <div class="po-acciones">
+          <button type="submit" class="admin-btn">Guardar</button>
+          <button type="button" id="po-copiar" class="admin-btn admin-btn--secundario">Copiar link de venta</button>
+          <span id="po-guardado" class="po-nota" role="status"></span>
+        </div>
+      </form>
+    </details>
+  </div>
+</AdminBase>
+
+<script>
+  import { iniciarAdminPoleras } from '../../scripts/admin-poleras.ts';
+  iniciarAdminPoleras();
+</script>
+
+<style is:global>
+.po-cabecera{ display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.po-kpis{ display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-bottom: 14px; }
+.po-kpi{ background: #fff; border: 1px solid var(--crm-linea); border-radius: 14px; padding: 12px 14px; }
+.po-kpi__label{ margin: 0; font-size: 13px; color: var(--crm-texto-2); }
+.po-kpi__valor{ margin: 2px 0 0; font-family: var(--font-display); font-weight: 800; font-size: 28px; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.po-card{ background: #fff; border: 1px solid var(--crm-linea); border-radius: 14px; padding: 16px; margin-bottom: 12px; }
+.po-card[hidden]{ display: none; }
+.po-h2{ margin: 0; font-family: var(--font-display); font-weight: 800; font-size: 17px; }
+.po-nota{ margin: 4px 0 0; font-size: 14px; color: var(--crm-texto-2); }
+.po-tallas{ display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.po-talla{ min-width: 64px; padding: 8px 12px; border: 1px solid var(--crm-linea); border-radius: 12px; text-align: center; background: var(--crm-fondo); }
+.po-talla b{ display: block; font-family: var(--font-display); font-size: 22px; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.po-talla span{ font-size: 13px; color: var(--crm-texto-2); }
+.po-herramientas{ display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin: 16px 0 12px; }
+.po-segmento{ display: inline-flex; gap: 4px; padding: 4px; background: #fff; border: 1px solid var(--crm-linea); border-radius: 12px; max-width: 100%; overflow-x: auto; }
+.po-segmento button{ border: 0; background: transparent; border-radius: 9px; min-height: 38px; padding: 0 14px; font: inherit; font-size: 14px; color: var(--crm-texto-2); cursor: pointer; white-space: nowrap; }
+.po-segmento button[aria-pressed="true"]{ background: var(--crm-carbon); color: #fff; font-weight: 600; }
+.po-buscar{ flex: 1 1 220px; max-width: 360px; }
+.po-lista{ display: flex; flex-direction: column; gap: 8px; }
+.po-pedido{ display: flex; align-items: center; gap: 14px; background: #fff; border: 1px solid var(--crm-linea); border-radius: 14px; padding: 12px 14px; }
+.po-pedido--entregado{ background: #F1F8F2; }
+.po-pedido__textos{ flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.po-pedido__nombre{ font-size: 16px; font-weight: 700; overflow-wrap: anywhere; }
+.po-pedido__tallas{ font-size: 15px; }
+.po-pedido__detalle{ font-size: 13px; color: var(--crm-texto-2); overflow-wrap: anywhere; }
+.po-etiqueta{ display: inline-block; margin-left: 6px; padding: 2px 8px; border-radius: 999px; font-family: var(--font-body); font-size: 12px; font-weight: 600; vertical-align: middle; }
+.po-etiqueta--ok{ background: var(--crm-ok-fondo); color: var(--crm-ok); }
+.po-etiqueta--pendiente{ background: var(--crm-pendiente-fondo); color: var(--crm-pendiente); }
+.po-etiqueta--alerta{ background: var(--crm-alerta-fondo); color: var(--crm-alerta); }
+.po-entregar{ flex-shrink: 0; }
+body.admin-tema .po-entregar--hecho{ background: var(--crm-ok-fondo); color: var(--crm-ok); border: 1px solid #BFE2C4; }
+.po-config{ margin-top: 16px; }
+.po-config summary{ cursor: pointer; min-height: 32px; }
+.po-config form{ margin-top: 14px; display: flex; flex-direction: column; gap: 8px; }
+.po-campos{ display: grid; grid-template-columns: 1fr 200px; gap: 12px; }
+.po-check{ display: flex; align-items: center; gap: 10px; min-height: 44px; font-size: 15px; cursor: pointer; }
+.po-check input{ width: 22px; height: 22px; accent-color: var(--crm-rojo); }
+.po-acciones{ display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 6px; }
+@media (max-width: 700px){
+  .po-kpis{ gap: 6px; }
+  .po-kpi{ padding: 10px; }
+  .po-kpi__label{ font-size: 12px; }
+  .po-kpi__valor{ font-size: 20px; }
+  .po-pedido{ flex-direction: column; align-items: stretch; gap: 10px; }
+  .po-campos{ grid-template-columns: 1fr; }
+  .po-buscar{ max-width: none; flex-basis: 100%; }
+  .po-segmento button{ min-height: 44px; }
+}
+</style>

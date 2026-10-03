@@ -557,3 +557,54 @@ export async function enviarLinkCuenta(apiKey: string, remitente: string, datos:
     </p>`;
   await enviarCorreoGenerico(apiKey, remitente, datos.email, 'Tu link de pagos Firehouse', plantillaBase('Firehouse', 'Tu cuenta Firehouse', cuerpo));
 }
+
+// ---------------------------------------------------------------------------
+// Tienda de poleras: comprobante de compra
+
+export interface DatosComprobanteTienda {
+  nombre: string;
+  alumno: string;
+  email: string;
+  numero: string; // commerce_order
+  fecha: string; // ISO
+  idPasarela: string | null;
+  lineas: Array<{ descripcion: string; monto: number }>;
+  total: number;
+}
+
+export function construirHtmlComprobanteTienda(d: DatosComprobanteTienda): string {
+  const fecha = new Intl.DateTimeFormat('es-CL', { dateStyle: 'long', timeStyle: 'short', timeZone: 'America/Santiago' }).format(new Date(d.fecha));
+  const filas = d.lineas
+    .map(
+      (l) => `<tr>
+        <td style="padding:8px 0;border-bottom:1px solid rgba(245,239,232,.12);font-size:14px;color:#F5EFE8;">${escaparHtml(l.descripcion)}</td>
+        <td style="padding:8px 0;border-bottom:1px solid rgba(245,239,232,.12);font-size:14px;color:#F5EFE8;text-align:right;white-space:nowrap;">${pesos(l.monto)}</td>
+      </tr>`,
+    )
+    .join('');
+  const cuerpo = `
+    <p style="font-size:15px;line-height:1.6;color:#F5EFE8;margin:0 0 18px;">
+      Hola, ${escaparHtml(d.nombre)}. Recibimos tu compra para <strong>${escaparHtml(d.alumno)}</strong>. Este es el detalle:
+    </p>
+    <table role="presentation" style="width:100%;border-collapse:collapse;margin:0 0 12px;">
+      ${filas}
+      <tr>
+        <td style="padding:10px 0;font-size:15px;color:#FFC400;font-weight:bold;">Total</td>
+        <td style="padding:10px 0;font-size:15px;color:#FFC400;font-weight:bold;text-align:right;">${pesos(d.total)}</td>
+      </tr>
+    </table>
+    <p style="font-size:14px;line-height:1.6;color:#F5EFE8;margin:0 0 18px;padding:12px 14px;border:1px solid rgba(255,196,0,.5);border-radius:10px;">
+      <strong>Entrega en el gimnasio.</strong> No hay despacho: la polera se entregará en el próximo
+      entrenamiento (de una semana para otra), en Santa Corina 197, La Cisterna.
+    </p>
+    <p style="font-size:13px;line-height:1.7;color:rgba(245,239,232,.75);margin:0 0 24px;">
+      N° de pedido: ${escaparHtml(d.numero)}<br/>
+      Fecha: ${escaparHtml(fecha)}<br/>
+      Medio de pago: Mercado Pago${d.idPasarela ? `<br/>ID de la operación en Mercado Pago: ${escaparHtml(d.idPasarela)}` : ''}
+    </p>`;
+  return plantillaBase('Comprobante de compra', 'Compra recibida ✓', cuerpo);
+}
+
+export async function enviarComprobanteTienda(apiKey: string, remitente: string, datos: DatosComprobanteTienda, bcc?: string[]): Promise<void> {
+  await enviarCorreoGenerico(apiKey, remitente, datos.email, `Tu compra de poleras Firehouse · ${datos.numero}`, construirHtmlComprobanteTienda(datos), bcc);
+}

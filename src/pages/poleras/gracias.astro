@@ -1,0 +1,32 @@
+---
+import Base from '../../layouts/Base.astro';
+import { whatsapp } from '../../data/sitio.js';
+---
+<Base titulo="Tu compra de poleras | Firehouse" descripcion="Estado de tu compra de poleras Firehouse." ruta="/poleras/gracias" noindex={true}>
+  <section class="td-section">
+    <div class="wrap td-wrap td-centro">
+      <p class="td-eyebrow">Firehouse</p>
+      <div id="tg-cargando"><h1 class="td-titulo">Confirmando tu pago…</h1><p class="td-texto">Esto toma solo unos segundos.</p></div>
+      <div id="tg-pagado" hidden>
+        <h1 class="td-titulo">¡Compra recibida! ✓</h1>
+        <p class="td-texto">Pagaste <strong id="tg-total"></strong> por <strong id="tg-items"></strong>. Te enviamos el comprobante a tu correo.</p>
+        <p class="td-aviso"><strong>Entrega en el gimnasio.</strong> No hay despacho: la polera se entregará en el próximo entrenamiento (de una semana para otra), en Santa Corina 197, La Cisterna.</p>
+      </div>
+      <div id="tg-pendiente" hidden>
+        <h1 class="td-titulo">Tu pago está en proceso</h1>
+        <p class="td-texto">Mercado Pago aún no lo confirma. Apenas se acredite, te llegará el comprobante por correo. No necesitas pagar de nuevo.</p>
+      </div>
+      <div id="tg-rechazado" hidden>
+        <h1 class="td-titulo">El pago no se completó</h1>
+        <p class="td-texto">No se hizo ningún cargo. Puedes intentarlo nuevamente.</p>
+        <a class="td-btn" href="/poleras">Volver a las poleras</a>
+      </div>
+      <a class="td-ayuda" href={whatsapp('ayudaRegistroStar')} target="_blank" rel="noopener">¿Dudas? Escríbenos por WhatsApp →</a>
+    </div>
+  </section>
+</Base>
+
+<script>
+  import { iniciarGraciasTienda } from '../../scripts/tienda.ts';
+  iniciarGraciasTienda();
+</script>

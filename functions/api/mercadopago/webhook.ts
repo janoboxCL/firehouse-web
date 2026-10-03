@@ -17,6 +17,8 @@ import { construirPaymentProvider, type PaymentProvidersEnv } from '../../lib/pa
 import { enviarCorreoConfirmacionCampana } from '../../lib/resend.ts';
 import { enviarConfirmacionStarSiCorresponde } from '../../lib/star-confirmation.ts';
 import { esPagoCuenta, procesarPagoCuenta } from '../../lib/cuenta-webhook.ts';
+import { procesarPedidoTienda } from '../../lib/tienda-webhook.ts';
+import { esPedidoTienda } from '../../../src/lib/crm/tienda.ts';
 
 interface Env extends PaymentProvidersEnv {
   SUPABASE_URL: string;
@@ -81,6 +83,11 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     // pasa por las ramas de Star ni de la campaña.
     if (esPagoCuenta(estado.commerceOrder)) {
       return await procesarPagoCuenta(supabase, context.env, estado);
+    }
+
+    // Tienda de poleras ("TIENDA-..."): también se procesa completo aparte.
+    if (esPedidoTienda(estado.commerceOrder)) {
+      return await procesarPedidoTienda(supabase, context.env, estado);
     }
 
     const esStar = esOrdenStar(estado.commerceOrder);
