@@ -15,6 +15,36 @@ interface ProductoPublico {
   tallas?: string[];
 }
 
+/** Fotos de la polera: al tocarlas se abren a pantalla completa, con anterior y siguiente. */
+function conectarVisor(): void {
+  const visor = $<HTMLDialogElement>('#td-visor');
+  const img = $<HTMLImageElement>('#td-visor-img');
+  const fotos = [...document.querySelectorAll<HTMLButtonElement>('.td-foto')];
+  let actual = 0;
+  const mostrar = (i: number) => {
+    actual = (i + fotos.length) % fotos.length;
+    img.src = fotos[actual].dataset.foto ?? '';
+    img.alt = fotos[actual].querySelector('img')?.alt ?? '';
+    $<HTMLElement>('#td-visor-titulo').textContent = `${fotos[actual].dataset.titulo ?? ''} · ${actual + 1} de ${fotos.length}`;
+  };
+  fotos.forEach((b, i) =>
+    b.addEventListener('click', () => {
+      mostrar(i);
+      visor.showModal();
+    }),
+  );
+  visor.addEventListener('click', (e) => {
+    const paso = (e.target as HTMLElement).closest<HTMLElement>('[data-visor]')?.dataset.visor;
+    if (paso) mostrar(actual + Number(paso));
+    else visor.close(); // tocar la foto, la X o el fondo cierra
+  });
+  visor.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight') mostrar(actual + 1);
+    if (e.key === 'ArrowLeft') mostrar(actual - 1);
+  });
+  visor.addEventListener('close', () => fotos[actual]?.focus());
+}
+
 export async function iniciarTienda(): Promise<void> {
   let producto: ProductoPublico = { activo: false };
   try {
@@ -51,6 +81,7 @@ export async function iniciarTienda(): Promise<void> {
     )
     .join('');
   form.hidden = false;
+  conectarVisor();
 
   const items = (): ItemPedido[] => tallas.filter((t) => cantidades.get(t)! > 0).map((t) => ({ talla: t, cantidad: cantidades.get(t)! }));
   const pagar = $<HTMLButtonElement>('#td-pagar');

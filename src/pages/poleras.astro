@@ -17,20 +17,43 @@ import { whatsapp } from '../data/sitio.js';
       <form id="td-form" class="td-form" novalidate hidden>
         <div class="td-fotos">
           <figure>
-            <picture>
-              <source srcset="/media/tienda/polera-frente.webp" type="image/webp" />
-              <img src="/media/tienda/polera-frente.jpg" alt="Polera negra Firehouse, vista de frente: «Fire House» en llamas con el logo de Firehouse All Stars" width="900" height="1125" loading="eager" />
-            </picture>
+            <button type="button" class="td-foto" data-foto="/media/tienda/polera-frente.jpg" data-titulo="Frente" aria-label="Ampliar foto: Frente">
+              <picture>
+                <source srcset="/media/tienda/polera-frente.webp" type="image/webp" />
+                <img src="/media/tienda/polera-frente.jpg" alt="Polera negra Firehouse, vista de frente: «Fire House» en llamas con el logo de Firehouse All Stars" width="900" height="1125" loading="eager" />
+              </picture>
+            </button>
             <figcaption>Frente</figcaption>
           </figure>
           <figure>
-            <picture>
-              <source srcset="/media/tienda/polera-espalda.webp" type="image/webp" />
-              <img src="/media/tienda/polera-espalda.jpg" alt="Polera negra Firehouse, vista de espalda: «Proudly introducing the original Fire House, the one and only»" width="900" height="1125" loading="eager" />
-            </picture>
+            <button type="button" class="td-foto" data-foto="/media/tienda/polera-espalda.jpg" data-titulo="Espalda" aria-label="Ampliar foto: Espalda">
+              <picture>
+                <source srcset="/media/tienda/polera-espalda.webp" type="image/webp" />
+                <img src="/media/tienda/polera-espalda.jpg" alt="Polera negra Firehouse, vista de espalda: «Proudly introducing the original Fire House, the one and only»" width="900" height="1125" loading="eager" />
+              </picture>
+            </button>
             <figcaption>Espalda</figcaption>
           </figure>
+          <figure>
+            <button type="button" class="td-foto" data-foto="/media/tienda/blaze-nova-frente.jpg" data-titulo="Blaze y Nova" aria-label="Ampliar foto: Blaze y Nova">
+              <picture>
+                <source srcset="/media/tienda/blaze-nova-frente.webp" type="image/webp" />
+                <img src="/media/tienda/blaze-nova-frente.jpg" alt="Blaze y Nova, los personajes de Firehouse, con la polera puesta, de frente" width="900" height="1125" loading="eager" />
+              </picture>
+            </button>
+            <figcaption>Blaze y Nova</figcaption>
+          </figure>
+          <figure>
+            <button type="button" class="td-foto" data-foto="/media/tienda/blaze-nova-espalda.jpg" data-titulo="Blaze y Nova, espalda" aria-label="Ampliar foto: Blaze y Nova, espalda">
+              <picture>
+                <source srcset="/media/tienda/blaze-nova-espalda.webp" type="image/webp" />
+                <img src="/media/tienda/blaze-nova-espalda.jpg" alt="Blaze y Nova, los personajes de Firehouse, con la polera puesta, de espalda" width="900" height="1125" loading="eager" />
+              </picture>
+            </button>
+            <figcaption>Blaze y Nova, espalda</figcaption>
+          </figure>
         </div>
+        <p class="td-fotos-ayuda">Toca una foto para agrandarla.</p>
         <p class="td-texto"><span id="td-descripcion"></span> Valor: <strong id="td-precio" class="td-precio"></strong> cada una.</p>
 
         <p class="td-aviso">
@@ -70,6 +93,16 @@ import { whatsapp } from '../data/sitio.js';
         </div>
       </form>
 
+      <dialog id="td-visor" class="td-visor" aria-label="Foto ampliada">
+        <button type="button" class="td-visor__cerrar" aria-label="Cerrar foto">✕</button>
+        <img id="td-visor-img" src="" alt="" />
+        <div class="td-visor__pie">
+          <button type="button" class="td-visor__nav" data-visor="-1" aria-label="Foto anterior">‹</button>
+          <span id="td-visor-titulo"></span>
+          <button type="button" class="td-visor__nav" data-visor="1" aria-label="Foto siguiente">›</button>
+        </div>
+      </dialog>
+
       <a class="td-ayuda" href={whatsapp('ayudaRegistroStar')} target="_blank" rel="noopener">¿Dudas? Escríbenos por WhatsApp →</a>
     </div>
   </section>
@@ -86,7 +119,19 @@ import { whatsapp } from '../data/sitio.js';
 .td-eyebrow{ font-family: var(--font-count); font-size: 11px; letter-spacing: .3em; color: var(--fire-yellow); text-transform: uppercase; }
 .td-titulo{ font-family: var(--font-display); font-weight: 800; font-size: clamp(1.7rem, 5vw, 2.4rem); margin-top: var(--e-2); }
 .td-texto{ color: var(--txt-soft); font-size: 16px; line-height: 1.6; margin-top: var(--e-2); }
-.td-fotos{ display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: var(--e-3); }
+.td-fotos{ display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: var(--e-3); }
+.td-foto{ display: block; width: 100%; padding: 0; border: 0; border-radius: 14px; background: none; cursor: zoom-in; }
+.td-foto:focus-visible{ outline: 2px solid var(--fire-yellow); outline-offset: 2px; }
+.td-fotos-ayuda{ margin: 8px 0 0; font-size: 13px; color: var(--txt-faint); text-align: center; }
+.td-visor{ width: 100vw; height: 100dvh; max-width: none; max-height: none; margin: 0; padding: 0; border: 0; background: rgba(10,8,7,.96); color: var(--txt); }
+.td-visor[open]{ display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.td-visor::backdrop{ background: rgba(10,8,7,.96); }
+.td-visor img{ flex: 1; min-height: 0; max-width: 100%; object-fit: contain; cursor: zoom-out; }
+.td-visor__cerrar{ position: absolute; top: 10px; right: 10px; width: 48px; height: 48px; border: 0; border-radius: 999px; background: rgba(245,239,232,.14); color: #fff; font-size: 20px; cursor: pointer; }
+.td-visor__pie{ display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; max-width: 520px; padding: 10px 14px calc(12px + env(safe-area-inset-bottom)); font-size: 15px; }
+.td-visor__nav{ width: 52px; height: 48px; border: 1px solid var(--txt-faint); border-radius: 12px; background: transparent; color: #fff; font-size: 26px; line-height: 1; cursor: pointer; }
+.td-visor button:focus-visible{ outline: 2px solid var(--fire-yellow); outline-offset: 2px; }
+@media (max-width: 560px){ .td-fotos{ grid-template-columns: 1fr 1fr; } }
 .td-fotos figure{ margin: 0; }
 .td-fotos img{ display: block; width: 100%; height: auto; border-radius: 14px; background: #fff; }
 .td-fotos figcaption{ margin-top: 6px; text-align: center; font-size: 13px; color: var(--txt-faint); }
