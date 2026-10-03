@@ -594,8 +594,8 @@ export function construirHtmlComprobanteTienda(d: DatosComprobanteTienda): strin
       </tr>
     </table>
     <p style="font-size:14px;line-height:1.6;color:#F5EFE8;margin:0 0 18px;padding:12px 14px;border:1px solid rgba(255,196,0,.5);border-radius:10px;">
-      <strong>Entrega en el gimnasio.</strong> No hay despacho: las poleras se entregan en el gimnasio
-      (Santa Corina 197, La Cisterna) en los días de entrenamiento. Se hacen por encargo: te avisaremos cuando la tuya esté lista para retirar.
+      <strong>Entrega en el gimnasio.</strong> No hay despacho: la polera se entregará en el próximo
+      entrenamiento (de una semana para otra), en Santa Corina 197, La Cisterna.
     </p>
     <p style="font-size:13px;line-height:1.7;color:rgba(245,239,232,.75);margin:0 0 24px;">
       N° de pedido: ${escaparHtml(d.numero)}<br/>

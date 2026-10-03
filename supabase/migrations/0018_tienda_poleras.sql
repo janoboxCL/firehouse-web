@@ -6,7 +6,7 @@
 --
 -- Qué hace (aditiva, idempotente y transaccional):
 --   1. tienda_productos: el producto, su precio, sus tallas y si está a la
---      venta. Parte DESACTIVADO y sin precio: se configura en /admin/poleras.
+--      venta. Parte DESACTIVADO y a $15.000: se activa en /admin/poleras.
 --   2. tienda_pedidos y tienda_pedido_items: cada compra con sus tallas.
 --      Los crea y confirma el servidor (clave de servicio); el panel solo
 --      lee y marca "entregado".
@@ -37,7 +37,7 @@ create table if not exists public.tienda_productos (
 );
 
 insert into public.tienda_productos (codigo, nombre, descripcion, precio, tallas, activo)
-values ('POLERA', 'Polera Firehouse', '', 0, array['10', '12', '14', 'S', 'M', 'L', 'XL'], false)
+values ('POLERA', 'Polera Firehouse', '', 15000, array['10', '12', '14', 'S', 'M', 'L', 'XL'], false)
 on conflict (codigo) do nothing;
 
 -- 2. Pedidos ----------------------------------------------------------------------

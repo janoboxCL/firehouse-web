@@ -15,11 +15,27 @@ import { whatsapp } from '../data/sitio.js';
       </div>
 
       <form id="td-form" class="td-form" novalidate hidden>
+        <div class="td-fotos">
+          <figure>
+            <picture>
+              <source srcset="/media/tienda/polera-frente.webp" type="image/webp" />
+              <img src="/media/tienda/polera-frente.jpg" alt="Polera negra Firehouse, vista de frente: «Fire House» en llamas con el logo de Firehouse All Stars" width="900" height="1125" loading="eager" />
+            </picture>
+            <figcaption>Frente</figcaption>
+          </figure>
+          <figure>
+            <picture>
+              <source srcset="/media/tienda/polera-espalda.webp" type="image/webp" />
+              <img src="/media/tienda/polera-espalda.jpg" alt="Polera negra Firehouse, vista de espalda: «Proudly introducing the original Fire House, the one and only»" width="900" height="1125" loading="eager" />
+            </picture>
+            <figcaption>Espalda</figcaption>
+          </figure>
+        </div>
         <p class="td-texto"><span id="td-descripcion"></span> Valor: <strong id="td-precio" class="td-precio"></strong> cada una.</p>
 
         <p class="td-aviso">
-          <strong>Entrega en el gimnasio.</strong> No hay despacho: las poleras se entregan en el gimnasio
-          (Santa Corina 197, La Cisterna) en los días de entrenamiento. Se hacen por encargo.
+          <strong>Entrega en el gimnasio.</strong> No hay despacho: la polera se entregará en el próximo
+          entrenamiento (de una semana para otra), en Santa Corina 197, La Cisterna.
         </p>
 
         <fieldset class="td-card">
@@ -70,6 +86,10 @@ import { whatsapp } from '../data/sitio.js';
 .td-eyebrow{ font-family: var(--font-count); font-size: 11px; letter-spacing: .3em; color: var(--fire-yellow); text-transform: uppercase; }
 .td-titulo{ font-family: var(--font-display); font-weight: 800; font-size: clamp(1.7rem, 5vw, 2.4rem); margin-top: var(--e-2); }
 .td-texto{ color: var(--txt-soft); font-size: 16px; line-height: 1.6; margin-top: var(--e-2); }
+.td-fotos{ display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: var(--e-3); }
+.td-fotos figure{ margin: 0; }
+.td-fotos img{ display: block; width: 100%; height: auto; border-radius: 14px; background: #fff; }
+.td-fotos figcaption{ margin-top: 6px; text-align: center; font-size: 13px; color: var(--txt-faint); }
 .td-precio{ color: var(--fire-yellow); font-size: 1.15em; }
 .td-aviso{ margin-top: var(--e-3); padding: 14px 16px; border: 1px solid var(--fire-yellow); border-radius: 12px; font-size: 15px; line-height: 1.55; color: var(--txt); }
 .td-card{ margin: var(--e-3) 0 0; min-width: 0; background: var(--ember-deep); border: 1px solid var(--hairline); border-radius: 16px; padding: var(--e-2) var(--e-3) var(--e-3); }
