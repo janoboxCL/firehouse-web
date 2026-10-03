@@ -63,7 +63,8 @@ export class MercadoPagoProvider implements PaymentProvider {
       body: JSON.stringify({
         items: input.items.map((i) => ({
           title: i.nombre,
-          description: 'Colección de contenido digital Firehouse',
+          // La descripción de contenido digital es solo de la Campaña 2026.
+          description: ['BLAZE', 'NOVA', 'BLAZE_NOVA'].includes(i.producto) ? 'Colección de contenido digital Firehouse' : 'Firehouse Cheerleading All Stars',
           quantity: 1,
           currency_id: 'CLP',
           unit_price: i.precio,

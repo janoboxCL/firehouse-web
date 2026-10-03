@@ -1,6 +1,9 @@
 ---
 import Base from '../layouts/Base.astro';
 import { whatsapp } from '../data/sitio.js';
+import { COMUNAS_CHILE, REGIONES_COMUNAS } from '../lib/crm/comunas.ts';
+
+const comunasRM = REGIONES_COMUNAS.find((r) => r.region === 'Metropolitana de Santiago')!.comunas;
 ---
 <Base titulo="Mi cuenta | Firehouse" descripcion="Pagos de tu familia en Firehouse Cheerleading All Stars." ruta="/pagar" noindex={true}>
   <section class="pg-section">
@@ -11,6 +14,80 @@ import { whatsapp } from '../data/sitio.js';
 
       <div id="pg-cuenta" hidden>
         <h1 class="pg-titulo">Hola, <span id="pg-familia"></span></h1>
+
+        <ol id="pg-pasos" class="pg-pasos" hidden>
+          <li id="pg-paso-1" aria-current="step"><span>1</span> Confirma tus datos</li>
+          <li id="pg-paso-2"><span>2</span> Pago</li>
+        </ol>
+
+        <form id="pg-ficha" class="pg-ficha" novalidate hidden>
+          <p class="pg-texto" id="pg-ficha-intro">Antes de pagar, revisa que tus datos estén correctos y completa lo que falte. Solo te lo pedimos una vez.</p>
+
+          <fieldset class="pg-card pg-ficha__bloque">
+            <legend class="pg-legend">Tus datos (apoderado)</legend>
+            <div class="pg-campos">
+              <div class="pg-campo">
+                <label class="pg-label" for="pg-ap-nombre">Nombre</label>
+                <input id="pg-ap-nombre" class="pg-in" type="text" autocomplete="given-name" maxlength="80" />
+                <p class="pg-campo-error" data-error="apoderado-nombre" hidden></p>
+              </div>
+              <div class="pg-campo">
+                <label class="pg-label" for="pg-ap-apellidos">Apellidos</label>
+                <input id="pg-ap-apellidos" class="pg-in" type="text" autocomplete="family-name" maxlength="120" />
+                <p class="pg-campo-error" data-error="apoderado-apellidos" hidden></p>
+              </div>
+              <div class="pg-campo">
+                <label class="pg-label" for="pg-ap-telefono">Celular (WhatsApp)</label>
+                <input id="pg-ap-telefono" class="pg-in" type="tel" inputmode="tel" autocomplete="tel" maxlength="20" placeholder="+56 9 1234 5678" />
+                <p class="pg-campo-error" data-error="apoderado-telefono" hidden></p>
+              </div>
+              <div class="pg-campo">
+                <label class="pg-label" for="pg-ap-email">Correo (para tus comprobantes)</label>
+                <input id="pg-ap-email" class="pg-in" type="email" inputmode="email" autocomplete="email" maxlength="254" placeholder="correo@ejemplo.cl" />
+                <p class="pg-campo-error" data-error="apoderado-email" hidden></p>
+              </div>
+              <div class="pg-campo">
+                <label class="pg-label" for="pg-ap-comuna">Comuna</label>
+                <select id="pg-ap-comuna" class="pg-in" autocomplete="address-level2">
+                  <option value="">Selecciona tu comuna</option>
+                  {comunasRM.map((c) => <option value={c}>{c}</option>)}
+                  <option value="OTRA">Otra (fuera de la Región Metropolitana)</option>
+                </select>
+                <input id="pg-ap-comuna-otra" class="pg-in pg-in--anidado" type="text" list="pg-lista-comunas" maxlength="100" placeholder="¿Cuál es tu comuna?" aria-label="¿Cuál es tu comuna?" hidden />
+                <datalist id="pg-lista-comunas">
+                  {COMUNAS_CHILE.map((c) => <option value={c} />)}
+                </datalist>
+                <p class="pg-campo-error" data-error="apoderado-comuna" hidden></p>
+              </div>
+              <div class="pg-campo">
+                <label class="pg-label" for="pg-ap-relacion">Tu relación con el deportista</label>
+                <select id="pg-ap-relacion" class="pg-in">
+                  <option value="MAMA">Mamá</option>
+                  <option value="PAPA">Papá</option>
+                  <option value="TUTOR">Tutor/a</option>
+                  <option value="OTRO">Otro</option>
+                </select>
+                <p class="pg-campo-error" data-error="apoderado-relacion" hidden></p>
+              </div>
+            </div>
+          </fieldset>
+
+          <div id="pg-ficha-atletas"></div>
+
+          <label class="pg-acepta">
+            <input type="checkbox" id="pg-acepta" />
+            <span>Confirmo que estos datos son correctos y acepto la <a href="/privacidad" target="_blank" rel="noopener">política de privacidad</a>.</span>
+          </label>
+          <p class="pg-campo-error" data-error="condiciones" hidden></p>
+          <p class="pg-campo-error" data-error="atletas" hidden></p>
+
+          <button type="submit" id="pg-ficha-guardar" class="pg-btn">Confirmar y continuar al pago</button>
+          <button type="button" id="pg-ficha-cancelar" class="pg-link" hidden>Volver al pago sin cambios</button>
+          <p id="pg-ficha-error" class="pg-error" role="alert" hidden></p>
+        </form>
+
+        <div id="pg-pago">
+        <p class="pg-datos-ok" id="pg-datos-ok" hidden>✓ Datos confirmados · <button type="button" class="pg-link" id="pg-ficha-editar">Revisar mis datos</button></p>
         <p class="pg-texto">Estos son los pagos de tu familia. Elige qué quieres pagar hoy.</p>
 
         <form id="pg-form" class="pg-card" novalidate>
@@ -28,6 +105,7 @@ import { whatsapp } from '../data/sitio.js';
           <h2 class="pg-subtitulo">Pagos realizados</h2>
           <ul id="pg-historial"></ul>
         </section>
+        </div>
       </div>
 
       <div id="pg-sin-link" hidden>
@@ -93,5 +171,40 @@ import { whatsapp } from '../data/sitio.js';
 .pg-recuperar__fila{ display: flex; flex-wrap: wrap; gap: 10px; }
 .pg-input{ flex: 1 1 220px; padding: 12px 16px; border-radius: var(--radio); border: 1px solid var(--hairline); background: var(--ember); color: var(--txt); font-size: 15px; }
 .pg-oculto{ position: absolute; left: -9999px; width: 1px; height: 1px; }
+/* Paso 1: confirmar datos */
+.pg-pasos{ list-style: none; display: flex; gap: 8px; padding: 0; margin: var(--e-3) 0 0; }
+.pg-pasos[hidden]{ display: none; }
+.pg-pasos li{ flex: 1; display: flex; align-items: center; gap: 8px; padding: 10px 12px; border: 1px solid var(--hairline); border-radius: 12px; font-size: 14px; color: var(--txt-faint); }
+.pg-pasos li span{ display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 999px; border: 1px solid currentColor; font-size: 13px; font-weight: 700; flex-shrink: 0; }
+.pg-pasos li[aria-current="step"]{ border-color: var(--fire-yellow); color: var(--txt); font-weight: 700; }
+.pg-pasos li[aria-current="step"] span{ background: var(--fire-yellow); border-color: var(--fire-yellow); color: var(--ember); }
+.pg-pasos li.pg-paso--listo span{ background: #2E7D4F; border-color: #2E7D4F; color: #fff; }
+.pg-ficha[hidden], #pg-pago[hidden]{ display: none; }
+.pg-ficha__bloque{ min-width: 0; margin-inline: 0; }
+.pg-legend{ font-family: var(--font-display); font-weight: 800; font-size: 1.05rem; padding: 0 8px; color: var(--fire-yellow); }
+.pg-campos{ display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.pg-campo{ min-width: 0; }
+.pg-campo--ancho{ grid-column: 1 / -1; }
+.pg-in{
+  width: 100%; height: 50px; padding: 0 14px; border-radius: 12px; border: 1px solid var(--txt-faint);
+  background: var(--ember); color: var(--txt); font: inherit; font-size: 16px;
+}
+.pg-in--anidado{ margin-top: 8px; }
+.pg-in[hidden]{ display: none; }
+.pg-in[aria-invalid="true"]{ border-color: #FF8A80; }
+.pg-in:focus-visible, .pg-acepta input:focus-visible, .pg-link:focus-visible{ outline: 2px solid var(--fire-yellow); outline-offset: 2px; }
+.pg-in--falta{ border-color: var(--fire-yellow); }
+.pg-pista{ margin: 6px 0 0; font-size: 13px; color: var(--txt-faint); }
+.pg-campo-error{ margin: 6px 0 0; font-size: 13px; color: #FF8A80; }
+.pg-campo-error[hidden]{ display: none; }
+.pg-acepta{ display: flex; align-items: flex-start; gap: 12px; margin-top: var(--e-3); font-size: 15px; line-height: 1.5; cursor: pointer; }
+.pg-acepta input{ width: 24px; height: 24px; margin-top: 1px; flex-shrink: 0; accent-color: var(--fire-yellow); }
+.pg-acepta a{ color: var(--fire-yellow); }
+.pg-link{ background: none; border: 0; padding: 0; min-height: 44px; font: inherit; font-size: 14px; color: var(--fire-yellow); text-decoration: underline; cursor: pointer; }
+#pg-ficha-cancelar{ display: block; margin: var(--e-1) auto 0; }
+#pg-ficha-cancelar[hidden]{ display: none; }
+.pg-datos-ok{ margin: var(--e-2) 0 0; font-size: 14px; color: var(--txt-soft); }
+.pg-datos-ok[hidden]{ display: none; }
+@media (max-width: 560px){ .pg-campos{ grid-template-columns: 1fr; } }
 .pg-ayuda{ display: inline-block; margin-top: var(--e-4); color: var(--fire-yellow); text-decoration: underline; font-size: 14px; }
 </style>

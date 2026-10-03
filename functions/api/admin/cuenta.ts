@@ -73,6 +73,26 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
         if (m !== 'sin_caso_star') return jsonResponse(500, { error: 'no_se_pudieron_crear_cargos' });
         aviso = 'Este deportista no tiene un caso Star: el link muestra solo sus cargos existentes.';
       }
+      // Hermanos con un caso Star vigente: sus cargos se crean también, para que
+      // la familia vea a todos en el mismo link (cada concepto se puede desmarcar).
+      try {
+        const { data: hermanos } = await supabase
+          .from('atletas')
+          .select('id, casos_crm ( journey, programa, estado )')
+          .eq('apoderado_id', apoderadoId)
+          .neq('id', atletaId);
+        for (const h of hermanos ?? []) {
+          const casos = (h.casos_crm ?? []) as Array<{ journey: string; programa: string | null; estado: string }>;
+          const vigente = casos.some(
+            (c) => (c.programa === 'STAR' || c.journey === 'CLASE_PRUEBA_STAR' || c.journey === 'FIREHOUSE_STAR') && !['NO_INTERESADO', 'NO_CONTINUA'].includes(c.estado),
+          );
+          if (!vigente) continue;
+          const r = await asegurarCargosStar(supabase, h.id as string, userId).catch(() => null);
+          if (r) creados.push(...r.creados);
+        }
+      } catch {
+        /* los hermanos son un complemento: el link se entrega igual */
+      }
     }
     if (!UUID.test(apoderadoId)) return jsonResponse(400, { error: 'apoderado_invalido' });
     const token = await obtenerOCrearToken(supabase, apoderadoId);

@@ -8,6 +8,7 @@ import { apoderadoPorToken, estadoCuenta } from '../../lib/cuenta-servidor.ts';
 import { construirPaymentProvider, type PaymentProvidersEnv } from '../../lib/payment-providers/index.ts';
 import { cargosPagables, generarCommerceOrder, tokenValido, validarSeleccion } from '../../../src/lib/crm/cuenta.ts';
 import { hoyChile } from '../../../src/lib/crm/programas.ts';
+import { leerFicha } from '../../lib/ficha-servidor.ts';
 
 interface Env extends PaymentProvidersEnv {
   SUPABASE_URL: string;
@@ -29,6 +30,12 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
   const supabase = createClient(env.SUPABASE_URL, env.SUPABASE_SERVICE_ROLE_KEY, { auth: { persistSession: false } });
   const apoderadoId = await apoderadoPorToken(supabase, token);
   if (!apoderadoId) return jsonResponse(404, { error: 'link_invalido' });
+
+  // Antes de pagar, la familia confirma sus datos (si la migración 0019 está aplicada).
+  const ficha = await leerFicha(supabase, apoderadoId);
+  if (ficha && !ficha.confirmada) {
+    return jsonResponse(409, { error: 'ficha_pendiente', mensaje: 'Antes de pagar, confirma tus datos. Recarga la página.' });
+  }
 
   const cuenta = await estadoCuenta(supabase, apoderadoId);
   const pagables = cargosPagables(cuenta.cargos, hoyChile());

@@ -1,12 +1,16 @@
 // GET /api/pagar/estado?t=TOKEN
-// Cuenta de una familia para la página /pagar: solo nombres de pila, conceptos
-// pendientes con su saldo e historial de pagos aprobados. Nunca RUT ni contacto.
+// Cuenta de una familia para la página /pagar: conceptos pendientes con su
+// saldo, historial de pagos aprobados y la ficha de la familia (sus propios
+// datos, para confirmarlos antes de pagar). El token secreto del link es lo
+// que identifica a la familia.
 
 import { createClient } from '@supabase/supabase-js';
 import { jsonResponse } from '../../lib/admin-auth.ts';
 import { apoderadoPorToken, estadoCuenta, primerNombre } from '../../lib/cuenta-servidor.ts';
 import { cargosPagables, tokenValido } from '../../../src/lib/crm/cuenta.ts';
 import { hoyChile } from '../../../src/lib/crm/programas.ts';
+import { leerFicha } from '../../lib/ficha-servidor.ts';
+import { leerConfigAcademia } from '../../lib/config-servidor.ts';
 
 interface Env {
   SUPABASE_URL: string;
@@ -21,7 +25,7 @@ export const onRequestGet: PagesFunction<Env> = async ({ request, env }) => {
   const apoderadoId = await apoderadoPorToken(supabase, token);
   if (!apoderadoId) return jsonResponse(404, { error: 'link_invalido' });
 
-  const cuenta = await estadoCuenta(supabase, apoderadoId);
+  const [cuenta, ficha, config] = await Promise.all([estadoCuenta(supabase, apoderadoId), leerFicha(supabase, apoderadoId), leerConfigAcademia(supabase)]);
   await supabase.from('links_pago').update({ ultimo_uso_at: new Date().toISOString() }).eq('apoderado_id', apoderadoId);
 
   const pagables = cargosPagables(cuenta.cargos, hoyChile());
@@ -29,6 +33,9 @@ export const onRequestGet: PagesFunction<Env> = async ({ request, env }) => {
 
   return jsonResponse(200, {
     familia: primerNombre(cuenta.apoderado?.nombre),
+    // null si la migración 0019 no está aplicada: la página omite el paso de datos.
+    ficha,
+    tallas: config.tallas,
     pendientes: pagables.map((c) => ({
       id: c.id,
       deportista: cuenta.atletas.find((a) => a.id === c.atleta_id)?.nombre ?? null,
