@@ -1,0 +1,111 @@
+---
+import Base from '../layouts/Base.astro';
+import { whatsapp } from '../data/sitio.js';
+---
+<Base titulo="Poleras Firehouse | Compra en línea" descripcion="Compra la polera de Firehouse Cheerleading All Stars. Se entrega en el gimnasio en los días de entrenamiento." ruta="/poleras" noindex={true}>
+  <section class="td-section">
+    <div class="wrap td-wrap">
+      <p class="td-eyebrow">Firehouse</p>
+      <h1 class="td-titulo" id="td-nombre">Poleras Firehouse</h1>
+
+      <p id="td-cargando" class="td-texto">Cargando…</p>
+
+      <div id="td-cerrada" hidden>
+        <p class="td-texto">La venta de poleras por la página no está disponible en este momento. Escríbenos y te ayudamos.</p>
+      </div>
+
+      <form id="td-form" class="td-form" novalidate hidden>
+        <p class="td-texto"><span id="td-descripcion"></span> Valor: <strong id="td-precio" class="td-precio"></strong> cada una.</p>
+
+        <p class="td-aviso">
+          <strong>Entrega en el gimnasio.</strong> No hay despacho: las poleras se entregan en el gimnasio
+          (Santa Corina 197, La Cisterna) en los días de entrenamiento. Se hacen por encargo.
+        </p>
+
+        <fieldset class="td-card">
+          <legend class="td-legend">1. Elige tallas y cantidades</legend>
+          <div id="td-tallas"></div>
+          <p id="td-error-items" class="td-error" role="alert" hidden></p>
+        </fieldset>
+
+        <fieldset class="td-card">
+          <legend class="td-legend">2. Tus datos</legend>
+          <label class="td-label" for="td-apoderado">Nombre del apoderado</label>
+          <input id="td-apoderado" class="td-input" type="text" autocomplete="name" maxlength="80" required />
+          <p id="td-error-apoderado" class="td-error" role="alert" hidden></p>
+
+          <label class="td-label" for="td-alumno">Nombre del alumno o alumna</label>
+          <input id="td-alumno" class="td-input" type="text" autocomplete="off" maxlength="80" required />
+          <p id="td-error-alumno" class="td-error" role="alert" hidden></p>
+
+          <label class="td-label" for="td-email">Correo (para enviarte el comprobante)</label>
+          <input id="td-email" class="td-input" type="email" inputmode="email" autocomplete="email" maxlength="160" placeholder="correo@ejemplo.cl" required />
+          <p id="td-error-email" class="td-error" role="alert" hidden></p>
+
+          <input type="text" name="sitio" id="td-sitio" class="td-oculto" tabindex="-1" autocomplete="off" aria-hidden="true" />
+        </fieldset>
+
+        <div class="td-pie">
+          <p class="td-resumen" id="td-resumen" aria-live="polite">Aún no eliges poleras.</p>
+          <p class="td-total">Total <strong id="td-total">$0</strong></p>
+          <button type="submit" id="td-pagar" class="td-btn" disabled>Pagar con Mercado Pago</button>
+          <p class="td-nota">Serás redirigido a Mercado Pago. Al confirmarse el pago te enviamos el comprobante por correo.</p>
+          <p id="td-error" class="td-error" role="alert" hidden></p>
+        </div>
+      </form>
+
+      <a class="td-ayuda" href={whatsapp('ayudaRegistroStar')} target="_blank" rel="noopener">¿Dudas? Escríbenos por WhatsApp →</a>
+    </div>
+  </section>
+</Base>
+
+<script>
+  import { iniciarTienda } from '../scripts/tienda.ts';
+  iniciarTienda();
+</script>
+
+<style is:global>
+.td-section{ padding: var(--e-6) 0 var(--e-7); }
+.td-wrap{ max-width: 620px; margin-inline: auto; }
+.td-eyebrow{ font-family: var(--font-count); font-size: 11px; letter-spacing: .3em; color: var(--fire-yellow); text-transform: uppercase; }
+.td-titulo{ font-family: var(--font-display); font-weight: 800; font-size: clamp(1.7rem, 5vw, 2.4rem); margin-top: var(--e-2); }
+.td-texto{ color: var(--txt-soft); font-size: 16px; line-height: 1.6; margin-top: var(--e-2); }
+.td-precio{ color: var(--fire-yellow); font-size: 1.15em; }
+.td-aviso{ margin-top: var(--e-3); padding: 14px 16px; border: 1px solid var(--fire-yellow); border-radius: 12px; font-size: 15px; line-height: 1.55; color: var(--txt); }
+.td-card{ margin: var(--e-3) 0 0; min-width: 0; background: var(--ember-deep); border: 1px solid var(--hairline); border-radius: 16px; padding: var(--e-2) var(--e-3) var(--e-3); }
+.td-legend{ font-family: var(--font-display); font-weight: 800; font-size: 1.1rem; padding: 0 8px; }
+.td-talla{ display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 0; border-top: 1px solid var(--hairline); }
+.td-talla:first-child{ border-top: 0; }
+.td-talla__nombre{ font-size: 17px; }
+.td-talla__nombre b{ font-family: var(--font-display); font-size: 1.15em; }
+.td-paso{ display: flex; align-items: center; gap: 6px; }
+.td-paso button{
+  width: 48px; height: 48px; border-radius: 12px; border: 1px solid var(--txt-faint); background: transparent; color: var(--txt);
+  font-size: 24px; line-height: 1; font-weight: 700; cursor: pointer;
+}
+.td-paso button:disabled{ opacity: .35; cursor: not-allowed; }
+.td-paso button:not(:disabled):hover{ border-color: var(--fire-yellow); color: var(--fire-yellow); }
+.td-paso output{ min-width: 36px; text-align: center; font-family: var(--font-display); font-weight: 800; font-size: 20px; }
+.td-talla--elegida .td-paso output{ color: var(--fire-yellow); }
+.td-label{ display: block; margin-top: var(--e-2); font-size: 14px; font-weight: 600; color: var(--txt-soft); }
+.td-input{
+  width: 100%; margin-top: 6px; height: 52px; padding: 0 14px; border-radius: 12px; border: 1px solid var(--txt-faint);
+  background: var(--ember); color: var(--txt); font: inherit; font-size: 17px;
+}
+.td-input:focus-visible, .td-btn:focus-visible, .td-paso button:focus-visible{ outline: 2px solid var(--fire-yellow); outline-offset: 2px; }
+.td-oculto{ position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
+.td-pie{ margin-top: var(--e-3); }
+.td-resumen{ margin: 0; font-size: 15px; color: var(--txt-soft); }
+.td-total{ display: flex; justify-content: space-between; align-items: baseline; font-size: 16px; margin: 6px 0 0; }
+.td-total strong{ font-family: var(--font-display); font-size: 1.7rem; color: var(--fire-yellow); }
+.td-btn{
+  display: inline-flex; justify-content: center; width: 100%; margin-top: var(--e-2); background: var(--fire-red); color: #fff;
+  font-weight: 800; font-family: var(--font-display); padding: 16px 28px; border-radius: var(--radio); border: none; cursor: pointer; font-size: 17px; text-decoration: none;
+}
+.td-btn:disabled{ opacity: .5; cursor: not-allowed; }
+.td-nota{ font-size: 13px; color: var(--txt-faint); margin-top: var(--e-2); text-align: center; }
+.td-error{ color: #FF8A80; font-size: 14px; margin: 6px 0 0; }
+.td-error[hidden]{ display: none; }
+.td-ayuda{ display: block; margin-top: var(--e-4); color: var(--fire-yellow); text-decoration: underline; font-size: 14px; text-align: center; }
+.td-centro{ text-align: center; }
+</style>
